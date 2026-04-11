@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app_main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app_main.iml" group="hust-kindergarden/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app_test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app_test.iml" group="hust-kindergarden/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hust-kindergarden.iml" filepath="$PROJECT_DIR$/.idea/modules/hust-kindergarden.iml" group="hust-kindergarden" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/hust-kindergarden.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/hust-kindergarden.app.iml" group="hust-kindergarden/app" />
+    </modules>
+  </component>
+</project>
