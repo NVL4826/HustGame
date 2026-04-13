@@ -217,8 +217,8 @@ public class HustGame extends ApplicationAdapter {
                     // Save return position slightly below the door tile
                     lastOutsideX = player.getX();
                     lastOutsideY = player.getY() - 32f;
-                    // Move player into library (spawn at the bottom entrance)
-                    loadMap("tang1.tmx", 512f, 100f);
+                    // Move player into library (spawn at the door gap)
+                    loadMap("tang1.tmx", 445f, 100f);
                 }
             }
         } else if (currentMapName.equals("tang1.tmx")) {
@@ -232,7 +232,7 @@ public class HustGame extends ApplicationAdapter {
             for (com.badlogic.gdx.math.Rectangle zone : stage2Zones) {
                 if (zone.contains(px, py)) {
                     lastTang1X = player.getX();
-                    lastTang1Y = zone.y - 32f; // Place safely in the gap
+                    lastTang1Y = 612f; // Hardcode exactly in the safe 36-pixel gap between tables and stairs
                     loadMap("Phong_doc.tmx", 240f, 80f);
                     break;
                 }
