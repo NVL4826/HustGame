@@ -34,20 +34,25 @@ public class PlayerMovementBehavior implements IMovementBehavior {
         boolean moving = false;
         Direction newDirection = actor.getDirection();
 
+        float currentSpeed = actor.getSpeed();
+        if (controller.isRunning()) {
+            currentSpeed *= 1.8f; // Gấp 1.8 lần khi chạy
+        }
+
         if (controller.isRight()) {
-            newX += actor.getSpeed() * delta;
+            newX += currentSpeed * delta;
             newDirection = Direction.RIGHT;
             moving = true;
         } else if (controller.isLeft()) {
-            newX -= actor.getSpeed() * delta;
+            newX -= currentSpeed * delta;
             newDirection = Direction.LEFT;
             moving = true;
         } else if (controller.isUp()) {
-            newY += actor.getSpeed() * delta;
+            newY += currentSpeed * delta;
             newDirection = Direction.UP;
             moving = true;
         } else if (controller.isDown()) {
-            newY -= actor.getSpeed() * delta;
+            newY -= currentSpeed * delta;
             newDirection = Direction.DOWN;
             moving = true;
         }

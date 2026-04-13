@@ -5,4 +5,5 @@ public interface IPlayerController {
     boolean isDown();
     boolean isLeft();
     boolean isRight();
+    boolean isRunning();
 }

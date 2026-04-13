@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
 public class GameInputHandler implements IPlayerController, InputProcessor {
-    private boolean up, down, left, right;
+    private boolean up, down, left, right, running;
 
     @Override
     public boolean isUp() {
@@ -27,11 +27,17 @@ public class GameInputHandler implements IPlayerController, InputProcessor {
     }
 
     @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP) up = true;
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN) down = true;
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT) left = true;
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT) right = true;
+        if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) running = true;
         return true;
     }
 
@@ -41,6 +47,7 @@ public class GameInputHandler implements IPlayerController, InputProcessor {
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN) down = false;
         if (keycode == Input.Keys.A || keycode == Input.Keys.LEFT) left = false;
         if (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT) right = false;
+        if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) running = false;
         return true;
     }
 
