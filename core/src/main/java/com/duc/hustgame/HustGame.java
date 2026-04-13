@@ -218,12 +218,12 @@ public class HustGame extends ApplicationAdapter {
                     lastOutsideX = player.getX();
                     lastOutsideY = player.getY() - 32f;
                     // Move player into library (spawn at the bottom entrance)
-                    loadMap("tang1.tmx", 512f, 100f);
+                    loadMap("tang1.tmx", 512f, 160f);
                 }
             }
         } else if (currentMapName.equals("tang1.tmx")) {
             // Exit library if they walk down out the door
-            if (player.getY() < 50f) {
+            if (player.getY() < 120f) {
                 loadMap("Final Outside.tmx", lastOutsideX, lastOutsideY);
             }
             // Check if player enters a Stage2 zone -> go to Phong_doc
@@ -232,14 +232,14 @@ public class HustGame extends ApplicationAdapter {
             for (com.badlogic.gdx.math.Rectangle zone : stage2Zones) {
                 if (zone.contains(px, py)) {
                     lastTang1X = player.getX();
-                    lastTang1Y = player.getY() - 32f;
-                    loadMap("Phong_doc.tmx", 240f, 80f);
+                    lastTang1Y = zone.y - 64f; // Place safely below the zone
+                    loadMap("Phong_doc.tmx", 240f, 160f);
                     break;
                 }
             }
         } else if (currentMapName.equals("Phong_doc.tmx")) {
             // Exit Phong_doc if they walk down out the door
-            if (player.getY() < 50f) {
+            if (player.getY() < 120f) {
                 loadMap("tang1.tmx", lastTang1X, lastTang1Y);
             }
         }
