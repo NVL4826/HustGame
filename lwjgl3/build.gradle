@@ -81,7 +81,7 @@ jar {
   }
 // this last step may help on some OSes that need extra instruction to make runnable JARs.
   doLast {
-    file(archiveFile).setExecutable(true, false)
+    archiveFile.get().asFile.setExecutable(true, false)
   }
 }
 
