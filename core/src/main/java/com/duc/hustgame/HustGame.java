@@ -16,6 +16,8 @@ public class HustGame extends ApplicationAdapter {
     private String currentMapName = "";
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
+    private EntityManager entityManager;
+    private GameInputHandler inputHandler;
     private Player player;
     private float lastOutsideX = 1024f;
     private float lastOutsideY = 1024f;
@@ -86,7 +88,12 @@ public class HustGame extends ApplicationAdapter {
             Gdx.app.error("Shader", "Failed to compile discardShader: " + discardShader.getLog());
         }
 
-        player = new Player(1024f, 1024f, map);
+        entityManager = new EntityManager();
+        inputHandler = new GameInputHandler();
+        Gdx.input.setInputProcessor(inputHandler);
+
+        player = new Player(1024f, 1024f, new Inventory(), inputHandler, map);
+        entityManager.addEntity(player);
     }
 
     private void loadMap(String mapFile, float startX, float startY) {
@@ -191,7 +198,7 @@ public class HustGame extends ApplicationAdapter {
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
 
-        player.update(delta);
+        entityManager.update(delta);
         
         if (librarySystem != null) {
             librarySystem.update(delta);
@@ -249,7 +256,7 @@ public class HustGame extends ApplicationAdapter {
         // 2. Vẽ Nhân vật bình thường (Màu thật)
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        player.draw(batch);
+        entityManager.draw(batch);
         batch.end();
 
         // 2.5 Vẽ thêm sách lơ lửng, nhân vật ngủ gật nếu đang ở thư viện
@@ -286,7 +293,7 @@ public class HustGame extends ApplicationAdapter {
 
         batch.setShader(silhouetteShader);
         batch.begin();
-        player.draw(batch);
+        entityManager.draw(batch);
         batch.end();
         batch.setShader(null);
 
@@ -306,7 +313,7 @@ public class HustGame extends ApplicationAdapter {
         if(batch != null) batch.dispose();
         if(map != null) map.dispose();
         if(mapRenderer != null) mapRenderer.dispose();
-        if(player != null) player.dispose();
+        if(entityManager != null) entityManager.dispose();
         if(silhouetteShader != null) silhouetteShader.dispose();
         if(librarySystem != null) librarySystem.dispose();
     }
