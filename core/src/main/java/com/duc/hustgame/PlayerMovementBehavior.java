@@ -65,8 +65,19 @@ public class PlayerMovementBehavior implements IMovementBehavior {
         }
 
         // Clamp to map
-        actor.setX(MathUtils.clamp(actor.getX(), actor.getWidth() / 2f, MAP_WIDTH - actor.getWidth() / 2f));
-        actor.setY(MathUtils.clamp(actor.getY(), actor.getHeight() / 2f, MAP_HEIGHT - actor.getHeight() / 2f));
+        float mapW = MAP_WIDTH;
+        float mapH = MAP_HEIGHT;
+        if (map != null) {
+            Integer w = map.getProperties().get("width", Integer.class);
+            Integer th = map.getProperties().get("tilewidth", Integer.class);
+            Integer h = map.getProperties().get("height", Integer.class);
+            Integer tv = map.getProperties().get("tileheight", Integer.class);
+            if (w != null && th != null) mapW = w * th;
+            if (h != null && tv != null) mapH = h * tv;
+        }
+
+        actor.setX(MathUtils.clamp(actor.getX(), actor.getWidth() / 2f, mapW - actor.getWidth() / 2f));
+        actor.setY(MathUtils.clamp(actor.getY(), actor.getHeight() / 2f, mapH - actor.getHeight() / 2f));
     }
 
     private boolean isColliding(Actor actor, float newX, float newY) {

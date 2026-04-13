@@ -21,6 +21,8 @@ public class HustGame extends ApplicationAdapter {
     private Player player;
     private float lastOutsideX = 1024f;
     private float lastOutsideY = 1024f;
+    private float lastTang1X = 240f;
+    private float lastTang1Y = 80f;
     private LibrarySystem librarySystem;
     private java.util.List<com.badlogic.gdx.math.Rectangle> stage2Zones = new java.util.ArrayList<>();
 
@@ -151,9 +153,9 @@ public class HustGame extends ApplicationAdapter {
             foregroundLayers[i] = fgLayersList.get(i);
         }
 
-        // Read spawn point from "Spawn" object layer if present
+        // Read spawn point from "Spawn" object layer if present, only if we are using the defaults
         com.badlogic.gdx.maps.MapLayer spawnLayer = map.getLayers().get("Spawn");
-        if (spawnLayer != null) {
+        if (spawnLayer != null && startX == 1024f && startY == 1024f) {
             for (com.badlogic.gdx.maps.MapObject obj : spawnLayer.getObjects()) {
                 if (obj instanceof com.badlogic.gdx.maps.objects.RectangleMapObject) {
                     com.badlogic.gdx.math.Rectangle r =
@@ -229,9 +231,16 @@ public class HustGame extends ApplicationAdapter {
             float py = player.getY();
             for (com.badlogic.gdx.math.Rectangle zone : stage2Zones) {
                 if (zone.contains(px, py)) {
+                    lastTang1X = player.getX();
+                    lastTang1Y = player.getY() - 32f;
                     loadMap("Phong_doc.tmx", 240f, 80f);
                     break;
                 }
+            }
+        } else if (currentMapName.equals("Phong_doc.tmx")) {
+            // Exit Phong_doc if they walk down out the door
+            if (player.getY() < 50f) {
+                loadMap("tang1.tmx", lastTang1X, lastTang1Y);
             }
         }
 
