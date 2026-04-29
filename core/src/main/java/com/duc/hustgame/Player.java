@@ -60,6 +60,8 @@ public class Player extends Actor {
     @Override
     public void update(float delta) {
         super.update(delta); // Runs IMovementBehavior logic which updates x, y, direction, and state
+        
+        GameState.instance.coffeeSystem.update(delta);
 
         if (state == EntityState.MOVING) {
             Animation<TextureRegion> anim;

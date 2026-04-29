@@ -34,24 +34,50 @@ public class PlayerMovementBehavior implements IMovementBehavior {
         boolean moving = false;
         Direction newDirection = actor.getDirection();
 
-        float currentSpeed = actor.getSpeed();
-        if (controller.isRunning()) {
+        float currentSpeed = actor.getSpeed() * GameState.instance.coffeeSystem.getSpeedMultiplier();
+        boolean isSprinting = controller.isRunning() && GameState.instance.stamina > 0;
+        
+        if (GameState.instance.stamina <= 0) {
+            currentSpeed *= 0.6f; // speed -40% when 0 stamina
+        } else if (isSprinting) {
             currentSpeed *= 1.8f; // Gấp 1.8 lần khi chạy
+            GameState.instance.stamina -= 10 * delta; // consume stamina
+        } else {
+            // slowly recover stamina when walking or idle
+            if (GameState.instance.stamina < GameState.instance.maxStamina) {
+                GameState.instance.stamina += 2 * delta; 
+            }
+        }
+        
+        boolean moveRight = controller.isRight();
+        boolean moveLeft = controller.isLeft();
+        boolean moveUp = controller.isUp();
+        boolean moveDown = controller.isDown();
+        
+        if (GameState.instance.coffeeSystem.hasReversedInput(MathUtils.random())) {
+            boolean tempRight = moveRight;
+            boolean tempLeft = moveLeft;
+            boolean tempUp = moveUp;
+            boolean tempDown = moveDown;
+            moveRight = tempLeft;
+            moveLeft = tempRight;
+            moveUp = tempDown;
+            moveDown = tempUp;
         }
 
-        if (controller.isRight()) {
+        if (moveRight) {
             newX += currentSpeed * delta;
             newDirection = Direction.RIGHT;
             moving = true;
-        } else if (controller.isLeft()) {
+        } else if (moveLeft) {
             newX -= currentSpeed * delta;
             newDirection = Direction.LEFT;
             moving = true;
-        } else if (controller.isUp()) {
+        } else if (moveUp) {
             newY += currentSpeed * delta;
             newDirection = Direction.UP;
             moving = true;
-        } else if (controller.isDown()) {
+        } else if (moveDown) {
             newY -= currentSpeed * delta;
             newDirection = Direction.DOWN;
             moving = true;
