@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Array;
 
-public class Player extends Actor {
+public class Player extends Actor implements ITargetable {
     private Inventory inventory;
-    
+
     private Texture[] allTextures;
     private Animation<TextureRegion> walkLeft, walkRight, walkDown, walkUp;
     private TextureRegion idleDown, idleUp, idleLeft, idleRight;
@@ -21,11 +21,11 @@ public class Player extends Actor {
     public Player(float startX, float startY, Inventory inventory, IPlayerController controller, TiledMap map) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE);
         this.inventory = inventory;
-        
+
         // Setup movement behavior
         PlayerMovementBehavior pmb = new PlayerMovementBehavior(controller, map);
         setMovementBehavior(pmb);
-        
+
         loadTextures();
     }
 
@@ -60,7 +60,7 @@ public class Player extends Actor {
     @Override
     public void update(float delta) {
         super.update(delta); // Runs IMovementBehavior logic which updates x, y, direction, and state
-        
+
         GameState.instance.coffeeSystem.update(delta);
 
         if (state == EntityState.MOVING) {

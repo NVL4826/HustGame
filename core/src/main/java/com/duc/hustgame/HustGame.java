@@ -3,7 +3,6 @@ package com.duc.hustgame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -11,11 +10,12 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
 public class HustGame extends ApplicationAdapter {
+    private GameRenderer gameRenderer;
+    private GameCamera gameCamera;
     private SpriteBatch batch;
     private TiledMap map;
     private String currentMapName = "";
     private OrthogonalTiledMapRenderer mapRenderer;
-    private OrthographicCamera camera;
     private EntityManager entityManager;
     private GameInputHandler inputHandler;
     private Player player;
@@ -96,25 +96,29 @@ public class HustGame extends ApplicationAdapter {
 
         player = new Player(1024f, 1024f, new Inventory(), inputHandler, map);
         entityManager.addEntity(player);
+        gameCamera = new GameCamera(VIEW_WIDTH, VIEW_HEIGHT);
+        gameCamera.setMapBounds(currentMapW, currentMapH);
+        gameCamera.setTarget(player);
+        gameRenderer = new GameRenderer(gameCamera, entityManager, batch, silhouetteShader, discardShader);
     }
+
 
     private void loadMap(String mapFile, float startX, float startY) {
         if (map != null) map.dispose();
         if (mapRenderer != null) mapRenderer.dispose();
-        
+
         currentMapName = mapFile;
         map = new TmxMapLoader().load(mapFile);
         mapRenderer = new OrthogonalTiledMapRenderer(map);
-        
-        if (camera == null) {
-            camera = new OrthographicCamera();
-            camera.setToOrtho(false, VIEW_WIDTH, VIEW_HEIGHT);
+
+        if (gameCamera == null) {
+            gameCamera = new GameCamera(VIEW_WIDTH, VIEW_HEIGHT);
         }
 
         int totalLayers = map.getLayers().size();
         java.util.List<Integer> bgLayersList = new java.util.ArrayList<>();
         java.util.List<Integer> fgLayersList = new java.util.ArrayList<>();
-        
+
         // Set per-map world bounds and camera zoom
         if (mapFile.equals("Phong_doc.tmx")) {
             currentMapW = 1440f;
@@ -129,7 +133,8 @@ public class HustGame extends ApplicationAdapter {
             currentMapH = 128 * 16f;
             currentCameraZoom = 1.0f;
         }
-        camera.zoom = currentCameraZoom;
+        gameCamera.setZoom(currentCameraZoom);
+        gameCamera.setMapBounds(currentMapW, currentMapH);
 
         for (int i = 0; i < totalLayers; i++) {
             String layerName = map.getLayers().get(i).getName();
@@ -142,12 +147,12 @@ public class HustGame extends ApplicationAdapter {
                 fgLayersList.add(i);
             }
         }
-        
+
         backgroundLayers = new int[bgLayersList.size()];
         for(int i = 0; i < bgLayersList.size(); i++) {
             backgroundLayers[i] = bgLayersList.get(i);
         }
-        
+
         foregroundLayers = new int[fgLayersList.size()];
         for(int i = 0; i < fgLayersList.size(); i++) {
             foregroundLayers[i] = fgLayersList.get(i);
@@ -201,7 +206,7 @@ public class HustGame extends ApplicationAdapter {
         float delta = Gdx.graphics.getDeltaTime();
 
         entityManager.update(delta);
-        
+
         if (librarySystem != null) {
             librarySystem.update(delta);
         }
@@ -246,75 +251,10 @@ public class HustGame extends ApplicationAdapter {
 
 
         // Zoom-aware camera clamping: half the visible world area
-        float halfW = VIEW_WIDTH  * currentCameraZoom / 2f;
-        float halfH = VIEW_HEIGHT * currentCameraZoom / 2f;
-        float camX = MathUtils.clamp(player.getX(), halfW, currentMapW - halfW);
-        float camY = MathUtils.clamp(player.getY(), halfH, currentMapH - halfH);
-        camera.position.set(camX, camY, 0);
-        camera.update();
+        gameCamera.update();
 
-        // 0. Xóa màu nền, Depth Buffer và Stencil Buffer
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_STENCIL_BUFFER_BIT);
-
-        mapRenderer.setView(camera);
-
-        // 1. Vẽ Background map bình thường
-        mapRenderer.render(backgroundLayers);
-
-        // 2. Vẽ Nhân vật bình thường (Màu thật)
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        entityManager.draw(batch);
-        batch.end();
-
-        // 2.5 Vẽ thêm sách lơ lửng, nhân vật ngủ gật nếu đang ở thư viện
-        if (librarySystem != null) {
-            batch.setProjectionMatrix(camera.combined);
-            librarySystem.render(batch);
-        }
-
-        // 3. Khởi động Stencil Buffer để đánh dấu vị trí các vật cản (Foreground)
-        Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
-        
-        // Cài đặt: Bất cứ pixel nào Foreground vẽ ra sẽ ghi số '1' vào Stencil Buffer
-        Gdx.gl.glStencilFunc(GL20.GL_ALWAYS, 1, 0xFF);
-        Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_REPLACE);
-        Gdx.gl.glStencilMask(0xFF); // Cho phép ghi đè lên Stencil
-        
-        // Vẽ Foreground map
-        // Sử dụng discardShader để các điểm ảnh trong suốt không ghi số '1'
-        mapRenderer.getBatch().setShader(discardShader);
-        mapRenderer.render(foregroundLayers);
-        mapRenderer.getBatch().setShader(null);
-
-        // 4. Vẽ Silhouette nhân vật
-        // Khóa ghi Stencil, chỉ dùng để check điều kiện (Read-only)
-        Gdx.gl.glStencilMask(0x00);
-        
-        // Cấu hình: Chỉ cho phép vẽ pixel nhân vật nếu khu vực đó Stencil Buffer đang chứa số '1'
-        // (Nghĩa là vị trí đó đã bị Foreground đè lên)
-        Gdx.gl.glStencilFunc(GL20.GL_EQUAL, 1, 0xFF);
-
-        // Bật trộn màu (Alpha Blending) để tạo độ mờ bóng đen
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-        batch.setShader(silhouetteShader);
-        batch.begin();
-        entityManager.draw(batch);
-        batch.end();
-        batch.setShader(null);
-
-        // Phục hồi cài đặt gốc của OpenGL
-        Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
-        Gdx.gl.glStencilMask(0xFF); // QUAN TRỌNG: Cần trả lại quyền ghi để hàm glClear ở frame tiếp theo có thể xóa sạch
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        // 5. Thêm lớp chiếu sáng của thư viện
-        if (librarySystem != null) {
-            librarySystem.renderLights(camera);
-        }
+        // --- VẼ ĐỒ HỌA (ĐÃ ĐƯỢC THU GỌN THÀNH 1 DÒNG) ---
+            gameRenderer.render(mapRenderer, backgroundLayers, foregroundLayers, librarySystem);
     }
 
     @Override
@@ -324,6 +264,7 @@ public class HustGame extends ApplicationAdapter {
         if(mapRenderer != null) mapRenderer.dispose();
         if(entityManager != null) entityManager.dispose();
         if(silhouetteShader != null) silhouetteShader.dispose();
+        if(discardShader != null) discardShader.dispose();
         if(librarySystem != null) librarySystem.dispose();
     }
 }
