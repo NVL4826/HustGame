@@ -27,20 +27,23 @@ public class BossRoomScreen implements Screen {
     private Texture bgTexture;
     private Texture bossTexture;
     private BitmapFont font;
-    
+
     private EntityManager entityManager;
     private Player player;
     private GameInputHandler inputHandler;
-    
+
+    // Túi đồ
+    private InventoryUI inventoryUI;
+
     // Boss State
     private int phase = 0; // 0: Cutscene, 1: Q&A, 2: Dodge, 3: Final
     private Rectangle bossRect;
     private float bossHp = 1000;
-    
+
     // Cutscene
     private String[] dialogue = {"...Em da den.", "Ta nghe noi em da vuot qua thu vien... va phong lab.", "Bay gio... hay bao ve do an cua em."};
     private int dialogueIndex = 0;
-    
+
     // Phase 1 & 2 Q&A
     class Question {
         String text;
@@ -52,20 +55,20 @@ public class BossRoomScreen implements Screen {
     private int currentQuestionIndex = 0;
     private Rectangle[] answerRects;
     private float answerTimer = 5f;
-    
+
     // Phase 2 Dodge
     private List<Rectangle> fallingPapers;
     private String[] paperTexts = {"SAI", "CHINH LAI", "THIEU REF"};
-    
+
     // Phase 3 Final Code Puzzle
     private Stage stage;
     private TextField textField;
     private boolean typingPhase = false;
-    
+
     // Victory
     private boolean victory = false;
     private float victoryTimer = 0f;
-    
+
     public BossRoomScreen(MainGame game) {
         this.game = game;
     }
@@ -74,39 +77,41 @@ public class BossRoomScreen implements Screen {
     public void show() {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
-        
+
+        inventoryUI = new InventoryUI();
+
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        
+
         try {
             bgTexture = new Texture("Boss Room.jpg");
             bossTexture = new Texture("Boss THT.png");
         } catch(Exception e) {}
-        
+
         entityManager = new EntityManager();
         inputHandler = new GameInputHandler();
         Gdx.input.setInputProcessor(inputHandler);
-        
-        player = new Player(400, 100, new Inventory(), inputHandler, null);
+
+        player = new Player(400, 100, GameState.instance.globalInventory, inputHandler, null);
         entityManager.addEntity(player);
-        
+
         bossRect = new Rectangle(350, 450, 100, 100); // placeholder size if texture fails
-        
+
         questions = new ArrayList<>();
         questions.add(new Question("Tai sao em chon thuat toan nay?", new String[]{"Em thay tren mang", "Em copy ban", "Do phuc tap phu hop"}, 2));
         questions.add(new Question("Dataset cua em co bao nhieu records?", new String[]{"Nhieu", "Chua dem", "10,847 records"}, 2));
         questions.add(new Question("Code O(n^2) - tai sao khong dung O(n log n)?", new String[]{"Khong biet", "Vi dataset nho", "Vi nhin quen hon"}, 1));
         questions.add(new Question("He thong deploy o dau?", new String[]{"Localhost", "Cloud voi CI/CD", "May ban em"}, 1));
-        
+
         answerRects = new Rectangle[3];
         answerRects[0] = new Rectangle(100, 200, 150, 40);
         answerRects[1] = new Rectangle(325, 200, 150, 40);
         answerRects[2] = new Rectangle(550, 200, 150, 40);
-        
+
         fallingPapers = new ArrayList<>();
-        
+
         // Setup Stage for UI (Text input)
         stage = new Stage(new ScreenViewport());
         Skin skin = new Skin();
@@ -121,13 +126,13 @@ public class BossRoomScreen implements Screen {
         tfs.fontColor = Color.BLACK;
         tfs.background = skin.newDrawable("white", Color.WHITE);
         tfs.cursor = skin.newDrawable("white", Color.BLACK);
-        
+
         textField = new TextField("", tfs);
         textField.setPosition(300, 200);
         textField.setSize(200, 40);
         textField.setVisible(false);
         stage.addActor(textField);
-        
+
         // In cutscene, we wait for ENTER
     }
 
@@ -135,13 +140,13 @@ public class BossRoomScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
+
         float dt = delta;
         if (GameState.instance.hasNao && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             // artifact slow mo
             dt *= 0.3f;
         }
-        
+
         // Update
         if (phase == 0) {
             // Cutscene
@@ -155,10 +160,10 @@ public class BossRoomScreen implements Screen {
             entityManager.update(dt);
             player.setX(MathUtils.clamp(player.getX(), 0, 800));
             player.setY(MathUtils.clamp(player.getY(), 0, 600));
-            
+
             if (currentQuestionIndex < questions.size()) {
                 answerTimer -= dt;
-                
+
                 if (phase == 2) {
                     // Spawn falling papers
                     if (MathUtils.random() < 2f * dt) {
@@ -176,7 +181,7 @@ public class BossRoomScreen implements Screen {
                         }
                     }
                 }
-                
+
                 if (answerTimer <= 0) {
                     // Time out
                     GameState.instance.hp -= 25;
@@ -230,12 +235,12 @@ public class BossRoomScreen implements Screen {
             // Victory
             victoryTimer += delta;
         }
-        
+
         // Draw
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
-        
+
         batch.begin();
         if (bgTexture != null) {
             if (victory) batch.setColor(1f, 1f, 1f, Math.max(0, 1 - victoryTimer/3f));
@@ -243,7 +248,7 @@ public class BossRoomScreen implements Screen {
             batch.setColor(Color.WHITE);
         }
         batch.end();
-        
+
         if (phase != 4) {
             batch.begin();
             if (bossTexture != null) {
@@ -257,7 +262,7 @@ public class BossRoomScreen implements Screen {
                 batch.begin();
             }
             batch.end();
-            
+
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.RED);
             shapeRenderer.rect(200, 580, 400, 10);
@@ -265,14 +270,14 @@ public class BossRoomScreen implements Screen {
             shapeRenderer.rect(200, 580, (bossHp / 1000f) * 400, 10);
             shapeRenderer.end();
         }
-        
+
         if (phase == 0) {
             // Draw dialogue box
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(0, 0, 0, 0.8f);
             shapeRenderer.rect(100, 50, 600, 100);
             shapeRenderer.end();
-            
+
             batch.begin();
             font.draw(batch, "T.H.T: " + dialogue[dialogueIndex], 120, 120);
             font.draw(batch, "[PRESS ENTER TO CONTINUE]", 500, 70);
@@ -281,25 +286,25 @@ public class BossRoomScreen implements Screen {
             batch.begin();
             entityManager.draw(batch);
             batch.end();
-            
+
             if (currentQuestionIndex < questions.size()) {
                 Question q = questions.get(currentQuestionIndex);
-                
+
                 // Question UI
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 shapeRenderer.setColor(0, 0, 0, 0.7f);
                 shapeRenderer.rect(100, 300, 600, 50);
-                
+
                 for (int i = 0; i < 3; i++) {
                     shapeRenderer.setColor(Color.BLUE);
                     shapeRenderer.rect(answerRects[i].x, answerRects[i].y, answerRects[i].width, answerRects[i].height);
                 }
-                
+
                 // Timer bar
                 shapeRenderer.setColor(Color.YELLOW);
                 shapeRenderer.rect(100, 280, (answerTimer / 5f) * 600, 5);
                 shapeRenderer.end();
-                
+
                 batch.begin();
                 font.draw(batch, q.text, 120, 335);
                 for (int i = 0; i < 3; i++) {
@@ -307,7 +312,7 @@ public class BossRoomScreen implements Screen {
                 }
                 batch.end();
             }
-            
+
             if (phase == 2) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 shapeRenderer.setColor(Color.WHITE);
@@ -327,13 +332,13 @@ public class BossRoomScreen implements Screen {
             shapeRenderer.setColor(0, 0, 0, 0.8f);
             shapeRenderer.rect(200, 200, 400, 150);
             shapeRenderer.end();
-            
+
             batch.begin();
             font.draw(batch, "if (codeWorks && studentUnderstands) {", 220, 330);
             font.draw(batch, "    return ???;", 220, 300);
             font.draw(batch, "}", 220, 270);
             batch.end();
-            
+
             stage.draw();
         } else if (phase == 4) {
             // White screen victory
@@ -344,7 +349,7 @@ public class BossRoomScreen implements Screen {
             shapeRenderer.rect(0, 0, 800, 600);
             shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
-            
+
             if (victoryTimer > 3f) {
                 batch.begin();
                 font.setColor(Color.BLACK);
@@ -356,7 +361,7 @@ public class BossRoomScreen implements Screen {
                 batch.end();
             }
         }
-        
+
         // HUD
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.DARK_GRAY);
@@ -364,8 +369,10 @@ public class BossRoomScreen implements Screen {
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(10, 580, (GameState.instance.hp / GameState.instance.maxHp) * 100, 10);
         shapeRenderer.end();
+
+        inventoryUI.render(player, batch, shapeRenderer, font);
     }
-    
+
     private void checkPhase() {
         if (bossHp <= 700 && phase == 1) {
             phase = 2; // Move to Dodge phase

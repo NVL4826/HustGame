@@ -112,4 +112,8 @@ public class Player extends Actor implements ITargetable {
         this.x = newX;
         this.y = newY;
     }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
 }

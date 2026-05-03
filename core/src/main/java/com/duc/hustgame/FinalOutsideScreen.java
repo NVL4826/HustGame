@@ -19,17 +19,19 @@ public class FinalOutsideScreen implements Screen {
     private TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera camera;
-    
+
     private EntityManager entityManager;
     private Player player;
     private GameInputHandler inputHandler;
-    
+
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
     private SpriteBatch batch;
-    
+
     private int[] backgroundLayers;
     private int[] foregroundLayers;
+
+    private InventoryUI inventoryUI;
 
     public FinalOutsideScreen(MainGame game) {
         this.game = game;
@@ -39,28 +41,32 @@ public class FinalOutsideScreen implements Screen {
     public void show() {
         map = new TmxMapLoader().load("Final Outside.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map);
-        
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 480, 320);
-        
+
         entityManager = new EntityManager();
         inputHandler = new GameInputHandler();
+
+        inventoryUI = new InventoryUI();
+
         Gdx.input.setInputProcessor(inputHandler);
-        
+
         // Spawn at map center or near door
-        player = new Player(1024f, 1024f, new Inventory(), inputHandler, map);
+        player = new Player(1024f, 1024f, GameState.instance.globalInventory, inputHandler, map);
         entityManager.addEntity(player);
-        
+
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        
+
         setupLayers();
-        
+
         GameState.instance.previousScreen = "FinalOutsideScreen";
+
     }
-    
+
     private void setupLayers() {
         java.util.List<Integer> bgLayers = new java.util.ArrayList<>();
         java.util.List<Integer> fgLayers = new java.util.ArrayList<>();
@@ -74,7 +80,7 @@ public class FinalOutsideScreen implements Screen {
         }
         backgroundLayers = new int[bgLayers.size()];
         for(int i=0; i<bgLayers.size(); i++) backgroundLayers[i] = bgLayers.get(i);
-        
+
         foregroundLayers = new int[fgLayers.size()];
         for(int i=0; i<fgLayers.size(); i++) foregroundLayers[i] = fgLayers.get(i);
     }
@@ -83,9 +89,9 @@ public class FinalOutsideScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
+
         entityManager.update(delta);
-        
+
         // Camera logic
         float mapW = 128 * 16f;
         float mapH = 128 * 16f;
@@ -93,17 +99,17 @@ public class FinalOutsideScreen implements Screen {
         float camY = MathUtils.clamp(player.getY(), camera.viewportHeight / 2f, mapH - camera.viewportHeight / 2f);
         camera.position.set(camX, camY, 0);
         camera.update();
-        
+
         mapRenderer.setView(camera);
         mapRenderer.render(backgroundLayers);
-        
+
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         entityManager.draw(batch);
         batch.end();
-        
+
         mapRenderer.render(foregroundLayers);
-        
+
         // Check transition to Tang1Screen (Cua layer)
         TiledMapTileLayer cuaLayer = (TiledMapTileLayer) map.getLayers().get("Cua");
         if (cuaLayer != null) {
@@ -113,10 +119,12 @@ public class FinalOutsideScreen implements Screen {
                 game.screenTransition.fadeOut(new Tang1Screen(game), 0.5f);
             }
         }
-        
+
         drawHUD();
+
+        inventoryUI.render(player, batch, shapeRenderer, font);
     }
-    
+
     private void drawHUD() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         // HP Bar
@@ -124,14 +132,14 @@ public class FinalOutsideScreen implements Screen {
         shapeRenderer.rect(10, Gdx.graphics.getHeight() - 20, 100, 10);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(10, Gdx.graphics.getHeight() - 20, (GameState.instance.hp / GameState.instance.maxHp) * 100, 10);
-        
+
         // Stamina Bar
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(10, Gdx.graphics.getHeight() - 35, 100, 10);
         shapeRenderer.setColor(Color.YELLOW);
         shapeRenderer.rect(10, Gdx.graphics.getHeight() - 35, (GameState.instance.stamina / GameState.instance.maxStamina) * 100, 10);
         shapeRenderer.end();
-        
+
         batch.begin();
         font.draw(batch, "HP: " + (int)GameState.instance.hp, 115, Gdx.graphics.getHeight() - 10);
         font.draw(batch, "SP: " + (int)GameState.instance.stamina, 115, Gdx.graphics.getHeight() - 25);
@@ -161,4 +169,5 @@ public class FinalOutsideScreen implements Screen {
         batch.dispose();
         font.dispose();
     }
+
 }
