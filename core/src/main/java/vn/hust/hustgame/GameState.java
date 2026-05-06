@@ -1,5 +1,8 @@
 package vn.hust.hustgame;
 
+import vn.hust.hustgame.inventory.Inventory;
+import vn.hust.hustgame.world.CoffeeSystem;
+
 public class GameState {
     public static GameState instance = new GameState();
 
