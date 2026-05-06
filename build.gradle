@@ -54,7 +54,7 @@ configure(subprojects) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'Hust Game'
+  ext.appName = 'BKHN_Adventure'
   repositories {
     mavenCentral()
     // You may want to remove the following line if you have errors downloading dependencies.
@@ -64,4 +64,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'Hust Game' + '-parent'
+eclipse.project.name = 'BKHN_Adventure' + '-parent'

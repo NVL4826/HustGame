@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="90" height="90" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="2">
+ <imagelayer id="1" name="Background">
+  <image source="Phong_doc.jpg" width="1440" height="1440"/>
+ </imagelayer>
+ <objectgroup id="3" name="Spawn">
+  <object id="1" x="685.772" y="1359.32" width="107.572" height="74.5671"/>
+ </objectgroup>
+ <objectgroup id="2" name="Collision"/>
+</map>
