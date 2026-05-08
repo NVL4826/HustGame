@@ -18,22 +18,26 @@ public class Inventory {
 
     /**
      * Thêm vật phẩm vào túi đồ.
+     *
      * @param itemId Mã định danh vật phẩm (ví dụ: "coffee", "usb")
      * @param amount Số lượng muốn thêm
      */
     public void addItem(String itemId, int amount) {
-        if (amount <= 0) return;
+        if (amount <= 0)
+            return;
         items.put(itemId, items.getOrDefault(itemId, 0) + amount);
     }
 
     /**
      * Xóa vật phẩm khỏi túi đồ.
+     *
      * @param itemId Mã định danh vật phẩm
      * @param amount Số lượng muốn xóa
      * @return true nếu xóa thành công (đủ số lượng), false nếu không đủ.
      */
     public boolean removeItem(String itemId, int amount) {
-        if (amount <= 0) return false;
+        if (amount <= 0)
+            return false;
 
         int currentAmount = items.getOrDefault(itemId, 0);
         if (currentAmount >= amount) {
@@ -50,6 +54,7 @@ public class Inventory {
 
     /**
      * Kiểm tra xem túi đồ có chứa một lượng vật phẩm nhất định hay không.
+     *
      * @param itemId Mã định danh vật phẩm
      * @param amount Số lượng cần kiểm tra
      * @return true nếu đủ số lượng.

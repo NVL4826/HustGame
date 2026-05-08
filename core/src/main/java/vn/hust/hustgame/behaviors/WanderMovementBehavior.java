@@ -28,7 +28,7 @@ public class WanderMovementBehavior implements IMovementBehavior {
     public void update(Entity entity, float delta) {
         if (!(entity instanceof Actor)) return;
         Actor actor = (Actor) entity;
-        
+
         wanderTimer -= delta;
 
         if (wanderTimer <= 0) {
@@ -46,14 +46,14 @@ public class WanderMovementBehavior implements IMovementBehavior {
             actor.setDirection(currentWanderDirection);
             float newX = actor.getX();
             float newY = actor.getY();
-            
+
             switch (currentWanderDirection) {
                 case UP: newY += actor.getSpeed() * delta; break;
                 case DOWN: newY -= actor.getSpeed() * delta; break;
                 case LEFT: newX -= actor.getSpeed() * delta; break;
                 case RIGHT: newX += actor.getSpeed() * delta; break;
             }
-            
+
             // Just updating position naively for Wander. Collision could be added.
             actor.setX(newX);
             actor.setY(newY);

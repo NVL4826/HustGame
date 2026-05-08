@@ -14,8 +14,8 @@ public class PlayerMovementBehavior implements IMovementBehavior {
     private IPlayerController controller;
     private TiledMap map;
     private Rectangle tempBounds;
-    
-    private static final float MAP_WIDTH  = 128 * 16f;
+
+    private static final float MAP_WIDTH = 128 * 16f;
     private static final float MAP_HEIGHT = 128 * 16f;
 
     public PlayerMovementBehavior(IPlayerController controller, TiledMap map) {
@@ -30,7 +30,8 @@ public class PlayerMovementBehavior implements IMovementBehavior {
 
     @Override
     public void update(Entity entity, float delta) {
-        if (!(entity instanceof Actor)) return;
+        if (!(entity instanceof Actor))
+            return;
         Actor actor = (Actor) entity;
 
         float newX = actor.getX();
@@ -40,7 +41,7 @@ public class PlayerMovementBehavior implements IMovementBehavior {
 
         float currentSpeed = actor.getSpeed() * GameState.instance.coffeeSystem.getSpeedMultiplier();
         boolean isSprinting = controller.isRunning() && GameState.instance.stamina > 0;
-        
+
         if (GameState.instance.stamina <= 0) {
             currentSpeed *= 0.6f; // speed -40% when 0 stamina
         } else if (isSprinting) {
@@ -49,15 +50,15 @@ public class PlayerMovementBehavior implements IMovementBehavior {
         } else {
             // slowly recover stamina when walking or idle
             if (GameState.instance.stamina < GameState.instance.maxStamina) {
-                GameState.instance.stamina += 2 * delta; 
+                GameState.instance.stamina += 2 * delta;
             }
         }
-        
+
         boolean moveRight = controller.isRight();
         boolean moveLeft = controller.isLeft();
         boolean moveUp = controller.isUp();
         boolean moveDown = controller.isDown();
-        
+
         if (GameState.instance.coffeeSystem.hasReversedInput(MathUtils.random())) {
             boolean tempRight = moveRight;
             boolean tempLeft = moveLeft;
@@ -107,8 +108,10 @@ public class PlayerMovementBehavior implements IMovementBehavior {
             Integer th = map.getProperties().get("tilewidth", Integer.class);
             Integer h = map.getProperties().get("height", Integer.class);
             Integer tv = map.getProperties().get("tileheight", Integer.class);
-            if (w != null && th != null) mapW = w * th;
-            if (h != null && tv != null) mapH = h * tv;
+            if (w != null && th != null)
+                mapW = w * th;
+            if (h != null && tv != null)
+                mapH = h * tv;
         }
 
         actor.setX(MathUtils.clamp(actor.getX(), actor.getWidth() / 2f, mapW - actor.getWidth() / 2f));
@@ -116,7 +119,8 @@ public class PlayerMovementBehavior implements IMovementBehavior {
     }
 
     private boolean isColliding(Actor actor, float newX, float newY) {
-        if (map == null || map.getLayers().get("Object Layer 1") == null) return false;
+        if (map == null || map.getLayers().get("Object Layer 1") == null)
+            return false;
 
         float feetWidth = actor.getWidth() * 0.4f; // ~20px
         float feetHeight = actor.getHeight() * 0.2f; // ~10px

@@ -32,17 +32,21 @@ public class HustGame extends Game {
         super.render();
 
         // Vẽ hiệu ứng chuyển cảnh nếu có
-        if (screenTransition != null && screenTransition.update(com.badlogic.gdx.Gdx.graphics.getDeltaTime())) {
-            screenTransition.render();
+        if (screenTransition != null) {
+            screenTransition.render(com.badlogic.gdx.Gdx.graphics.getDeltaTime());
         }
     }
 
     @Override
     public void dispose() {
-        if (screen != null) screen.dispose();
-        if (spriteBatch != null) spriteBatch.dispose();
-        if (assetManager != null) assetManager.dispose();
-        if (screenTransition != null) screenTransition.dispose();
+        if (screen != null)
+            screen.dispose();
+        if (spriteBatch != null)
+            spriteBatch.dispose();
+        if (assetManager != null)
+            assetManager.dispose();
+        if (screenTransition != null)
+            screenTransition.dispose();
     }
 
     public SpriteBatch getSpriteBatch() {

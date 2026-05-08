@@ -18,7 +18,7 @@ public class GameRenderer {
     private ShaderProgram discardShader;
 
     public GameRenderer(GameCamera gameCamera, EntityManager entityManager, SpriteBatch batch,
-                        ShaderProgram silhouetteShader, ShaderProgram discardShader) {
+            ShaderProgram silhouetteShader, ShaderProgram discardShader) {
         this.gameCamera = gameCamera;
         this.entityManager = entityManager;
         this.batch = batch;
@@ -26,8 +26,10 @@ public class GameRenderer {
         this.discardShader = discardShader;
     }
 
-    public void render(OrthogonalTiledMapRenderer mapRenderer, int[] backgroundLayers, int[] foregroundLayers, LibrarySystem librarySystem) {
-        if (mapRenderer == null) return;
+    public void render(OrthogonalTiledMapRenderer mapRenderer, int[] backgroundLayers, int[] foregroundLayers,
+            LibrarySystem librarySystem) {
+        if (mapRenderer == null)
+            return;
 
         // 0. Xóa màu nền, Depth Buffer và Stencil Buffer
         Gdx.gl.glClearColor(0, 0, 0, 1);

@@ -31,7 +31,8 @@ public class GameState {
     // Screen transition
     public String previousScreen = "";
 
-    private GameState() {}
+    private GameState() {
+    }
 
     public void reset() {
         hp = 100f;
@@ -46,6 +47,7 @@ public class GameState {
         labCleared = false;
         previousScreen = "";
     }
+
     public String currentHint = "";
     public float hintTimer = 0f;
 }

@@ -31,7 +31,7 @@ public class EntityManager {
     }
 
     public void draw(SpriteBatch batch) {
-        // Here we could implement Y-sorting as assigned in Ticket 2.2, 
+        // Here we could implement Y-sorting as assigned in Ticket 2.2,
         // but for now, we just draw them as they came.
         for (Entity entity : entities) {
             entity.draw(batch);

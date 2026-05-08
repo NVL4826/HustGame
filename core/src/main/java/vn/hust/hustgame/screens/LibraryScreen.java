@@ -1,41 +1,21 @@
 package vn.hust.hustgame.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 import vn.hust.hustgame.HustGame;
 import vn.hust.hustgame.GameState;
-import vn.hust.hustgame.entities.EntityManager;
-import vn.hust.hustgame.entities.Player;
-import vn.hust.hustgame.entities.EntityState;
-import vn.hust.hustgame.input.GameInputHandler;
 import vn.hust.hustgame.ui.BookPuzzle;
-import vn.hust.hustgame.ui.InventoryUI;
 
-public class LibraryScreen extends BaseScreen {
-    private OrthographicCamera camera;
-    private SpriteBatch batch;
-    private ShapeRenderer shapeRenderer;
-    private Texture bgTexture;
-
-    private EntityManager entityManager;
-    private Player player;
-    private GameInputHandler inputHandler;
-
+public class LibraryScreen extends PlayScreen {
     private BookPuzzle puzzle;
     private boolean puzzleSolved = false;
-
     private float redFlashTimer = 0f;
 
     // Boss
@@ -52,40 +32,16 @@ public class LibraryScreen extends BaseScreen {
     // Artifact
     private Rectangle artifactRect;
 
-    private BitmapFont font;
-    private InventoryUI inventoryUI;
-
     public LibraryScreen(HustGame game) {
         super(game);
     }
 
     @Override
     public void show() {
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600); // Fixed resolution for library puzzle
-
-        batch = game.getSpriteBatch();
-        shapeRenderer = new ShapeRenderer();
-
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
-        inventoryUI = new InventoryUI();
-
-        try {
-            bgTexture = new Texture("Library1.jpg");
-        } catch (Exception e) {
-            bgTexture = null;
-        }
-
-        entityManager = new EntityManager();
-        inputHandler = new GameInputHandler();
-        Gdx.input.setInputProcessor(inputHandler);
-
-        player = new Player(400, 100, GameState.instance.globalInventory, inputHandler, null); // No tiled map
-        entityManager.addEntity(player);
+        super.show();
+        loadMap("library.tmx", 400, 100);
 
         puzzle = new BookPuzzle(this);
-
         bossRect = new Rectangle(400, 500, 50, 50);
         bossProjectiles = new ArrayList<>();
         bullets = new ArrayList<>();
@@ -101,143 +57,136 @@ public class LibraryScreen extends BaseScreen {
     }
 
     @Override
-    public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    protected void onUpdate(float delta) {
+        if (GameState.instance.isInventoryOpen)
+            return;
 
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.I)) {
-            GameState.instance.isInventoryOpen = !GameState.instance.isInventoryOpen;
+        if (!puzzleSolved) {
+            puzzle.update(delta);
+            if (puzzle.isSolved()) {
+                puzzleSolved = true;
+                bossSpawned = true;
+            }
+        } else if (!bossDefeated) {
+            updateBossLogic(delta);
+        } else {
+            updateAfterBossLogic(delta);
         }
 
-        if (!GameState.instance.isInventoryOpen) {
-            entityManager.update(delta);
+        if (redFlashTimer > 0)
+            redFlashTimer -= delta;
+    }
 
-            // Manual bounds check for player
-            player.setX(MathUtils.clamp(player.getX(), 0, 800));
-            player.setY(MathUtils.clamp(player.getY(), 0, 600));
+    private void updateBossLogic(float delta) {
+        bossAttackTimer += delta;
+        if (bossAttackTimer > 1.5f) {
+            bossAttackTimer = 0;
+            bossProjectiles.add(new Rectangle(bossRect.x + 10, bossRect.y, 10, 10));
+            bossProjectiles.add(new Rectangle(bossRect.x + 30, bossRect.y, 10, 10));
+        }
 
-            if (!puzzleSolved) {
-                puzzle.update(delta);
-            } else if (bossSpawned && !bossDefeated) {
-                // Boss Logic
-                float dx = player.getX() - bossRect.x;
-                float dy = player.getY() - bossRect.y;
-                float dist = (float) Math.sqrt(dx * dx + dy * dy);
-                if (dist > 0) {
-                    bossRect.x += (dx / dist) * 30 * delta;
-                    bossRect.y += (dy / dist) * 30 * delta;
-                }
-
-                bossAttackTimer += delta;
-                if (bossAttackTimer >= 2f) {
-                    bossAttackTimer = 0f;
-                    Rectangle proj = new Rectangle(bossRect.x, bossRect.y, 20, 15);
-                    bossProjectiles.add(proj);
-                }
-
-                for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
-                    Rectangle p = bossProjectiles.get(i);
-                    p.y -= 150 * delta;
-
-                    Rectangle pBounds = new Rectangle(player.getX() - 25, player.getY() - 25, 50, 50);
-                    if (pBounds.overlaps(p)) {
-                        GameState.instance.hp -= 15;
-                        bossProjectiles.remove(i);
-                        flashRed();
-                    } else if (p.y < 0) {
-                        bossProjectiles.remove(i);
-                    }
-                }
-
-                if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                    bullets.add(new Rectangle(player.getX(), player.getY(), 10, 10));
-                }
-                for (int i = bullets.size() - 1; i >= 0; i--) {
-                    Rectangle b = bullets.get(i);
-                    b.y += 300 * delta;
-                    if (b.overlaps(bossRect)) {
-                        bossHp -= 20;
-                        bullets.remove(i);
-                    } else if (b.y > 600) {
-                        bullets.remove(i);
-                    }
-                }
-
-                if (bossHp <= 0) {
-                    bossDefeated = true;
-                    artifactRect = new Rectangle(bossRect.x, bossRect.y, 30, 30);
-                }
-            } else if (bossDefeated) {
-                Rectangle pBounds = new Rectangle(player.getX() - 25, player.getY() - 25, 50, 50);
-                if (artifactRect != null && pBounds.overlaps(artifactRect)) {
-                    GameState.instance.hasNao = true;
-                    GameState.instance.libraryCleared = true;
-                    artifactRect = null;
-                    game.setScreen(new LabScreen(game));
-                }
+        for (int i = bossProjectiles.size() - 1; i >= 0; i--) {
+            Rectangle r = bossProjectiles.get(i);
+            r.y -= 200 * delta;
+            if (r.y < 0)
+                bossProjectiles.remove(i);
+            else if (r.overlaps(new Rectangle(player.getX() - 15, player.getY() - 15, 30, 30))) {
+                bossProjectiles.remove(i);
+                GameState.instance.hp -= 10;
+                redFlashTimer = 0.2f;
             }
         }
 
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-        shapeRenderer.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        if (bgTexture != null) {
-            batch.draw(bgTexture, 0, 0, 800, 600);
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
+            bullets.add(new Rectangle(player.getX(), player.getY() + 20, 5, 10));
         }
-        entityManager.draw(batch);
-        batch.end();
+
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            Rectangle b = bullets.get(i);
+            b.y += 400 * delta;
+            if (b.overlaps(bossRect)) {
+                bossHp -= 20;
+                bullets.remove(i);
+            } else if (b.y > 600) {
+                bullets.remove(i);
+            }
+        }
+
+        if (bossHp <= 0) {
+            bossDefeated = true;
+            artifactRect = new Rectangle(bossRect.x, bossRect.y, 30, 30);
+        }
+    }
+
+    private void updateAfterBossLogic(float delta) {
+        Rectangle pBounds = new Rectangle(player.getX() - 25, player.getY() - 25, 50, 50);
+        if (artifactRect != null && pBounds.overlaps(artifactRect)) {
+            GameState.instance.hasNao = true;
+            GameState.instance.libraryCleared = true;
+            artifactRect = null;
+        }
+    }
+
+    @Override
+    protected void onDraw() {
+        OrthographicCamera cam = gameCamera.getCamera();
+        batch.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(cam.combined);
+
+        // Map handles background via mapRenderer in PlayScreen.render()
 
         if (!puzzleSolved) {
             puzzle.render(shapeRenderer, batch);
-        }
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        if (bossSpawned && !bossDefeated) {
-            shapeRenderer.setColor(Color.RED);
-            shapeRenderer.rect(bossRect.x, bossRect.y, bossRect.width, bossRect.height);
-            shapeRenderer.setColor(Color.BROWN);
-            for (Rectangle p : bossProjectiles) {
-                shapeRenderer.rect(p.x, p.y, p.width, p.height);
+        } else if (!bossDefeated) {
+            drawBossBattle();
+        } else {
+            if (artifactRect != null) {
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                shapeRenderer.setColor(Color.GOLD);
+                shapeRenderer.rect(artifactRect.x, artifactRect.y, artifactRect.width, artifactRect.height);
+                shapeRenderer.end();
             }
-            shapeRenderer.setColor(Color.YELLOW);
-            for (Rectangle b : bullets) {
-                shapeRenderer.rect(b.x, b.y, b.width, b.height);
-            }
-            shapeRenderer.setColor(Color.GREEN);
-            shapeRenderer.rect(bossRect.x, bossRect.y + 60, (bossHp / 500f) * 50, 5);
-        } else if (bossDefeated && artifactRect != null) {
-            shapeRenderer.setColor(Color.BLUE);
-            shapeRenderer.circle(artifactRect.x + 15, artifactRect.y + 15, 15);
         }
-        shapeRenderer.end();
 
         if (redFlashTimer > 0) {
-            redFlashTimer -= delta;
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(new Color(1, 0, 0, 0.3f));
+            shapeRenderer.setColor(1, 0, 0, 0.3f);
             shapeRenderer.rect(0, 0, 800, 600);
             shapeRenderer.end();
-            Gdx.gl.glDisable(GL20.GL_BLEND);
         }
 
-        inventoryUI.render(player, batch, shapeRenderer, font);
+        drawEntities();
+    }
+
+    private void drawBossBattle() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(bossRect.x, bossRect.y, bossRect.width, bossRect.height);
+
+        shapeRenderer.setColor(Color.GRAY);
+        shapeRenderer.rect(300, 570, 200, 10);
+        shapeRenderer.setColor(Color.GREEN);
+        shapeRenderer.rect(300, 570, (bossHp / 500f) * 200, 10);
+
+        shapeRenderer.setColor(Color.PURPLE);
+        for (Rectangle r : bossProjectiles)
+            shapeRenderer.rect(r.x, r.y, r.width, r.height);
+
+        shapeRenderer.setColor(Color.WHITE);
+        for (Rectangle b : bullets)
+            shapeRenderer.rect(b.x, b.y, b.width, b.height);
+        shapeRenderer.end();
     }
 
     @Override
     public void dispose() {
-        // We do not dispose batch as it is owned by HustGame
-        shapeRenderer.dispose();
-        if (bgTexture != null) bgTexture.dispose();
-        entityManager.dispose();
-        puzzle.dispose();
-        font.dispose();
+        if (puzzle != null)
+            puzzle.dispose();
+        super.dispose();
     }
 
     public OrthographicCamera getCamera() {
-        return camera;
+        return gameCamera.getCamera();
     }
 }

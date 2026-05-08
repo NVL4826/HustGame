@@ -1,7 +1,6 @@
 package vn.hust.hustgame.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -24,7 +23,8 @@ public class InventoryUI {
     }
 
     public void render(Player player, SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
-        if (!GameState.instance.isInventoryOpen) return;
+        if (!GameState.instance.isInventoryOpen)
+            return;
 
         shapeRenderer.setProjectionMatrix(uiCam.combined);
         batch.setProjectionMatrix(uiCam.combined);
@@ -69,12 +69,7 @@ public class InventoryUI {
             font.draw(batch, "Chua co gi o day ca...", panelX + 50, panelY + panelH - offsetY);
         } else {
             // Xác định phím số nào đang được bấm
-            int keyPressed = -1;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) keyPressed = 1;
-            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) keyPressed = 2;
-            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) keyPressed = 3;
-            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) keyPressed = 4;
-            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) keyPressed = 5;
+            int keyPressed = player.getController().getJustPressedNum();
 
             int itemIndex = 1;
             String itemToConsume = null; // Biến lưu tạm item cần dùng để tránh lỗi ConcurrentModificationException
@@ -84,12 +79,16 @@ public class InventoryUI {
                 String itemName = itemKey;
 
                 // Format lại tên cho đẹp
-                if (itemKey.equals("coffee_den")) itemName = "Ca phe den (+The luc)";
-                if (itemKey.equals("energy_drink")) itemName = "Nuoc tang luc (+40 The luc)";
-                if (itemKey.equals("kho_ga")) itemName = "Kho ga la chanh (+25 HP)";
+                if (itemKey.equals("coffee_den"))
+                    itemName = "Ca phe den (+The luc)";
+                if (itemKey.equals("energy_drink"))
+                    itemName = "Nuoc tang luc (+40 The luc)";
+                if (itemKey.equals("kho_ga"))
+                    itemName = "Kho ga la chanh (+25 HP)";
 
                 // Hiển thị dạng: [1] Ca phe den : x2
-                font.draw(batch, "[" + itemIndex + "] " + itemName + " :  x" + entry.getValue(), panelX + 50, panelY + panelH - offsetY);
+                font.draw(batch, "[" + itemIndex + "] " + itemName + " :  x" + entry.getValue(), panelX + 50,
+                        panelY + panelH - offsetY);
 
                 // Nếu người chơi bấm đúng số thứ tự của item này
                 if (keyPressed == itemIndex) {
@@ -100,14 +99,16 @@ public class InventoryUI {
                 itemIndex++;
             }
 
-            // Xử lý sử dụng vật phẩm (Sau vòng lặp để tránh lỗi mảng đang duyệt bị thay đổi)
+            // Xử lý sử dụng vật phẩm (Sau vòng lặp để tránh lỗi mảng đang duyệt bị thay
+            // đổi)
             if (itemToConsume != null) {
                 if (player.getInventory().removeItem(itemToConsume, 1)) {
                     // Áp dụng tác dụng của từng loại vật phẩm
                     if (itemToConsume.equals("coffee_den")) {
                         GameState.instance.coffeeSystem.consume(CoffeeSystem.CoffeeType.DEN);
                     } else if (itemToConsume.equals("energy_drink")) {
-                        GameState.instance.stamina = Math.min(GameState.instance.maxStamina, GameState.instance.stamina + 40);
+                        GameState.instance.stamina = Math.min(GameState.instance.maxStamina,
+                                GameState.instance.stamina + 40);
                     } else if (itemToConsume.equals("kho_ga")) {
                         GameState.instance.hp = Math.min(GameState.instance.maxHp, GameState.instance.hp + 25);
                     }

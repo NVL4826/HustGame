@@ -14,7 +14,7 @@ public class LoadingScreen extends BaseScreen {
         drawProgressBar();
 
         if (game.getAssetManager().update()) {
-            game.setScreen(new PlayScreen(game));
+            game.setScreen(new FinalOutsideScreen(game));
         }
     }
 

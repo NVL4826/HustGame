@@ -7,5 +7,6 @@ public enum EventType {
     ITEM_DROPPED,
     QUEST_UPDATED,
     INVENTORY_CHANGED,
-    ENTITY_DIED
+    ENTITY_DIED,
+    MAP_TRANSITION
 }

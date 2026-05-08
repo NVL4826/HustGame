@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="166">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-up" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="166">
  <tileset firstgid="1" source="tang1.tsx"/>
  <imagelayer id="1" name="Grass">
   <image source="tang1.png" width="1024" height="1024"/>
  </imagelayer>
- <layer id="3" name="Ban bao ve" width="64" height="64">
+ <layer id="3" name="Ban bao ve" width="64" height="64" visible="0">
   <data encoding="base64" compression="zlib">
    eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
   </data>
  </layer>
- <objectgroup id="2" name="Object Layer 1">
+ <objectgroup id="2" name="Object Layer 1" visible="0">
   <object id="1" x="0" y="0" width="1024" height="32"/>
   <object id="2" x="0" y="992" width="1024" height="32"/>
   <object id="3" x="0" y="0" width="32" height="1024"/>
@@ -142,8 +142,20 @@
   <object id="162" x="27.3333" y="715.333" width="14.3333" height="19.6667"/>
   <object id="165" x="785.5" y="505.5" width="16.5" height="51"/>
  </objectgroup>
- <objectgroup id="5" name="Stage2">
-  <object id="151" x="337.833" y="323.833" width="102.333" height="72.1667"/>
-  <object id="152" x="681.333" y="338" width="99.3333" height="70"/>
+ <objectgroup color="#ffffff" id="5" name="Portals" opacity="0.75">
+  <object id="151" name="GoToLibrary" x="337.833" y="323.833" width="102.333" height="72.1667" visible="0">
+   <properties>
+    <property name="spawnX" type="float" value="640"/>
+    <property name="spawnY" type="float" value="640"/>
+    <property name="target" value="library.tmx"/>
+   </properties>
+  </object>
+  <object id="152" name="GoToLibrary" x="681.333" y="338" width="99.3333" height="70" visible="0">
+   <properties>
+    <property name="spawnX" type="float" value="640"/>
+    <property name="spawnY" type="float" value="128"/>
+    <property name="target" value="library.tmx"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

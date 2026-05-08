@@ -19,35 +19,39 @@ public class BookPuzzle {
         public int targetSemester;
         public boolean placedCorrectly = false;
         public boolean isDragging = false;
-        
+
         public Book(String name, float x, float y, int targetSemester) {
             this.name = name;
             this.rect = new Rectangle(x, y, 100, 30);
             this.targetSemester = targetSemester;
         }
     }
-    
+
     public static class Slot {
         public int semester;
         public Rectangle rect;
-        
+
         public Slot(int semester, float x, float y) {
             this.semester = semester;
             this.rect = new Rectangle(x, y, 120, 40);
         }
     }
-    
+
     public List<Book> books;
     public List<Slot> slots;
     private BitmapFont font;
     private boolean isSolved = false;
     private LibraryScreen screen;
-    
+
+    public boolean isSolved() {
+        return isSolved;
+    }
+
     public BookPuzzle(LibraryScreen screen) {
         this.screen = screen;
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        
+
         books = new ArrayList<>();
         books.add(new Book("Toan cao cap", 50, 400, 1));
         books.add(new Book("CTDL & GT", 50, 350, 3));
@@ -57,21 +61,23 @@ public class BookPuzzle {
         books.add(new Book("Ky nghe PM", 50, 150, 5));
         books.add(new Book("AI", 50, 100, 7));
         books.add(new Book("Do an", 50, 50, 8));
-        
+
         slots = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             slots.add(new Slot(i + 1, 300, 400 - i * 50));
         }
     }
-    
+
     public void update(float delta) {
-        if (isSolved) return;
-        
-        com.badlogic.gdx.math.Vector3 touchPos = new com.badlogic.gdx.math.Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        if (isSolved)
+            return;
+
+        com.badlogic.gdx.math.Vector3 touchPos = new com.badlogic.gdx.math.Vector3(Gdx.input.getX(), Gdx.input.getY(),
+                0);
         screen.getCamera().unproject(touchPos);
         float mx = touchPos.x;
         float my = touchPos.y;
-        
+
         if (Gdx.input.justTouched()) {
             for (Book b : books) {
                 if (!b.placedCorrectly && b.rect.contains(mx, my)) {
@@ -80,7 +86,7 @@ public class BookPuzzle {
                 }
             }
         }
-        
+
         if (Gdx.input.isTouched()) {
             for (Book b : books) {
                 if (b.isDragging) {
@@ -114,7 +120,7 @@ public class BookPuzzle {
                     }
                 }
             }
-            
+
             // Check win condition
             boolean allPlaced = true;
             for (Book b : books) {
@@ -129,17 +135,18 @@ public class BookPuzzle {
             }
         }
     }
-    
+
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        if (isSolved) return;
-        
+        if (isSolved)
+            return;
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Slot s : slots) {
             shapeRenderer.setColor(Color.YELLOW);
             shapeRenderer.rect(s.rect.x, s.rect.y, s.rect.width, s.rect.height);
         }
         shapeRenderer.end();
-        
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Book b : books) {
             if (b.placedCorrectly) {
@@ -153,7 +160,7 @@ public class BookPuzzle {
             shapeRenderer.rect(b.rect.x, b.rect.y, b.rect.width, b.rect.height);
         }
         shapeRenderer.end();
-        
+
         batch.begin();
         for (Slot s : slots) {
             font.draw(batch, "HK " + s.semester, s.rect.x + 10, s.rect.y + 25);
@@ -163,7 +170,7 @@ public class BookPuzzle {
         }
         batch.end();
     }
-    
+
     public void dispose() {
         font.dispose();
     }

@@ -5,9 +5,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 public class GameCamera {
     private OrthographicCamera camera;
-    private ITargetable target; // Mục tiêu bám theo (Player)
+    private ITargetable target;
 
-    // Các thông số khung hình và bản đồ
     private float viewWidth;
     private float viewHeight;
     private float mapWidth;
@@ -17,7 +16,6 @@ public class GameCamera {
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
         camera = new OrthographicCamera();
-        // Thiết lập camera theo kích thước màn hình
         camera.setToOrtho(false, viewWidth, viewHeight);
     }
 
@@ -25,7 +23,6 @@ public class GameCamera {
         this.target = target;
     }
 
-    // Cập nhật kích thước bản đồ mỗi khi qua màn mới
     public void setMapBounds(float mapWidth, float mapHeight) {
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
@@ -35,7 +32,6 @@ public class GameCamera {
         camera.zoom = zoom;
     }
 
-    // Hàm này sẽ tự động tính toán vị trí để không bị lẹm ra ngoài map
     public void update() {
         if (target != null) {
             float halfW = viewWidth * camera.zoom / 2f;

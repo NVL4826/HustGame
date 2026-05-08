@@ -4,15 +4,31 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+
 public class GameAssetManager {
     private final AssetManager manager;
 
     public GameAssetManager() {
         this.manager = new AssetManager();
+        manager.setLoader(TiledMap.class, new TmxMapLoader());
     }
 
     public void loadAllAssets() {
-        // manager.load("example.png", Texture.class);
+        // Textures
+        manager.load("Lab.jpg", Texture.class);
+        manager.load("Boss Room.jpg", Texture.class);
+        manager.load("Boss THT.png", Texture.class);
+        manager.load("Library1.jpg", Texture.class);
+        manager.load("4.png", Texture.class);
+
+        // Maps
+        manager.load("Final Outside.tmx", TiledMap.class);
+        manager.load("tang1.tmx", TiledMap.class);
+        manager.load("Phong_doc.tmx", TiledMap.class);
+        manager.load("library.tmx", TiledMap.class);
+        manager.load("lab.tmx", TiledMap.class);
+        manager.load("boss_room.tmx", TiledMap.class);
     }
 
     public boolean update() {

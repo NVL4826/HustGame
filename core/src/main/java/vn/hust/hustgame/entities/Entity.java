@@ -21,25 +21,58 @@ public abstract class Entity {
     }
 
     public abstract void update(float delta);
+
     public abstract void draw(SpriteBatch batch);
+
     public abstract void dispose();
 
-    public float getX() { return x; }
-    public void setX(float x) { this.x = x; updateBounds(); }
-    public float getY() { return y; }
-    public void setY(float y) { this.y = y; updateBounds(); }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
-    
-    public Rectangle getBounds() { return bounds; }
-    
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+        updateBounds();
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+        updateBounds();
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public Rectangle getBounds() {
+        return bounds;
+    }
+
     protected void updateBounds() {
         this.bounds.setPosition(x, y);
     }
-    
-    public boolean isDestroyed() { return isDestroyed; }
-    public void setDestroyed(boolean destroyed) { this.isDestroyed = destroyed; }
-    
-    public EntityState getState() { return state; }
-    public void setState(EntityState state) { this.state = state; }
+
+    public boolean isDestroyed() {
+        return isDestroyed;
+    }
+
+    public void setDestroyed(boolean destroyed) {
+        this.isDestroyed = destroyed;
+    }
+
+    public EntityState getState() {
+        return state;
+    }
+
+    public void setState(EntityState state) {
+        this.state = state;
+    }
 }

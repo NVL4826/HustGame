@@ -1,14 +1,17 @@
 package vn.hust.hustgame.screens;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import vn.hust.hustgame.HustGame;
 
 public abstract class BaseScreen implements Screen {
     protected HustGame game;
+    protected SpriteBatch batch;
 
     public BaseScreen(HustGame game) {
         this.game = game;
+        this.batch = game.getSpriteBatch();
     }
 
     @Override

@@ -1,13 +1,8 @@
 package vn.hust.hustgame.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,20 +12,8 @@ import java.util.List;
 import vn.hust.hustgame.HustGame;
 import vn.hust.hustgame.GameState;
 import vn.hust.hustgame.entities.*;
-import vn.hust.hustgame.input.GameInputHandler;
-import vn.hust.hustgame.ui.InventoryUI;
 
-public class LabScreen extends BaseScreen {
-    private OrthographicCamera camera;
-    private SpriteBatch batch;
-    private ShapeRenderer shapeRenderer;
-    private Texture bgTexture;
-    private BitmapFont font;
-
-    private EntityManager entityManager;
-    private Player player;
-    private GameInputHandler inputHandler;
-
+public class LabScreen extends PlayScreen {
     private List<BaseEnemy> enemies;
     private List<Rectangle> enemyProjectiles;
     private List<Rectangle> playerBullets;
@@ -49,18 +32,20 @@ public class LabScreen extends BaseScreen {
     private float stunTimer = 0f;
     private float showEnemiesTimer = 0f;
 
-    private InventoryUI inventoryUI;
-
-    class ItemDrop {
+    static class ItemDrop {
         Rectangle rect;
         Color color;
         int type; // 0: Coffee, 1: Energy Drink, 2: Kho Ga
+
         ItemDrop(float x, float y, int type) {
             this.rect = new Rectangle(x, y, 15, 15);
             this.type = type;
-            if (type == 0) color = Color.YELLOW;
-            else if (type == 1) color = Color.GREEN;
-            else color = Color.BROWN;
+            if (type == 0)
+                color = Color.YELLOW;
+            else if (type == 1)
+                color = Color.GREEN;
+            else
+                color = Color.BROWN;
         }
     }
 
@@ -70,26 +55,8 @@ public class LabScreen extends BaseScreen {
 
     @Override
     public void show() {
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600);
-
-        batch = game.getSpriteBatch();
-        shapeRenderer = new ShapeRenderer();
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
-
-        inventoryUI = new InventoryUI();
-
-        try {
-            bgTexture = new Texture("Lab.jpg");
-        } catch(Exception e) { bgTexture = null; }
-
-        entityManager = new EntityManager();
-        inputHandler = new GameInputHandler();
-        Gdx.input.setInputProcessor(inputHandler);
-
-        player = new Player(400, 100, GameState.instance.globalInventory, inputHandler, null);
-        entityManager.addEntity(player);
+        super.show();
+        loadMap("lab.tmx", 400, 100);
 
         enemies = new ArrayList<>();
         enemyProjectiles = new ArrayList<>();
@@ -106,171 +73,182 @@ public class LabScreen extends BaseScreen {
 
         switch (wave) {
             case 1:
-                for(int i=0; i<5; i++) enemies.add(new NullPointerEnemy(MathUtils.random(100, 700), MathUtils.random(300, 500)));
+                for (int i = 0; i < 5; i++)
+                    enemies.add((BaseEnemy) EntityFactory.createEnemy("null_pointer", MathUtils.random(100, 700),
+                            MathUtils.random(300, 500), null));
                 break;
             case 2:
-                for(int i=0; i<3; i++) enemies.add(new NullPointerEnemy(MathUtils.random(100, 700), MathUtils.random(300, 500)));
-                for(int i=0; i<2; i++) enemies.add(new SyntaxErrorEnemy(MathUtils.random(100, 700), MathUtils.random(300, 500)));
+                for (int i = 0; i < 3; i++)
+                    enemies.add((BaseEnemy) EntityFactory.createEnemy("null_pointer", MathUtils.random(100, 700),
+                            MathUtils.random(300, 500), null));
+                for (int i = 0; i < 2; i++)
+                    enemies.add((BaseEnemy) EntityFactory.createEnemy("syntax_error", MathUtils.random(100, 700),
+                            MathUtils.random(300, 500), null));
                 break;
             case 3:
-                enemies.add(new InfiniteLoopEnemy(400, 400));
-                for(int i=0; i<4; i++) enemies.add(new NullPointerEnemy(MathUtils.random(100, 700), MathUtils.random(300, 500)));
+                enemies.add((BaseEnemy) EntityFactory.createEnemy("infinite_loop", 400, 400, null));
+                for (int i = 0; i < 4; i++)
+                    enemies.add((BaseEnemy) EntityFactory.createEnemy("null_pointer", MathUtils.random(100, 700),
+                            MathUtils.random(300, 500), null));
                 break;
             case 4:
-                for(int i=0; i<2; i++) enemies.add(new InfiniteLoopEnemy(MathUtils.random(100, 700), MathUtils.random(300, 500)));
-                for(int i=0; i<2; i++) enemies.add(new SyntaxErrorEnemy(MathUtils.random(100, 700), MathUtils.random(300, 500)));
+                for (int i = 0; i < 2; i++)
+                    enemies.add((BaseEnemy) EntityFactory.createEnemy("infinite_loop", MathUtils.random(100, 700),
+                            MathUtils.random(300, 500), null));
+                for (int i = 0; i < 2; i++)
+                    enemies.add((BaseEnemy) EntityFactory.createEnemy("syntax_error", MathUtils.random(100, 700),
+                            MathUtils.random(300, 500), null));
                 break;
             case 5:
-                enemies.add(new StackOverflowEnemy(400, 400, false));
-                enemies.add(new NullPointerEnemy(200, 400));
-                enemies.add(new SyntaxErrorEnemy(600, 400));
+                enemies.add((BaseEnemy) EntityFactory.createEnemy("stack_overflow", 400, 400, null));
+                enemies.add((BaseEnemy) EntityFactory.createEnemy("null_pointer", 200, 400, null));
+                enemies.add((BaseEnemy) EntityFactory.createEnemy("syntax_error", 600, 400, null));
                 break;
         }
     }
 
     @Override
-    public void render(float delta) {
+    protected void onUpdate(float delta) {
+        if (GameState.instance.isInventoryOpen)
+            return;
+
         float dt = delta;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            GameState.instance.isInventoryOpen = !GameState.instance.isInventoryOpen;
+        if (slowMotionTimer > 0) {
+            dt *= 0.3f;
+            slowMotionTimer -= delta;
         }
-        if (!GameState.instance.isInventoryOpen) {
-            if (slowMotionTimer > 0) {
-                dt *= 0.3f;
-                slowMotionTimer -= delta;
+        if (stunTimer > 0) {
+            stunTimer -= delta;
+        }
+        if (showEnemiesTimer > 0) {
+            showEnemiesTimer -= delta;
+        }
+
+        player.setX(MathUtils.clamp(player.getX(), 0, 800));
+        player.setY(MathUtils.clamp(player.getY(), 0, 600));
+
+        Rectangle pBounds = new Rectangle(player.getX() - 25, player.getY() - 25, 50, 50);
+
+        if (labCleared) {
+            if (usbRect != null && pBounds.overlaps(usbRect)) {
+                GameState.instance.hasUsb = true;
+                GameState.instance.labCleared = true;
+                usbRect = null;
             }
-            if (stunTimer > 0) {
-                stunTimer -= delta;
-            }
-            if (showEnemiesTimer > 0) {
-                showEnemiesTimer -= delta;
-            }
-
-            Gdx.gl.glClearColor(0, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-            entityManager.update(delta);
-            player.setX(MathUtils.clamp(player.getX(), 0, 800));
-            player.setY(MathUtils.clamp(player.getY(), 0, 600));
-
-            Rectangle pBounds = new Rectangle(player.getX() - 25, player.getY() - 25, 50, 50);
-
-            if (labCleared) {
-                if (usbRect != null && pBounds.overlaps(usbRect)) {
-                    GameState.instance.hasUsb = true;
-                    GameState.instance.labCleared = true;
-                    game.getScreenTransition().fadeOut(new BossRoomScreen(game), 1f);
-                    usbRect = null;
-                }
-            } else if (waveActive) {
-                if (stunTimer <= 0) {
-                    for (int i = enemies.size() - 1; i >= 0; i--) {
-                        BaseEnemy e = enemies.get(i);
-                        e.update(dt, player, this);
-                        if (e.isDead()) {
-                            if (MathUtils.random() < 0.3f) {
-                                items.add(new ItemDrop(e.getX(), e.getY(), MathUtils.random(0, 2)));
-                            }
-                            if (e instanceof StackOverflowEnemy && !((StackOverflowEnemy) e).isSplit) {
-                                enemies.add(new StackOverflowEnemy(e.getX() - 30, e.getY(), true));
-                                enemies.add(new StackOverflowEnemy(e.getX() + 30, e.getY(), true));
-                            }
-                            enemies.remove(i);
-                        } else if (e.getBounds().overlaps(pBounds) && !(e instanceof SyntaxErrorEnemy)) {
-                            GameState.instance.hp -= 10 * dt;
-                        }
-                    }
+            // Portal from lab.tmx handles spatial transition to BossRoom via
+            // checkTriggers()
+        } else if (waveActive) {
+            updateWaveLogic(dt, pBounds);
+        } else {
+            waveTimer -= delta;
+            if (waveTimer <= 0) {
+                if (currentWave < 5) {
+                    currentWave++;
+                    startWave(currentWave);
                 } else {
-                    for (BaseEnemy e : enemies) e.getBounds().setPosition(e.getX(), e.getY());
-                }
-
-                if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                    playerBullets.add(new Rectangle(player.getX(), player.getY(), 10, 10));
-                }
-                for (int i = playerBullets.size() - 1; i >= 0; i--) {
-                    Rectangle b = playerBullets.get(i);
-                    b.y += 400 * delta;
-                    boolean hit = false;
-                    for (BaseEnemy e : enemies) {
-                        if (b.overlaps(e.getBounds())) {
-                            e.takeDamage(10);
-                            hit = true;
-                            break;
-                        }
-                    }
-                    if (hit || b.y > 600) playerBullets.remove(i);
-                }
-
-                for (int i = enemyProjectiles.size() - 1; i >= 0; i--) {
-                    Rectangle p = enemyProjectiles.get(i);
-                    p.y -= 200 * dt;
-                    if (p.overlaps(pBounds)) {
-                        GameState.instance.hp -= 10;
-                        enemyProjectiles.remove(i);
-                    } else if (p.y < 0) {
-                        enemyProjectiles.remove(i);
-                    }
-                }
-
-                if (GameState.instance.hasNao && Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-                    slowMotionTimer = 3f;
-                }
-                if (Gdx.input.isKeyJustPressed(Input.Keys.E) && GameState.instance.stamina >= 20) {
-                    stunTimer = 2f;
-                    GameState.instance.stamina -= 20;
-                }
-                if (Gdx.input.isKeyJustPressed(Input.Keys.F) && GameState.instance.stamina >= 10) {
-                    showEnemiesTimer = 5f;
-                    GameState.instance.stamina -= 10;
-                }
-
-                if (enemies.isEmpty()) {
-                    waveActive = false;
-                    waveTimer = 3f;
-                }
-            } else {
-                waveTimer -= delta;
-                if (waveTimer <= 0) {
-                    if (currentWave < 5) {
-                        currentWave++;
-                        startWave(currentWave);
-                    } else {
-                        labCleared = true;
-                        usbRect = new Rectangle(385, 285, 30, 30);
-                    }
-                }
-            }
-
-            for (int i = items.size() - 1; i >= 0; i--) {
-                ItemDrop item = items.get(i);
-                if (item.rect.overlaps(pBounds)) {
-                    if (item.type == 0) {
-                        player.getInventory().addItem("coffee_den", 1);
-                    } else if (item.type == 1) {
-                        player.getInventory().addItem("energy_drink", 1);
-                    } else {
-                        player.getInventory().addItem("kho_ga", 1);
-                    }
-                    items.remove(i);
+                    labCleared = true;
+                    usbRect = new Rectangle(385, 285, 30, 30);
                 }
             }
         }
 
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-        shapeRenderer.setProjectionMatrix(camera.combined);
+        updateItemPickups(pBounds);
+    }
 
-        if (bgTexture != null) {
-            batch.begin();
-            batch.setColor(isLightsOut ? 0.3f : 1f, isLightsOut ? 0.3f : 1f, isLightsOut ? 0.3f : 1f, 1f);
-            batch.draw(bgTexture, 0, 0, 800, 600);
-            batch.setColor(Color.WHITE);
-            batch.end();
+    private void updateWaveLogic(float dt, Rectangle pBounds) {
+        if (stunTimer <= 0) {
+            for (int i = enemies.size() - 1; i >= 0; i--) {
+                BaseEnemy e = enemies.get(i);
+                e.update(dt, player, this);
+                if (e.isDead()) {
+                    if (MathUtils.random() < 0.3f) {
+                        items.add(new ItemDrop(e.getX(), e.getY(), MathUtils.random(0, 2)));
+                    }
+                    if (e instanceof StackOverflowEnemy && !((StackOverflowEnemy) e).isSplit) {
+                        enemies.add(new StackOverflowEnemy(e.getX() - 30, e.getY(), true, map));
+                        enemies.add(new StackOverflowEnemy(e.getX() + 30, e.getY(), true, map));
+                    }
+                    enemies.remove(i);
+                } else if (e.getBounds().overlaps(pBounds) && !(e instanceof SyntaxErrorEnemy)) {
+                    GameState.instance.hp -= 10 * dt;
+                }
+            }
+        } else {
+            for (BaseEnemy e : enemies)
+                e.getBounds().setPosition(e.getX(), e.getY());
         }
 
-        batch.begin();
-        entityManager.draw(batch);
-        batch.end();
+        if (inputHandler.isSpaceJustPressed()) {
+            playerBullets.add(new Rectangle(player.getX(), player.getY(), 10, 10));
+        }
+        for (int i = playerBullets.size() - 1; i >= 0; i--) {
+            Rectangle b = playerBullets.get(i);
+            b.y += 400 * Gdx.graphics.getDeltaTime();
+            boolean hit = false;
+            for (BaseEnemy e : enemies) {
+                if (b.overlaps(e.getBounds())) {
+                    e.takeDamage(10);
+                    hit = true;
+                    break;
+                }
+            }
+            if (hit || b.y > 600)
+                playerBullets.remove(i);
+        }
+
+        for (int i = enemyProjectiles.size() - 1; i >= 0; i--) {
+            Rectangle p = enemyProjectiles.get(i);
+            p.y -= 200 * dt;
+            if (p.overlaps(pBounds)) {
+                GameState.instance.hp -= 10;
+                enemyProjectiles.remove(i);
+            } else if (p.y < 0) {
+                enemyProjectiles.remove(i);
+            }
+        }
+
+        if (GameState.instance.hasNao && inputHandler.isQJustPressed())
+            slowMotionTimer = 3f;
+        if (inputHandler.isEJustPressed() && GameState.instance.stamina >= 20) {
+            stunTimer = 2f;
+            GameState.instance.stamina -= 20;
+        }
+        if (inputHandler.isFJustPressed() && GameState.instance.stamina >= 10) {
+            showEnemiesTimer = 5f;
+            GameState.instance.stamina -= 10;
+        }
+
+        if (enemies.isEmpty()) {
+            waveActive = false;
+            waveTimer = 3f;
+        }
+    }
+
+    private void updateItemPickups(Rectangle pBounds) {
+        for (int i = items.size() - 1; i >= 0; i--) {
+            ItemDrop item = items.get(i);
+            if (item.rect.overlaps(pBounds)) {
+                if (item.type == 0)
+                    player.getInventory().addItem("coffee_den", 1);
+                else if (item.type == 1)
+                    player.getInventory().addItem("energy_drink", 1);
+                else
+                    player.getInventory().addItem("kho_ga", 1);
+                items.remove(i);
+            }
+        }
+    }
+
+    @Override
+    protected void onDraw() {
+        OrthographicCamera cam = gameCamera.getCamera();
+        batch.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(cam.combined);
+
+        // Map handles background via mapRenderer in PlayScreen.render()
+
+        // Draw player and entities
+        drawEntities();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (ItemDrop item : items) {
@@ -291,9 +269,8 @@ public class LabScreen extends BaseScreen {
         }
 
         if (!isLightsOut || showEnemiesTimer > 0) {
-            for (BaseEnemy e : enemies) {
+            for (BaseEnemy e : enemies)
                 e.draw(shapeRenderer, batch, font);
-            }
         } else if (isLightsOut) {
             for (BaseEnemy e : enemies) {
                 if (e.getBounds().overlaps(new Rectangle(player.getX() - 100, player.getY() - 100, 200, 200))) {
@@ -303,106 +280,12 @@ public class LabScreen extends BaseScreen {
         }
         shapeRenderer.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.DARK_GRAY);
-        shapeRenderer.rect(10, 580, 100, 10);
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(10, 580, (GameState.instance.hp / GameState.instance.maxHp) * 100, 10);
-
-        shapeRenderer.setColor(Color.DARK_GRAY);
-        shapeRenderer.rect(10, 565, 100, 10);
-        shapeRenderer.setColor(Color.YELLOW);
-        shapeRenderer.rect(10, 565, (GameState.instance.stamina / GameState.instance.maxStamina) * 100, 10);
-        shapeRenderer.end();
-
         batch.begin();
         font.draw(batch, "Wave: " + currentWave + "/5", 350, 580);
         batch.end();
-
-        inventoryUI.render(player, batch, shapeRenderer, font);
     }
 
     public void addEnemyProjectile(Rectangle rect) {
         enemyProjectiles.add(rect);
-    }
-
-    @Override
-    public void dispose() {
-        shapeRenderer.dispose();
-        if (bgTexture != null) bgTexture.dispose();
-        font.dispose();
-        entityManager.dispose();
-    }
-}
-
-class NullPointerEnemy extends BaseEnemy {
-    public NullPointerEnemy(float x, float y) { super(x, y, 30, 30, 30, "NPE", Color.RED); }
-    @Override public float getMaxHp() { return 30; }
-    @Override public void update(float delta, Player p, LabScreen s) {
-        float dx = p.getX() - getX(); float dy = p.getY() - getY();
-        float dist = (float) Math.sqrt(dx*dx + dy*dy);
-        if (dist > 0) { 
-            setX(getX() + (dx/dist) * 50 * delta); 
-            setY(getY() + (dy/dist) * 50 * delta); 
-        }
-        setX(MathUtils.clamp(getX(), 0, 800 - getWidth()));
-        setY(MathUtils.clamp(getY(), 0, 600 - getHeight()));
-        getBounds().setPosition(getX(), getY());
-    }
-}
-
-class SyntaxErrorEnemy extends BaseEnemy {
-    private float fireTimer = 0;
-    public SyntaxErrorEnemy(float x, float y) { super(x, y, 30, 30, 25, "SyntaxErr", Color.ORANGE); }
-    @Override public float getMaxHp() { return 25; }
-    @Override public void update(float delta, Player p, LabScreen s) {
-        float dx = p.getX() - getX(); float dy = p.getY() - getY();
-        float dist = (float) Math.sqrt(dx*dx + dy*dy);
-        if (dist < 200) { 
-            setX(getX() - (dx/dist) * 30 * delta); 
-            setY(getY() - (dy/dist) * 30 * delta); 
-        }
-        setX(MathUtils.clamp(getX(), 0, 800 - getWidth()));
-        setY(MathUtils.clamp(getY(), 0, 600 - getHeight()));
-        getBounds().setPosition(getX(), getY());
-        fireTimer += delta;
-        if (fireTimer >= 1.5f) {
-            fireTimer = 0;
-            s.addEnemyProjectile(new Rectangle(getX() + 10, getY(), 10, 10));
-        }
-    }
-}
-
-class InfiniteLoopEnemy extends BaseEnemy {
-    private float vx = 70, vy = 70;
-    public InfiniteLoopEnemy(float x, float y) { super(x, y, 50, 50, 80, "InfLoop", Color.PURPLE); }
-    @Override public float getMaxHp() { return 80; }
-    @Override public void update(float delta, Player p, LabScreen s) {
-        setX(getX() + vx * delta); setY(getY() + vy * delta);
-        if (getX() < 0) { setX(0); vx = -vx; }
-        if (getX() > 800 - getWidth()) { setX(800 - getWidth()); vx = -vx; }
-        if (getY() < 0) { setY(0); vy = -vy; }
-        if (getY() > 600 - getHeight()) { setY(600 - getHeight()); vy = -vy; }
-        getBounds().setPosition(getX(), getY());
-    }
-}
-
-class StackOverflowEnemy extends BaseEnemy {
-    public boolean isSplit;
-    public StackOverflowEnemy(float x, float y, boolean isSplit) {
-        super(x, y, isSplit ? 40 : 80, isSplit ? 40 : 80, isSplit ? 50 : 100, "StackOver", Color.MAROON);
-        this.isSplit = isSplit;
-    }
-    @Override public float getMaxHp() { return isSplit ? 50 : 100; }
-    @Override public void update(float delta, Player p, LabScreen s) {
-        float dx = p.getX() - getX(); float dy = p.getY() - getY();
-        float dist = (float) Math.sqrt(dx*dx + dy*dy);
-        if (dist > 0) { 
-            setX(getX() + (dx/dist) * 35 * delta); 
-            setY(getY() + (dy/dist) * 35 * delta); 
-        }
-        setX(MathUtils.clamp(getX(), 0, 800 - getWidth()));
-        setY(MathUtils.clamp(getY(), 0, 600 - getHeight()));
-        getBounds().setPosition(getX(), getY());
     }
 }

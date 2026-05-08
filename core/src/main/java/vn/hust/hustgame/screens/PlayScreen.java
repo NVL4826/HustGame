@@ -2,153 +2,146 @@ package vn.hust.hustgame.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
 
 import vn.hust.hustgame.HustGame;
+import vn.hust.hustgame.GameState;
 import vn.hust.hustgame.entities.*;
+import vn.hust.hustgame.events.*;
 import vn.hust.hustgame.graphics.GameRenderer;
 import vn.hust.hustgame.input.GameInputHandler;
-import vn.hust.hustgame.inventory.Inventory;
+import vn.hust.hustgame.ui.HUD;
+import vn.hust.hustgame.ui.InventoryUI;
 import vn.hust.hustgame.world.GameCamera;
-import vn.hust.hustgame.world.LibrarySystem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayScreen extends BaseScreen {
-    private GameState state;
-    private GameRenderer gameRenderer;
-    private GameCamera gameCamera;
-    private TiledMap map;
-    private String currentMapName = "";
-    private OrthogonalTiledMapRenderer mapRenderer;
-    private EntityManager entityManager;
-    private GameInputHandler inputHandler;
-    private Player player;
-    
-    private float lastOutsideX = 1024f;
-    private float lastOutsideY = 1024f;
-    private float lastTang1X = 240f;
-    private float lastTang1Y = 80f;
-    
-    private LibrarySystem librarySystem;
-    private List<Rectangle> stage2Zones = new ArrayList<>();
+public abstract class PlayScreen extends BaseScreen implements EventListener {
+    protected ScreenState state;
+    protected GameRenderer gameRenderer;
+    protected GameCamera gameCamera;
+    protected TiledMap map;
+    protected String currentMapName = "";
+    protected OrthogonalTiledMapRenderer mapRenderer;
+    protected EntityManager entityManager;
+    protected GameInputHandler inputHandler;
+    protected Player player;
+
+    protected ShapeRenderer shapeRenderer;
+    protected BitmapFont font;
+    protected HUD hud;
+    protected InventoryUI inventoryUI;
+
+    protected List<Portal> portals = new ArrayList<>();
 
     private int[] backgroundLayers;
     private int[] foregroundLayers;
 
-    private com.badlogic.gdx.graphics.glutils.ShaderProgram silhouetteShader;
-    private com.badlogic.gdx.graphics.glutils.ShaderProgram discardShader;
+    private ShaderProgram silhouetteShader;
+    private ShaderProgram discardShader;
 
-    private static final float VIEW_WIDTH  = 480f;
-    private static final float VIEW_HEIGHT = 320f;
-    
-    private float currentMapW = 128 * 16f;
-    private float currentMapH = 128 * 16f;
-    private float currentCameraZoom = 1f;
+    protected static final float VIEW_WIDTH = 800f;
+    protected static final float VIEW_HEIGHT = 600f;
 
     public PlayScreen(HustGame game) {
         super(game);
-        this.state = GameState.RUNNING;
-        
+        this.state = ScreenState.RUNNING;
+
         initShaders();
-        
+
         entityManager = new EntityManager();
         inputHandler = new GameInputHandler();
-        
-        loadMap("Final Outside.tmx", 1024f, 1024f);
 
-        player = new Player(1024f, 1024f, new Inventory(), inputHandler, map);
-        entityManager.addEntity(player);
-        
-        gameCamera = new GameCamera(VIEW_WIDTH, VIEW_HEIGHT);
-        gameCamera.setMapBounds(currentMapW, currentMapH);
-        gameCamera.setTarget(player);
-        
-        gameRenderer = new GameRenderer(gameCamera, entityManager, game.getSpriteBatch(), silhouetteShader, discardShader);
+        initCommonUI();
+
+        EventDispatcher.getInstance().addListener(EventType.MAP_TRANSITION, this);
+    }
+
+    protected void initCommonUI() {
+        if (shapeRenderer == null)
+            shapeRenderer = new ShapeRenderer();
+        if (font == null) {
+            font = new BitmapFont();
+            font.setColor(Color.WHITE);
+        }
+        if (hud == null)
+            hud = new HUD();
+        if (inventoryUI == null)
+            inventoryUI = new InventoryUI();
     }
 
     private void initShaders() {
-        String vertexShader = "attribute vec4 a_position;\n" +
-            "attribute vec4 a_color;\n" +
-            "attribute vec2 a_texCoord0;\n" +
-            "uniform mat4 u_projTrans;\n" +
-            "varying vec4 v_color;\n" +
-            "varying vec2 v_texCoords;\n" +
-            "void main() {\n" +
-            "    v_color = a_color;\n" +
-            "    v_texCoords = a_texCoord0;\n" +
-            "    gl_Position = u_projTrans * a_position;\n" +
-            "}\n";
+        String vert = Gdx.files.internal("shaders/default.vert").readString();
+        String fragSil = Gdx.files.internal("shaders/silhouette.frag").readString();
+        String fragDisc = Gdx.files.internal("shaders/discard.frag").readString();
 
-        String fragSilhouette = "#ifdef GL_ES\n" +
-            "precision mediump float;\n" +
-            "#endif\n" +
-            "varying vec4 v_color;\n" +
-            "varying vec2 v_texCoords;\n" +
-            "uniform sampler2D u_texture;\n" +
-            "void main() {\n" +
-            "    vec4 texColor = texture2D(u_texture, v_texCoords);\n" +
-            "    if(texColor.a < 0.1) discard;\n" +
-            "    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.6 * texColor.a);\n" +
-            "}\n";
-            
-        silhouetteShader = new com.badlogic.gdx.graphics.glutils.ShaderProgram(vertexShader, fragSilhouette);
-        
-        String fragDiscard = "#ifdef GL_ES\n" +
-            "precision mediump float;\n" +
-            "#endif\n" +
-            "varying vec4 v_color;\n" +
-            "varying vec2 v_texCoords;\n" +
-            "uniform sampler2D u_texture;\n" +
-            "void main() {\n" +
-            "    vec4 texColor = texture2D(u_texture, v_texCoords);\n" +
-            "    if(texColor.a < 0.1) discard;\n" +
-            "    gl_FragColor = v_color * texColor;\n" +
-            "}\n";
-            
-        discardShader = new com.badlogic.gdx.graphics.glutils.ShaderProgram(vertexShader, fragDiscard);
-    }
-
-    private void loadMap(String mapFile, float startX, float startY) {
-        if (map != null) map.dispose();
-        if (mapRenderer != null) mapRenderer.dispose();
-
-        currentMapName = mapFile;
-        map = new TmxMapLoader().load(mapFile);
-        mapRenderer = new OrthogonalTiledMapRenderer(map);
-
-        if (gameCamera != null) {
-            if (mapFile.equals("Phong_doc.tmx")) {
-                currentMapW = 1440f;
-                currentMapH = 1440f;
-                currentCameraZoom = 2.0f;
-            } else if (mapFile.equals("tang1.tmx")) {
-                currentMapW = 1024f;
-                currentMapH = 1024f;
-                currentCameraZoom = 1.0f;
-            } else {
-                currentMapW = 128 * 16f;
-                currentMapH = 128 * 16f;
-                currentCameraZoom = 1.0f;
-            }
-            gameCamera.setZoom(currentCameraZoom);
-            gameCamera.setMapBounds(currentMapW, currentMapH);
+        silhouetteShader = new ShaderProgram(vert, fragSil);
+        if (!silhouetteShader.isCompiled()) {
+            Gdx.app.error("Shaders", "Silhouette shader failed: " + silhouetteShader.getLog());
         }
 
+        discardShader = new ShaderProgram(vert, fragDisc);
+        if (!discardShader.isCompiled()) {
+            Gdx.app.error("Shaders", "Discard shader failed: " + discardShader.getLog());
+        }
+    }
+
+    protected void loadMap(String mapFile, float startX, float startY) {
+        if (mapRenderer != null)
+            mapRenderer.dispose();
+
+        currentMapName = mapFile;
+        map = game.getAssetManager().getTiledMap(mapFile);
+        mapRenderer = new OrthogonalTiledMapRenderer(map);
+
+        // Data-driven map properties
+        float mapW = map.getProperties().get("width", Integer.class) * 16f;
+        float mapH = map.getProperties().get("height", Integer.class) * 16f;
+        float zoom = map.getProperties().get("zoom", 1.0f, Float.class);
+
+        if (gameCamera == null) {
+            gameCamera = new GameCamera(VIEW_WIDTH, VIEW_HEIGHT);
+        }
+        gameCamera.setZoom(zoom);
+        gameCamera.setMapBounds(mapW, mapH);
+
+        if (player == null) {
+            player = EntityFactory.createPlayer(startX, startY, GameState.instance.globalInventory, inputHandler, map);
+            entityManager.addEntity(player);
+            gameCamera.setTarget(player);
+        } else {
+            player.setMap(map, startX, startY);
+        }
+
+        if (gameRenderer == null) {
+            gameRenderer = new GameRenderer(gameCamera, entityManager, game.getSpriteBatch(), silhouetteShader,
+                    discardShader);
+        }
+
+        setupLayers();
+        setupPortals();
+    }
+
+    private void setupLayers() {
         List<Integer> bgLayersList = new ArrayList<>();
         List<Integer> fgLayersList = new ArrayList<>();
         for (int i = 0; i < map.getLayers().size(); i++) {
             String layerName = map.getLayers().get(i).getName();
             if (layerName.equals("Via He") || layerName.equals("Duong")
-                || layerName.equals("Grass") || layerName.equals("Nha1")
-                || layerName.equals("Background")) {
+                    || layerName.equals("Grass") || layerName.equals("Nha1")
+                    || layerName.equals("Background")) {
                 bgLayersList.add(i);
             } else {
                 fgLayersList.add(i);
@@ -156,32 +149,25 @@ public class PlayScreen extends BaseScreen {
         }
 
         backgroundLayers = new int[bgLayersList.size()];
-        for(int i = 0; i < bgLayersList.size(); i++) backgroundLayers[i] = bgLayersList.get(i);
+        for (int i = 0; i < bgLayersList.size(); i++)
+            backgroundLayers[i] = bgLayersList.get(i);
         foregroundLayers = new int[fgLayersList.size()];
-        for(int i = 0; i < fgLayersList.size(); i++) foregroundLayers[i] = fgLayersList.get(i);
+        for (int i = 0; i < fgLayersList.size(); i++)
+            foregroundLayers[i] = fgLayersList.get(i);
+    }
 
-        if (player != null) {
-            player.setMap(map, startX, startY);
-        }
-
-        stage2Zones.clear();
-        if (mapFile.equals("tang1.tmx")) {
-            com.badlogic.gdx.maps.MapLayer s2Layer = map.getLayers().get("Stage2");
-            if (s2Layer != null) {
-                for (com.badlogic.gdx.maps.MapObject obj : s2Layer.getObjects()) {
-                    if (obj instanceof com.badlogic.gdx.maps.objects.RectangleMapObject) {
-                        stage2Zones.add(((com.badlogic.gdx.maps.objects.RectangleMapObject) obj).getRectangle());
-                    }
+    protected void setupPortals() {
+        portals.clear();
+        MapLayer portalLayer = map.getLayers().get("Portals");
+        if (portalLayer != null) {
+            for (MapObject obj : portalLayer.getObjects()) {
+                if (obj instanceof RectangleMapObject) {
+                    Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                    String target = obj.getProperties().get("target", String.class);
+                    float spawnX = obj.getProperties().get("spawnX", 0f, Float.class);
+                    float spawnY = obj.getProperties().get("spawnY", 0f, Float.class);
+                    portals.add(new Portal(rect, target, spawnX, spawnY));
                 }
-            }
-        }
-
-        if (mapFile.equals("Phong_doc.tmx")) {
-            if (librarySystem == null) librarySystem = new LibrarySystem();
-        } else {
-            if (librarySystem != null) {
-                librarySystem.dispose();
-                librarySystem = null;
             }
         }
     }
@@ -195,65 +181,151 @@ public class PlayScreen extends BaseScreen {
 
     @Override
     public void render(float delta) {
-        if (state == GameState.RUNNING) {
+        // Clear screen
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        if (state == ScreenState.RUNNING && !game.getScreenTransition().isTransitioning()) {
             entityManager.update(delta);
-            if (librarySystem != null) librarySystem.update(delta);
+            onUpdate(delta);
             checkTriggers();
         }
 
-        gameCamera.update();
-        gameRenderer.render(mapRenderer, backgroundLayers, foregroundLayers, librarySystem);
+        if (gameCamera != null) {
+            gameCamera.update();
+        }
+
+        // Only render map if gameRenderer and mapRenderer are available (map-based
+        // screens)
+        if (gameRenderer != null && mapRenderer != null) {
+            gameRenderer.render(mapRenderer, backgroundLayers, foregroundLayers, null);
+        }
+
+        onDraw();
+
+        handleCommonInput();
+        renderCommonUI();
+
+        inputHandler.update();
     }
 
-    private void checkTriggers() {
-        if (currentMapName.equals("Final Outside.tmx")) {
-            com.badlogic.gdx.maps.tiled.TiledMapTileLayer cuaLayer = (com.badlogic.gdx.maps.tiled.TiledMapTileLayer) map.getLayers().get("Cua");
-            if (cuaLayer != null) {
-                int cellX = (int) (player.getX() / 16f);
-                int cellY = (int) (player.getY() / 16f);
-                com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell cell = cuaLayer.getCell(cellX, cellY);
-                if (cell != null && cell.getTile() != null) {
-                    lastOutsideX = player.getX();
-                    lastOutsideY = player.getY() - 32f;
-                    loadMap("tang1.tmx", 445f, 100f);
-                }
-            }
-        } else if (currentMapName.equals("tang1.tmx")) {
-            if (player.getY() < 65f) {
-                loadMap("Final Outside.tmx", lastOutsideX, lastOutsideY);
-            }
-            float px = player.getX();
-            float py = player.getY();
-            for (Rectangle zone : stage2Zones) {
-                if (zone.contains(px, py)) {
-                    lastTang1X = player.getX();
-                    lastTang1Y = 612f;
-                    loadMap("Phong_doc.tmx", 240f, 80f);
-                    break;
-                }
-            }
-        } else if (currentMapName.equals("Phong_doc.tmx")) {
-            if (player.getY() < 65f) {
-                loadMap("tang1.tmx", lastTang1X, lastTang1Y);
+    protected abstract void onUpdate(float delta);
+
+    protected abstract void onDraw();
+
+    /** Helper for non-map screens to draw their entities manually */
+    protected void drawEntities() {
+        if (gameCamera != null) {
+            batch.setProjectionMatrix(gameCamera.getCamera().combined);
+        }
+        batch.begin();
+        entityManager.draw(batch);
+        batch.end();
+    }
+
+    protected void renderCommonUI() {
+        if (hud != null)
+            hud.render(batch, shapeRenderer, font);
+        if (inventoryUI != null && player != null) {
+            inventoryUI.render(player, batch, shapeRenderer, font);
+        }
+    }
+
+    protected void handleCommonInput() {
+        if (inputHandler.isInventoryJustPressed()) {
+            GameState.instance.isInventoryOpen = !GameState.instance.isInventoryOpen;
+        }
+    }
+
+    protected void checkTriggers() {
+        if (game.getScreenTransition().isTransitioning())
+            return;
+        for (Portal portal : portals) {
+            if (portal.bounds.contains(player.getX(), player.getY())) {
+                MapTransitionData data = new MapTransitionData(portal.targetMap, portal.spawnX, portal.spawnY);
+                handleMapTransition(data);
+                break;
             }
         }
     }
 
     @Override
-    public void dispose() {
-        if (map != null) map.dispose();
-        if (mapRenderer != null) mapRenderer.dispose();
-        if (entityManager != null) entityManager.dispose();
-        if (silhouetteShader != null) silhouetteShader.dispose();
-        if (discardShader != null) discardShader.dispose();
-        if (librarySystem != null) librarySystem.dispose();
+    public void onEvent(GameEvent<?> event) {
+        if (event.getType() == EventType.MAP_TRANSITION) {
+            MapTransitionData data = (MapTransitionData) event.getData();
+            handleMapTransition(data);
+        }
     }
 
-    public GameState getState() {
+    /**
+     * Resolves a target identifier to a Screen instance.
+     * Target can be a TMX filename (e.g. "tang1.tmx") mapped to its Screen class,
+     * or a screen name (e.g. "LibraryScreen").
+     */
+    protected Screen resolveTargetScreen(String target) {
+        switch (target) {
+            case "Final Outside.tmx":
+                return new FinalOutsideScreen(game);
+            case "tang1.tmx":
+                return new Tang1Screen(game);
+            case "library.tmx":
+                return new LibraryScreen(game);
+            case "lab.tmx":
+                return new LabScreen(game);
+            case "boss_room.tmx":
+                return new BossRoomScreen(game);
+            default:
+                Gdx.app.error("PlayScreen", "Unknown target screen: " + target);
+                return null;
+        }
+    }
+
+    protected void handleMapTransition(MapTransitionData data) {
+        if (game.getScreenTransition().isTransitioning())
+            return;
+
+        Screen targetScreen = resolveTargetScreen(data.targetMap);
+        if (targetScreen != null) {
+            game.getScreenTransition().fadeOut(targetScreen, 0.5f);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        EventDispatcher.getInstance().removeListener(EventType.MAP_TRANSITION, this);
+        if (mapRenderer != null)
+            mapRenderer.dispose();
+        if (entityManager != null)
+            entityManager.dispose();
+        if (silhouetteShader != null)
+            silhouetteShader.dispose();
+        if (discardShader != null)
+            discardShader.dispose();
+        if (shapeRenderer != null)
+            shapeRenderer.dispose();
+        if (font != null)
+            font.dispose();
+    }
+
+    public ScreenState getState() {
         return state;
     }
 
-    public void setState(GameState state) {
+    public void setState(ScreenState state) {
         this.state = state;
+    }
+
+    public static class Portal {
+        public Rectangle bounds;
+        public String targetMap;
+        public float spawnX;
+        public float spawnY;
+
+        public Portal(Rectangle bounds, String targetMap, float spawnX, float spawnY) {
+            this.bounds = bounds;
+            this.targetMap = targetMap;
+            this.spawnX = spawnX;
+            this.spawnY = spawnY;
+        }
     }
 }
