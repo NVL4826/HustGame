@@ -58,6 +58,8 @@ www-test/
 
 ## VS Code
 .vscode/
+backup/
+.agents/
 
 ## IntelliJ, Android Studio:
 .idea/

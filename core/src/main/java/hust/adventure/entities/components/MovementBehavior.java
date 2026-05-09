@@ -1,0 +1,16 @@
+package hust.adventure.entities.components;
+
+import hust.adventure.entities.base.BaseEntity;
+
+/**
+ * Interface for movement strategies.
+ */
+public interface MovementBehavior {
+    /**
+     * Update the entity's position based on its movement strategy.
+     * 
+     * @param entity The entity to move.
+     * @param delta  Time delta.
+     */
+    void update(BaseEntity entity, float delta);
+}
