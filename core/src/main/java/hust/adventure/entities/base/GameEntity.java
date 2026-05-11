@@ -11,6 +11,7 @@ import hust.adventure.collision.Collider;
 public interface GameEntity extends Disposable {
     void update(float delta);
     void draw(SpriteBatch batch);
+    void drawHitbox(com.badlogic.gdx.graphics.glutils.ShapeRenderer sr);
     
     float getX();
     float getY();

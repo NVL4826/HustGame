@@ -80,4 +80,12 @@ public class StatusEffectManager {
     public boolean hasStatus(final StatusFlag flag) {
         return flagCounts.containsKey(flag);
     }
+ 
+    /**
+     * Clears all active effects. Used for object pooling reset.
+     */
+    public void clear() {
+        activeEffects.clear();
+        flagCounts.clear();
+    }
 }

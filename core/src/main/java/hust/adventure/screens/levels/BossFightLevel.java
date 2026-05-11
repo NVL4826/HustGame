@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,8 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.Pixmap;
 import hust.adventure.HustGame;
-import hust.adventure.core.ProgressContext;
-import hust.adventure.core.LevelConfig;
+import hust.adventure.core.config.LevelConfig;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.enemies.FinalBoss;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +58,8 @@ public class BossFightLevel extends BaseLevelScreen {
 
     @Override
     protected void initLevel() {
-        finalBoss = entityFactory.createFinalBoss(350, 450, collisionManager,
+        finalBoss = entityFactory.createFinalBoss(350, 450,
                 game.getAssetManager().getTexture("Boss THT.png"));
-        entityManager.addEntity(finalBoss);
 
         initBossContent();
         initUI();
@@ -87,12 +85,11 @@ public class BossFightLevel extends BaseLevelScreen {
     private void initUI() {
         stage = new Stage(new ScreenViewport());
         final Skin skin = new Skin();
-        final Pixmap pixmap = new Pixmap(100, 30,
-                Pixmap.Format.RGBA8888);
+        final Pixmap pixmap = new Pixmap(100, 30, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
         skin.add("white", new Texture(pixmap));
-        skin.add("default", new BitmapFont());
+        skin.add("default", game.getFont());
 
         final TextField.TextFieldStyle tfs = new TextField.TextFieldStyle();
         tfs.font = skin.getFont("default");
@@ -156,8 +153,7 @@ public class BossFightLevel extends BaseLevelScreen {
     private void updateDodge(float dt) {
         if (MathUtils.random() < 2f * dt) {
             final float startX = MathUtils.random(100, VIEW_WIDTH - 100);
-            entityManager
-                    .addEntity(entityFactory.createProjectile(startX, VIEW_HEIGHT, 0, -150, 10, Color.WHITE, false));
+            entityFactory.createProjectile(startX, VIEW_HEIGHT, 0, -150, 10, Color.WHITE, false);
         }
     }
 

@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import hust.adventure.core.ProgressContext;
+import hust.adventure.core.TimeProvider;
+import hust.adventure.core.context.ProgressContext;
 
 public class HUD {
     private OrthographicCamera uiCam;
@@ -15,6 +16,12 @@ public class HUD {
         uiCam = new OrthographicCamera();
         uiCam.setToOrtho(false, 800, 600);
         uiCam.update();
+    }
+
+    private TimeProvider timeProvider;
+
+    public void setTimeProvider(TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
     }
 
     public void render(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
@@ -61,9 +68,17 @@ public class HUD {
         font.draw(batch, "HP: " + (int) ProgressContext.instance.hp + "/" + (int) ProgressContext.instance.maxHp, 180,
                 583);
         font.draw(batch,
-                "SP: " + (int) ProgressContext.instance.stamina + "/" + (int) ProgressContext.instance.maxStamina,
-                180, 563);
+                "SP: " + (int) ProgressContext.instance.stamina + "/" + (int) ProgressContext.instance.maxStamina, 180,
+                563);
         font.draw(batch, "Morale: " + (int) ProgressContext.instance.morale + "%", 180, 543);
+
+        if (timeProvider != null) {
+            int totalSeconds = (int) timeProvider.getCurrentTime();
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
+            String timeString = String.format("%02d:%02d", minutes, seconds);
+            font.draw(batch, "Time: " + timeString, 380, 583);
+        }
 
         // Status artifacts
         if (ProgressContext.instance.hasNao)

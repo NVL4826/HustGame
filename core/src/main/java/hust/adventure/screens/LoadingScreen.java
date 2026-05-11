@@ -1,8 +1,9 @@
 package hust.adventure.screens;
 
 import hust.adventure.HustGame;
-import hust.adventure.core.LevelConfig;
-import hust.adventure.core.LevelID;
+import hust.adventure.core.config.LevelConfig;
+import hust.adventure.core.config.LevelID;
+import hust.adventure.screens.levels.LevelFactory;
 
 public class LoadingScreen extends BaseScreen {
 
@@ -16,8 +17,9 @@ public class LoadingScreen extends BaseScreen {
         drawProgressBar();
 
         if (game.getAssetManager().update()) {
-            LevelConfig config = new LevelConfig(LevelID.FINAL_OUTSIDE, "Final Outside.tmx", 1024f, 1024f);
-            game.setScreen(hust.adventure.screens.levels.LevelFactory.createLevel(game, config));
+            LevelConfig config = new LevelConfig(LevelID.MAP_1, "tsx/map_1.tmx", 400f, 400f, 1.0f, null,
+                    LevelID.MAP_1.getAmbientColor());
+            game.setScreen(LevelFactory.createLevel(game, config));
         }
     }
 

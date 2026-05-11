@@ -5,13 +5,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.screens.LoadingScreen;
 import hust.adventure.screens.ScreenTransition;
-import hust.adventure.assets.GameAssetManager;
-import hust.adventure.core.LevelConfig;
-import hust.adventure.core.LevelID;
+import hust.adventure.core.GameAssetManager;
+import hust.adventure.core.config.LevelConfig;
+import hust.adventure.core.config.LevelID;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
@@ -34,11 +36,19 @@ public class HustGame extends Game implements EventListener {
     public void create() {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-        font = new BitmapFont();
         assetManager = new GameAssetManager();
         eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.addListener(EventType.MAP_TRANSITION, this);
         screenTransition = new ScreenTransition(this);
+
+        // Khởi tạo font hỗ trợ tiếng Việt
+        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ui/font.ttf"));
+        final FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+        parameter.size = 18;
+        parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS
+                + "àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ";
+        font = generator.generateFont(parameter);
+        generator.dispose();
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));
@@ -55,11 +65,12 @@ public class HustGame extends Game implements EventListener {
         if (screenTransition.isTransitioning())
             return;
 
-        final LevelID nextId = LevelID.fromMapPath(data.targetMap);
+        final LevelID nextId = LevelID.fromMapPath(data.getTargetMap());
         if (nextId == null)
             return;
 
-        final LevelConfig config = new LevelConfig(nextId, data.targetMap, data.spawnX, data.spawnY);
+        final LevelConfig config = new LevelConfig(nextId, data.getTargetMap(), data.getSpawnX(), data.getSpawnY(),
+                1.0f, null, nextId.getAmbientColor());
         final Screen nextScreen = LevelFactory.createLevel(this, config);
 
         if (nextScreen != null) {

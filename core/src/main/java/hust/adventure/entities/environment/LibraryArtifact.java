@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import hust.adventure.core.ProgressContext;
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.base.BaseEntity;
 

@@ -3,7 +3,10 @@ package hust.adventure.entities;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Pool;
 import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.factory.EntityFactory;
 import java.util.Comparator;
 
 /**
@@ -26,21 +29,26 @@ public class EntityManager implements Disposable {
         pendingAdd.add(entity);
     }
 
-    public void update(final float delta) {
+    public void update(final float delta, final EntityFactory factory) {
         // Process pending additions
         if (pendingAdd.size > 0) {
             entities.addAll(pendingAdd);
             pendingAdd.clear();
         }
-
+ 
         // Update and cleanup destroyed entities
         for (int i = entities.size - 1; i >= 0; i--) {
             final GameEntity entity = entities.get(i);
             entity.update(delta);
-
+ 
             if (entity.isDestroyed()) {
                 entity.dispose();
                 entities.removeIndex(i);
+ 
+                // Return to pool if it's a BaseEntity and Poolable
+                if (factory != null && entity instanceof BaseEntity && entity instanceof Pool.Poolable) {
+                    factory.freeEntity((BaseEntity) entity);
+                }
             }
         }
     }

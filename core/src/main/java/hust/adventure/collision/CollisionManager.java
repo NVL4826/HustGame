@@ -28,6 +28,7 @@ public class CollisionManager {
     private final Array<WallEntity> staticWalls;
     private final Rectangle tempRect;
     private float mapWidth, mapHeight;
+    private boolean isInfinite;
 
     public CollisionManager(final EntityManager entityManager, final float cellSize) {
         if (entityManager == null) {
@@ -64,15 +65,47 @@ public class CollisionManager {
         }
 
         if (map != null) {
-            final Integer w = map.getProperties().get("width", Integer.class);
-            final Integer th = map.getProperties().get("tilewidth", Integer.class);
-            final Integer h = map.getProperties().get("height", Integer.class);
-            final Integer tv = map.getProperties().get("tileheight", Integer.class);
-            if (w != null && th != null)
-                this.mapWidth = w * th;
-            if (h != null && tv != null)
-                this.mapHeight = h * tv;
+            // Support both Integer and Float properties, with a default of 0 if missing
+            Object w = map.getProperties().get("width");
+            Object h = map.getProperties().get("height");
+            Object th = map.getProperties().get("tilewidth");
+            Object tv = map.getProperties().get("tileheight");
+
+            float width = 0, height = 0, tileW = 0, tileH = 0;
+
+            if (w instanceof Integer) width = (Integer) w; else if (w instanceof Float) width = (Float) w;
+            if (h instanceof Integer) height = (Integer) h; else if (h instanceof Float) height = (Float) h;
+            if (th instanceof Integer) tileW = (Integer) th; else if (th instanceof Float) tileW = (Float) th;
+            if (tv instanceof Integer) tileH = (Integer) tv; else if (tv instanceof Float) tileH = (Float) tv;
+
+            if (width > 0 && tileW > 0)
+                this.mapWidth = width * tileW;
+            else
+                this.mapWidth = 2000f; // Default fallback
+
+            if (height > 0 && tileH > 0)
+                this.mapHeight = height * tileH;
+            else
+                this.mapHeight = 2000f; // Default fallback
+                
+            Gdx.app.log("CollisionManager", "Map bounds set to: " + mapWidth + "x" + mapHeight);
         }
+    }
+
+    public void setInfinite(boolean infinite) {
+        this.isInfinite = infinite;
+    }
+
+    public boolean isInfinite() {
+        return isInfinite;
+    }
+
+    public float getMapWidth() {
+        return mapWidth;
+    }
+
+    public float getMapHeight() {
+        return mapHeight;
     }
 
     /**
@@ -85,8 +118,8 @@ public class CollisionManager {
      */
     public boolean canMove(final GameEntity entity, final float nextX, final float nextY) {
         // 1. Boundary check
-        if (nextX < entity.getWidth() / 2f || nextX > mapWidth - entity.getWidth() / 2f
-                || nextY < entity.getHeight() / 2f || nextY > mapHeight - entity.getHeight() / 2f) {
+        if (!isInfinite && (nextX < entity.getWidth() / 2f || nextX > mapWidth - entity.getWidth() / 2f
+                || nextY < entity.getHeight() / 2f || nextY > mapHeight - entity.getHeight() / 2f)) {
             return false;
         }
 
@@ -193,18 +226,32 @@ public class CollisionManager {
 
             addColliderToCell(cellX, cellY, collider);
 
-            // Handle objects overlapping multiple cells
+            // Handle objects overlapping multiple cells using their bounding box
+            float minX, maxX, minY, maxY;
             if (collider.getShape() == Collider.Shape.RECTANGLE) {
-                final float x2 = entity.getX() + entity.getWidth();
-                final float y2 = entity.getY() + entity.getHeight();
-                final int cellX2 = (int) (x2 / cellSize);
-                final int cellY2 = (int) (y2 / cellSize);
+                // For rectangles, bounds are (x - width/2, y - height/2) to (x + width/2, y + height/2) based on BaseEntity getBounds()
+                minX = entity.getBounds().x;
+                maxX = entity.getBounds().x + entity.getBounds().width;
+                minY = entity.getBounds().y;
+                maxY = entity.getBounds().y + entity.getBounds().height;
+            } else {
+                // For circles
+                float radius = collider.getRadius();
+                minX = entity.getX() - radius;
+                maxX = entity.getX() + radius;
+                minY = entity.getY() - radius;
+                maxY = entity.getY() + radius;
+            }
 
-                for (int x = cellX; x <= cellX2; x++) {
-                    for (int y = cellY; y <= cellY2; y++) {
-                        if (x != cellX || y != cellY) {
-                            addColliderToCell(x, y, collider);
-                        }
+            final int cellX1 = (int) (minX / cellSize);
+            final int cellY1 = (int) (minY / cellSize);
+            final int cellX2 = (int) (maxX / cellSize);
+            final int cellY2 = (int) (maxY / cellSize);
+
+            for (int x = cellX1; x <= cellX2; x++) {
+                for (int y = cellY1; y <= cellY2; y++) {
+                    if (x != cellX || y != cellY) {
+                        addColliderToCell(x, y, collider);
                     }
                 }
             }
@@ -247,10 +294,121 @@ public class CollisionManager {
         }
     }
 
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
     private boolean canCollide(final Collider c1, final Collider c2) {
         final int layer1 = c1.getLayer();
         final int layer2 = c2.getLayer();
 
         return (collisionMatrix[log2(layer1)] & layer2) != 0;
+    }
+
+    /**
+     * Finds all entities within a rectangular area that match the layer mask.
+     */
+    public Array<GameEntity> getEntitiesInArea(final Rectangle area, final int layerMask) {
+        final Array<GameEntity> result = new Array<>();
+        final int startX = (int) (area.x / cellSize);
+        final int startY = (int) (area.y / cellSize);
+        final int endX = (int) ((area.x + area.width) / cellSize);
+        final int endY = (int) ((area.y + area.height) / cellSize);
+
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                final Array<Collider> cell = grid.get(hash(x, y));
+                if (cell != null) {
+                    for (final Collider c : cell) {
+                        if ((c.getLayer() & layerMask) != 0 && c.getOwner().getBounds().overlaps(area)) {
+                            if (!result.contains(c.getOwner(), true)) {
+                                result.add(c.getOwner());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Finds all entities within a circular radius that match the layer mask.
+     */
+    public Array<GameEntity> getEntitiesInRadius(final float cx, final float cy, final float radius, final int layerMask) {
+        final Array<GameEntity> result = new Array<>();
+        final int startX = (int) ((cx - radius) / cellSize);
+        final int startY = (int) ((cy - radius) / cellSize);
+        final int endX = (int) ((cx + radius) / cellSize);
+        final int endY = (int) ((cy + radius) / cellSize);
+
+        final float radiusSq = radius * radius;
+
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                final Array<Collider> cell = grid.get(hash(x, y));
+                if (cell != null) {
+                    for (final Collider c : cell) {
+                        if ((c.getLayer() & layerMask) != 0) {
+                            final float dx = c.getOwner().getX() - cx;
+                            final float dy = c.getOwner().getY() - cy;
+                            if (dx * dx + dy * dy <= radiusSq) {
+                                if (!result.contains(c.getOwner(), true)) {
+                                    result.add(c.getOwner());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Finds the nearest entity to a point within a maximum range that matches the layer mask.
+     * Uses spatial hashing to expand the search radius efficiently.
+     */
+    public GameEntity getNearestEntity(final float cx, final float cy, final float maxRange, final int layerMask) {
+        GameEntity nearest = null;
+        float minDistanceSq = maxRange * maxRange;
+
+        final int centerX = (int) (cx / cellSize);
+        final int centerY = (int) (cy / cellSize);
+        final int rangeInCells = (int) Math.ceil(maxRange / cellSize);
+
+        // Expand search outward from center cell
+        for (int r = 0; r <= rangeInCells; r++) {
+            boolean foundInRange = false;
+            for (int x = centerX - r; x <= centerX + r; x++) {
+                for (int y = centerY - r; y <= centerY + r; y++) {
+                    // Only check the perimeter of the current "ring" (r)
+                    if (Math.abs(x - centerX) == r || Math.abs(y - centerY) == r) {
+                        final Array<Collider> cell = grid.get(hash(x, y));
+                        if (cell != null) {
+                            for (final Collider c : cell) {
+                                if ((c.getLayer() & layerMask) != 0) {
+                                    final float dx = c.getOwner().getX() - cx;
+                                    final float dy = c.getOwner().getY() - cy;
+                                    final float distSq = dx * dx + dy * dy;
+                                    if (distSq < minDistanceSq) {
+                                        minDistanceSq = distSq;
+                                        nearest = c.getOwner();
+                                        foundInRange = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // If we found something in this ring, and the ring's boundary is further than 
+            // the min distance found, we can stop.
+            if (foundInRange && (r * cellSize) * (r * cellSize) > minDistanceSq) {
+                break;
+            }
+        }
+
+        return nearest;
     }
 }

@@ -9,6 +9,7 @@ import hust.adventure.entities.state.IdleState;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
  * Base implementation of a game entity. Provides positioning, bounding box, and basic state management.
@@ -16,14 +17,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 public abstract class BaseEntity implements GameEntity, Collidable {
     protected float x;
     protected float y;
-    protected final float width;
-    protected final float height;
-    protected final Rectangle bounds;
+    protected float width;
+    protected float height;
+    protected Rectangle bounds;
     private boolean isDestroyed;
     private EntityState state;
     private Collider collider;
     private static Texture whitePixel;
-
+ 
     public BaseEntity(final float x, final float y, final float width, final float height) {
         this.x = x;
         this.y = y;
@@ -41,6 +42,18 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     public abstract void draw(SpriteBatch batch);
 
     @Override
+    public void drawHitbox(ShapeRenderer sr) {
+        if (collider == null) return;
+        
+        sr.setColor(Color.RED);
+        if (collider.getShape() == Collider.Shape.RECTANGLE) {
+            sr.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        } else {
+            sr.circle(x, y, collider.getRadius());
+        }
+    }
+
+    @Override
     public void destroy() {
         this.isDestroyed = true;
     }
@@ -48,6 +61,10 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     @Override
     public boolean isDestroyed() {
         return isDestroyed;
+    }
+
+    public void setDestroyed(boolean destroyed) {
+        this.isDestroyed = destroyed;
     }
 
     public final float getX() {
@@ -117,7 +134,7 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     public void dispose() {
     }
 
-    protected void drawRect(SpriteBatch batch, float x, float y, float width, float height, Color color) {
+    public void drawRect(SpriteBatch batch, float x, float y, float width, float height, Color color) {
         if (whitePixel == null) {
             Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             pixmap.setColor(Color.WHITE);

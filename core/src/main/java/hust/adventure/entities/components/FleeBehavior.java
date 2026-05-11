@@ -4,11 +4,24 @@ import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.BaseEnemy;
 
-public class FleeBehavior implements AIBehavior {
+import hust.adventure.collision.CollisionManager;
+import com.badlogic.gdx.utils.Pool;
+
+public class FleeBehavior implements AIBehavior, Pool.Poolable {
     private float speed;
     private float safeDistance;
 
+    public FleeBehavior() {
+        this.speed = 0f;
+        this.safeDistance = 0f;
+    }
+
     public FleeBehavior(float speed, float safeDistance) {
+        this.speed = speed;
+        this.safeDistance = safeDistance;
+    }
+
+    public void init(float speed, float safeDistance) {
         this.speed = speed;
         this.safeDistance = safeDistance;
     }
@@ -20,8 +33,20 @@ public class FleeBehavior implements AIBehavior {
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (dist < safeDistance && dist > 0) {
-            enemy.setX(enemy.getX() - (dx / dist) * speed * delta);
-            enemy.setY(enemy.getY() - (dy / dist) * speed * delta);
+            float nextX = enemy.getX() - (dx / dist) * speed * delta;
+            float nextY = enemy.getY() - (dy / dist) * speed * delta;
+            
+            CollisionManager cm = enemy.getCollisionManager();
+            if (cm != null && cm.canMove(enemy, nextX, nextY)) {
+                enemy.setX(nextX);
+                enemy.setY(nextY);
+            }
         }
+    }
+
+    @Override
+    public void reset() {
+        this.speed = 0f;
+        this.safeDistance = 0f;
     }
 }

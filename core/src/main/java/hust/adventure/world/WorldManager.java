@@ -1,5 +1,6 @@
 package hust.adventure.world;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -7,7 +8,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import hust.adventure.entities.environment.WallEntity;
-
+import hust.adventure.entities.factory.EntityFactory;
+import hust.adventure.entities.EntityManager;
+import hust.adventure.graphics.LightProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +22,22 @@ public class WorldManager implements Disposable {
     private TiledMap currentMap;
     private final List<WallEntity> walls;
     private final List<Portal> portals;
+    private InfiniteMapRenderer mapRenderer;
 
     public WorldManager() {
         this.walls = new ArrayList<>();
         this.portals = new ArrayList<>();
     }
 
-    public void loadMap(final TiledMap map) {
+    public void loadMap(final TiledMap map, EntityFactory factory, EntityManager entityManager,
+            LightProvider lightProvider) {
         if (map == null)
             throw new IllegalArgumentException("Map cannot be null");
         this.currentMap = map;
 
         setupWalls();
         setupPortals();
+        setupLightingObjects(factory, entityManager, lightProvider);
     }
 
     private void setupWalls() {
@@ -60,6 +66,38 @@ public class WorldManager implements Disposable {
                     portals.add(new Portal(rect, target, spawnX, spawnY));
                 }
             }
+        }
+    }
+
+    private void setupLightingObjects(EntityFactory factory, EntityManager entityManager, LightProvider lightProvider) {
+        if (factory == null || entityManager == null || lightProvider == null)
+            return;
+        MapLayer lightLayer = currentMap.getLayers().get("LightingObjects");
+        if (lightLayer != null) {
+            for (MapObject obj : lightLayer.getObjects()) {
+                float x = obj.getProperties().get("x", 0f, Float.class);
+                float y = obj.getProperties().get("y", 0f, Float.class);
+                String name = obj.getName();
+
+                if ("Book".equalsIgnoreCase(name)) {
+                    factory.createFloatingBook(x, y, lightProvider);
+                } else if ("Candle".equalsIgnoreCase(name)) {
+                    factory.createCandle(x, y, lightProvider);
+                }
+            }
+        }
+    }
+
+    public void initInfiniteWorld(final InfiniteMapRenderer mapRenderer) {
+        if (mapRenderer == null) {
+            throw new IllegalArgumentException("InfiniteMapRenderer cannot be null");
+        }
+        this.mapRenderer = mapRenderer;
+    }
+
+    public void renderBackground(final SpriteBatch batch) {
+        if (mapRenderer != null) {
+            mapRenderer.draw(batch);
         }
     }
 

@@ -12,6 +12,7 @@ public class CameraManager {
     private GameEntity target;
     private float mapWidth, mapHeight;
     private float lerp = 0.1f;
+    private boolean isInfinite;
 
     public CameraManager(float viewportWidth, float viewportHeight) {
         camera = new OrthographicCamera();
@@ -25,6 +26,10 @@ public class CameraManager {
     public void setMapBounds(float width, float height) {
         this.mapWidth = width;
         this.mapHeight = height;
+    }
+
+    public void setInfinite(boolean infinite) {
+        this.isInfinite = infinite;
     }
 
     public void setZoom(float zoom) {
@@ -41,11 +46,13 @@ public class CameraManager {
             camera.position.y = MathUtils.lerp(camera.position.y, targetY, lerp);
 
             // Clamp to map bounds
-            float halfWidth = (camera.viewportWidth * camera.zoom) / 2f;
-            float halfHeight = (camera.viewportHeight * camera.zoom) / 2f;
+            if (!isInfinite) {
+                float halfWidth = (camera.viewportWidth * camera.zoom) / 2f;
+                float halfHeight = (camera.viewportHeight * camera.zoom) / 2f;
 
-            camera.position.x = MathUtils.clamp(camera.position.x, halfWidth, mapWidth - halfWidth);
-            camera.position.y = MathUtils.clamp(camera.position.y, halfHeight, mapHeight - halfHeight);
+                camera.position.x = MathUtils.clamp(camera.position.x, halfWidth, mapWidth - halfWidth);
+                camera.position.y = MathUtils.clamp(camera.position.y, halfHeight, mapHeight - halfHeight);
+            }
         }
         camera.update();
     }

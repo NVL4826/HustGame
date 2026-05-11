@@ -2,15 +2,22 @@ package hust.adventure.items.types;
 
 import hust.adventure.effects.types.SpeedBoostEffect;
 import hust.adventure.entities.base.BaseActor;
-import hust.adventure.items.Consumable;
 
 public class BlackCoffee extends BaseCoffee {
     @Override
-    public String getId() { return "coffee_den"; }
+    public String getId() {
+        return "coffee_den";
+    }
+
     @Override
-    public String getName() { return "Cà Phê Đen"; }
+    public String getName() {
+        return "Cà Phê Đen";
+    }
+
     @Override
-    public String getDescription() { return "Hồi 10 HP, 30 Thể lực, tăng tốc trong 30s."; }
+    public String getDescription() {
+        return "Hồi 10 HP, 30 Thể lực, tăng tốc trong 30s.";
+    }
 
     @Override
     public void consume(BaseActor consumer) {

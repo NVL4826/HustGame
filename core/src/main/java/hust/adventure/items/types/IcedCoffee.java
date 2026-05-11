@@ -1,15 +1,22 @@
 package hust.adventure.items.types;
 
 import hust.adventure.entities.base.BaseActor;
-import hust.adventure.items.Consumable;
 
 public class IcedCoffee extends BaseCoffee {
     @Override
-    public String getId() { return "coffee_da"; }
+    public String getId() {
+        return "coffee_da";
+    }
+
     @Override
-    public String getName() { return "Cà Phê Đá"; }
+    public String getName() {
+        return "Cà Phê Đá";
+    }
+
     @Override
-    public String getDescription() { return "Hồi 10 Thể lực."; }
+    public String getDescription() {
+        return "Hồi 10 Thể lực.";
+    }
 
     @Override
     public void consume(BaseActor consumer) {

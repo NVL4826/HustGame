@@ -9,10 +9,19 @@ import hust.adventure.entities.components.FleeBehavior;
  * Enemy that flees from the player.
  */
 public class InfiniteLoopEnemy extends BaseEnemy {
-
+ 
+    public InfiniteLoopEnemy() {
+        super();
+    }
+ 
     public InfiniteLoopEnemy(float x, float y, CollisionManager collisionManager) {
         super(x, y, 32, 32, 200, "InfLoop", Color.PURPLE, collisionManager);
         setBehavior(new FleeBehavior(80f, 150f));
+    }
+ 
+    @Override
+    public void reset() {
+        super.reset();
     }
 
     @Override

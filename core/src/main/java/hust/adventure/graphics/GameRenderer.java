@@ -10,12 +10,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
 
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
+import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.status.StatusFlag;
 import hust.adventure.ui.HUD;
 import hust.adventure.ui.InventoryUI;
-import hust.adventure.world.LibrarySystem;
+import hust.adventure.ui.LevelUpUI;
+import hust.adventure.ui.DamageTextManager;
+import hust.adventure.ui.RouletteUI;
+import hust.adventure.world.WorldManager;
 
 /**
  * Centralized renderer for the game, responsible for map, entities, and UI.
@@ -28,11 +33,16 @@ public class GameRenderer {
     private final ShaderProgram discardShader;
     private final HUD hud;
     private final InventoryUI inventoryUI;
+    private final LevelUpUI levelUpUI;
+    private final DamageTextManager damageTextManager;
+    private final RouletteUI rouletteUI;
+    private final WorldManager worldManager;
     private static final Matrix4 uiMatrix = new Matrix4();
 
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
-            final InventoryUI inventoryUI) {
+            final InventoryUI inventoryUI, final LevelUpUI levelUpUI, final DamageTextManager damageTextManager, 
+            final RouletteUI rouletteUI, final WorldManager worldManager) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
         this.batch = batch;
@@ -40,6 +50,10 @@ public class GameRenderer {
         this.discardShader = discardShader;
         this.hud = hud;
         this.inventoryUI = inventoryUI;
+        this.levelUpUI = levelUpUI;
+        this.damageTextManager = damageTextManager;
+        this.rouletteUI = rouletteUI;
+        this.worldManager = worldManager;
     }
 
     /**
@@ -47,7 +61,7 @@ public class GameRenderer {
      */
     public void render(final float delta, final OrthogonalTiledMapRenderer mapRenderer, final int[] backgroundLayers,
             final int[] foregroundLayers, final Player player, final ShapeRenderer shapeRenderer, final BitmapFont font,
-            final LibrarySystem librarySystem) {
+            final LightingManager lightingManager) {
 
         if (cameraManager != null) {
             cameraManager.update();
@@ -63,20 +77,22 @@ public class GameRenderer {
 
         mapRenderer.setView(cameraManager.getCamera());
 
+        // 0.5. Vẽ Infinite Background
+        if (worldManager != null) {
+            batch.setProjectionMatrix(cameraManager.getCamera().combined);
+            batch.begin();
+            worldManager.renderBackground(batch);
+            batch.end();
+        }
+
         // 1. Vẽ Background map
         mapRenderer.render(backgroundLayers);
 
-        // 2. Vẽ Nhân vật
+        // 2. Vẽ Nhân vật và thực thể (Y-sorting)
         batch.setProjectionMatrix(cameraManager.getCamera().combined);
         batch.begin();
         entityManager.draw(batch);
         batch.end();
-
-        // 2.5 Vẽ thêm sách lơ lửng nếu ở thư viện
-        if (librarySystem != null) {
-            batch.setProjectionMatrix(cameraManager.getCamera().combined);
-            librarySystem.render(batch);
-        }
 
         // 3. Stencil Buffer cho Foreground
         Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
@@ -105,9 +121,22 @@ public class GameRenderer {
         Gdx.gl.glStencilMask(0xFF);
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        // 5. Thêm lớp chiếu sáng của thư viện
-        if (librarySystem != null) {
-            librarySystem.renderLights(cameraManager.getCamera());
+        // 4.5 Render Damage Text
+        if (damageTextManager != null) {
+            batch.setProjectionMatrix(cameraManager.getCamera().combined);
+            batch.begin();
+            damageTextManager.render(batch, font);
+            batch.end();
+        }
+
+        // 5. Thêm lớp chiếu sáng (nếu có)
+        if (lightingManager != null) {
+            lightingManager.render(cameraManager.getCamera());
+        }
+
+        // 5.5. Render Debug Hitboxes
+        if (ProgressContext.instance.showDebug) {
+            renderDebugHitboxes(shapeRenderer);
         }
 
         // 6. Render UI
@@ -122,10 +151,25 @@ public class GameRenderer {
         if (inventoryUI != null && player != null) {
             inventoryUI.render(player, batch, shapeRenderer, font);
         }
+        if (levelUpUI != null && player != null) {
+            levelUpUI.render(player, batch, shapeRenderer, font);
+        }
+        if (rouletteUI != null) {
+            rouletteUI.render(batch, shapeRenderer, font);
+        }
 
         if (player != null && player.hasStatus(StatusFlag.CONFUSED)) {
             drawVignette(shapeRenderer);
         }
+    }
+
+    private void renderDebugHitboxes(final ShapeRenderer shapeRenderer) {
+        shapeRenderer.setProjectionMatrix(cameraManager.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (final GameEntity entity : entityManager.getEntities()) {
+            entity.drawHitbox(shapeRenderer);
+        }
+        shapeRenderer.end();
     }
 
     private void drawVignette(ShapeRenderer shapeRenderer) {

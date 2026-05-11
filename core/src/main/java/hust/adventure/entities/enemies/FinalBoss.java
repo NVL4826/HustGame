@@ -14,10 +14,24 @@ import hust.adventure.entities.Player;
 public class FinalBoss extends BaseEnemy {
     private Texture texture;
     private static final float MAX_HP = 1000f;
-
+ 
+    public FinalBoss() {
+        super();
+    }
+ 
     public FinalBoss(float x, float y, CollisionManager collisionManager, Texture texture) {
         super(x, y, 100, 100, MAX_HP, "T.H.T", Color.RED, collisionManager);
         this.texture = texture;
+    }
+ 
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+ 
+    @Override
+    public void reset() {
+        super.reset();
+        this.texture = null;
     }
 
     @Override

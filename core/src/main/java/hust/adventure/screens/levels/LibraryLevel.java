@@ -2,20 +2,17 @@ package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
 import hust.adventure.HustGame;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.core.config.LevelConfig;
 import hust.adventure.entities.enemies.LibraryBoss;
-import hust.adventure.entities.base.GameEntity;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.events.EventListener;
 import hust.adventure.ui.BookPuzzle;
-import hust.adventure.core.LevelConfig;
 
 /**
  * Library level with puzzle-solving and boss fight.
  */
-public class LibraryLevel extends BaseLevelScreen implements EventListener {
+public class LibraryLevel extends BaseLevelScreen {
     private BookPuzzle puzzle;
     private boolean puzzleSolved = false;
     private float redFlashTimer = 0f;
@@ -27,8 +24,19 @@ public class LibraryLevel extends BaseLevelScreen implements EventListener {
 
     @Override
     protected void initLevel() {
-        puzzle = new BookPuzzle(this);
+        final java.util.Map<String, Integer> bookConfigs = new java.util.LinkedHashMap<>();
+        bookConfigs.put("Toan cao cap", 1);
+        bookConfigs.put("CTDL & GT", 3);
+        bookConfigs.put("Mang may tinh", 5);
+        bookConfigs.put("CSDL", 4);
+        bookConfigs.put("Lap trinh Java", 4);
+        bookConfigs.put("Ky nghe PM", 5);
+        bookConfigs.put("AI", 7);
+        bookConfigs.put("Do an", 8);
+
+        puzzle = new BookPuzzle(bookConfigs);
         EventDispatcher.getInstance().addListener(EventType.PUZZLE_FAILED, this);
+        EventDispatcher.getInstance().addListener(EventType.PUZZLE_SOLVED, this);
     }
 
     @Override
@@ -37,12 +45,7 @@ public class LibraryLevel extends BaseLevelScreen implements EventListener {
             puzzle.update(delta);
         } else {
             if (inputReader.isSpaceJustPressed()) {
-                entityManager.addEntity(entityFactory.createProjectile(player.getX(), player.getY() + 20, 0, 400, 20,
-                        Color.WHITE, true));
-            }
-            for (final GameEntity e : entityManager.getEntities()) {
-                if (e instanceof BaseEnemy)
-                    ((BaseEnemy) e).handleUpdate(delta, player, entityManager);
+                entityFactory.createProjectile(player.getX(), player.getY() + 20, 0, 400, 20, Color.WHITE, true);
             }
         }
         if (redFlashTimer > 0)
@@ -60,12 +63,11 @@ public class LibraryLevel extends BaseLevelScreen implements EventListener {
         }
     }
 
-    public void onPuzzleSolved() {
+    private void onPuzzleSolved() {
         if (puzzleSolved)
             return;
         puzzleSolved = true;
-        libraryBoss = (LibraryBoss) entityFactory.createLibraryBoss(400, 500, collisionManager);
-        entityManager.addEntity(libraryBoss);
+        libraryBoss = (LibraryBoss) entityFactory.createLibraryBoss(400, 500);
     }
 
     public void flashRed() {
@@ -76,12 +78,15 @@ public class LibraryLevel extends BaseLevelScreen implements EventListener {
     public void onEvent(final GameEvent<?> event) {
         if (event.getType() == EventType.PUZZLE_FAILED) {
             flashRed();
+        } else if (event.getType() == EventType.PUZZLE_SOLVED) {
+            onPuzzleSolved();
         }
     }
 
     @Override
     public void dispose() {
         EventDispatcher.getInstance().removeListener(EventType.PUZZLE_FAILED, this);
+        EventDispatcher.getInstance().removeListener(EventType.PUZZLE_SOLVED, this);
         if (puzzle != null)
             puzzle.dispose();
         super.dispose();

@@ -23,6 +23,7 @@ public class ItemManager {
         register(new WeaselCoffee());
         register(new EnergyDrink());
         register(new DriedChicken());
+        register(new SimpleItem("note", "Ghi chú", "Một mảnh giấy nhỏ có chữ."));
     }
 
     public void register(Item item) {

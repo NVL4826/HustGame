@@ -13,23 +13,68 @@ import hust.adventure.entities.Player;
 import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.components.AIBehavior;
 import hust.adventure.entities.factory.EntityFactory;
+import hust.adventure.utils.GamePools;
 
+import com.badlogic.gdx.utils.Pool;
+ 
 /**
  * Base class for all enemy types. Inherits core living entity logic from BaseActor.
+ * Supports object pooling.
  */
-public abstract class BaseEnemy extends BaseActor {
-    private final String name;
-    private final Color color;
-    private final CollisionManager collisionManager;
+public abstract class BaseEnemy extends BaseActor implements Pool.Poolable {
+    private String name;
+    private Color color;
+    private CollisionManager collisionManager;
     private EntityFactory factory;
     private AIBehavior behavior;
-
+ 
+    /**
+     * Default constructor for memory allocation.
+     */
+    public BaseEnemy() {
+        super(0, 0, 0, 0, 0);
+    }
+ 
     public BaseEnemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
             final Color color, final CollisionManager collisionManager) {
-        super(x, y, w, h, maxHp);
+        this();
+        init(x, y, w, h, maxHp, name, color, collisionManager);
+    }
+ 
+    /**
+     * Runtime Constructor (init). Sets state when obtained from pool.
+     */
+    public void init(final float x, final float y, final float w, final float h, final float maxHp, final String name,
+            final Color color, final CollisionManager collisionManager) {
+        setX(x);
+        setY(y);
+        this.width = w;
+        this.height = h;
+        this.setMaxHp(maxHp);
+        this.setHp(maxHp);
         this.name = name;
         this.color = color;
         this.collisionManager = collisionManager;
+        setDestroyed(false);
+    }
+ 
+    @Override
+    public void reset() {
+        setDestroyed(true);
+        name = null;
+        color = null;
+        collisionManager = null;
+        factory = null;
+        if (behavior != null) {
+            GamePools.free(behavior);
+            behavior = null;
+        }
+        if (getCollider() != null) {
+            getCollider().setListener(null);
+        }
+        if (getStatusEffectManager() != null) {
+            getStatusEffectManager().clear();
+        }
     }
 
     @Override
@@ -101,7 +146,7 @@ public abstract class BaseEnemy extends BaseActor {
         return color;
     }
 
-    protected final CollisionManager getCollisionManager() {
+    public final CollisionManager getCollisionManager() {
         return collisionManager;
     }
 

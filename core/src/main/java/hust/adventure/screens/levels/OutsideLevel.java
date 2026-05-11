@@ -1,7 +1,7 @@
 package hust.adventure.screens.levels;
 
 import hust.adventure.HustGame;
-import hust.adventure.core.LevelConfig;
+import hust.adventure.core.config.LevelConfig;
 
 /**
  * Initial outside level of the game.

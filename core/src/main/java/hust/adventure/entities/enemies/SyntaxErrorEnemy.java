@@ -2,7 +2,6 @@ package hust.adventure.entities.enemies;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.collision.CollisionManager;
 
 import hust.adventure.entities.EntityManager;
@@ -15,9 +14,19 @@ import hust.adventure.entities.components.FleeBehavior;
 public class SyntaxErrorEnemy extends BaseEnemy {
     private float fireTimer = 0;
 
+    public SyntaxErrorEnemy() {
+        super();
+    }
+
     public SyntaxErrorEnemy(float x, float y, CollisionManager collisionManager) {
         super(x, y, 30, 30, 25, "SyntaxErr", Color.ORANGE, collisionManager);
         setBehavior(new FleeBehavior(30f, 200f));
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        fireTimer = 0;
     }
 
     @Override
@@ -28,9 +37,23 @@ public class SyntaxErrorEnemy extends BaseEnemy {
         float dy = p.getY() - getY();
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
-        // Clamp to screen
-        setX(MathUtils.clamp(getX(), 0, 800 - getWidth()));
-        setY(MathUtils.clamp(getY(), 0, 600 - getHeight()));
+        // Map bounds check handled by CollisionManager
+        CollisionManager cm = getCollisionManager();
+        if (cm != null && cm.getMapWidth() > 0 && !cm.isInfinite()) {
+            float minX = getWidth() / 2f;
+            float maxX = cm.getMapWidth() - getWidth() / 2f;
+            float minY = getHeight() / 2f;
+            float maxY = cm.getMapHeight() - getHeight() / 2f;
+
+            if (getX() < minX)
+                setX(minX);
+            if (getX() > maxX)
+                setX(maxX);
+            if (getY() < minY)
+                setY(minY);
+            if (getY() > maxY)
+                setY(maxY);
+        }
 
         fireTimer += delta;
         if (fireTimer >= 1.5f) {
@@ -39,7 +62,7 @@ public class SyntaxErrorEnemy extends BaseEnemy {
                 // Fire towards player
                 float vx = (dx / dist) * 200;
                 float vy = (dy / dist) * 200;
-                em.addEntity(getFactory().createProjectile(getX(), getY(), vx, vy, 10, Color.ORANGE, false));
+                getFactory().createProjectile(getX(), getY(), vx, vy, 10, Color.ORANGE, false);
             }
         }
     }

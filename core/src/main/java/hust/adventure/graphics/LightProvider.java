@@ -1,0 +1,21 @@
+package hust.adventure.graphics;
+
+import box2dLight.PointLight;
+import com.badlogic.gdx.graphics.Color;
+
+/**
+ * Interface to provide lighting services to entities without tight coupling to LightingManager.
+ */
+public interface LightProvider {
+    /**
+     * Creates a point light and returns it.
+     * 
+     * @param rays number of rays for the light
+     * @param color color of the light
+     * @param distance distance of the light
+     * @param x x position
+     * @param y y position
+     * @return the created PointLight
+     */
+    PointLight createPointLight(int rays, Color color, float distance, float x, float y);
+}

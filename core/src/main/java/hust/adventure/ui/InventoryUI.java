@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import hust.adventure.utils.GamePools;
 
-import hust.adventure.core.ProgressContext;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.Player;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
+import hust.adventure.items.Item;
 
 import java.util.Map;
 
@@ -66,7 +68,9 @@ public class InventoryUI {
 
         font.setColor(Color.WHITE);
         int offsetY = 60;
-        Map<String, Integer> items = player.getInventory().getAllItems();
+        
+        // Lấy dữ liệu dưới dạng Read-only
+        Map<Item, Integer> items = player.getInventory().getReadOnlyItems();
 
         if (items.isEmpty()) {
             font.draw(batch, "Chua co gi o day ca...", panelX + 50, panelY + panelH - offsetY);
@@ -75,19 +79,11 @@ public class InventoryUI {
             int keyPressed = player.getController().getJustPressedNum();
 
             int itemIndex = 1;
-            String itemToConsume = null; // Biến lưu tạm item cần dùng để tránh lỗi ConcurrentModificationException
+            String itemToConsumeId = null; 
 
-            for (Map.Entry<String, Integer> entry : items.entrySet()) {
-                String itemKey = entry.getKey();
-                String itemName = itemKey;
-
-                // Format lại tên cho đẹp
-                if (itemKey.equals("coffee_den"))
-                    itemName = "Ca phe den (+The luc)";
-                if (itemKey.equals("energy_drink"))
-                    itemName = "Nuoc tang luc (+40 The luc)";
-                if (itemKey.equals("kho_ga"))
-                    itemName = "Kho ga la chanh (+25 HP)";
+            for (Map.Entry<Item, Integer> entry : items.entrySet()) {
+                Item item = entry.getKey();
+                String itemName = item.getName();
 
                 // Hiển thị dạng: [1] Ca phe den : x2
                 font.draw(batch, "[" + itemIndex + "] " + itemName + " :  x" + entry.getValue(), panelX + 50,
@@ -95,16 +91,19 @@ public class InventoryUI {
 
                 // Nếu người chơi bấm đúng số thứ tự của item này
                 if (keyPressed == itemIndex) {
-                    itemToConsume = itemKey;
+                    itemToConsumeId = item.getId();
                 }
 
                 offsetY += 30;
                 itemIndex++;
             }
 
-            // Xử lý sử dụng vật phẩm (Sau vòng lặp để tránh lỗi mảng đang duyệt bị thay đổi)
-            if (itemToConsume != null) {
-                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ITEM_USED, itemToConsume));
+            // Xử lý sử dụng vật phẩm
+            if (itemToConsumeId != null) {
+                // Dispatch event với ID (Player sẽ resolve lại qua ItemManager)
+                GameEvent<String> event = GamePools.obtainEvent();
+                event.init(EventType.ITEM_USED, itemToConsumeId);
+                EventDispatcher.getInstance().dispatch(event);
             }
         }
 

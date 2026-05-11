@@ -24,6 +24,8 @@ public interface PlayerController {
     boolean isEnterJustPressed();
 
     int getJustPressedNum();
+    
+    boolean isDebugJustPressed();
 
     default boolean isAttackJustPressed() {
         return isSpaceJustPressed();

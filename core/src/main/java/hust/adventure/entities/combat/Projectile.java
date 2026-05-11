@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import com.badlogic.gdx.utils.Pool;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.base.BaseEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
@@ -13,19 +14,47 @@ import hust.adventure.collision.Collider;
 /**
  * Represents a projectile fired by a player or enemy.
  */
-public class Projectile extends BaseEntity {
+public class Projectile extends BaseEntity implements Pool.Poolable {
     private float vx, vy;
     private Color color;
     private boolean isPlayerProjectile;
     private float damage;
+    private float startX, startY;
+    private static final float MAX_RANGE = 2000f;
+
+    public Projectile() {
+        super(0, 0, 10, 10);
+    }
 
     public Projectile(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer) {
         super(x, y, 10, 10);
+        init(x, y, vx, vy, damage, color, isPlayer);
+    }
+
+    public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer) {
+        setX(x);
+        setY(y);
         this.vx = vx;
         this.vy = vy;
         this.damage = damage;
         this.color = color;
         this.isPlayerProjectile = isPlayer;
+        this.startX = x;
+        this.startY = y;
+        setDestroyed(false);
+    }
+
+    @Override
+    public void reset() {
+        setDestroyed(false);
+        vx = 0;
+        vy = 0;
+        damage = 0;
+        color = Color.WHITE;
+        isPlayerProjectile = false;
+        if (getCollider() != null) {
+            getCollider().setListener(null);
+        }
     }
 
     @Override
@@ -57,8 +86,8 @@ public class Projectile extends BaseEntity {
         setX(getX() + vx * delta);
         setY(getY() + vy * delta);
 
-        // Destroy if far off screen (assuming a safe margin)
-        if (getX() < -500 || getX() > 2500 || getY() < -500 || getY() > 2500) {
+        // Destroy if traveled too far from spawn point
+        if (Math.abs(getX() - startX) > MAX_RANGE || Math.abs(getY() - startY) > MAX_RANGE) {
             destroy();
         }
     }
@@ -75,7 +104,7 @@ public class Projectile extends BaseEntity {
 
     @Override
     public void dispose() {
-        // No resources to dispose
+        // No native resources to clean up here.
     }
 
     public boolean isPlayerProjectile() {

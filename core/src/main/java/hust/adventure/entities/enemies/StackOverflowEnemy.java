@@ -11,10 +11,20 @@ import hust.adventure.entities.components.BouncingBehavior;
  */
 public class StackOverflowEnemy extends BaseEnemy {
     private boolean isSplit = false;
-
+ 
+    public StackOverflowEnemy() {
+        super();
+    }
+ 
     public StackOverflowEnemy(float x, float y, CollisionManager collisionManager) {
         super(x, y, 40, 40, 50, "StackOvfl", Color.RED, collisionManager);
         setBehavior(new BouncingBehavior(100, 100, 800, 600));
+    }
+ 
+    @Override
+    public void reset() {
+        super.reset();
+        isSplit = false;
     }
 
     public boolean isSplit() {

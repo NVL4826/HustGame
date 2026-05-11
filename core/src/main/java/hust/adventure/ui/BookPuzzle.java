@@ -5,173 +5,189 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
-
-import hust.adventure.core.ProgressContext;
+import com.badlogic.gdx.utils.Disposable;
+import hust.adventure.utils.GamePools;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.GameEvent;
-import hust.adventure.screens.levels.LibraryLevel;
 import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
+import hust.adventure.ui.components.PuzzleBook;
+import hust.adventure.ui.components.PuzzleSlot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class BookPuzzle {
-    public static class Book {
-        public String name;
-        public Rectangle rect;
-        public int targetSemester;
-        public boolean placedCorrectly = false;
-        public boolean isDragging = false;
+/**
+ * UI Component for the Library Book Puzzle.
+ * Handles input logic and rendering.
+ */
+public class BookPuzzle implements Disposable {
+    private static final float VIEWPORT_WIDTH = 800f;
+    private static final float VIEWPORT_HEIGHT = 600f;
+    private static final float BOOK_WIDTH = 100f;
+    private static final float BOOK_HEIGHT = 30f;
+    private static final float SLOT_WIDTH = 120f;
+    private static final float SLOT_HEIGHT = 40f;
 
-        public Book(String name, float x, float y, int targetSemester) {
-            this.name = name;
-            this.rect = new Rectangle(x, y, 100, 30);
-            this.targetSemester = targetSemester;
-        }
-    }
+    private static final Color COLOR_SLOT = Color.YELLOW;
+    private static final Color COLOR_BOOK_CORRECT = Color.GREEN;
+    private static final Color COLOR_BOOK_DRAGGING = Color.BLUE;
+    private static final Color COLOR_BOOK_DEFAULT = Color.BROWN;
 
-    public static class Slot {
-        public int semester;
-        public Rectangle rect;
-
-        public Slot(int semester, float x, float y) {
-            this.semester = semester;
-            this.rect = new Rectangle(x, y, 120, 40);
-        }
-    }
-
-    public List<Book> books;
-    public List<Slot> slots;
-    private BitmapFont font;
+    private final List<PuzzleBook> books;
+    private final List<PuzzleSlot> slots;
+    private final BitmapFont font;
     private boolean isSolved = false;
-    private LibraryLevel screen;
 
-    public boolean isSolved() {
-        return isSolved;
+    public BookPuzzle(final Map<String, Integer> bookConfigs) {
+        if (bookConfigs == null || bookConfigs.isEmpty()) {
+            throw new IllegalArgumentException("Book configurations cannot be null or empty");
+        }
+
+        this.font = new BitmapFont();
+        this.font.setColor(Color.WHITE);
+        this.books = new ArrayList<>();
+        this.slots = new ArrayList<>();
+
+        initializePuzzle(bookConfigs);
     }
 
-    public BookPuzzle(LibraryLevel screen) {
-        this.screen = screen;
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
-
-        books = new ArrayList<>();
-        books.add(new Book("Toan cao cap", 50, 400, 1));
-        books.add(new Book("CTDL & GT", 50, 350, 3));
-        books.add(new Book("Mang may tinh", 50, 300, 5));
-        books.add(new Book("CSDL", 50, 250, 4));
-        books.add(new Book("Lap trinh Java", 50, 200, 4));
-        books.add(new Book("Ky nghe PM", 50, 150, 5));
-        books.add(new Book("AI", 50, 100, 7));
-        books.add(new Book("Do an", 50, 50, 8));
-
-        slots = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            slots.add(new Slot(i + 1, 300, 400 - i * 50));
+    private void initializePuzzle(final Map<String, Integer> bookConfigs) {
+        int i = 0;
+        for (final Map.Entry<String, Integer> entry : bookConfigs.entrySet()) {
+            final float yPos = 400 - i * 50;
+            books.add(new PuzzleBook(entry.getKey(), 50, yPos, BOOK_WIDTH, BOOK_HEIGHT, entry.getValue()));
+            slots.add(new PuzzleSlot(i + 1, 300, yPos, SLOT_WIDTH, SLOT_HEIGHT));
+            i++;
         }
     }
 
-    public void update(float delta) {
-        if (isSolved)
+    public void update(final float delta) {
+        if (isSolved) {
             return;
+        }
 
-        float mx = Gdx.input.getX() * 800f / Gdx.graphics.getWidth();
-        float my = (Gdx.graphics.getHeight() - Gdx.input.getY()) * 600f / Gdx.graphics.getHeight();
+        final float mx = Gdx.input.getX() * VIEWPORT_WIDTH / Gdx.graphics.getWidth();
+        final float my = (Gdx.graphics.getHeight() - Gdx.input.getY()) * VIEWPORT_HEIGHT / Gdx.graphics.getHeight();
 
+        handleInput(mx, my);
+        checkWinCondition();
+    }
+
+    private void handleInput(final float mx, final float my) {
         if (Gdx.input.justTouched()) {
-            for (Book b : books) {
-                if (!b.placedCorrectly && b.rect.contains(mx, my)) {
-                    b.isDragging = true;
-                    break; // Only drag one at a time
+            for (final PuzzleBook b : books) {
+                if (b.isClicked(mx, my)) {
+                    b.setDragging(true);
+                    break;
                 }
             }
         }
 
         if (Gdx.input.isTouched()) {
-            for (Book b : books) {
-                if (b.isDragging) {
-                    b.rect.x = mx - b.rect.width / 2;
-                    b.rect.y = my - b.rect.height / 2;
+            for (final PuzzleBook b : books) {
+                if (b.isDragging()) {
+                    b.setPosition(mx - b.getRect().width / 2, my - b.getRect().height / 2);
                 }
             }
         } else {
-            // Check drops
-            for (Book b : books) {
-                if (b.isDragging) {
-                    b.isDragging = false;
-                    boolean placed = false;
-                    for (Slot s : slots) {
-                        if (s.rect.overlaps(b.rect)) {
-                            if (b.targetSemester == s.semester) {
-                                b.placedCorrectly = true;
-                                b.rect.setPosition(s.rect.x + 10, s.rect.y + 5);
-                                placed = true;
-                            } else {
-                                // Wrong placement penalty - Dispatched via event
-                                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PUZZLE_FAILED, 10f));
-                            }
-                            break;
-                        }
-                    }
-                    if (!placed && !b.placedCorrectly) {
-                        // Return to some initial layout (simplified)
-                        b.rect.x = 50;
-                    }
-                }
-            }
+            handleDrop();
+        }
+    }
 
-            // Check win condition
-            boolean allPlaced = true;
-            for (Book b : books) {
-                if (!b.placedCorrectly) {
-                    allPlaced = false;
-                    break;
+    private void handleDrop() {
+        for (final PuzzleBook b : books) {
+            if (b.isDragging()) {
+                b.setDragging(false);
+                boolean placed = false;
+                for (final PuzzleSlot s : slots) {
+                    if (s.overlaps(b.getRect())) {
+                        if (b.getTargetSemester() == s.getExpectedSemester()) {
+                            b.snapToSlot(s);
+                            placed = true;
+                        } else {
+                            GameEvent<Float> event = GamePools.obtainEvent();
+                            event.init(EventType.PUZZLE_FAILED, 10f);
+                            EventDispatcher.getInstance().dispatch(event);
+                        }
+                        break;
+                    }
                 }
-            }
-            if (allPlaced) {
-                isSolved = true;
-                screen.onPuzzleSolved();
+                if (!placed && !b.isPlacedCorrectly()) {
+                    b.resetPosition();
+                }
             }
         }
     }
 
-    public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        if (isSolved)
-            return;
+    private void checkWinCondition() {
+        boolean allPlaced = true;
+        for (final PuzzleBook b : books) {
+            if (!b.isPlacedCorrectly()) {
+                allPlaced = false;
+                break;
+            }
+        }
 
+        if (allPlaced && !isSolved) {
+            isSolved = true;
+            GameEvent<Void> event = GamePools.obtainEvent();
+            event.init(EventType.PUZZLE_SOLVED, null);
+            EventDispatcher.getInstance().dispatch(event);
+        }
+    }
+
+    public void render(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
+        if (isSolved) {
+            return;
+        }
+
+        drawShapes(shapeRenderer);
+        drawText(batch);
+    }
+
+    private void drawShapes(final ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Slot s : slots) {
-            shapeRenderer.setColor(Color.YELLOW);
-            shapeRenderer.rect(s.rect.x, s.rect.y, s.rect.width, s.rect.height);
+        shapeRenderer.setColor(COLOR_SLOT);
+        for (final PuzzleSlot s : slots) {
+            shapeRenderer.rect(s.getX(), s.getY(), s.getWidth(), s.getHeight());
         }
         shapeRenderer.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (Book b : books) {
-            if (b.placedCorrectly) {
-                shapeRenderer.setColor(Color.GREEN);
-            } else if (ProgressContext.instance.hasNao && b.isDragging) {
-                // Hint logic: highlight red if over wrong slot (simplified)
-                shapeRenderer.setColor(Color.BLUE);
+        for (final PuzzleBook b : books) {
+            if (b.isPlacedCorrectly()) {
+                shapeRenderer.setColor(COLOR_BOOK_CORRECT);
+            } else if (ProgressContext.instance.hasNao && b.isDragging()) {
+                shapeRenderer.setColor(COLOR_BOOK_DRAGGING);
             } else {
-                shapeRenderer.setColor(Color.BROWN);
+                shapeRenderer.setColor(COLOR_BOOK_DEFAULT);
             }
-            shapeRenderer.rect(b.rect.x, b.rect.y, b.rect.width, b.rect.height);
+            shapeRenderer.rect(b.getX(), b.getY(), b.getRect().width, b.getRect().height);
         }
         shapeRenderer.end();
+    }
 
+    private void drawText(final SpriteBatch batch) {
         batch.begin();
-        for (Slot s : slots) {
-            font.draw(batch, "HK " + s.semester, s.rect.x + 10, s.rect.y + 25);
+        for (final PuzzleSlot s : slots) {
+            font.draw(batch, "HK " + s.getExpectedSemester(), s.getX() + 10, s.getY() + 25);
         }
-        for (Book b : books) {
-            font.draw(batch, b.name, b.rect.x + 5, b.rect.y + 20);
+        for (final PuzzleBook b : books) {
+            font.draw(batch, b.getSubjectName(), b.getX() + 5, b.getY() + 20);
         }
         batch.end();
     }
 
+    public boolean isSolved() {
+        return isSolved;
+    }
+
+    @Override
     public void dispose() {
-        font.dispose();
+        if (font != null) {
+            font.dispose();
+        }
     }
 }

@@ -5,6 +5,7 @@ package hust.adventure.entities.base;
  */
 public interface Damageable {
     void takeDamage(float damage);
+    void takeDamage(float damage, boolean isCrit);
     float getHp();
     float getMaxHp();
     boolean isDead();

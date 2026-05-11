@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.HustGame;
-import hust.adventure.core.ProgressContext;
-import hust.adventure.core.LevelConfig;
+import hust.adventure.core.config.LevelConfig;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.enemies.StackOverflowEnemy;
 import java.util.ArrayList;
 import java.util.List;
+import hust.adventure.items.ItemManager;
 
 /**
  * Lab level with enemy wave mechanics.
@@ -113,25 +114,22 @@ public class LabLevel extends BaseLevelScreen {
     }
 
     private void spawnLabEnemy(final String type, final float x, final float y) {
-        final BaseEnemy enemy = (BaseEnemy) entityFactory.createEnemy(type, x, y, collisionManager);
+        final BaseEnemy enemy = (BaseEnemy) entityFactory.createEnemy(type, x, y);
         labEnemies.add(enemy);
-        entityManager.addEntity(enemy);
     }
 
     private void updateLabWaveLogic(float dt, final Rectangle pBounds) {
         if (stunTimer <= 0) {
             for (int i = labEnemies.size() - 1; i >= 0; i--) {
                 final BaseEnemy e = labEnemies.get(i);
-                e.handleUpdate(dt, player, entityManager);
-                if (e.isDead()) {
+                if (e.isDead() || e.isDestroyed()) {
                     handleEnemyDeath(e);
                     labEnemies.remove(i);
                 }
             }
         }
         if (inputReader.isSpaceJustPressed()) {
-            entityManager.addEntity(
-                    entityFactory.createProjectile(player.getX(), player.getY(), 0, 400, 10, Color.YELLOW, true));
+            entityFactory.createProjectile(player.getX(), player.getY(), 0, 400, 10, Color.YELLOW, true);
         }
         if (labEnemies.isEmpty()) {
             waveActive = false;
@@ -144,7 +142,8 @@ public class LabLevel extends BaseLevelScreen {
             final String[] items = { "coffee_den", "energy_drink", "kho_ga" };
             final Color[] colors = { Color.YELLOW, Color.GREEN, Color.BROWN };
             final int idx = MathUtils.random(0, 2);
-            entityManager.addEntity(entityFactory.createItemDrop(e.getX(), e.getY(), items[idx], colors[idx]));
+            entityFactory.createItemDrop(e.getX(), e.getY(), 
+                ItemManager.instance.getItem(items[idx]), colors[idx]);
         }
         if (e instanceof StackOverflowEnemy && !((StackOverflowEnemy) e).isSplit()) {
             spawnLabEnemy("stack_overflow", e.getX() - 30, e.getY());

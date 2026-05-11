@@ -4,9 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import hust.adventure.collision.CollisionManager;
 import com.badlogic.gdx.utils.Array;
-import hust.adventure.core.ProgressContext;
+
 import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.base.Targetable;
 import hust.adventure.entities.components.PlayerMovementBehavior;
@@ -20,6 +19,15 @@ import hust.adventure.inventory.Inventory;
 import hust.adventure.items.Item;
 import hust.adventure.items.ItemManager;
 import hust.adventure.items.Consumable;
+import hust.adventure.events.ItemPickedUpEvent;
+import hust.adventure.entities.interactables.ExpGem;
+import hust.adventure.collision.CollisionLayer;
+import hust.adventure.collision.CollisionManager;
+import hust.adventure.core.context.ProgressContext;
+import hust.adventure.entities.factory.EntityFactory;
+import hust.adventure.entities.weapons.WeaponFactory;
+import hust.adventure.entities.weapons.WeaponManager;
+import hust.adventure.entities.base.GameEntity;
 
 /**
  * Main player character class.
@@ -27,6 +35,9 @@ import hust.adventure.items.Consumable;
 public class Player extends BaseActor implements Targetable, EventListener {
     private final Inventory inventory;
     private final PlayerController controller;
+    private final WeaponManager weaponManager;
+    private CollisionManager collisionManager;
+    private EntityFactory entityFactory;
 
     private Texture[] allTextures;
     private Animation<TextureRegion> walkLeft, walkRight, walkDown, walkUp;
@@ -42,6 +53,11 @@ public class Player extends BaseActor implements Targetable, EventListener {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
         this.inventory = inventory;
         this.controller = controller;
+        this.collisionManager = collisionManager;
+        this.weaponManager = new WeaponManager(this);
+
+        // Starting weapon
+        weaponManager.addWeapon(WeaponFactory.createWeapon("whip", this));
 
         // Composition: Movement behavior
         this.setMovementBehavior(new PlayerMovementBehavior(controller, collisionManager));
@@ -50,6 +66,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
         // Register for events
         EventDispatcher.getInstance().addListener(EventType.PUZZLE_FAILED, this);
         EventDispatcher.getInstance().addListener(EventType.ITEM_USED, this);
+        EventDispatcher.getInstance().addListener(EventType.ITEM_PICKED_UP, this);
 
         // Sync initial HP from global context
         this.setHp(ProgressContext.instance.hp);
@@ -93,6 +110,17 @@ public class Player extends BaseActor implements Targetable, EventListener {
         ProgressContext.instance.hp = getHp();
         ProgressContext.instance.stamina = getStamina();
 
+        // Magnetic radius for ExpGem
+        if (collisionManager != null) {
+            Array<GameEntity> items = collisionManager.getEntitiesInRadius(getX(), getY(), 150f,
+                    CollisionLayer.ITEM);
+            for (GameEntity item : items) {
+                if (item instanceof ExpGem) {
+                    ((ExpGem) item).setTarget(this);
+                }
+            }
+        }
+
         if (getState() instanceof MovingState) {
             Animation<TextureRegion> anim;
             switch (getDirection()) {
@@ -115,6 +143,8 @@ public class Player extends BaseActor implements Targetable, EventListener {
             }
             stateTime += delta;
         }
+
+        weaponManager.update(delta);
     }
 
     @Override
@@ -139,12 +169,14 @@ public class Player extends BaseActor implements Targetable, EventListener {
             }
         }
         batch.draw(frame, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight());
+        weaponManager.draw(batch);
     }
 
     public void setCollisionContext(final CollisionManager newManager, final float newX, final float newY) {
         if (getMovementBehavior() instanceof PlayerMovementBehavior) {
             ((PlayerMovementBehavior) getMovementBehavior()).setCollisionManager(newManager);
         }
+        this.collisionManager = newManager;
         setX(newX);
         setY(newY);
     }
@@ -155,6 +187,22 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
     public final PlayerController getController() {
         return controller;
+    }
+
+    public final CollisionManager getCollisionManager() {
+        return collisionManager;
+    }
+
+    public final WeaponManager getWeaponManager() {
+        return weaponManager;
+    }
+
+    public void setFactory(final EntityFactory factory) {
+        this.entityFactory = factory;
+    }
+
+    public EntityFactory getFactory() {
+        return entityFactory;
     }
 
     @Override
@@ -173,9 +221,14 @@ public class Player extends BaseActor implements Targetable, EventListener {
             final String itemId = (String) event.getData();
             final Item item = ItemManager.instance.getItem(itemId);
             if (item instanceof Consumable) {
-                if (inventory.removeItem(itemId, 1)) {
+                if (inventory.removeItem(item, 1)) {
                     ((Consumable) item).consume(this);
                 }
+            }
+        } else if (event.getType() == EventType.ITEM_PICKED_UP) {
+            final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
+            if (data.getPicker() == this) {
+                inventory.addItem(data.getItem(), 1);
             }
         }
     }
@@ -184,6 +237,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
     public void dispose() {
         EventDispatcher.getInstance().removeListener(EventType.PUZZLE_FAILED, this);
         EventDispatcher.getInstance().removeListener(EventType.ITEM_USED, this);
+        EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
         if (allTextures != null) {
             for (final Texture t : allTextures) {
                 if (t != null)

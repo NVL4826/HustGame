@@ -52,6 +52,10 @@ public class Collider {
         return layer;
     }
 
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
     public Shape getShape() {
         return shape;
     }
