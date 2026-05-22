@@ -10,6 +10,7 @@ import hust.adventure.entities.base.BaseEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.Collider;
+import hust.adventure.core.context.ProgressContext;
 
 /**
  * Represents a projectile fired by a player or enemy.
@@ -85,7 +86,7 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
     public void update(float delta) {
         float localDelta = delta;
         if (!isPlayerProjectile) {
-            localDelta *= hust.adventure.core.context.ProgressContext.instance.getEnemyTimeScale();
+            localDelta *= ProgressContext.instance.getEnemyTimeScale();
         }
         setX(getX() + vx * localDelta);
         setY(getY() + vy * localDelta);

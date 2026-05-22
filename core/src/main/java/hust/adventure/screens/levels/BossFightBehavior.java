@@ -3,6 +3,7 @@ package hust.adventure.screens.levels;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
@@ -422,15 +423,14 @@ public class BossFightBehavior implements LevelBehavior {
 
     private void drawVictory(final LevelContext context) {
         // White screen victory fade-in
-        Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA,
-                com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
         context.getShapeRenderer().begin(ShapeType.Filled);
         context.getShapeRenderer().setColor(new Color(1f, 1f, 1f, Math.min(1f, victoryTimer / 2f)));
         context.getShapeRenderer().rect(0f, 0f, 800f, 600f);
         context.getShapeRenderer().end();
-        Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
         context.getGame().getSpriteBatch().begin();

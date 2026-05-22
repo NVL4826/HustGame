@@ -1,12 +1,11 @@
-package hust.adventure.entities.weapons;
+package hust.adventure.items.weapons;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import hust.adventure.items.Item;
 
 /**
  * Interface defining the behavior of a weapon.
  */
-public interface Weaponable extends Item {
+public interface Weaponable {
     /**
      * Attempts to trigger the weapon's attack logic.
      */
@@ -38,7 +37,22 @@ public interface Weaponable extends Item {
     int getLevel();
 
     /**
+     * Gets the unique ID of the weapon type.
+     */
+    String getId();
+
+    /**
      * Gets the unique name of the weapon type.
      */
     String getName();
+
+    /**
+     * Gets the description of the weapon.
+     */
+    String getDescription();
+
+    /**
+     * Returns whether this weapon fires automatically or is manual.
+     */
+    boolean isAutoFiring();
 }

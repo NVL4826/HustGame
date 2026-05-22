@@ -74,7 +74,6 @@ public class LevelUpUI {
         font.setColor(Color.WHITE);
         font.draw(batch, "Chon 1 phan thuong:", panelX + 50, panelY + panelH - 80);
 
-        int keyPressed = player.getController().getJustPressedNum();
         int offsetY = 130;
 
         for (int i = 0; i < currentChoices.size; i++) {
@@ -87,18 +86,25 @@ public class LevelUpUI {
             font.draw(batch, "    " + action.getDescription(), panelX + 70, panelY + panelH - offsetY - 25);
 
             offsetY += 80;
-
-            if (keyPressed == choiceNum) {
-                // Execute action and resume
-                action.execute(player);
-                if (onResume != null)
-                    onResume.run();
-                currentChoices.clear(); // Clear so we don't accidentally execute again
-                break;
-            }
         }
 
         batch.end();
+    }
+
+    public void update(Player player) {
+        if (currentChoices.isEmpty() || player == null) {
+            return;
+        }
+
+        int keyPressed = player.getController().getJustPressedNum();
+        if (keyPressed > 0 && keyPressed <= currentChoices.size) {
+            UpgradeAction action = currentChoices.get(keyPressed - 1);
+            action.execute(player);
+            if (onResume != null) {
+                onResume.run();
+            }
+            currentChoices.clear();
+        }
     }
 
     public void dispose() {

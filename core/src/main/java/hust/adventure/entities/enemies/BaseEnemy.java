@@ -13,6 +13,7 @@ import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.components.AIBehavior;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.base.Damageable;
+import hust.adventure.core.context.ProgressContext;
 
 /**
  * Base class for all enemy types. Inherits core living entity logic from BaseActor.
@@ -78,7 +79,7 @@ public abstract class BaseEnemy extends BaseActor {
 
     @Override
     public void update(final float delta) {
-        super.update(delta * hust.adventure.core.context.ProgressContext.instance.getEnemyTimeScale());
+        super.update(delta * ProgressContext.instance.getEnemyTimeScale());
         if (isDead()) {
             destroy();
         }
@@ -106,9 +107,9 @@ public abstract class BaseEnemy extends BaseActor {
             return;
         
         // Flashlight culling in lights out mode (if showEnemiesTimer / radar is not active)
-        if (hust.adventure.core.context.ProgressContext.instance.isLightsOut()
-                && hust.adventure.core.context.ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
-            final Player p = hust.adventure.core.context.ProgressContext.instance.getPlayer();
+        if (ProgressContext.instance.isLightsOut()
+                && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
+            final Player p = ProgressContext.instance.getPlayer();
             if (p != null) {
                 final float dx = getX() - p.getX();
                 final float dy = getY() - p.getY();

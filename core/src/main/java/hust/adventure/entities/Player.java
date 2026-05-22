@@ -1,5 +1,6 @@
 package hust.adventure.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -25,8 +26,9 @@ import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.factory.EntityFactory;
-import hust.adventure.entities.weapons.WeaponFactory;
-import hust.adventure.entities.weapons.WeaponManager;
+import hust.adventure.items.weapons.WeaponFactory;
+import hust.adventure.items.weapons.WeaponManager;
+import hust.adventure.items.weapons.Weaponable;
 import hust.adventure.entities.base.GameEntity;
 
 /**
@@ -74,7 +76,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.iframeTimer = 0f;
 
         // Starting weapon
-        weaponManager.addWeapon(WeaponFactory.createWeapon("whip", this));
+        weaponManager.addWeapon(WeaponFactory.createWeapon("bun_dau", this));
 
         // Composition: Movement behavior
         this.setMovementBehavior(new PlayerMovementBehavior(controller, collisionManager));
@@ -213,6 +215,14 @@ public class Player extends BaseActor implements Targetable, EventListener {
             stateTime += delta;
         }
 
+        if (controller.isSpaceJustPressed()) {
+            for (final Weaponable weapon : weaponManager.getWeapons()) {
+                if (!weapon.isAutoFiring()) {
+                    weapon.fire();
+                }
+            }
+        }
+
         weaponManager.update(delta);
     }
 
@@ -240,12 +250,12 @@ public class Player extends BaseActor implements Targetable, EventListener {
         float oldAlpha = batch.getColor().a;
         if (iframeTimer > 0) {
             float alpha = 0.5f + 0.3f * (float) Math.sin(iframeTimer * 30f);
-            com.badlogic.gdx.graphics.Color color = batch.getColor();
+            Color color = batch.getColor();
             batch.setColor(color.r, color.g, color.b, alpha);
         }
         batch.draw(frame, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight());
         if (iframeTimer > 0) {
-            com.badlogic.gdx.graphics.Color color = batch.getColor();
+            Color color = batch.getColor();
             batch.setColor(color.r, color.g, color.b, oldAlpha);
         }
         weaponManager.draw(batch);

@@ -31,6 +31,24 @@ public class StackOverflowEnemy extends BaseEnemy {
     }
 
     @Override
+    public void destroy() {
+        if (isDestroyed()) {
+            return;
+        }
+        super.destroy();
+        if (!isSplit && getFactory() != null) {
+            final BaseEnemy e1 = (BaseEnemy) getFactory().createEnemy("stack_overflow", getX() - 30, getY());
+            final BaseEnemy e2 = (BaseEnemy) getFactory().createEnemy("stack_overflow", getX() + 30, getY());
+            if (e1 instanceof StackOverflowEnemy) {
+                ((StackOverflowEnemy) e1).setSplit(true);
+            }
+            if (e2 instanceof StackOverflowEnemy) {
+                ((StackOverflowEnemy) e2).setSplit(true);
+            }
+        }
+    }
+
+    @Override
     protected void renderSpecific(SpriteBatch batch) {
         drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), getColor());
     }

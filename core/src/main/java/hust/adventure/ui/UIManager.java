@@ -2,6 +2,8 @@ package hust.adventure.ui;
 
 import com.badlogic.gdx.utils.Disposable;
 
+import hust.adventure.entities.Player;
+
 /**
  * Manages UI components and their visibility.
  */
@@ -22,9 +24,11 @@ public class UIManager implements Disposable {
         this.debugUI = new DebugUI();
     }
 
-    public void update(final float delta) {
+    public void update(final float delta, final Player player) {
         damageTextManager.update(delta);
         rouletteUI.update(delta);
+        inventoryUI.update(player);
+        levelUpUI.update(player);
     }
 
     public HUD getHud() {

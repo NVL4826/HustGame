@@ -79,6 +79,15 @@ public class HustGame extends Game implements EventListener {
     }
 
     @Override
+    public void setScreen(final Screen screen) {
+        final Screen oldScreen = this.screen;
+        super.setScreen(screen);
+        if (oldScreen != null && oldScreen != screen) {
+            oldScreen.dispose();
+        }
+    }
+
+    @Override
     public void render() {
         // Ủy quyền render cho Screen hiện hành
         super.render();

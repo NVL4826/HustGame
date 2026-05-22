@@ -4,29 +4,23 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.enemies.BaseEnemy;
-import hust.adventure.entities.enemies.StackOverflowEnemy;
 import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.events.EventType;
+import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.ItemManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Behavior class for the Lab level, managing custom wave spawns, lighting changes, and USB collection.
  */
-public class LabBehavior implements LevelBehavior {
+public class LabBehavior implements LevelBehavior, EventListener {
     private static final int MAX_WAVE = 5;
     private static final float SPAWN_USB_X = 385f;
     private static final float SPAWN_USB_Y = 285f;
-    private static final float USB_SIZE = 30f;
     private static final float BOSS_SPAWN_X = 400f;
     private static final float BOSS_SPAWN_Y = 100f;
     private static final String BOSS_MAP = "boss_room.tmx";
@@ -44,8 +38,7 @@ public class LabBehavior implements LevelBehavior {
     private boolean waveActive = false;
     private float waveTimer = 2f;
     private boolean labCleared = false;
-    private Rectangle usbRect;
-    private final List<BaseEnemy> labEnemies = new ArrayList<>();
+    private boolean usbSpawned = false;
     private OrthographicCamera uiCam;
 
     @Override
@@ -54,24 +47,20 @@ public class LabBehavior implements LevelBehavior {
         uiCam.setToOrtho(false, 800, 600);
         uiCam.update();
         startLabWave(context, currentWave);
+        EventDispatcher.getInstance().addListener(EventType.ITEM_PICKED_UP, this);
     }
 
     @Override
     public void update(final LevelContext context, final float delta) {
-        final Rectangle pBounds = context.getPlayer().getBounds();
         if (labCleared) {
-            if (usbRect != null && pBounds.overlaps(usbRect)) {
-                ProgressContext.instance.setHasUsb(true);
-                ProgressContext.instance.setLabCleared(true);
-                
-                final MapTransitionData data = new MapTransitionData(BOSS_MAP, BOSS_SPAWN_X, BOSS_SPAWN_Y);
-                final GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
-                EventDispatcher.getInstance().dispatch(event);
-                
-                usbRect = null;
+            return;
+        }
+
+        if (waveActive) {
+            if (!context.getEntityManager().hasActiveEnemies()) {
+                waveActive = false;
+                waveTimer = WAVE_TRANSITION_DELAY;
             }
-        } else if (waveActive) {
-            updateLabWaveLogic(context, delta, pBounds);
         } else {
             waveTimer -= delta;
             if (waveTimer <= 0) {
@@ -79,8 +68,12 @@ public class LabBehavior implements LevelBehavior {
                     currentWave++;
                     startLabWave(context, currentWave);
                 } else {
-                    labCleared = true;
-                    usbRect = new Rectangle(SPAWN_USB_X, SPAWN_USB_Y, USB_SIZE, USB_SIZE);
+                    if (!usbSpawned) {
+                        labCleared = true;
+                        context.getEntityFactory().createItemDrop(SPAWN_USB_X, SPAWN_USB_Y,
+                                ItemManager.instance.getItem("usb"), Color.CYAN);
+                        usbSpawned = true;
+                    }
                 }
             }
         }
@@ -88,15 +81,6 @@ public class LabBehavior implements LevelBehavior {
 
     @Override
     public void draw(final LevelContext context) {
-        if (usbRect != null) {
-            final ShapeRenderer sr = context.getShapeRenderer();
-            sr.setProjectionMatrix(context.getCamera().combined);
-            sr.begin(ShapeRenderer.ShapeType.Filled);
-            sr.setColor(Color.CYAN);
-            sr.rect(usbRect.x, usbRect.y, usbRect.width, usbRect.height);
-            sr.end();
-        }
-
         final SpriteBatch batch = context.getBatch();
         final BitmapFont font = context.getFont();
         batch.setProjectionMatrix(uiCam.combined);
@@ -108,7 +92,6 @@ public class LabBehavior implements LevelBehavior {
 
     private void startLabWave(final LevelContext context, int wave) {
         waveActive = true;
-        labEnemies.clear();
         ProgressContext.instance.setLightsOut(wave == LIGHTS_OUT_WAVE);
 
         if (wave == LIGHTS_OUT_WAVE) {
@@ -154,45 +137,32 @@ public class LabBehavior implements LevelBehavior {
     }
 
     private void spawnLabEnemy(final LevelContext context, final String type, final float x, final float y) {
-        final BaseEnemy enemy = (BaseEnemy) context.getEntityFactory().createEnemy(type, x, y);
-        labEnemies.add(enemy);
+        context.getEntityFactory().createEnemy(type, x, y);
     }
 
-    private void updateLabWaveLogic(final LevelContext context, float delta, final Rectangle pBounds) {
-        for (int i = labEnemies.size() - 1; i >= 0; i--) {
-            final BaseEnemy e = labEnemies.get(i);
-            if (e.isDead() || e.isDestroyed()) {
-                handleEnemyDeath(context, e);
-                labEnemies.remove(i);
+    @Override
+    public void onEvent(final GameEvent<?> event) {
+        if (event.getType() == EventType.ITEM_PICKED_UP) {
+            final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
+            if (data.getItem().getId().equals("usb")) {
+                ProgressContext.instance.setHasUsb(true);
+                ProgressContext.instance.setLabCleared(true);
+                
+                final MapTransitionData transData = new MapTransitionData(BOSS_MAP, BOSS_SPAWN_X, BOSS_SPAWN_Y);
+                final GameEvent<MapTransitionData> transEvent = new GameEvent<>(EventType.MAP_TRANSITION, transData);
+                EventDispatcher.getInstance().dispatch(transEvent);
             }
         }
-        if (context.getInputReader().isSpaceJustPressed()) {
-            context.getEntityFactory().createProjectile(context.getPlayer().getX(), context.getPlayer().getY(), 0, 400, 10, Color.YELLOW, true);
-        }
-        if (labEnemies.isEmpty()) {
-            waveActive = false;
-            waveTimer = WAVE_TRANSITION_DELAY;
-        }
     }
 
-    private void handleEnemyDeath(final LevelContext context, final BaseEnemy e) {
-        if (MathUtils.random() < 0.3f) {
-            final String[] items = { "coffee_den", "energy_drink", "kho_ga" };
-            final Color[] colors = { Color.YELLOW, Color.GREEN, Color.BROWN };
-            final int idx = MathUtils.random(0, 2);
-            context.getEntityFactory().createItemDrop(e.getX(), e.getY(),
-                    ItemManager.instance.getItem(items[idx]), colors[idx]);
-        }
-        if (e instanceof StackOverflowEnemy && !((StackOverflowEnemy) e).isSplit()) {
-            spawnLabEnemy(context, ENEMY_STACK_OVERFLOW, e.getX() - 30, e.getY());
-            spawnLabEnemy(context, ENEMY_STACK_OVERFLOW, e.getX() + 30, e.getY());
-        }
-        e.destroy();
+    @Override
+    public boolean canTransition(final LevelContext context) {
+        return labCleared;
     }
 
     @Override
     public void dispose(final LevelContext context) {
-        labEnemies.clear();
+        EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
         ProgressContext.instance.setLightsOut(false);
     }
 

@@ -114,6 +114,7 @@ public class EntityFactoryImpl implements EntityFactory {
             p.setCollider(new Collider(p, layer, Collider.Shape.RECTANGLE, 5f));
         } else {
             p.getCollider().setLayer(layer);
+            p.setCollider(p.getCollider());
         }
         entityManager.addEntity(p);
         return p;

@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.factory.EntityFactory;
 import java.util.Comparator;
 
@@ -69,6 +70,22 @@ public class EntityManager implements Disposable {
         }
         entities.clear();
         pendingAdd.clear();
+    }
+
+    public boolean hasActiveEnemies() {
+        for (int i = 0; i < entities.size; i++) {
+            final GameEntity e = entities.get(i);
+            if (e instanceof BaseEnemy && !e.isDestroyed()) {
+                return true;
+            }
+        }
+        for (int i = 0; i < pendingAdd.size; i++) {
+            final GameEntity e = pendingAdd.get(i);
+            if (e instanceof BaseEnemy && !e.isDestroyed()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Array<GameEntity> getEntities() {

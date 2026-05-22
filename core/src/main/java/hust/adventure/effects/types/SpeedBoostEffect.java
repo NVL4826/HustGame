@@ -27,7 +27,9 @@ public class SpeedBoostEffect implements StatusEffect {
 
     @Override
     public void onEnd(BaseActor target) {
-        target.setSpeedMultiplier(1.0f);
+        if (target.getStatusEffectManager().getEffectCount(StatusFlag.SPEED_BOOSTED) <= 1) {
+            target.setSpeedMultiplier(1.0f);
+        }
     }
 
     @Override

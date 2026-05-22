@@ -9,6 +9,7 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.TreasureOpenedEvent;
+import hust.adventure.collision.Collider;
  
 public class TreasureChest extends BaseEntity implements Interactable {
     private Texture texture;
@@ -27,7 +28,7 @@ public class TreasureChest extends BaseEntity implements Interactable {
     }
  
     @Override
-    public void setCollider(hust.adventure.collision.Collider collider) {
+    public void setCollider(Collider collider) {
         super.setCollider(collider);
         if (collider != null) {
             collider.setListener(other -> {

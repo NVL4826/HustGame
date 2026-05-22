@@ -1,5 +1,7 @@
 package hust.adventure.core.config;
 
+import com.badlogic.gdx.graphics.Color;
+
 /**
  * Identifiers for all game levels to support data-driven screen logic.
  */
@@ -26,16 +28,16 @@ public enum LevelID {
         return null;
     }
 
-    public com.badlogic.gdx.graphics.Color getAmbientColor() {
+    public Color getAmbientColor() {
         switch (this) {
         case LIBRARY:
-            return new com.badlogic.gdx.graphics.Color(0.6f, 0.6f, 0.6f, 1f);
+            return new Color(0.6f, 0.6f, 0.6f, 1f);
         case BOSS_ROOM:
-            return new com.badlogic.gdx.graphics.Color(0.6f, 0.6f, 0.6f, 1f);
+            return new Color(0.6f, 0.6f, 0.6f, 1f);
         case LAB:
-            return new com.badlogic.gdx.graphics.Color(0.6f, 0.6f, 0.6f, 1f);
+            return new Color(0.6f, 0.6f, 0.6f, 1f);
         default:
-            return new com.badlogic.gdx.graphics.Color(0.9f, 0.9f, 0.9f, 1f); // White for outside
+            return new Color(0.9f, 0.9f, 0.9f, 1f); // White for outside
         }
     }
 

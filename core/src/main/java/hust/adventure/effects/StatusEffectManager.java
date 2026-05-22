@@ -81,6 +81,19 @@ public class StatusEffectManager {
     }
 
     /**
+     * Gets the count of active effects for a specific status flag.
+     * 
+     * @param flag The flag to check.
+     * @return The count of active effects.
+     */
+    public int getEffectCount(final StatusFlag flag) {
+        if (flag == null) {
+            return 0;
+        }
+        return flagCounts.get(flag, 0);
+    }
+
+    /**
      * Clears all active effects. Used for object pooling reset.
      */
     public void clear() {

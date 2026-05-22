@@ -13,6 +13,10 @@ public class CoffeeItem extends ConsumableItem {
         super(id, name, description, createCoffeeEffect(consumptionEffect));
     }
 
+    public CoffeeItem(final String id, final String name, final String description, final Consumer<BaseActor> consumptionEffect, final java.util.List<FloatingTextInfo> floatingTexts) {
+        super(id, name, description, createCoffeeEffect(consumptionEffect), floatingTexts);
+    }
+
     private static Consumer<BaseActor> createCoffeeEffect(final Consumer<BaseActor> effect) {
         if (effect == null) {
             throw new IllegalArgumentException("Coffee effect cannot be null");

@@ -7,8 +7,9 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
+import com.badlogic.gdx.utils.Disposable;
 
-public class ScenarioService implements EventListener, com.badlogic.gdx.utils.Disposable {
+public class ScenarioService implements EventListener, Disposable {
     private static final String BOSS_TEXTURE_NAME = "Boss THT.png";
     private static final float BOSS_SPAWN_OFFSET = 300f;
 

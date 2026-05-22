@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.core.TimeProvider;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.entities.Player;
+import hust.adventure.entities.status.StatusFlag;
 
 public class HUD {
     private OrthographicCamera uiCam;
@@ -110,6 +112,31 @@ public class HUD {
             font.setColor(Color.CYAN);
             font.draw(batch, String.format("RADAR ACTIVE (%.1fs)", ProgressContext.instance.getShowEnemiesTimer()), 20, spellY);
             spellY -= 20;
+        }
+
+        // Active status effects notifications
+        Player player = ProgressContext.instance.getPlayer();
+        if (player != null) {
+            if (player.hasStatus(StatusFlag.SPEED_BOOSTED)) {
+                font.setColor(Color.CYAN);
+                font.draw(batch, "SPEED BOOST ACTIVE!", 20, spellY);
+                spellY -= 20;
+            }
+            if (player.hasStatus(StatusFlag.REGEN_HP)) {
+                font.setColor(Color.GREEN);
+                font.draw(batch, "HP REGEN ACTIVE!", 20, spellY);
+                spellY -= 20;
+            }
+            if (player.hasStatus(StatusFlag.REGEN_STAMINA)) {
+                font.setColor(Color.GOLD);
+                font.draw(batch, "STAMINA REGEN ACTIVE!", 20, spellY);
+                spellY -= 20;
+            }
+            if (player.hasStatus(StatusFlag.CONFUSED)) {
+                font.setColor(Color.MAGENTA);
+                font.draw(batch, "CONFUSION ACTIVE!", 20, spellY);
+                spellY -= 20;
+            }
         }
         font.setColor(Color.WHITE);
 

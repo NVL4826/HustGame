@@ -1,4 +1,4 @@
-package hust.adventure.entities.weapons;
+package hust.adventure.items.weapons;
 
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
@@ -6,11 +6,12 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.RewardSelectedEvent;
 import hust.adventure.entities.Player;
+import com.badlogic.gdx.utils.Disposable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public final class WeaponUpgradeService implements EventListener, com.badlogic.gdx.utils.Disposable {
+public final class WeaponUpgradeService implements EventListener, Disposable {
     private final Player player;
     private final Map<String, WeaponUpgradeDefinition> upgradeRegistry;
 
@@ -28,6 +29,7 @@ public final class WeaponUpgradeService implements EventListener, com.badlogic.g
         registerUpgrade(new WeaponUpgradeDefinition("whip_upgrade", "whip", 5f, 0f));
         registerUpgrade(new WeaponUpgradeDefinition("wand_power", "magic_wand", 3f, 0.1f));
         registerUpgrade(new WeaponUpgradeDefinition("garlic_range", "garlic", 1f, 0.05f));
+        registerUpgrade(new WeaponUpgradeDefinition("bundau_upgrade", "bun_dau", 4f, 0.05f));
     }
 
     public void registerUpgrade(final WeaponUpgradeDefinition def) {
@@ -48,7 +50,7 @@ public final class WeaponUpgradeService implements EventListener, com.badlogic.g
                 return;
             }
             final String rewardId = data.getRewardId();
-            
+
             final WeaponUpgradeDefinition upgrade = upgradeRegistry.get(rewardId);
             if (upgrade == null) {
                 return;
@@ -76,7 +78,8 @@ public final class WeaponUpgradeService implements EventListener, com.badlogic.g
         public final float damageBonus;
         public final float cooldownReduction;
 
-        public WeaponUpgradeDefinition(final String rewardId, final String targetWeaponId, final float damageBonus, final float cooldownReduction) {
+        public WeaponUpgradeDefinition(final String rewardId, final String targetWeaponId, final float damageBonus,
+                final float cooldownReduction) {
             if (rewardId == null) {
                 throw new IllegalArgumentException("Reward ID cannot be null");
             }

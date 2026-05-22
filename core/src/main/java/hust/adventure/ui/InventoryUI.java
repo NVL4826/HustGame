@@ -74,34 +74,23 @@ public class InventoryUI {
         if (items.isEmpty()) {
             font.draw(batch, "Chua co gi o day ca...", panelX + 50, panelY + panelH - offsetY);
         } else {
-            // Xác định phím số nào đang được bấm
-            int keyPressed = player.getController().getJustPressedNum();
- 
             int itemIndex = 1;
-            String itemToConsumeId = null; 
- 
             for (Map.Entry<Item, Integer> entry : items.entrySet()) {
                 Item item = entry.getKey();
                 String itemName = item.getName();
- 
+
                 // Hiển thị dạng: [1] Ca phe den : x2
+                font.setColor(Color.WHITE);
                 font.draw(batch, "[" + itemIndex + "] " + itemName + " :  x" + entry.getValue(), panelX + 50,
                         panelY + panelH - offsetY);
- 
-                // Nếu người chơi bấm đúng số thứ tự của item này
-                if (keyPressed == itemIndex) {
-                    itemToConsumeId = item.getId();
-                }
- 
-                offsetY += 30;
+
+                // Hiển thị mô tả của vật phẩm
+                font.setColor(Color.LIGHT_GRAY);
+                font.draw(batch, "   " + item.getDescription(), panelX + 50,
+                        panelY + panelH - offsetY - 18);
+
+                offsetY += 45;
                 itemIndex++;
-            }
- 
-            // Xử lý sử dụng vật phẩm
-            if (itemToConsumeId != null) {
-                // Dispatch event với ID (Player sẽ resolve lại qua ItemManager)
-                GameEvent<String> event = new GameEvent<>(EventType.ITEM_USED, itemToConsumeId);
-                EventDispatcher.getInstance().dispatch(event);
             }
         }
  
@@ -110,6 +99,32 @@ public class InventoryUI {
         batch.end();
     }
  
+    public void update(Player player) {
+        if (!ProgressContext.instance.isInventoryOpen() || player == null) {
+            return;
+        }
+
+        int keyPressed = player.getController().getJustPressedNum();
+        if (keyPressed > 0) {
+            Map<Item, Integer> items = player.getInventory().getReadOnlyItems();
+            int itemIndex = 1;
+            String itemToConsumeId = null;
+
+            for (Map.Entry<Item, Integer> entry : items.entrySet()) {
+                if (keyPressed == itemIndex) {
+                    itemToConsumeId = entry.getKey().getId();
+                    break;
+                }
+                itemIndex++;
+            }
+
+            if (itemToConsumeId != null) {
+                GameEvent<String> event = new GameEvent<>(EventType.ITEM_USED, itemToConsumeId);
+                EventDispatcher.getInstance().dispatch(event);
+            }
+        }
+    }
+
     public void dispose() {
     }
 }

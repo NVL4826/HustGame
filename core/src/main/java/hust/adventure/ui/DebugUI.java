@@ -1,6 +1,7 @@
 package hust.adventure.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -69,7 +70,8 @@ public class DebugUI {
         new DebugOption("kho_ga", "Dried Chicken"),
         new DebugOption("whip", "Whip (Roi)"),
         new DebugOption("magic_wand", "Magic Wand (Đua)"),
-        new DebugOption("garlic", "Garlic (Toi)")
+        new DebugOption("garlic", "Garlic (Toi)"),
+        new DebugOption("bun_dau", "Bun Dau (Đậu)")
     };
 
     private static final DebugOption[] MONSTER_OPTIONS = {
@@ -136,17 +138,17 @@ public class DebugUI {
             return null;
         }
 
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.UP)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             selectedIndex = (selectedIndex - 1 + currentOptions.length) % currentOptions.length;
         }
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.DOWN)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             selectedIndex = (selectedIndex + 1) % currentOptions.length;
         }
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             cancelSelection();
             return null;
         }
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ENTER)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             DebugOption selection = currentOptions[selectedIndex];
             cancelSelection();
             return selection;

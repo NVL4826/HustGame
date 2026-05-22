@@ -1,6 +1,8 @@
 package hust.adventure.core;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.enemies.FinalBoss;
@@ -10,8 +12,10 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
+import hust.adventure.items.ItemManager;
+import com.badlogic.gdx.utils.Disposable;
 
-public class LootDropService implements EventListener, com.badlogic.gdx.utils.Disposable {
+public class LootDropService implements EventListener, Disposable {
     private static final float DEFAULT_EXP_GEM_VALUE = 10f;
 
     private final EntityFactory entityFactory;
@@ -35,6 +39,15 @@ public class LootDropService implements EventListener, com.badlogic.gdx.utils.Di
                     entityFactory.createTreasureChest(deadEntity.getX(), deadEntity.getY(), tex);
                 } else {
                     entityFactory.createExpGem(deadEntity.getX(), deadEntity.getY(), DEFAULT_EXP_GEM_VALUE);
+                    
+                    // 30% chance to drop a random consumable (previously in LabBehavior)
+                    if (MathUtils.random() < 0.3f) {
+                        final String[] items = { "coffee_den", "energy_drink", "kho_ga" };
+                        final Color[] colors = { Color.YELLOW, Color.GREEN, Color.BROWN };
+                        final int idx = MathUtils.random(0, 2);
+                        entityFactory.createItemDrop(deadEntity.getX(), deadEntity.getY(),
+                                ItemManager.instance.getItem(items[idx]), colors[idx]);
+                    }
                 }
             }
         }

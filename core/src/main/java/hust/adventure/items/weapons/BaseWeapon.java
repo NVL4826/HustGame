@@ -1,25 +1,24 @@
-package hust.adventure.entities.weapons;
+package hust.adventure.items.weapons;
 
 import hust.adventure.entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * Abstract base class for all weapons.
- * Handles common functionality like cooldown management and level tracking.
+ * Abstract base class for all weapons. Handles common functionality like cooldown management and level tracking.
  */
 public abstract class BaseWeapon implements Weaponable {
-    protected final Player owner;
-    protected float baseDamage;
-    protected float cooldown;
-    protected float area;
-    protected int level;
-    protected float currentCooldownTimer;
-    protected final String id;
-    protected final String name;
-    protected final String description;
+    private final Player owner;
+    private float baseDamage;
+    private float cooldown;
+    private float area;
+    private int level;
+    private float currentCooldownTimer;
+    private final String id;
+    private final String name;
+    private final String description;
 
-    public BaseWeapon(final Player owner, final String id, final String name, final String description, 
-                      final float baseDamage, final float cooldown, final float area) {
+    public BaseWeapon(final Player owner, final String id, final String name, final String description,
+            final float baseDamage, final float cooldown, final float area) {
         if (owner == null) {
             throw new IllegalArgumentException("Owner cannot be null");
         }
@@ -44,12 +43,17 @@ public abstract class BaseWeapon implements Weaponable {
     }
 
     @Override
+    public boolean isAutoFiring() {
+        return true;
+    }
+
+    @Override
     public void updateTimer(final float deltaTime) {
         if (currentCooldownTimer > 0) {
             currentCooldownTimer -= deltaTime;
         }
-        
-        if (currentCooldownTimer <= 0) {
+
+        if (isAutoFiring() && currentCooldownTimer <= 0) {
             fire();
         }
     }
@@ -84,6 +88,42 @@ public abstract class BaseWeapon implements Weaponable {
         return level;
     }
 
+    public final Player getOwner() {
+        return owner;
+    }
+
+    public final float getBaseDamage() {
+        return baseDamage;
+    }
+
+    public final void setBaseDamage(final float baseDamage) {
+        this.baseDamage = baseDamage;
+    }
+
+    public final float getCooldown() {
+        return cooldown;
+    }
+
+    public final void setCooldown(final float cooldown) {
+        this.cooldown = cooldown;
+    }
+
+    public final float getArea() {
+        return area;
+    }
+
+    public final void setArea(final float area) {
+        this.area = area;
+    }
+
+    public final float getCurrentCooldownTimer() {
+        return currentCooldownTimer;
+    }
+
+    protected final void setCurrentCooldownTimer(final float currentCooldownTimer) {
+        this.currentCooldownTimer = currentCooldownTimer;
+    }
+
     public void addBaseDamage(final float amount) {
         this.baseDamage += amount;
     }
@@ -105,10 +145,12 @@ public abstract class BaseWeapon implements Weaponable {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof hust.adventure.items.Item)) return false;
-        final hust.adventure.items.Item item = (hust.adventure.items.Item) o;
-        return java.util.Objects.equals(getId(), item.getId());
+        if (this == o)
+            return true;
+        if (!(o instanceof Weaponable))
+            return false;
+        final Weaponable weapon = (Weaponable) o;
+        return java.util.Objects.equals(getId(), weapon.getId());
     }
 
     @Override

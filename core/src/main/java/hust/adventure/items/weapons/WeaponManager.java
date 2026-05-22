@@ -1,4 +1,4 @@
-package hust.adventure.entities.weapons;
+package hust.adventure.items.weapons;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
@@ -21,6 +21,7 @@ public class WeaponManager {
 
     /**
      * Updates all equipped weapons.
+     * 
      * @param delta Time elapsed.
      */
     public void update(final float delta) {
@@ -31,6 +32,7 @@ public class WeaponManager {
 
     /**
      * Draws effects for all weapons.
+     * 
      * @param batch The SpriteBatch to use.
      */
     public void draw(final SpriteBatch batch) {
@@ -41,6 +43,7 @@ public class WeaponManager {
 
     /**
      * Adds a new weapon to the player.
+     * 
      * @param weapon The weapon to add.
      */
     public void addWeapon(final Weaponable weapon) {

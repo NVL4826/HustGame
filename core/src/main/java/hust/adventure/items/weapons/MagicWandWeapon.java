@@ -1,4 +1,4 @@
-package hust.adventure.entities.weapons;
+package hust.adventure.items.weapons;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -19,7 +19,7 @@ public class MagicWandWeapon extends BaseWeapon {
 
     @Override
     protected void executeAttackAction() {
-        final GameEntity target = owner.getCollisionManager().getNearestEntity(owner.getX(), owner.getY(), MAX_RANGE,
+        final GameEntity target = getOwner().getCollisionManager().getNearestEntity(getOwner().getX(), getOwner().getY(), MAX_RANGE,
                 CollisionLayer.ENEMY);
 
         if (target != null) {
@@ -28,15 +28,15 @@ public class MagicWandWeapon extends BaseWeapon {
     }
 
     private void fireAt(final GameEntity target) {
-        final float startX = owner.getX();
-        final float startY = owner.getY();
+        final float startX = getOwner().getX();
+        final float startY = getOwner().getY();
 
         final Vector2 direction = new Vector2(target.getX() - startX, target.getY() - startY).nor();
         final float vx = direction.x * PROJECTILE_SPEED;
         final float vy = direction.y * PROJECTILE_SPEED;
 
-        if (owner.getFactory() != null) {
-            owner.getFactory().createProjectile(startX, startY, vx, vy, baseDamage, Color.CYAN, true);
+        if (getOwner().getFactory() != null) {
+            getOwner().getFactory().createProjectile(startX, startY, vx, vy, getBaseDamage(), Color.CYAN, true);
         }
     }
 }

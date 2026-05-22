@@ -1,6 +1,5 @@
 package hust.adventure.screens.levels;
 
-import com.badlogic.gdx.graphics.Color;
 import hust.adventure.entities.enemies.LibraryBoss;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
@@ -15,6 +14,7 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
     private LevelContext context;
     private BookPuzzle puzzle;
     private boolean puzzleSolved = false;
+    private boolean artifactSpawned = false;
     private float redFlashTimer = 0f;
     private LibraryBoss libraryBoss;
 
@@ -45,11 +45,9 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
         if (!puzzleSolved) {
             puzzle.update(delta);
         } else {
-            if (context.getInputReader().isSpaceJustPressed()) {
-                context.getEntityFactory().createProjectile(
-                        context.getPlayer().getX(),
-                        context.getPlayer().getY() + 20,
-                        0, 400, 20, Color.WHITE, true);
+            if (libraryBoss != null && (libraryBoss.isDead() || libraryBoss.isDestroyed()) && !artifactSpawned) {
+                context.getEntityFactory().createLibraryArtifact(libraryBoss.getX(), libraryBoss.getY());
+                artifactSpawned = true;
             }
         }
         if (redFlashTimer > 0) {
@@ -87,6 +85,11 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
         } else if (event.getType() == EventType.PUZZLE_SOLVED) {
             onPuzzleSolved();
         }
+    }
+
+    @Override
+    public boolean canTransition(final LevelContext context) {
+        return puzzleSolved;
     }
 
     @Override

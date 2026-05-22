@@ -1,6 +1,7 @@
 package hust.adventure.entities.base;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import hust.adventure.collision.Collider;
@@ -13,7 +14,7 @@ public interface GameEntity extends Disposable {
 
     void draw(SpriteBatch batch);
 
-    void drawHitbox(com.badlogic.gdx.graphics.glutils.ShapeRenderer sr);
+    void drawHitbox(ShapeRenderer sr);
 
     float getX();
 

@@ -10,6 +10,7 @@ import hust.adventure.entities.state.IdleState;
 import hust.adventure.entities.state.MovingState;
 import hust.adventure.entities.status.StatusFlag;
 import hust.adventure.input.PlayerController;
+import hust.adventure.core.context.ProgressContext;
 
 public class PlayerMovementBehavior implements MovementBehavior {
     private PlayerController controller;
@@ -38,7 +39,7 @@ public class PlayerMovementBehavior implements MovementBehavior {
         float currentSpeed = actor.getSpeed();
         boolean isSprinting = controller.isRunning() && actor.getStamina() > 0;
 
-        if (hust.adventure.core.context.ProgressContext.instance.isFastRun()) {
+        if (ProgressContext.instance.isFastRun()) {
             currentSpeed *= 3.0f;
             actor.restoreStamina(100f * delta);
         } else if (actor.getStamina() <= 0) {

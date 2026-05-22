@@ -1,8 +1,10 @@
 package hust.adventure.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -26,7 +28,7 @@ import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
-import hust.adventure.entities.weapons.WeaponUpgradeService;
+import hust.adventure.items.weapons.WeaponUpgradeService;
 import hust.adventure.events.*;
 import hust.adventure.gamestate.PlayMode;
 import hust.adventure.graphics.CameraManager;
@@ -37,9 +39,12 @@ import hust.adventure.screens.levels.LevelBehavior;
 import hust.adventure.screens.levels.LevelContext;
 import hust.adventure.stats.LevelManager;
 import hust.adventure.ui.UIManager;
+import hust.adventure.ui.DebugUI;
 import hust.adventure.ui.components.DamageIncreaseAction;
 import hust.adventure.ui.components.HealAction;
 import hust.adventure.ui.components.UpgradeAction;
+import hust.adventure.items.Item;
+import hust.adventure.items.ItemManager;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
 import hust.adventure.world.WorldManager;
@@ -212,8 +217,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         final IntArray fg = new IntArray();
 
         for (int i = 0; i < worldManager.getCurrentMap().getLayers().size(); i++) {
-            final String name = worldManager.getCurrentMap().getLayers().get(i).getName();
-            if (isBackgroundLayer(name)) {
+            final com.badlogic.gdx.maps.MapLayer layer = worldManager.getCurrentMap().getLayers().get(i);
+            if (isBackgroundLayer(layer)) {
                 bg.add(i);
             } else {
                 fg.add(i);
@@ -223,7 +228,22 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         foregroundLayers = fg.toArray();
     }
 
-    private boolean isBackgroundLayer(final String name) {
+    private boolean isBackgroundLayer(final com.badlogic.gdx.maps.MapLayer layer) {
+        if (layer == null) {
+            return false;
+        }
+        final Object isBgProp = layer.getProperties().get("isBackground");
+        if (isBgProp instanceof Boolean) {
+            return (Boolean) isBgProp;
+        }
+        if (isBgProp instanceof String) {
+            return "true".equalsIgnoreCase((String) isBgProp) || "1".equals(isBgProp);
+        }
+        
+        final String name = layer.getName();
+        if (name == null) {
+            return false;
+        }
         return name.equals("Via He") || name.equals("Duong") || name.equals("Grass") || name.equals("Nha1")
                 || name.equals("Background") || name.equals("Floor") || name.equals("Tile Layer 1");
     }
@@ -247,14 +267,15 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
             for (GameEntity e : entityManager.getEntities()) {
                 if (e instanceof BaseEnemy) {
-                    ((BaseEnemy) e).handleUpdate(delta * ProgressContext.instance.getEnemyTimeScale(), player, entityManager);
+                    ((BaseEnemy) e).handleUpdate(delta * ProgressContext.instance.getEnemyTimeScale(), player,
+                            entityManager);
                 }
             }
 
             lightingManager.update();
             collisionManager.update(worldManager.getWalls());
             checkTriggers();
-            uiManager.update(delta);
+            uiManager.update(delta, player);
             updateLevel(delta);
         }
 
@@ -288,10 +309,10 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         if (ProgressContext.instance.isShowDebug() && uiManager.getDebugUI() != null) {
-            hust.adventure.ui.DebugUI debugUI = uiManager.getDebugUI();
+            DebugUI debugUI = uiManager.getDebugUI();
 
             if (debugUI.isActive()) {
-                hust.adventure.ui.DebugUI.DebugOption selected = debugUI.handleSelectionInput();
+                DebugUI.DebugOption selected = debugUI.handleSelectionInput();
                 if (selected != null) {
                     executeDebugAction(debugUI.getPreviousMode(), selected);
                     state = PlayMode.RUNNING;
@@ -302,47 +323,49 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
                 return; // Suppress other actions while selection is active
             }
 
-            if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F4)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) {
                 ProgressContext.instance.setGodMode(!ProgressContext.instance.isGodMode());
             }
-            if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F5)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
                 ProgressContext.instance.setFastRun(!ProgressContext.instance.isFastRun());
             }
-            if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F6)) {
-                debugUI.startSelection(hust.adventure.ui.DebugUI.SelectionMode.MAP);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F6)) {
+                debugUI.startSelection(DebugUI.SelectionMode.MAP);
                 state = PlayMode.IN_UI;
             }
-            if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F7)) {
-                debugUI.startSelection(hust.adventure.ui.DebugUI.SelectionMode.ITEM);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F7)) {
+                debugUI.startSelection(DebugUI.SelectionMode.ITEM);
                 state = PlayMode.IN_UI;
             }
-            if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F8)) {
-                debugUI.startSelection(hust.adventure.ui.DebugUI.SelectionMode.MONSTER);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.F8)) {
+                debugUI.startSelection(DebugUI.SelectionMode.MONSTER);
                 state = PlayMode.IN_UI;
             }
         }
     }
 
-    private void executeDebugAction(hust.adventure.ui.DebugUI.SelectionMode mode, hust.adventure.ui.DebugUI.DebugOption option) {
-        if (mode == hust.adventure.ui.DebugUI.SelectionMode.MAP) {
+    private void executeDebugAction(DebugUI.SelectionMode mode, DebugUI.DebugOption option) {
+        if (mode == DebugUI.SelectionMode.MAP) {
             String targetMap = option.id;
-            hust.adventure.events.MapTransitionData data = new hust.adventure.events.MapTransitionData(targetMap, 400f, 400f);
-            hust.adventure.events.GameEvent<hust.adventure.events.MapTransitionData> event = 
-                new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.MAP_TRANSITION, data);
+            hust.adventure.events.MapTransitionData data = new hust.adventure.events.MapTransitionData(targetMap, 400f,
+                    400f);
+            hust.adventure.events.GameEvent<hust.adventure.events.MapTransitionData> event = new hust.adventure.events.GameEvent<>(
+                    hust.adventure.events.EventType.MAP_TRANSITION, data);
             hust.adventure.events.EventDispatcher.getInstance().dispatch(event);
-        } else if (mode == hust.adventure.ui.DebugUI.SelectionMode.ITEM) {
+        } else if (mode == DebugUI.SelectionMode.ITEM) {
             String itemId = option.id;
-            hust.adventure.items.Item item = hust.adventure.items.ItemManager.instance.getItem(itemId);
+            Item item = ItemManager.instance.getItem(itemId);
             if (item != null) {
-                entityFactory.createItemDrop(player.getX() + 32f, player.getY(), item, com.badlogic.gdx.graphics.Color.WHITE);
+                entityFactory.createItemDrop(player.getX() + 32f, player.getY(), item, Color.WHITE);
             }
-        } else if (mode == hust.adventure.ui.DebugUI.SelectionMode.MONSTER) {
+        } else if (mode == DebugUI.SelectionMode.MONSTER) {
             String enemyId = option.id;
             try {
                 if (enemyId.equals("libboss")) {
                     entityFactory.createLibraryBoss(player.getX() + 64f, player.getY());
                 } else if (enemyId.equals("finalboss")) {
-                    entityFactory.createFinalBoss(player.getX() + 64f, player.getY(), game.getAssetManager().getTexture("Boss THT.png"));
+                    entityFactory.createFinalBoss(player.getX() + 64f, player.getY(),
+                            game.getAssetManager().getTexture("Boss THT.png"));
                 } else {
                     entityFactory.createEnemy(enemyId, player.getX() + 64f, player.getY());
                 }
@@ -354,6 +377,10 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     private void checkTriggers() {
         if (game.getScreenTransition().isTransitioning()) {
+            return;
+        }
+
+        if (behavior != null && !behavior.canTransition(this)) {
             return;
         }
 
