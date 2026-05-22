@@ -23,11 +23,6 @@ public class SyntaxErrorEnemy extends BaseEnemy {
         setBehavior(new FleeBehavior(30f, 200f));
     }
 
-    @Override
-    public void reset() {
-        super.reset();
-        fireTimer = 0;
-    }
 
     @Override
     public void handleUpdate(float delta, Player p, EntityManager em) {

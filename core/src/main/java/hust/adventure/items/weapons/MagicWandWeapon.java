@@ -13,8 +13,8 @@ public class MagicWandWeapon extends BaseWeapon {
     private static final float PROJECTILE_SPEED = 200f;
     private static final float MAX_RANGE = 400f;
 
-    public MagicWandWeapon(final Player owner, final WeaponStats initialStats) {
-        super(owner, initialStats);
+    public MagicWandWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
+        super(owner, "magic_wand", "Gậy phép", "Bắn tia phép vào kẻ địch gần nhất.", baseDamage, cooldown, area);
     }
 
     @Override

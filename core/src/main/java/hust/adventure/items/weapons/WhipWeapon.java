@@ -18,8 +18,8 @@ public class WhipWeapon extends BaseWeapon {
     private float flashTimer = 0f;
     private static final float FLASH_DURATION = 0.15f;
 
-    public WhipWeapon(final Player owner, final WeaponStats initialStats) {
-        super(owner, initialStats);
+    public WhipWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
+        super(owner, "whip", "Roi da", "Tấn công kẻ địch trước mặt theo hình chữ nhật.", baseDamage, cooldown, area);
         this.hitArea = new Rectangle();
     }
 

@@ -19,10 +19,6 @@ public class InfiniteLoopEnemy extends BaseEnemy {
         setBehavior(new FleeBehavior(80f, 150f));
     }
  
-    @Override
-    public void reset() {
-        super.reset();
-    }
 
     @Override
     protected void renderSpecific(SpriteBatch batch) {

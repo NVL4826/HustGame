@@ -20,10 +20,6 @@ public class LibraryBoss extends BaseEnemy {
         setBehavior(new ChaseBehavior(40f));
     }
  
-    @Override
-    public void reset() {
-        super.reset();
-    }
 
     @Override
     protected void renderSpecific(SpriteBatch batch) {

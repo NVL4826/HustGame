@@ -19,10 +19,6 @@ public class NullPointerEnemy extends BaseEnemy {
         setBehavior(new ChaseBehavior(60f));
     }
  
-    @Override
-    public void reset() {
-        super.reset();
-    }
 
     @Override
     protected void renderSpecific(SpriteBatch batch) {

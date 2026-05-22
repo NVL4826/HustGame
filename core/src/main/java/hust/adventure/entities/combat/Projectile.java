@@ -83,8 +83,12 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
 
     @Override
     public void update(float delta) {
-        setX(getX() + vx * delta);
-        setY(getY() + vy * delta);
+        float localDelta = delta;
+        if (!isPlayerProjectile) {
+            localDelta *= hust.adventure.core.context.ProgressContext.instance.getEnemyTimeScale();
+        }
+        setX(getX() + vx * localDelta);
+        setY(getY() + vy * localDelta);
 
         // Destroy if traveled too far from spawn point
         if (Math.abs(getX() - startX) > MAX_RANGE || Math.abs(getY() - startY) > MAX_RANGE) {

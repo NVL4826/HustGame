@@ -11,8 +11,8 @@ import hust.adventure.entities.enemies.BaseEnemy;
  */
 public class GarlicAuraWeapon extends BaseWeapon {
 
-    public GarlicAuraWeapon(final Player owner, final WeaponStats initialStats) {
-        super(owner, initialStats);
+    public GarlicAuraWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
+        super(owner, "garlic", "Tỏi bảo hộ", "Tạo vòng hào quang gây sát thương xung quanh.", baseDamage, cooldown, area);
     }
 
     @Override
@@ -26,7 +26,5 @@ public class GarlicAuraWeapon extends BaseWeapon {
                 ((BaseEnemy) target).takeDamage(baseDamage);
             }
         }
-        
-        // Visual effects (vfx) could be triggered here
     }
 }

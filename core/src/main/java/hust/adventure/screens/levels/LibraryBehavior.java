@@ -1,29 +1,30 @@
 package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
-import hust.adventure.HustGame;
-import hust.adventure.core.config.LevelConfig;
 import hust.adventure.entities.enemies.LibraryBoss;
 import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.ui.BookPuzzle;
 
 /**
- * Library level with puzzle-solving and boss fight.
+ * Behavior class for the Library level, managing puzzle and boss fight.
  */
-public class LibraryLevel extends BaseLevelScreen {
+public class LibraryBehavior implements LevelBehavior, EventListener {
+    private LevelContext context;
     private BookPuzzle puzzle;
     private boolean puzzleSolved = false;
     private float redFlashTimer = 0f;
     private LibraryBoss libraryBoss;
 
-    public LibraryLevel(final HustGame game, final LevelConfig config) {
-        super(game, config);
-    }
-
     @Override
-    protected void initLevel() {
+    public void init(final LevelContext context) {
+        if (context == null) {
+            throw new IllegalArgumentException("LevelContext cannot be null");
+        }
+        this.context = context;
+
         final java.util.Map<String, Integer> bookConfigs = new java.util.LinkedHashMap<>();
         bookConfigs.put("Toan cao cap", 1);
         bookConfigs.put("CTDL & GT", 3);
@@ -40,22 +41,26 @@ public class LibraryLevel extends BaseLevelScreen {
     }
 
     @Override
-    protected void updateLevel(float delta) {
+    public void update(final LevelContext context, final float delta) {
         if (!puzzleSolved) {
             puzzle.update(delta);
         } else {
-            if (inputReader.isSpaceJustPressed()) {
-                entityFactory.createProjectile(player.getX(), player.getY() + 20, 0, 400, 20, Color.WHITE, true);
+            if (context.getInputReader().isSpaceJustPressed()) {
+                context.getEntityFactory().createProjectile(
+                        context.getPlayer().getX(),
+                        context.getPlayer().getY() + 20,
+                        0, 400, 20, Color.WHITE, true);
             }
         }
-        if (redFlashTimer > 0)
+        if (redFlashTimer > 0) {
             redFlashTimer -= delta;
+        }
     }
 
     @Override
-    protected void drawLevel() {
+    public void draw(final LevelContext context) {
         if (!puzzleSolved) {
-            puzzle.render(shapeRenderer, batch);
+            puzzle.render(context.getShapeRenderer(), context.getBatch());
         } else {
             if (libraryBoss != null && !libraryBoss.isDestroyed()) {
                 // UI for Boss health would go here
@@ -64,10 +69,11 @@ public class LibraryLevel extends BaseLevelScreen {
     }
 
     private void onPuzzleSolved() {
-        if (puzzleSolved)
+        if (puzzleSolved) {
             return;
+        }
         puzzleSolved = true;
-        libraryBoss = (LibraryBoss) entityFactory.createLibraryBoss(400, 500);
+        libraryBoss = (LibraryBoss) context.getEntityFactory().createLibraryBoss(400, 500);
     }
 
     public void flashRed() {
@@ -84,11 +90,11 @@ public class LibraryLevel extends BaseLevelScreen {
     }
 
     @Override
-    public void dispose() {
+    public void dispose(final LevelContext context) {
         EventDispatcher.getInstance().removeListener(EventType.PUZZLE_FAILED, this);
         EventDispatcher.getInstance().removeListener(EventType.PUZZLE_SOLVED, this);
-        if (puzzle != null)
+        if (puzzle != null) {
             puzzle.dispose();
-        super.dispose();
+        }
     }
 }

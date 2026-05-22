@@ -24,7 +24,13 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     private EntityState state;
     private Collider collider;
     private static Texture whitePixel;
- 
+
+    public BaseEntity() {
+        this.bounds = new Rectangle();
+        this.isDestroyed = false;
+        this.state = new IdleState();
+    }
+
     public BaseEntity(final float x, final float y, final float width, final float height) {
         this.x = x;
         this.y = y;
@@ -43,8 +49,9 @@ public abstract class BaseEntity implements GameEntity, Collidable {
 
     @Override
     public void drawHitbox(ShapeRenderer sr) {
-        if (collider == null) return;
-        
+        if (collider == null)
+            return;
+
         sr.setColor(Color.RED);
         if (collider.getShape() == Collider.Shape.RECTANGLE) {
             sr.rect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -132,6 +139,18 @@ public abstract class BaseEntity implements GameEntity, Collidable {
 
     @Override
     public void dispose() {
+    }
+
+    public static void disposeStaticResources() {
+        if (whitePixel != null) {
+            whitePixel.dispose();
+            whitePixel = null;
+        }
+    }
+
+    @Override
+    public Rectangle getMovementBounds(float x, float y, Rectangle out) {
+        return out.set(x - width / 2f, y - height / 2f, width, height);
     }
 
     public void drawRect(SpriteBatch batch, float x, float y, float width, float height, Color color) {

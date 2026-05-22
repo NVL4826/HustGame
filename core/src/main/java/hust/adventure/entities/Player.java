@@ -45,8 +45,24 @@ public class Player extends BaseActor implements Targetable, EventListener {
     private Animation<TextureRegion> lastAnim = null;
     private float stateTime = 0f;
 
+    private float iframeTimer = 0f;
+    private static final float IFRAME_DURATION = 0.5f;
+
     private static final float DRAW_SIZE = 50f;
     private static final float MAX_HP = 100f;
+
+    // Spells Constants
+    private static final float SLOW_MOTION_DURATION = 3f;
+    private static final float SLOW_MOTION_TIME_SCALE = 0.3f;
+    private static final float STUN_DURATION = 2f;
+    private static final float STUN_STAMINA_COST = 20f;
+    private static final float RADAR_DURATION = 5f;
+    private static final float RADAR_STAMINA_COST = 10f;
+
+    // Spells Timers
+    private float slowMotionTimer;
+    private float stunTimer;
+    private float showEnemiesTimer;
 
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager) {
@@ -55,6 +71,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.controller = controller;
         this.collisionManager = collisionManager;
         this.weaponManager = new WeaponManager(this);
+        this.iframeTimer = 0f;
 
         // Starting weapon
         weaponManager.addWeapon(WeaponFactory.createWeapon("whip", this));
@@ -68,8 +85,13 @@ public class Player extends BaseActor implements Targetable, EventListener {
         EventDispatcher.getInstance().addListener(EventType.ITEM_USED, this);
         EventDispatcher.getInstance().addListener(EventType.ITEM_PICKED_UP, this);
 
+        this.slowMotionTimer = 0f;
+        this.stunTimer = 0f;
+        this.showEnemiesTimer = 0f;
+        ProgressContext.instance.setPlayer(this);
+
         // Sync initial HP from global context
-        this.setHp(ProgressContext.instance.hp);
+        this.setHp(ProgressContext.instance.getHp());
     }
 
     private void loadTextures() {
@@ -105,10 +127,57 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
     @Override
     public void update(final float delta) {
+        if (ProgressContext.instance.isGodMode()) {
+            setHp(getMaxHp());
+        }
+        if (iframeTimer > 0) {
+            iframeTimer = Math.max(0f, iframeTimer - delta);
+        }
+
+        // Skill key checks
+        if (ProgressContext.instance.isHasNao() && controller.isSkillQJustPressed()) {
+            slowMotionTimer = SLOW_MOTION_DURATION;
+        }
+
+        if (controller.isSkillEJustPressed() && getStamina() >= STUN_STAMINA_COST) {
+            setStamina(getStamina() - STUN_STAMINA_COST);
+            stunTimer = STUN_DURATION;
+        }
+
+        if (controller.isSkillFJustPressed() && getStamina() >= RADAR_STAMINA_COST) {
+            setStamina(getStamina() - RADAR_STAMINA_COST);
+            showEnemiesTimer = RADAR_DURATION;
+        }
+
+        // Timer updates
+        if (slowMotionTimer > 0) {
+            slowMotionTimer = Math.max(0f, slowMotionTimer - delta);
+        }
+        if (stunTimer > 0) {
+            stunTimer = Math.max(0f, stunTimer - delta);
+        }
+        if (showEnemiesTimer > 0) {
+            showEnemiesTimer = Math.max(0f, showEnemiesTimer - delta);
+        }
+
+        // Propagate active timer states to global ProgressContext
+        float enemyTimeScale = 1.0f;
+        if (stunTimer > 0) {
+            enemyTimeScale = 0f;
+        } else if (slowMotionTimer > 0) {
+            enemyTimeScale = SLOW_MOTION_TIME_SCALE;
+        }
+        ProgressContext.instance.setEnemyTimeScale(enemyTimeScale);
+        ProgressContext.instance.setShowEnemiesTimer(showEnemiesTimer);
+
+        if (ProgressContext.instance.getPlayer() != this) {
+            ProgressContext.instance.setPlayer(this);
+        }
+
         super.update(delta);
         // Sync stats to global context for UI/saving
-        ProgressContext.instance.hp = getHp();
-        ProgressContext.instance.stamina = getStamina();
+        ProgressContext.instance.setHp(getHp());
+        ProgressContext.instance.setStamina(getStamina());
 
         // Magnetic radius for ExpGem
         if (collisionManager != null) {
@@ -168,17 +237,25 @@ public class Player extends BaseActor implements Targetable, EventListener {
                 break;
             }
         }
+        float oldAlpha = batch.getColor().a;
+        if (iframeTimer > 0) {
+            float alpha = 0.5f + 0.3f * (float) Math.sin(iframeTimer * 30f);
+            com.badlogic.gdx.graphics.Color color = batch.getColor();
+            batch.setColor(color.r, color.g, color.b, alpha);
+        }
         batch.draw(frame, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight());
+        if (iframeTimer > 0) {
+            com.badlogic.gdx.graphics.Color color = batch.getColor();
+            batch.setColor(color.r, color.g, color.b, oldAlpha);
+        }
         weaponManager.draw(batch);
     }
 
-    public void setCollisionContext(final CollisionManager newManager, final float newX, final float newY) {
+    public void setCollisionManager(final CollisionManager newManager) {
+        this.collisionManager = newManager;
         if (getMovementBehavior() instanceof PlayerMovementBehavior) {
             ((PlayerMovementBehavior) getMovementBehavior()).setCollisionManager(newManager);
         }
-        this.collisionManager = newManager;
-        setX(newX);
-        setY(newY);
     }
 
     public final Inventory getInventory() {
@@ -207,9 +284,35 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
     @Override
     public void takeDamage(final float amount) {
-        super.takeDamage(amount);
+        takeDamage(amount, false, false);
+    }
+
+    @Override
+    public void takeDamage(final float amount, final boolean isCrit) {
+        takeDamage(amount, isCrit, false);
+    }
+
+    public void takeDamage(final float amount, final boolean isCrit, final boolean ignoreIFrames) {
+        if (ProgressContext.instance.isGodMode()) {
+            return;
+        }
+        if (!ignoreIFrames && iframeTimer > 0) {
+            return;
+        }
+        super.takeDamage(amount, isCrit);
+        if (!ignoreIFrames) {
+            iframeTimer = IFRAME_DURATION;
+        }
         // Sync to global context
-        ProgressContext.instance.hp = getHp();
+        ProgressContext.instance.setHp(getHp());
+    }
+
+    public float getIframeTimer() {
+        return iframeTimer;
+    }
+
+    public void setIframeTimer(final float iframeTimer) {
+        this.iframeTimer = iframeTimer;
     }
 
     @Override
@@ -235,6 +338,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
     @Override
     public void dispose() {
+        ProgressContext.instance.setPlayer(null);
         EventDispatcher.getInstance().removeListener(EventType.PUZZLE_FAILED, this);
         EventDispatcher.getInstance().removeListener(EventType.ITEM_USED, this);
         EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);

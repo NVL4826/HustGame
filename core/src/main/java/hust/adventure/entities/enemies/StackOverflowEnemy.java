@@ -21,11 +21,6 @@ public class StackOverflowEnemy extends BaseEnemy {
         setBehavior(new BouncingBehavior(100, 100, 800, 600));
     }
  
-    @Override
-    public void reset() {
-        super.reset();
-        isSplit = false;
-    }
 
     public boolean isSplit() {
         return isSplit;

@@ -11,6 +11,7 @@ public class UIManager implements Disposable {
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
     private final RouletteUI rouletteUI;
+    private final DebugUI debugUI;
 
     public UIManager() {
         this.hud = new HUD();
@@ -18,6 +19,7 @@ public class UIManager implements Disposable {
         this.levelUpUI = new LevelUpUI();
         this.damageTextManager = new DamageTextManager();
         this.rouletteUI = new RouletteUI();
+        this.debugUI = new DebugUI();
     }
 
     public void update(final float delta) {
@@ -43,6 +45,10 @@ public class UIManager implements Disposable {
 
     public RouletteUI getRouletteUI() {
         return rouletteUI;
+    }
+
+    public DebugUI getDebugUI() {
+        return debugUI;
     }
 
     @Override

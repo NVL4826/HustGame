@@ -1,38 +1,26 @@
 package hust.adventure.events;
  
-import com.badlogic.gdx.utils.Pool;
-import hust.adventure.utils.GamePools;
+import java.util.Objects;
  
 /**
- * Generic event class that supports object pooling.
- * @param <T> The type of data associated with the event.
+ * Generic event wrapper for the game's event system.
+ * 
+ * @param <T> The type of data carried by the event.
  */
-public class GameEvent<T> implements Pool.Poolable {
-    private EventType type;
-    private T data;
+public class GameEvent<T> {
+    private final EventType type;
+    private final T data;
  
     /**
-     * Default constructor for pooling.
+     * Creates a new game event.
+     *
+     * @param type The type of the event.
+     * @param data The payload data.
+     * @throws NullPointerException if type is null.
      */
-    public GameEvent() {
-    }
- 
-    public GameEvent(EventType type, T data) {
-        init(type, data);
-    }
- 
-    public void init(EventType type, T data) {
-        this.type = type;
+    public GameEvent(final EventType type, final T data) {
+        this.type = Objects.requireNonNull(type, "EventType cannot be null");
         this.data = data;
-    }
- 
-    @Override
-    public void reset() {
-        if (data instanceof Pool.Poolable) {
-            GamePools.free(data);
-        }
-        this.type = null;
-        this.data = null;
     }
  
     public EventType getType() {

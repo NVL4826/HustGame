@@ -9,10 +9,12 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
+import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.status.StatusFlag;
 import hust.adventure.ui.HUD;
@@ -20,6 +22,7 @@ import hust.adventure.ui.InventoryUI;
 import hust.adventure.ui.LevelUpUI;
 import hust.adventure.ui.DamageTextManager;
 import hust.adventure.ui.RouletteUI;
+import hust.adventure.ui.DebugUI;
 import hust.adventure.world.WorldManager;
 
 /**
@@ -36,13 +39,17 @@ public class GameRenderer {
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
     private final RouletteUI rouletteUI;
+    private final DebugUI debugUI;
     private final WorldManager worldManager;
     private static final Matrix4 uiMatrix = new Matrix4();
+    private final GlyphLayout layout = new GlyphLayout();
+    private static final float ENEMY_NAME_OFFSET_Y = 15f;
+    private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
 
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
             final InventoryUI inventoryUI, final LevelUpUI levelUpUI, final DamageTextManager damageTextManager, 
-            final RouletteUI rouletteUI, final WorldManager worldManager) {
+            final RouletteUI rouletteUI, final DebugUI debugUI, final WorldManager worldManager) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
         this.batch = batch;
@@ -53,6 +60,7 @@ public class GameRenderer {
         this.levelUpUI = levelUpUI;
         this.damageTextManager = damageTextManager;
         this.rouletteUI = rouletteUI;
+        this.debugUI = debugUI;
         this.worldManager = worldManager;
     }
 
@@ -92,6 +100,35 @@ public class GameRenderer {
         batch.setProjectionMatrix(cameraManager.getCamera().combined);
         batch.begin();
         entityManager.draw(batch);
+
+        // Vẽ tên của quái vật
+        for (final GameEntity entity : entityManager.getEntities()) {
+            if (entity instanceof BaseEnemy) {
+                final BaseEnemy enemy = (BaseEnemy) entity;
+                if (!enemy.isDead()) {
+                    // Flashlight culling check in lights out mode
+                    if (ProgressContext.instance.isLightsOut()
+                            && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
+                        final Player p = ProgressContext.instance.getPlayer();
+                        if (p != null) {
+                            final float dx = enemy.getX() - p.getX();
+                            final float dy = enemy.getY() - p.getY();
+                            if ((dx * dx + dy * dy) > FLASHLIGHT_CULL_DIST_SQ) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    font.setColor(enemy.getColor());
+                    layout.setText(font, enemy.getName());
+                    final float tx = enemy.getX() - layout.width / 2f;
+                    final float ty = enemy.getY() + enemy.getHeight() / 2f + ENEMY_NAME_OFFSET_Y;
+                    font.draw(batch, enemy.getName(), tx, ty);
+                }
+            }
+        }
+        font.setColor(Color.WHITE); // Reset font color
+
         batch.end();
 
         // 3. Stencil Buffer cho Foreground
@@ -135,7 +172,7 @@ public class GameRenderer {
         }
 
         // 5.5. Render Debug Hitboxes
-        if (ProgressContext.instance.showDebug) {
+        if (ProgressContext.instance.isShowHitbox()) {
             renderDebugHitboxes(shapeRenderer);
         }
 
@@ -156,6 +193,9 @@ public class GameRenderer {
         }
         if (rouletteUI != null) {
             rouletteUI.render(batch, shapeRenderer, font);
+        }
+        if (debugUI != null) {
+            debugUI.render(batch, shapeRenderer, font);
         }
 
         if (player != null && player.hasStatus(StatusFlag.CONFUSED)) {

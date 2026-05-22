@@ -8,7 +8,7 @@ import com.badlogic.gdx.InputProcessor;
  */
 public class InputReader implements PlayerController, InputProcessor {
     private boolean up, down, left, right, running;
-    private boolean spaceJP, qJP, eJP, fJP, iJP, enterJP, debugJP;
+    private boolean spaceJP, qJP, eJP, fJP, iJP, enterJP, debugJP, hitboxJP;
     private int numJP = -1;
 
     public void update() {
@@ -19,6 +19,7 @@ public class InputReader implements PlayerController, InputProcessor {
         iJP = false;
         enterJP = false;
         debugJP = false;
+        hitboxJP = false;
         numJP = -1;
     }
 
@@ -83,6 +84,11 @@ public class InputReader implements PlayerController, InputProcessor {
     }
 
     @Override
+    public boolean isHitboxJustPressed() {
+        return hitboxJP;
+    }
+
+    @Override
     public int getJustPressedNum() {
         return numJP;
     }
@@ -111,8 +117,10 @@ public class InputReader implements PlayerController, InputProcessor {
             iJP = true;
         if (keycode == Input.Keys.ENTER)
             enterJP = true;
-        if (keycode == Input.Keys.F3)
+        if (keycode == Input.Keys.F2)
             debugJP = true;
+        if (keycode == Input.Keys.F3)
+            hitboxJP = true;
         if (keycode >= Input.Keys.NUM_1 && keycode <= Input.Keys.NUM_5)
             numJP = keycode - Input.Keys.NUM_1 + 1;
         return true;

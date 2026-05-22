@@ -9,6 +9,9 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 
 public class ScenarioService implements EventListener, com.badlogic.gdx.utils.Disposable {
+    private static final String BOSS_TEXTURE_NAME = "Boss THT.png";
+    private static final float BOSS_SPAWN_OFFSET = 300f;
+
     private final EntityFactory entityFactory;
     private final Player player;
     private final GameAssetManager assetManager;
@@ -28,12 +31,11 @@ public class ScenarioService implements EventListener, com.badlogic.gdx.utils.Di
     }
 
     private void spawnFinalBoss() {
-        Texture bossTex = assetManager.getTexture("character.png"); // dummy texture for boss if specific one doesn't
-                                                                    // exist
+        Texture bossTex = assetManager.getTexture(BOSS_TEXTURE_NAME);
 
         // Spawn somewhat near the player
-        float spawnX = player.getX() + 300f;
-        float spawnY = player.getY() + 300f;
+        float spawnX = player.getX() + BOSS_SPAWN_OFFSET;
+        float spawnY = player.getY() + BOSS_SPAWN_OFFSET;
 
         entityFactory.createFinalBoss(spawnX, spawnY, bossTex);
     }

@@ -12,6 +12,8 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 
 public class LootDropService implements EventListener, com.badlogic.gdx.utils.Disposable {
+    private static final float DEFAULT_EXP_GEM_VALUE = 10f;
+
     private final EntityFactory entityFactory;
     private final GameAssetManager assetManager;
 
@@ -29,10 +31,10 @@ public class LootDropService implements EventListener, com.badlogic.gdx.utils.Di
             if (deadEntity instanceof BaseEnemy) {
                 // Determine drop
                 if (deadEntity instanceof LibraryBoss || deadEntity instanceof FinalBoss) {
-                    Texture tex = assetManager.getTexture("character.png"); // placeholder texture for treasure chest
+                    Texture tex = assetManager.getTexture(GameAssetManager.CHEST_TEXTURE_PATH);
                     entityFactory.createTreasureChest(deadEntity.getX(), deadEntity.getY(), tex);
                 } else {
-                    entityFactory.createExpGem(deadEntity.getX(), deadEntity.getY(), 10f);
+                    entityFactory.createExpGem(deadEntity.getX(), deadEntity.getY(), DEFAULT_EXP_GEM_VALUE);
                 }
             }
         }

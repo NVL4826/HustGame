@@ -34,7 +34,7 @@ public class HUD {
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(20, 570, 150, 15);
 
-        float hpPercent = Math.max(0, Math.min(1, ProgressContext.instance.hp / ProgressContext.instance.maxHp));
+        float hpPercent = Math.max(0, Math.min(1, ProgressContext.instance.getHp() / ProgressContext.instance.getMaxHp()));
         if (hpPercent > 0.6f)
             shapeRenderer.setColor(Color.GREEN);
         else if (hpPercent > 0.3f)
@@ -48,7 +48,7 @@ public class HUD {
         shapeRenderer.rect(20, 550, 150, 15);
 
         float staminaPercent = Math.max(0,
-                Math.min(1, ProgressContext.instance.stamina / ProgressContext.instance.maxStamina));
+                Math.min(1, ProgressContext.instance.getStamina() / ProgressContext.instance.getMaxStamina()));
         shapeRenderer.setColor(Color.GOLD);
         shapeRenderer.rect(20, 550, staminaPercent * 150, 15);
 
@@ -56,21 +56,30 @@ public class HUD {
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(20, 530, 150, 15);
 
-        float moralePercent = Math.max(0, Math.min(1, ProgressContext.instance.morale / 100f));
+        float moralePercent = Math.max(0, Math.min(1, ProgressContext.instance.getMorale() / 100f));
         shapeRenderer.setColor(Color.SKY);
         shapeRenderer.rect(20, 530, moralePercent * 150, 15);
+
+        // 4. Draw Exp Bar
+        shapeRenderer.setColor(Color.DARK_GRAY);
+        shapeRenderer.rect(20, 510, 150, 15);
+
+        float expPercent = Math.max(0, Math.min(1, ProgressContext.instance.getExp() / ProgressContext.instance.getExpToNextLevel()));
+        shapeRenderer.setColor(Color.PURPLE);
+        shapeRenderer.rect(20, 510, expPercent * 150, 15);
 
         shapeRenderer.end();
 
         // 4. Draw Labels
         batch.begin();
         font.setColor(Color.WHITE);
-        font.draw(batch, "HP: " + (int) ProgressContext.instance.hp + "/" + (int) ProgressContext.instance.maxHp, 180,
+        font.draw(batch, "HP: " + (int) ProgressContext.instance.getHp() + "/" + (int) ProgressContext.instance.getMaxHp(), 180,
                 583);
         font.draw(batch,
-                "SP: " + (int) ProgressContext.instance.stamina + "/" + (int) ProgressContext.instance.maxStamina, 180,
+                "SP: " + (int) ProgressContext.instance.getStamina() + "/" + (int) ProgressContext.instance.getMaxStamina(), 180,
                 563);
-        font.draw(batch, "Morale: " + (int) ProgressContext.instance.morale + "%", 180, 543);
+        font.draw(batch, "Morale: " + (int) ProgressContext.instance.getMorale() + "%", 180, 543);
+        font.draw(batch, "LV: " + ProgressContext.instance.getLevel() + " EXP: " + (int) ProgressContext.instance.getExp() + "/" + (int) ProgressContext.instance.getExpToNextLevel(), 180, 523);
 
         if (timeProvider != null) {
             int totalSeconds = (int) timeProvider.getCurrentTime();
@@ -81,10 +90,28 @@ public class HUD {
         }
 
         // Status artifacts
-        if (ProgressContext.instance.hasNao)
-            font.draw(batch, "Artifact: Brain 100%", 20, 510);
-        if (ProgressContext.instance.hasUsb)
-            font.draw(batch, "Artifact: USB", 20, 490);
+        if (ProgressContext.instance.isHasNao())
+            font.draw(batch, "Artifact: Brain 100%", 20, 480);
+        if (ProgressContext.instance.isHasUsb())
+            font.draw(batch, "Artifact: USB", 20, 460);
+
+        // Active spells notifications
+        float spellY = 440;
+        if (ProgressContext.instance.getEnemyTimeScale() == 0f) {
+            font.setColor(Color.ORANGE);
+            font.draw(batch, "STUN ACTIVE!", 20, spellY);
+            spellY -= 20;
+        } else if (ProgressContext.instance.getEnemyTimeScale() == 0.3f) {
+            font.setColor(Color.GOLD);
+            font.draw(batch, "SLOW-MOTION ACTIVE!", 20, spellY);
+            spellY -= 20;
+        }
+        if (ProgressContext.instance.getShowEnemiesTimer() > 0f) {
+            font.setColor(Color.CYAN);
+            font.draw(batch, String.format("RADAR ACTIVE (%.1fs)", ProgressContext.instance.getShowEnemiesTimer()), 20, spellY);
+            spellY -= 20;
+        }
+        font.setColor(Color.WHITE);
 
         batch.end();
     }

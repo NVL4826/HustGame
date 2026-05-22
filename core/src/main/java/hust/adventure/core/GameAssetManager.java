@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Json;
 import hust.adventure.wave.WaveConfig;
 
 public class GameAssetManager {
+    public static final String CHEST_TEXTURE_PATH = "titled/Objects/chest.png";
     private final AssetManager manager;
     private Texture whitePixel;
     private final Json json;
@@ -35,6 +36,7 @@ public class GameAssetManager {
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);
         manager.load("4.png", Texture.class);
+        manager.load(CHEST_TEXTURE_PATH, Texture.class);
 
         // Maps
         manager.load("Final Outside.tmx", TiledMap.class);

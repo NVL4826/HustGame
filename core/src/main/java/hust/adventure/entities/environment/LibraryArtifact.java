@@ -20,8 +20,8 @@ public class LibraryArtifact extends BaseEntity {
         Collider c = new Collider(this, CollisionLayer.ITEM, Collider.Shape.RECTANGLE);
         c.setListener(other -> {
             if (other instanceof Player) {
-                ProgressContext.instance.hasNao = true;
-                ProgressContext.instance.libraryCleared = true;
+                ProgressContext.instance.setHasNao(true);
+                ProgressContext.instance.setLibraryCleared(true);
                 destroy();
             }
         });

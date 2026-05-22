@@ -1,36 +1,18 @@
 package hust.adventure.events;
  
-import com.badlogic.gdx.utils.Pool;
- 
 /**
- * Data for MAP_TRANSITION event, supports object pooling.
+ * Data for MAP_TRANSITION event.
  */
-public class MapTransitionData implements Pool.Poolable {
-    private String targetMap;
-    private float spawnX;
-    private float spawnY;
- 
-    /**
-     * Default constructor for pooling.
-     */
-    public MapTransitionData() {
-    }
+public class MapTransitionData {
+    private final String targetMap;
+    private final float spawnX;
+    private final float spawnY;
  
     public MapTransitionData(String targetMap, float spawnX, float spawnY) {
-        init(targetMap, spawnX, spawnY);
-    }
- 
-    public void init(String targetMap, float spawnX, float spawnY) {
+        if (targetMap == null) throw new NullPointerException("targetMap cannot be null");
         this.targetMap = targetMap;
         this.spawnX = spawnX;
         this.spawnY = spawnY;
-    }
- 
-    @Override
-    public void reset() {
-        this.targetMap = null;
-        this.spawnX = 0;
-        this.spawnY = 0;
     }
  
     public String getTargetMap() {

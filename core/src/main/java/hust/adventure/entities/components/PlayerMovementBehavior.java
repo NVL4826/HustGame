@@ -38,7 +38,10 @@ public class PlayerMovementBehavior implements MovementBehavior {
         float currentSpeed = actor.getSpeed();
         boolean isSprinting = controller.isRunning() && actor.getStamina() > 0;
 
-        if (actor.getStamina() <= 0) {
+        if (hust.adventure.core.context.ProgressContext.instance.isFastRun()) {
+            currentSpeed *= 3.0f;
+            actor.restoreStamina(100f * delta);
+        } else if (actor.getStamina() <= 0) {
             currentSpeed *= 0.6f; // speed -40% when 0 stamina
         } else if (isSprinting) {
             currentSpeed *= 1.8f; // Gấp 1.8 lần khi chạy

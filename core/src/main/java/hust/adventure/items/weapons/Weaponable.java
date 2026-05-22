@@ -1,21 +1,23 @@
 package hust.adventure.entities.weapons;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import hust.adventure.items.Item;
 
 /**
  * Interface defining the behavior of a weapon.
  */
-public interface Weaponable {
+public interface Weaponable extends Item {
     /**
      * Attempts to trigger the weapon's attack logic.
      */
     void fire();
 
     /**
-     * Upgrades the weapon with the given statistics.
-     * @param nextLevelStats The stats for the next level.
+     * Upgrades the weapon by applying stat bonuses.
+     * @param damageBonus Flat damage increase.
+     * @param cooldownReduction Cooldown reduction amount.
      */
-    void upgrade(WeaponStats nextLevelStats);
+    void upgrade(float damageBonus, float cooldownReduction);
 
     /**
      * Updates the weapon's internal timers.
@@ -34,4 +36,9 @@ public interface Weaponable {
      * @return The level.
      */
     int getLevel();
+
+    /**
+     * Gets the unique name of the weapon type.
+     */
+    String getName();
 }

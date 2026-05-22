@@ -1,5 +1,5 @@
 package hust.adventure.ui;
-
+ 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,8 +9,7 @@ import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.RewardSelectedEvent;
-import hust.adventure.utils.GamePools;
-
+ 
 public class RouletteUI implements EventListener {
     private boolean active = false;
     private float timer = 0;
@@ -32,10 +31,8 @@ public class RouletteUI implements EventListener {
             timer -= delta; // Even when game is paused, we need delta. BaseLevelScreen uses real delta for UI.
             if (timer <= 0) {
                 active = false;
-                RewardSelectedEvent data = GamePools.obtain(RewardSelectedEvent.class);
-                data.init("whip_upgrade");
-                GameEvent<RewardSelectedEvent> rewardEvent = GamePools.obtainEvent();
-                rewardEvent.init(EventType.REWARD_SELECTED, data);
+                RewardSelectedEvent data = new RewardSelectedEvent("whip_upgrade");
+                GameEvent<RewardSelectedEvent> rewardEvent = new GameEvent<>(EventType.REWARD_SELECTED, data);
                 EventDispatcher.getInstance().dispatch(rewardEvent);
             }
         }
@@ -54,7 +51,7 @@ public class RouletteUI implements EventListener {
     public boolean isActive() {
         return active;
     }
-
+ 
     public void dispose() {
         EventDispatcher.getInstance().removeListener(EventType.TREASURE_OPENED, this);
     }

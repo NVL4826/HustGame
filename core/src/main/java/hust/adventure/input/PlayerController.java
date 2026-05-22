@@ -27,6 +27,10 @@ public interface PlayerController {
     
     boolean isDebugJustPressed();
 
+    default boolean isHitboxJustPressed() {
+        return false;
+    }
+
     default boolean isAttackJustPressed() {
         return isSpaceJustPressed();
     }

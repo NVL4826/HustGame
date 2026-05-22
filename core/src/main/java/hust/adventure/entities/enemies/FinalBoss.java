@@ -28,11 +28,6 @@ public class FinalBoss extends BaseEnemy {
         this.texture = texture;
     }
  
-    @Override
-    public void reset() {
-        super.reset();
-        this.texture = null;
-    }
 
     @Override
     public void handleUpdate(float delta, Player player, EntityManager entityManager) {

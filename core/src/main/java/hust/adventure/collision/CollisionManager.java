@@ -3,7 +3,6 @@ package hust.adventure.collision;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Pool;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,7 +20,6 @@ import java.util.List;
 public class CollisionManager {
     private final float cellSize;
     private final ObjectMap<Long, Array<Collider>> grid;
-    private final Pool<Array<Collider>> arrayPool;
     private final int[] collisionMatrix;
     private final EntityManager entityManager;
     private final Array<GameEntity> allCollidables;
@@ -40,12 +38,6 @@ public class CollisionManager {
         this.allCollidables = new Array<>();
         this.staticWalls = new Array<>();
         this.tempRect = new Rectangle();
-        this.arrayPool = new Pool<Array<Collider>>() {
-            @Override
-            protected Array<Collider> newObject() {
-                return new Array<>();
-            }
-        };
         this.collisionMatrix = new int[32];
         initCollisionMatrix();
     }
@@ -124,7 +116,7 @@ public class CollisionManager {
         }
 
         // 2. Wall collision check
-        final Rectangle collisionBox = getCollisionBox(entity, nextX, nextY, tempRect);
+        final Rectangle collisionBox = entity.getMovementBounds(nextX, nextY, tempRect);
 
         for (int i = 0; i < staticWalls.size; i++) {
             if (collisionBox.overlaps(staticWalls.get(i).getBounds())) {
@@ -133,19 +125,6 @@ public class CollisionManager {
         }
 
         return true;
-    }
-
-    private Rectangle getCollisionBox(final GameEntity entity, final float x, final float y, final Rectangle out) {
-        if (entity instanceof BaseActor) {
-            // Use feet-based collision box for actors
-            final float feetWidth = entity.getWidth() * 0.4f;
-            final float feetHeight = entity.getHeight() * 0.2f;
-            out.set(x - feetWidth / 2f, y - entity.getHeight() / 2f, feetWidth, feetHeight);
-        } else {
-            // Use default bounds for other entities
-            out.set(x - entity.getWidth() / 2f, y - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight());
-        }
-        return out;
     }
 
     private void initCollisionMatrix() {
@@ -203,11 +182,6 @@ public class CollisionManager {
     }
 
     private void rebuildGrid(final Array<GameEntity> entities) {
-        // Return existing arrays to the pool
-        for (final Array<Collider> cell : grid.values()) {
-            cell.clear();
-            arrayPool.free(cell);
-        }
         grid.clear();
 
         for (int i = 0; i < entities.size; i++) {
@@ -262,7 +236,7 @@ public class CollisionManager {
         final long key = hash(x, y);
         Array<Collider> cell = grid.get(key);
         if (cell == null) {
-            cell = arrayPool.obtain();
+            cell = new Array<>();
             grid.put(key, cell);
         }
         cell.add(collider);

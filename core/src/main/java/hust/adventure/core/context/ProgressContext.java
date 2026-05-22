@@ -3,6 +3,7 @@ package hust.adventure.core.context;
 import hust.adventure.gamestate.GameState;
 import hust.adventure.gamestate.PlayingGameState;
 import hust.adventure.inventory.Inventory;
+import hust.adventure.entities.Player;
 
 /**
  * Manages the global game data and current game flow state.
@@ -11,27 +12,38 @@ public class ProgressContext {
     public static ProgressContext instance = new ProgressContext();
 
     // Player stats (Encapsulated)
-    public float hp = 100f;
-    public float maxHp = 100f;
-    public float stamina = 100f;
-    public float maxStamina = 100f;
-    public float morale = 100f;
+    private float hp = 100f;
+    private float maxHp = 100f;
+    private float stamina = 100f;
+    private float maxStamina = 100f;
+    private float morale = 100f;
+    private int level = 1;
+    private float exp = 0;
+    private float expToNextLevel = 100f;
 
-    public Inventory globalInventory = new Inventory();
+    private Inventory globalInventory = new Inventory();
 
     // Artifacts collected
-    public boolean hasNao = false;
-    public boolean hasUsb = false;
-    public int coffeeCount = 0;
+    private boolean hasNao = false;
+    private boolean hasUsb = false;
+    private int coffeeCount = 0;
 
     // Progress
-    public boolean libraryCleared = false;
-    public boolean labCleared = false;
+    private boolean libraryCleared = false;
+    private boolean labCleared = false;
     private String previousScreen = "";
 
     // Systems
-    public boolean isInventoryOpen = false;
-    public boolean showDebug = false;
+    private boolean isInventoryOpen = false;
+    private boolean showDebug = false;
+    private boolean showHitbox = false;
+    private boolean godMode = false;
+    private boolean fastRun = false;
+    // Global Spells / Timers / Context
+    private float enemyTimeScale = 1.0f;
+    private boolean lightsOut = false;
+    private float showEnemiesTimer = 0f;
+    private Player player = null;
 
     // State Pattern
     private GameState currentState;
@@ -64,17 +76,211 @@ public class ProgressContext {
         this.previousScreen = previousScreen;
     }
 
+    public float getHp() {
+        return hp;
+    }
+
+    public void setHp(float hp) {
+        this.hp = hp;
+    }
+
+    public float getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(float maxHp) {
+        this.maxHp = maxHp;
+    }
+
+    public float getStamina() {
+        return stamina;
+    }
+
+    public void setStamina(float stamina) {
+        this.stamina = stamina;
+    }
+
+    public float getMaxStamina() {
+        return maxStamina;
+    }
+
+    public void setMaxStamina(float maxStamina) {
+        this.maxStamina = maxStamina;
+    }
+
+    public float getMorale() {
+        return morale;
+    }
+
+    public void setMorale(float morale) {
+        this.morale = morale;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public float getExp() {
+        return exp;
+    }
+
+    public void setExp(float exp) {
+        this.exp = exp;
+    }
+
+    public float getExpToNextLevel() {
+        return expToNextLevel;
+    }
+
+    public void setExpToNextLevel(float expToNextLevel) {
+        this.expToNextLevel = expToNextLevel;
+    }
+
+    public Inventory getGlobalInventory() {
+        return globalInventory;
+    }
+
+    public void setGlobalInventory(Inventory globalInventory) {
+        this.globalInventory = globalInventory;
+    }
+
+    public boolean isHasNao() {
+        return hasNao;
+    }
+
+    public void setHasNao(boolean hasNao) {
+        this.hasNao = hasNao;
+    }
+
+    public boolean isHasUsb() {
+        return hasUsb;
+    }
+
+    public void setHasUsb(boolean hasUsb) {
+        this.hasUsb = hasUsb;
+    }
+
+    public int getCoffeeCount() {
+        return coffeeCount;
+    }
+
+    public void setCoffeeCount(int coffeeCount) {
+        this.coffeeCount = coffeeCount;
+    }
+
+    public boolean isLibraryCleared() {
+        return libraryCleared;
+    }
+
+    public void setLibraryCleared(boolean libraryCleared) {
+        this.libraryCleared = libraryCleared;
+    }
+
+    public boolean isLabCleared() {
+        return labCleared;
+    }
+
+    public void setLabCleared(boolean labCleared) {
+        this.labCleared = labCleared;
+    }
+
+    public boolean isInventoryOpen() {
+        return isInventoryOpen;
+    }
+
+    public void setInventoryOpen(boolean inventoryOpen) {
+        isInventoryOpen = inventoryOpen;
+    }
+
+    public boolean isShowDebug() {
+        return showDebug;
+    }
+
+    public void setShowDebug(boolean showDebug) {
+        this.showDebug = showDebug;
+    }
+
+    public boolean isGodMode() {
+        return godMode;
+    }
+
+    public void setGodMode(boolean godMode) {
+        this.godMode = godMode;
+    }
+
+    public boolean isFastRun() {
+        return fastRun;
+    }
+
+    public void setFastRun(boolean fastRun) {
+        this.fastRun = fastRun;
+    }
+
+    public boolean isShowHitbox() {
+        return showHitbox;
+    }
+
+    public void setShowHitbox(boolean showHitbox) {
+        this.showHitbox = showHitbox;
+    }
+
+    public float getEnemyTimeScale() {
+        return enemyTimeScale;
+    }
+
+    public void setEnemyTimeScale(float enemyTimeScale) {
+        this.enemyTimeScale = enemyTimeScale;
+    }
+
+    public boolean isLightsOut() {
+        return lightsOut;
+    }
+
+    public void setLightsOut(boolean lightsOut) {
+        this.lightsOut = lightsOut;
+    }
+
+    public float getShowEnemiesTimer() {
+        return showEnemiesTimer;
+    }
+
+    public void setShowEnemiesTimer(float showEnemiesTimer) {
+        this.showEnemiesTimer = showEnemiesTimer;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public void reset() {
         hp = 100f;
         maxHp = 100f;
         stamina = 100f;
         maxStamina = 100f;
         morale = 100f;
+        level = 1;
+        exp = 0;
+        expToNextLevel = 100f;
         hasNao = false;
         hasUsb = false;
         coffeeCount = 0;
         libraryCleared = false;
         labCleared = false;
+        showHitbox = false;
+        godMode = false;
+        fastRun = false;
+        enemyTimeScale = 1.0f;
+        lightsOut = false;
+        showEnemiesTimer = 0f;
+        player = null;
         setGameState(new PlayingGameState());
     }
 }

@@ -1,0 +1,59 @@
+package hust.adventure.screens.levels;
+
+import com.badlogic.gdx.graphics.Color;
+import hust.adventure.items.Item;
+import hust.adventure.items.ItemManager;
+
+/**
+ * Behavior class for the Test level, spawning all entities and items for debugging.
+ */
+public class TestBehavior implements LevelBehavior {
+    @Override
+    public void init(final LevelContext context) {
+        if (context == null) {
+            throw new IllegalArgumentException("LevelContext cannot be null");
+        }
+
+        // Spawn Enemies in a row
+        final float enemyY = 600f;
+        context.getEntityFactory().createEnemy("syntax_error", 100f, enemyY);
+        context.getEntityFactory().createEnemy("null_pointer", 250f, enemyY);
+        context.getEntityFactory().createEnemy("infinite_loop", 400f, enemyY);
+        context.getEntityFactory().createEnemy("stack_overflow", 550f, enemyY);
+
+        // Spawn Bosses
+        final float bossY = 400f;
+        context.getEntityFactory().createLibraryBoss(200f, bossY);
+        context.getEntityFactory().createFinalBoss(500f, bossY,
+                context.getGame().getAssetManager().getTexture("Boss THT.png"));
+
+        // Spawn Items in a row
+        final float itemY = 200f;
+        final String[] itemIds = {
+                "coffee_den", "coffee_sua", "coffee_da", "coffee_chon",
+                "energy_drink", "kho_ga", "note"
+        };
+
+        for (int i = 0; i < itemIds.length; i++) {
+            final Item item = ItemManager.instance.getItem(itemIds[i]);
+            if (item != null) {
+                context.getEntityFactory().createItemDrop(100f + i * 100f, itemY, item, Color.WHITE);
+            }
+        }
+    }
+
+    @Override
+    public void update(final LevelContext context, final float delta) {
+        // No special logic
+    }
+
+    @Override
+    public void draw(final LevelContext context) {
+        // No special rendering
+    }
+
+    @Override
+    public void dispose(final LevelContext context) {
+        // No special cleanup
+    }
+}

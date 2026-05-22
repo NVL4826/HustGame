@@ -1,5 +1,5 @@
 package hust.adventure.entities.interactables;
-
+ 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Pool;
@@ -10,17 +10,16 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.ExpGainedEvent;
 import hust.adventure.events.GameEvent;
-import hust.adventure.utils.GamePools;
-
+ 
 public class ExpGem extends BaseEntity implements Pool.Poolable {
     private float amount;
     private Targetable target;
     private float speed = 300f; // Speed when attracted
-
+ 
     public ExpGem() {
         super(0, 0, 10, 10);
     }
-
+ 
     public void init(float x, float y, float amount) {
         setX(x);
         setY(y);
@@ -28,11 +27,11 @@ public class ExpGem extends BaseEntity implements Pool.Poolable {
         this.target = null;
         setDestroyed(false);
     }
-
+ 
     public void setTarget(Targetable target) {
         this.target = target;
     }
-
+ 
     @Override
     public void reset() {
         setDestroyed(true);
@@ -42,32 +41,29 @@ public class ExpGem extends BaseEntity implements Pool.Poolable {
             getCollider().setListener(null);
         }
     }
-
+ 
     @Override
     public void setCollider(Collider collider) {
         super.setCollider(collider);
         if (collider != null) {
             collider.setListener(other -> {
                 // Check if colliding with player (Layer could be PLAYER)
-                ExpGainedEvent payload = GamePools.obtain(ExpGainedEvent.class);
-                payload.init(amount);
-
-                GameEvent<ExpGainedEvent> event = GamePools.obtainEvent();
-                event.init(EventType.EXP_GAINED, payload);
-
+                ExpGainedEvent payload = new ExpGainedEvent(amount);
+                GameEvent<ExpGainedEvent> event = new GameEvent<>(EventType.EXP_GAINED, payload);
+ 
                 EventDispatcher.getInstance().dispatch(event);
                 destroy();
             });
         }
     }
-
+ 
     @Override
     public void update(float delta) {
         if (target != null && !target.isDestroyed()) {
             float dx = target.getX() - getX();
             float dy = target.getY() - getY();
             float dist = (float) Math.sqrt(dx * dx + dy * dy);
-
+ 
             if (dist > 0) {
                 float vx = (dx / dist) * speed * delta;
                 float vy = (dy / dist) * speed * delta;
@@ -76,7 +72,7 @@ public class ExpGem extends BaseEntity implements Pool.Poolable {
             }
         }
     }
-
+ 
     @Override
     public void draw(SpriteBatch batch) {
         drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), Color.CYAN);

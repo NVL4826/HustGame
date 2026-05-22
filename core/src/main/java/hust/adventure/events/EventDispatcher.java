@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import hust.adventure.utils.GamePools;
  
+/**
+ * Central event dispatcher for the game.
+ */
 public class EventDispatcher {
     private static EventDispatcher instance;
  
@@ -62,6 +64,11 @@ public class EventDispatcher {
         eventListeners.remove(listener);
     }
  
+    /**
+     * Dispatches an event to all registered listeners.
+     *
+     * @param event The event to dispatch.
+     */
     public void dispatch(GameEvent<?> event) {
         isDispatching = true;
         List<EventListener> eventListeners = listeners.get(event.getType());
@@ -76,8 +83,5 @@ public class EventDispatcher {
             action.run();
         }
         queueActions.clear();
- 
-        // Auto-free pooled event after dispatch
-        GamePools.free(event);
     }
 }

@@ -3,10 +3,10 @@
     {
       "timeStart": 0,
       "timeEnd": 60,
-      "enemyType": "syntax_error",
+      "enemyType": "null_pointer",
       "spawnInterval": 1.5,
       "spawnCount": 1,
-      "pattern": "RANDOM_EDGE" 
+      "pattern": "RANDOM_EDGE"
     },
     {
       "timeStart": 60,
@@ -14,7 +14,7 @@
       "enemyType": "null_pointer",
       "spawnInterval": 2.0,
       "spawnCount": 2,
-      "pattern": "RANDOM_EDGE" 
+      "pattern": "RANDOM_EDGE"
     },
     {
       "timeStart": 120,

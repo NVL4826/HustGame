@@ -1,6 +1,7 @@
 package hust.adventure.entities.base;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 import hust.adventure.effects.StatusEffectManager;
 import hust.adventure.entities.components.MovementBehavior;
@@ -9,7 +10,6 @@ import hust.adventure.events.EntityDamagedEvent;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.utils.GamePools;
 
 /**
  * Base class for all living and moving entities. Combines positioning with health and movement logic.
@@ -24,7 +24,14 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
     private Direction direction;
     private MovementBehavior movementBehavior;
     private StatusEffectManager statusEffectManager;
- 
+
+    public BaseActor() {
+        super();
+        this.statusEffectManager = new StatusEffectManager(this);
+        this.speedMultiplier = 1.0f;
+        this.direction = Direction.DOWN;
+    }
+
     public BaseActor(final float x, final float y, final float width, final float height, final float maxHp) {
         super(x, y, width, height);
         this.maxHp = maxHp;
@@ -56,21 +63,19 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
 
     @Override
     public void takeDamage(final float amount, final boolean isCrit) {
-        if (isDead()) return;
+        if (isDead())
+            return;
 
         if (amount < 0)
             throw new IllegalArgumentException("Damage amount cannot be negative");
         this.hp = Math.max(0, this.hp - amount);
 
-        EntityDamagedEvent eventData = GamePools.obtain(EntityDamagedEvent.class);
-        eventData.init(this, amount, isCrit);
-        GameEvent<EntityDamagedEvent> event = GamePools.obtainEvent();
-        event.init(EventType.ENTITY_DAMAGED, eventData);
+        EntityDamagedEvent eventData = new EntityDamagedEvent(this, amount, isCrit);
+        GameEvent<EntityDamagedEvent> event = new GameEvent<>(EventType.ENTITY_DAMAGED, eventData);
         EventDispatcher.getInstance().dispatch(event);
 
         if (isDead()) {
-            GameEvent<GameEntity> deathEvent = GamePools.obtainEvent();
-            deathEvent.init(EventType.ENTITY_DIED, this);
+            GameEvent<GameEntity> deathEvent = new GameEvent<>(EventType.ENTITY_DIED, this);
             EventDispatcher.getInstance().dispatch(deathEvent);
             destroy();
         }
@@ -94,7 +99,7 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
     protected final void setHp(final float hp) {
         this.hp = Math.max(0, Math.min(maxHp, hp));
     }
- 
+
     protected final void setMaxHp(final float maxHp) {
         this.maxHp = maxHp;
     }
@@ -161,6 +166,16 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
 
     public final StatusEffectManager getStatusEffectManager() {
         return statusEffectManager;
+    }
+
+    private static final float FEET_WIDTH_RATIO = 0.4f;
+    private static final float FEET_HEIGHT_RATIO = 0.2f;
+
+    @Override
+    public Rectangle getMovementBounds(float x, float y, Rectangle out) {
+        final float feetWidth = getWidth() * FEET_WIDTH_RATIO;
+        final float feetHeight = getHeight() * FEET_HEIGHT_RATIO;
+        return out.set(x - feetWidth / 2f, y - getHeight() / 2f, feetWidth, feetHeight);
     }
 
     @Override

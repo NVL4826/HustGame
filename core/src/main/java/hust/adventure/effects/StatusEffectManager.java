@@ -1,10 +1,9 @@
 package hust.adventure.effects;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.status.StatusFlag;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Manages active status effects for a specific BaseActor.
@@ -12,14 +11,14 @@ import java.util.Map;
 public class StatusEffectManager {
     private final BaseActor owner;
     private final Array<StatusEffect> activeEffects;
-    private final Map<StatusFlag, Integer> flagCounts;
+    private final ObjectIntMap<StatusFlag> flagCounts;
 
     public StatusEffectManager(final BaseActor owner) {
         if (owner == null)
             throw new IllegalArgumentException("Owner cannot be null");
         this.owner = owner;
         this.activeEffects = new Array<>();
-        this.flagCounts = new HashMap<>();
+        this.flagCounts = new ObjectIntMap<>();
     }
 
     /**
@@ -29,14 +28,14 @@ public class StatusEffectManager {
      */
     public void addEffect(final StatusEffect effect) {
         if (effect == null)
-            return;
+            throw new IllegalArgumentException("Effect cannot be null");
 
         activeEffects.add(effect);
         effect.onStart(owner);
 
         final StatusFlag flag = effect.getFlag();
         if (flag != null) {
-            flagCounts.put(flag, flagCounts.getOrDefault(flag, 0) + 1);
+            flagCounts.put(flag, flagCounts.get(flag, 0) + 1);
         }
     }
 
@@ -62,11 +61,11 @@ public class StatusEffectManager {
 
         final StatusFlag flag = effect.getFlag();
         if (flag != null) {
-            final int count = flagCounts.getOrDefault(flag, 0);
+            final int count = flagCounts.get(flag, 0);
             if (count > 1) {
                 flagCounts.put(flag, count - 1);
             } else {
-                flagCounts.remove(flag);
+                flagCounts.remove(flag, 0);
             }
         }
     }
@@ -80,11 +79,15 @@ public class StatusEffectManager {
     public boolean hasStatus(final StatusFlag flag) {
         return flagCounts.containsKey(flag);
     }
- 
+
     /**
      * Clears all active effects. Used for object pooling reset.
      */
     public void clear() {
+        // Proper cleanup: call onEnd for all effects before clearing
+        for (int i = activeEffects.size - 1; i >= 0; i--) {
+            activeEffects.get(i).onEnd(owner);
+        }
         activeEffects.clear();
         flagCounts.clear();
     }

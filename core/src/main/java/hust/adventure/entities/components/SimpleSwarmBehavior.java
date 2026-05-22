@@ -1,7 +1,6 @@
 package hust.adventure.entities.components;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Pool;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.BaseEnemy;
@@ -11,19 +10,10 @@ import hust.adventure.collision.CollisionManager;
  * CPU-optimized behavior for swarm enemies. Moves directly towards the player using a simple vector and respects walls.
  * Implements Poolable to avoid GC overhead.
  */
-public class SimpleSwarmBehavior implements AIBehavior, Pool.Poolable {
-    private final Vector2 tmpVector = new Vector2();
-    private float speed;
+public class SimpleSwarmBehavior implements AIBehavior {
+    private static final Vector2 tmpVector = new Vector2();
 
-    /**
-     * Default constructor for pooling.
-     */
     public SimpleSwarmBehavior() {
-        this.speed = 0f;
-    }
-
-    public void init(final float speed) {
-        this.speed = speed;
     }
 
     @Override
@@ -38,8 +28,8 @@ public class SimpleSwarmBehavior implements AIBehavior, Pool.Poolable {
         final float distance = tmpVector.len();
 
         if (distance > 0) {
-            // Normalize and scale by speed
-            tmpVector.nor().scl(speed * delta);
+            // Normalize and scale by enemy's speed
+            tmpVector.nor().scl(enemy.getSpeed() * delta);
 
             final float nextX = enemy.getX() + tmpVector.x;
             final float nextY = enemy.getY() + tmpVector.y;
@@ -54,9 +44,4 @@ public class SimpleSwarmBehavior implements AIBehavior, Pool.Poolable {
         }
     }
 
-    @Override
-    public void reset() {
-        this.speed = 0f;
-        this.tmpVector.setZero();
-    }
 }
