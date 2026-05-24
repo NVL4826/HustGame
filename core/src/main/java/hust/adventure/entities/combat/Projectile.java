@@ -1,6 +1,8 @@
 package hust.adventure.entities.combat;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -23,12 +25,15 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
     private float startX, startY;
     private static final float MAX_RANGE = 2000f;
 
+    /** Shared bullet texture loaded once, disposed with disposeStaticResources(). */
+    private static Texture bulletTexture;
+
     public Projectile() {
-        super(0, 0, 10, 10);
+        super(0, 0, 30, 30);
     }
 
     public Projectile(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer) {
-        super(x, y, 10, 10);
+        super(x, y, 30, 30);
         init(x, y, vx, vy, damage, color, isPlayer);
     }
 
@@ -43,6 +48,22 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
         this.startX = x;
         this.startY = y;
         setDestroyed(false);
+    }
+
+    /** Lazily load the bullet texture the first time it is needed. */
+    private static Texture getBulletTexture() {
+        if (bulletTexture == null) {
+            bulletTexture = new Texture(Gdx.files.internal("bullet.png"));
+        }
+        return bulletTexture;
+    }
+
+    /** Call this when the game shuts down to free the texture from GPU memory. */
+    public static void disposeStaticResources() {
+        if (bulletTexture != null) {
+            bulletTexture.dispose();
+            bulletTexture = null;
+        }
     }
 
     @Override
@@ -99,7 +120,32 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
 
     @Override
     public void draw(SpriteBatch batch) {
-        drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), color);
+        Texture tex = getBulletTexture();
+
+        float w = getWidth();
+        float h = getHeight();
+        float originX = w / 2f;
+        float originY = h / 2f;
+
+        // Calculate rotation angle from velocity vector.
+        // The sprite faces RIGHT by default (0°); atan2 gives CCW angle from +X axis.
+        float angle = 0f;
+        if (vx != 0 || vy != 0) {
+            angle = (float) Math.toDegrees(Math.atan2(vy, vx));
+        }
+
+        batch.setColor(Color.WHITE); // draw without tint so the sprite's own colours show
+        batch.draw(
+            tex,
+            getX() - originX, getY() - originY, // position (bottom-left)
+            originX, originY,                    // origin for rotation
+            w, h,                                // size
+            1f, 1f,                              // scale
+            angle,                               // rotation in degrees
+            0, 0,                                // source rect start
+            tex.getWidth(), tex.getHeight(),     // source rect size
+            false, false                         // flip
+        );
     }
 
     public void drawDebug(ShapeRenderer sr) {

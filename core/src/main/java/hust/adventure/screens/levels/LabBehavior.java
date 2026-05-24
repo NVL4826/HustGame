@@ -41,6 +41,11 @@ public class LabBehavior implements LevelBehavior, EventListener {
     private boolean usbSpawned = false;
     private OrthographicCamera uiCam;
 
+    // Blink effect cho wave 3
+    private static final float BLINK_INTERVAL = 1.0f; // 1 giây hiện, 1 giây ẩn
+    private float blinkTimer = 0f;
+    private boolean blinkPhase = true; // true = hiện, false = ẩn
+
     @Override
     public void init(final LevelContext context) {
         uiCam = new OrthographicCamera();
@@ -54,6 +59,16 @@ public class LabBehavior implements LevelBehavior, EventListener {
     public void update(final LevelContext context, final float delta) {
         if (labCleared) {
             return;
+        }
+
+        // ── Blink logic cho wave 3 ────────────────────────────────────────────
+        if (currentWave == 3 && waveActive) {
+            blinkTimer += delta;
+            if (blinkTimer >= BLINK_INTERVAL) {
+                blinkTimer = 0f;
+                blinkPhase = !blinkPhase;
+                ProgressContext.instance.setEnemyBlinkVisible(blinkPhase);
+            }
         }
 
         if (waveActive) {
@@ -92,6 +107,10 @@ public class LabBehavior implements LevelBehavior, EventListener {
 
     private void startLabWave(final LevelContext context, int wave) {
         waveActive = true;
+        // Reset blink khi vào wave mới (chỉ wave 3 mới blink)
+        blinkTimer = 0f;
+        blinkPhase = true;
+        ProgressContext.instance.setEnemyBlinkVisible(true);
         ProgressContext.instance.setLightsOut(wave == LIGHTS_OUT_WAVE);
 
         if (wave == LIGHTS_OUT_WAVE) {
@@ -164,6 +183,7 @@ public class LabBehavior implements LevelBehavior, EventListener {
     public void dispose(final LevelContext context) {
         EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
         ProgressContext.instance.setLightsOut(false);
+        ProgressContext.instance.setEnemyBlinkVisible(true); // reset blink khi rời màn lab
     }
 
     public boolean isLightsOut() {

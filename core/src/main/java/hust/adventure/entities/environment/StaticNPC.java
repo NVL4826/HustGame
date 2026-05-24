@@ -24,7 +24,7 @@ public class StaticNPC extends BaseEntity {
 
     @Override
     public void draw(SpriteBatch batch) {
-        drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), color);
+        // No visual – NPC sprite is rendered via the tilemap layer
     }
 
     public String getName() {

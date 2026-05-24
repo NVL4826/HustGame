@@ -139,6 +139,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (mapRenderer != null) {
             mapRenderer.dispose();
         }
+        // Ghi lại màn hiện tại để GameOverScreen biết restart vào đâu
+        ProgressContext.instance.setCurrentLevelConfig(config);
 
         lightingManager.setAmbientLight(config.getAmbientColor());
         worldManager.loadMap(game.getAssetManager().getTiledMap(config.getMapPath()), entityFactory, entityManager,
@@ -262,6 +264,13 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     @Override
     public void render(float delta) {
+        // ── Check player death ──────────────────────────────────────────────
+        if (player != null && ProgressContext.instance.getHp() <= 0
+                && !game.getScreenTransition().isTransitioning()) {
+            game.getScreenTransition().fadeOut(new GameOverScreen(game), 0.8f);
+            return;
+        }
+
         if (state == PlayMode.RUNNING && !game.getScreenTransition().isTransitioning()) {
             entityManager.update(delta, entityFactory);
 
@@ -275,9 +284,11 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             lightingManager.update();
             collisionManager.update(worldManager.getWalls());
             checkTriggers();
-            uiManager.update(delta, player);
             updateLevel(delta);
         }
+
+        // uiManager.update chạy MỌI lúc (kể cả IN_UI) để nhận input từ LevelUpUI, InventoryUI
+        uiManager.update(delta, player);
 
         if (gameRenderer != null) {
             gameRenderer.render(delta, mapRenderer, backgroundLayers, foregroundLayers, player, shapeRenderer, font,

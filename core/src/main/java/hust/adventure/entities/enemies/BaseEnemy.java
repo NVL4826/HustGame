@@ -118,6 +118,10 @@ public abstract class BaseEnemy extends BaseActor {
                 }
             }
         }
+
+        // Blink effect: skip render khi enemyBlinkVisible == false
+        if (!ProgressContext.instance.isEnemyBlinkVisible())
+            return;
         
         renderSpecific(batch);
     }

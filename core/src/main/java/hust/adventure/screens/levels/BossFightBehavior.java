@@ -274,15 +274,41 @@ public class BossFightBehavior implements LevelBehavior {
     @Override
     public void draw(final LevelContext context) {
 
-        // Render Boss HP bar at the top of the screen (phases 0, 1, 2, 3)
+        // ── Boss HP bar (top-center, styled) ─────────────────────────────
         if (phase != PHASE_VICTORY && finalBoss != null) {
+            float bossHpPct = finalBoss.getHp() / finalBoss.getMaxHp();
+            float barX = 150f, barY = 575f, barW = 500f, barH = 14f;
+
             context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
             context.getShapeRenderer().begin(ShapeType.Filled);
-            context.getShapeRenderer().setColor(Color.RED);
-            context.getShapeRenderer().rect(200f, 580f, 400f, 10f);
-            context.getShapeRenderer().setColor(Color.GREEN);
-            context.getShapeRenderer().rect(200f, 580f, (finalBoss.getHp() / finalBoss.getMaxHp()) * 400f, 10f);
+
+            // Dark background
+            context.getShapeRenderer().setColor(0.08f, 0.02f, 0.02f, 1f);
+            context.getShapeRenderer().rect(barX - 2, barY - 2, barW + 4, barH + 4);
+
+            // Gradient fill: orange-red → red
+            int steps = (int)(barW * bossHpPct);
+            for (int i = 0; i < steps; i++) {
+                float t = i / (float) steps;
+                context.getShapeRenderer().setColor(1f - t * 0.3f, 0.15f * (1f - t), 0f, 1f);
+                context.getShapeRenderer().rect(barX + i, barY, 1f, barH);
+            }
             context.getShapeRenderer().end();
+
+            // Border
+            context.getShapeRenderer().begin(ShapeType.Line);
+            context.getShapeRenderer().setColor(0.9f, 0.2f, 0.2f, 0.9f);
+            context.getShapeRenderer().rect(barX, barY, barW, barH);
+            context.getShapeRenderer().end();
+
+            // Label
+            context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
+            context.getGame().getSpriteBatch().begin();
+            context.getGame().getFont().setColor(1f, 0.5f, 0.2f, 1f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                    "BOSS THT  " + (int) finalBoss.getHp() + " / " + (int) finalBoss.getMaxHp(),
+                    barX, barY + barH + 14f);
+            context.getGame().getSpriteBatch().end();
         }
 
         switch (phase) {
@@ -303,22 +329,43 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     private void drawCutscene(final LevelContext context) {
-        // Draw dialogue box background
+        final float BOX_X = 80f, BOX_Y = 40f, BOX_W = 640f, BOX_H = 110f;
+
         context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
         context.getShapeRenderer().begin(ShapeType.Filled);
-        context.getShapeRenderer().setColor(0f, 0f, 0f, 0.8f);
-        context.getShapeRenderer().rect(100f, 50f, 600f, 100f);
+
+        // Panel nền dark academic
+        context.getShapeRenderer().setColor(0.04f, 0.03f, 0.10f, 0.95f);
+        context.getShapeRenderer().rect(BOX_X, BOX_Y, BOX_W, BOX_H);
+
+        // Header accent bar
+        context.getShapeRenderer().setColor(0.55f, 0.15f, 0.05f, 1f);
+        context.getShapeRenderer().rect(BOX_X, BOX_Y + BOX_H - 24f, BOX_W, 24f);
         context.getShapeRenderer().end();
 
-        // Draw dialogue texts
+        // Border
+        context.getShapeRenderer().begin(ShapeType.Line);
+        context.getShapeRenderer().setColor(0.85f, 0.35f, 0.1f, 1f);
+        context.getShapeRenderer().rect(BOX_X, BOX_Y, BOX_W, BOX_H);
+        context.getShapeRenderer().setColor(0.4f, 0.15f, 0.05f, 0.5f);
+        context.getShapeRenderer().rect(BOX_X + 2, BOX_Y + 2, BOX_W - 4, BOX_H - 4);
+        context.getShapeRenderer().end();
+
         context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
         context.getGame().getSpriteBatch().begin();
+        // Speaker name
+        context.getGame().getFont().setColor(1f, 0.65f, 0.2f, 1f);
+        context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "Tạ Hải Tùng", BOX_X + 10f, BOX_Y + BOX_H - 6f);
+        // Dialogue
         if (dialogueIndex < dialogue.length) {
             context.getGame().getFont().setColor(Color.WHITE);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "T.H.T: " + dialogue[dialogueIndex],
-                    120f, 120f);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "[PRESS ENTER TO CONTINUE]", 500f,
-                    70f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                    "\"" + dialogue[dialogueIndex] + "\"", BOX_X + 14f, BOX_Y + BOX_H - 34f);
+            // Blink hint
+            float blink = (System.currentTimeMillis() / 500) % 2 == 0 ? 1f : 0.3f;
+            context.getGame().getFont().setColor(0.7f, 0.7f, 0.7f, blink);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                    "▶ Nhấn ENTER để tiếp tục", BOX_X + BOX_W - 230f, BOX_Y + 18f);
         }
         context.getGame().getSpriteBatch().end();
     }
@@ -327,67 +374,126 @@ public class BossFightBehavior implements LevelBehavior {
         if (currentQuestionIndex < questions.size()) {
             final Question q = questions.get(currentQuestionIndex);
 
-            // 1. Draw UI boxes using ShapeRenderer
+            final float QX = 70f, QY = 310f, QW = 660f, QH = 55f;
+            final float[] ANS_X = {80f,  300f, 520f};
+            final float ANS_Y = 220f, ANS_W = 195f, ANS_H = 55f;
+            final String[] LABELS = {"A", "B", "C"};
+
             context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
             context.getShapeRenderer().begin(ShapeType.Filled);
 
-            // Question background (semi-transparent black)
-            context.getShapeRenderer().setColor(0f, 0f, 0f, 0.7f);
-            context.getShapeRenderer().rect(100f, 300f, 600f, 50f);
+            // ── Question panel ─────────────────────────────────────────────
+            context.getShapeRenderer().setColor(0.05f, 0.04f, 0.13f, 0.96f);
+            context.getShapeRenderer().rect(QX, QY, QW, QH);
+            // Left accent stripe
+            context.getShapeRenderer().setColor(0.2f, 0.6f, 1.0f, 1f);
+            context.getShapeRenderer().rect(QX, QY, 5f, QH);
 
-            // Answer backgrounds (blue)
+            // ── Answer slots ───────────────────────────────────────────────
             for (int i = 0; i < 3; i++) {
-                context.getShapeRenderer().setColor(Color.BLUE);
-                context.getShapeRenderer().rect(answerRects[i].x, answerRects[i].y, answerRects[i].width,
-                        answerRects[i].height);
+                boolean playerInside = answerRects[i].contains(
+                        context.getPlayer().getX(), context.getPlayer().getY());
+                if (playerInside) {
+                    context.getShapeRenderer().setColor(0.25f, 0.55f, 0.95f, 0.95f);
+                } else {
+                    context.getShapeRenderer().setColor(0.08f, 0.07f, 0.20f, 0.92f);
+                }
+                context.getShapeRenderer().rect(ANS_X[i], ANS_Y, ANS_W, ANS_H);
+
+                // Letter badge background
+                context.getShapeRenderer().setColor(0.2f, 0.4f, 0.85f, 1f);
+                context.getShapeRenderer().rect(ANS_X[i], ANS_Y + ANS_H - 20f, 20f, 20f);
             }
 
-            // Timer bar (yellow)
-            context.getShapeRenderer().setColor(Color.YELLOW);
-            context.getShapeRenderer().rect(100f, 280f, (answerTimer / QUESTION_TIMER_RESET) * 600f, 5f);
+            // ── Timer bar ──────────────────────────────────────────────────
+            float timerPct = answerTimer / QUESTION_TIMER_RESET;
+            // Background
+            context.getShapeRenderer().setColor(0.1f, 0.05f, 0.05f, 1f);
+            context.getShapeRenderer().rect(QX, QY - 10f, QW, 7f);
+            // Fill gradient green→red
+            int tSteps = (int)(QW * timerPct);
+            for (int i = 0; i < tSteps; i++) {
+                float t = 1f - (i / (float) tSteps);
+                context.getShapeRenderer().setColor(t, 1f - t * 0.8f, 0f, 1f);
+                context.getShapeRenderer().rect(QX + i, QY - 10f, 1f, 7f);
+            }
+
             context.getShapeRenderer().end();
 
-            // Outline of answer boxes
+            // Borders
             context.getShapeRenderer().begin(ShapeType.Line);
-            context.getShapeRenderer().setColor(Color.WHITE);
+            context.getShapeRenderer().setColor(0.3f, 0.6f, 1.0f, 0.8f);
+            context.getShapeRenderer().rect(QX, QY, QW, QH);
             for (int i = 0; i < 3; i++) {
-                context.getShapeRenderer().rect(answerRects[i].x, answerRects[i].y, answerRects[i].width,
-                        answerRects[i].height);
+                boolean playerInside = answerRects[i].contains(
+                        context.getPlayer().getX(), context.getPlayer().getY());
+                context.getShapeRenderer().setColor(playerInside ? Color.WHITE : new Color(0.3f, 0.5f, 0.9f, 0.7f));
+                context.getShapeRenderer().rect(ANS_X[i], ANS_Y, ANS_W, ANS_H);
             }
             context.getShapeRenderer().end();
 
-            // 2. Draw texts using SpriteBatch
+            // ── Text ───────────────────────────────────────────────────────
             context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
             context.getGame().getSpriteBatch().begin();
+
+            // Question number
+            context.getGame().getFont().setColor(0.5f, 0.8f, 1.0f, 1f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                    "Câu " + (currentQuestionIndex + 1) + "/" + questions.size(), QX + 10f, QY + QH - 4f);
+
+            // Question text
             context.getGame().getFont().setColor(Color.WHITE);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), q.text, 120f, 335f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                    q.text, QX + 90f, QY + QH - 4f);
+
+            // Answer texts + letter badge
             for (int i = 0; i < q.answers.length; i++) {
-                context.getGame().getFont().draw(context.getGame().getSpriteBatch(), (i + 1) + ". " + q.answers[i],
-                        answerRects[i].x + 10f, answerRects[i].y + 25f);
+                // Badge letter
+                context.getGame().getFont().setColor(Color.WHITE);
+                context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                        LABELS[i], ANS_X[i] + 4f, ANS_Y + ANS_H - 4f);
+                // Answer text
+                context.getGame().getFont().setColor(0.9f, 0.9f, 1.0f, 1f);
+                context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                        q.answers[i], ANS_X[i] + 8f, ANS_Y + ANS_H - 24f);
             }
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "[Đứng vào ô đáp án và nhấn Space]",
-                    250f, 150f);
+
+            // Hint
+            context.getGame().getFont().setColor(0.5f, 0.6f, 0.8f, 1f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                    "Di chuyển vào ô đáp án → nhấn SPACE", 220f, 175f);
+
+            context.getGame().getFont().setColor(Color.WHITE);
             context.getGame().getSpriteBatch().end();
         }
 
-        // Draw falling papers in phase 2
+        // ── Falling papers (Phase DODGE) ────────────────────────────────────
         if (phase == PHASE_DODGE) {
-            // Draw background rectangles for papers
             context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
             context.getShapeRenderer().begin(ShapeType.Filled);
-            context.getShapeRenderer().setColor(Color.WHITE);
+            for (final FallingPaper paper : fallingPapers) {
+                // Paper body
+                context.getShapeRenderer().setColor(0.95f, 0.95f, 0.88f, 1f);
+                context.getShapeRenderer().rect(paper.rect.x, paper.rect.y, paper.rect.width, paper.rect.height);
+                // Red top strip
+                context.getShapeRenderer().setColor(0.9f, 0.1f, 0.1f, 1f);
+                context.getShapeRenderer().rect(paper.rect.x, paper.rect.y + paper.rect.height - 7f, paper.rect.width, 7f);
+            }
+            context.getShapeRenderer().end();
+
+            context.getShapeRenderer().begin(ShapeType.Line);
+            context.getShapeRenderer().setColor(0.7f, 0.1f, 0.1f, 0.8f);
             for (final FallingPaper paper : fallingPapers) {
                 context.getShapeRenderer().rect(paper.rect.x, paper.rect.y, paper.rect.width, paper.rect.height);
             }
             context.getShapeRenderer().end();
 
-            // Draw texts on papers
             context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
             context.getGame().getSpriteBatch().begin();
-            context.getGame().getFont().setColor(Color.RED);
+            context.getGame().getFont().setColor(0.8f, 0.05f, 0.05f, 1f);
             for (final FallingPaper paper : fallingPapers) {
-                context.getGame().getFont().draw(context.getGame().getSpriteBatch(), paper.text, paper.rect.x + 5f,
-                        paper.rect.y + 20f);
+                context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
+                        paper.text, paper.rect.x + 5f, paper.rect.y + 20f);
             }
             context.getGame().getFont().setColor(Color.WHITE);
             context.getGame().getSpriteBatch().end();

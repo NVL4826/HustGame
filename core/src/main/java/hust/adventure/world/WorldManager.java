@@ -115,9 +115,9 @@ public class WorldManager implements Disposable {
 
     @Override
     public void dispose() {
-        if (currentMap != null) {
-            currentMap.dispose();
-        }
+        // NOTE: currentMap is owned by GameAssetManager and must NOT be disposed here.
+        // Disposing it would invalidate the AssetManager's cache and crash on next map load.
+        currentMap = null;
         walls.clear();
         portals.clear();
     }

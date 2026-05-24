@@ -43,6 +43,8 @@ public class ProgressContext {
     private float enemyTimeScale = 1.0f;
     private boolean lightsOut = false;
     private float showEnemiesTimer = 0f;
+    private boolean enemyBlinkVisible = true; // dùng cho hiệu ứng blink ở lab phase 3
+    private hust.adventure.core.config.LevelConfig currentLevelConfig = null; // màn hiện tại
     private Player player = null;
 
     // State Pattern
@@ -252,6 +254,22 @@ public class ProgressContext {
         this.showEnemiesTimer = showEnemiesTimer;
     }
 
+    public boolean isEnemyBlinkVisible() {
+        return enemyBlinkVisible;
+    }
+
+    public void setEnemyBlinkVisible(boolean enemyBlinkVisible) {
+        this.enemyBlinkVisible = enemyBlinkVisible;
+    }
+
+    public hust.adventure.core.config.LevelConfig getCurrentLevelConfig() {
+        return currentLevelConfig;
+    }
+
+    public void setCurrentLevelConfig(hust.adventure.core.config.LevelConfig currentLevelConfig) {
+        this.currentLevelConfig = currentLevelConfig;
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -280,6 +298,7 @@ public class ProgressContext {
         enemyTimeScale = 1.0f;
         lightsOut = false;
         showEnemiesTimer = 0f;
+        enemyBlinkVisible = true;
         player = null;
         setGameState(new PlayingGameState());
     }

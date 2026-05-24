@@ -75,6 +75,6 @@ public class ExpGem extends BaseEntity implements Pool.Poolable {
  
     @Override
     public void draw(SpriteBatch batch) {
-        drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), Color.CYAN);
+        // No visual – ExpGem is invisible (collected by collision)
     }
 }

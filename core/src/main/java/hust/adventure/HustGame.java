@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
+import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.combat.Projectile;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.screens.LoadingScreen;
 import hust.adventure.screens.ScreenTransition;
@@ -113,6 +115,12 @@ public class HustGame extends Game implements EventListener {
             assetManager.dispose();
         if (screenTransition != null)
             screenTransition.dispose();
+        hust.adventure.screens.GameOverScreen.disposeStatic();
+        hust.adventure.ui.HUD.disposeStatic();
+        hust.adventure.ui.InventoryUI.disposeStatic();
+        hust.adventure.entities.interactables.ItemDrop.disposeStaticResources();
+        Projectile.disposeStaticResources();
+        BaseEntity.disposeStaticResources();
     }
 
     public SpriteBatch getSpriteBatch() {
