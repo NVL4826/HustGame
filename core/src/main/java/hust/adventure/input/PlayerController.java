@@ -1,6 +1,8 @@
 package hust.adventure.input;
 
-public interface PlayerController {
+import com.badlogic.gdx.InputProcessor;
+
+public interface PlayerController extends InputProcessor {
     boolean isUp();
 
     boolean isDown();

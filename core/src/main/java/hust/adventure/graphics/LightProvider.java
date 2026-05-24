@@ -18,4 +18,11 @@ public interface LightProvider {
      * @return the created PointLight
      */
     PointLight createPointLight(int rays, Color color, float distance, float x, float y);
+
+    /**
+     * Sets the ambient light for the current environment.
+     * 
+     * @param color ambient light color
+     */
+    void setAmbientLight(Color color);
 }

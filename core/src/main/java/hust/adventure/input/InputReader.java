@@ -6,7 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 /**
  * System for handling player input and mapping it to game actions.
  */
-public class InputReader implements PlayerController, InputProcessor {
+public class InputReader implements PlayerController {
     private boolean up, down, left, right, running;
     private boolean spaceJP, qJP, eJP, fJP, iJP, enterJP, debugJP, hitboxJP;
     private int numJP = -1;

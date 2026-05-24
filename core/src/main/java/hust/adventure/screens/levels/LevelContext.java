@@ -10,9 +10,9 @@ import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.gamestate.PlayMode;
-import hust.adventure.graphics.LightingManager;
-import hust.adventure.input.InputReader;
-import hust.adventure.ui.UIManager;
+import hust.adventure.graphics.LightProvider;
+import hust.adventure.input.PlayerController;
+import hust.adventure.ui.UIProvider;
 
 /**
  * Interface representing the level context.
@@ -23,8 +23,8 @@ public interface LevelContext {
     LevelConfig getConfig();
     EntityFactory getEntityFactory();
     EntityManager getEntityManager();
-    UIManager getUIManager();
-    InputReader getInputReader();
+    UIProvider getUIManager();
+    PlayerController getInputReader();
     Player getPlayer();
     void setPlayer(final Player player);
     Camera getCamera();
@@ -33,5 +33,5 @@ public interface LevelContext {
     BitmapFont getFont();
     PlayMode getState();
     void setState(final PlayMode state);
-    LightingManager getLightingManager();
+    LightProvider getLightingManager();
 }

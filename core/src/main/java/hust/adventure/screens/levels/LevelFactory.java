@@ -1,7 +1,12 @@
 package hust.adventure.screens.levels;
 
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import hust.adventure.HustGame;
 import hust.adventure.core.config.LevelConfig;
+import hust.adventure.core.config.LevelID;
 import hust.adventure.screens.BaseScreen;
 import hust.adventure.screens.PlayScreen;
 
@@ -9,6 +14,17 @@ import hust.adventure.screens.PlayScreen;
  * Factory for creating specific level screens based on configuration.
  */
 public class LevelFactory {
+    private static final Map<LevelID, Supplier<LevelBehavior>> REGISTRY = new EnumMap<>(LevelID.class);
+
+    static {
+        REGISTRY.put(LevelID.LAB, LabBehavior::new);
+        REGISTRY.put(LevelID.LIBRARY, LibraryBehavior::new);
+        REGISTRY.put(LevelID.TANG_1, Floor1Behavior::new);
+        REGISTRY.put(LevelID.FINAL_OUTSIDE, OutsideBehavior::new);
+        REGISTRY.put(LevelID.BOSS_ROOM, BossFightBehavior::new);
+        REGISTRY.put(LevelID.TEST_LEVEL, TestBehavior::new);
+        REGISTRY.put(LevelID.MAP_1, Map1Behavior::new);
+    }
 
     public static BaseScreen createLevel(final HustGame game, final LevelConfig config) {
         if (config == null) {
@@ -18,33 +34,11 @@ public class LevelFactory {
             throw new IllegalArgumentException("HustGame cannot be null");
         }
 
-        final LevelBehavior behavior;
-        switch (config.getLevelId()) {
-            case LAB:
-                behavior = new LabBehavior();
-                break;
-            case LIBRARY:
-                behavior = new LibraryBehavior();
-                break;
-            case TANG_1:
-                behavior = new Floor1Behavior();
-                break;
-            case FINAL_OUTSIDE:
-                behavior = new OutsideBehavior();
-                break;
-            case BOSS_ROOM:
-                behavior = new BossFightBehavior();
-                break;
-            case TEST_LEVEL:
-                behavior = new TestBehavior();
-                break;
-            case MAP_1:
-                behavior = new Map1Behavior();
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown LevelID: " + config.getLevelId());
+        final Supplier<LevelBehavior> supplier = REGISTRY.get(config.getLevelId());
+        if (supplier == null) {
+            throw new IllegalArgumentException("Unknown or unregistered LevelID: " + config.getLevelId());
         }
 
-        return new PlayScreen(game, config, behavior);
+        return new PlayScreen(game, config, supplier.get());
     }
 }

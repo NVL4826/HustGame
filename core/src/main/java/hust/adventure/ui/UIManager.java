@@ -7,7 +7,7 @@ import hust.adventure.entities.Player;
 /**
  * Manages UI components and their visibility.
  */
-public class UIManager implements Disposable {
+public class UIManager implements UIProvider, Disposable {
     private final HUD hud;
     private final InventoryUI inventoryUI;
     private final LevelUpUI levelUpUI;

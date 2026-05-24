@@ -94,12 +94,6 @@ public class BossFightBehavior implements LevelBehavior {
         finalBoss = context.getEntityFactory().createFinalBoss(350, 450,
                 context.getGame().getAssetManager().getTexture("Boss THT.png"));
 
-        // Re-initialize final boss HP to 1000f to make it consistent with the boss fight logic
-        if (finalBoss != null) {
-            finalBoss.init(350, 450, 100, 100, INITIAL_BOSS_HP, "T.H.T", Color.RED, finalBoss.getCollisionManager(),
-                    50f);
-        }
-
         bgTexture = context.getGame().getAssetManager().getTexture("Boss Room.jpg");
 
         initBossContent();

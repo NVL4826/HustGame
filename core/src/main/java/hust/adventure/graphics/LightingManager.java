@@ -29,6 +29,7 @@ public class LightingManager implements LightProvider, Disposable {
     /**
      * Sets the ambient light for the current environment.
      */
+    @Override
     public void setAmbientLight(Color color) {
         if (color != null) {
             rayHandler.setAmbientLight(color);

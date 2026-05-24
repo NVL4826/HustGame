@@ -175,9 +175,7 @@ public class EntityFactoryImpl implements EntityFactory {
  
     @Override
     public FinalBoss createFinalBoss(float x, float y, Texture texture) {
-        FinalBoss boss = new FinalBoss();
-        boss.init(x, y, 100, 100, 2000, "FinalBoss", Color.WHITE, collisionManager, 50f);
-        boss.setTexture(texture);
+        FinalBoss boss = new FinalBoss(x, y, collisionManager, texture);
         boss.setFactory(this);
         boss.setCollider(new Collider(boss, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
         entityManager.addEntity(boss);
