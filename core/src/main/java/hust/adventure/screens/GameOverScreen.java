@@ -77,6 +77,9 @@ public class GameOverScreen extends BaseScreen {
         fadeAlpha = 1f;
         fadeTimer = 0f;
         Gdx.input.setInputProcessor(null);
+        if (game.getAudioManager() != null) {
+            game.getAudioManager().playMusic("audio/music/menu_theme.wav", true);
+        }
     }
 
     @Override

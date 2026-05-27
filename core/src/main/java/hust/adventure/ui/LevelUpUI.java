@@ -100,6 +100,9 @@ public class LevelUpUI {
         if (keyPressed > 0 && keyPressed <= currentChoices.size) {
             UpgradeAction action = currentChoices.get(keyPressed - 1);
             action.execute(player);
+            hust.adventure.events.EventDispatcher.getInstance().dispatch(
+                new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
+            );
             if (onResume != null) {
                 onResume.run();
             }

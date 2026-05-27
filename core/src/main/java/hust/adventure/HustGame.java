@@ -21,6 +21,7 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.screens.levels.LevelFactory;
+import hust.adventure.core.audio.AudioManager;
 import com.badlogic.gdx.Screen;
 
 /**
@@ -33,6 +34,7 @@ public class HustGame extends Game implements EventListener {
     private GameAssetManager assetManager;
     private EventDispatcher eventDispatcher;
     public ScreenTransition screenTransition;
+    private AudioManager audioManager;
 
     @Override
     public void create() {
@@ -41,6 +43,19 @@ public class HustGame extends Game implements EventListener {
         assetManager = new GameAssetManager();
         eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.addListener(EventType.MAP_TRANSITION, this);
+        
+        audioManager = new AudioManager(assetManager);
+        eventDispatcher.addListener(EventType.PLAY_SFX, audioManager);
+        eventDispatcher.addListener(EventType.PLAY_BGM, audioManager);
+        eventDispatcher.addListener(EventType.LEVEL_UP, audioManager);
+        eventDispatcher.addListener(EventType.ITEM_PICKED_UP, audioManager);
+        eventDispatcher.addListener(EventType.ITEM_USED, audioManager);
+        eventDispatcher.addListener(EventType.TREASURE_OPENED, audioManager);
+        eventDispatcher.addListener(EventType.PUZZLE_SOLVED, audioManager);
+        eventDispatcher.addListener(EventType.PUZZLE_FAILED, audioManager);
+        eventDispatcher.addListener(EventType.ENTITY_DAMAGED, audioManager);
+        eventDispatcher.addListener(EventType.ENTITY_DIED, audioManager);
+
         screenTransition = new ScreenTransition(this);
 
         // Khởi tạo font hỗ trợ tiếng Việt
@@ -91,6 +106,10 @@ public class HustGame extends Game implements EventListener {
 
     @Override
     public void render() {
+        if (audioManager != null) {
+            audioManager.update(Gdx.graphics.getDeltaTime());
+        }
+
         // Ủy quyền render cho Screen hiện hành
         super.render();
 
@@ -103,6 +122,20 @@ public class HustGame extends Game implements EventListener {
     @Override
     public void dispose() {
         eventDispatcher.removeListener(EventType.MAP_TRANSITION, this);
+        if (audioManager != null) {
+            eventDispatcher.removeListener(EventType.PLAY_SFX, audioManager);
+            eventDispatcher.removeListener(EventType.PLAY_BGM, audioManager);
+            eventDispatcher.removeListener(EventType.LEVEL_UP, audioManager);
+            eventDispatcher.removeListener(EventType.ITEM_PICKED_UP, audioManager);
+            eventDispatcher.removeListener(EventType.ITEM_USED, audioManager);
+            eventDispatcher.removeListener(EventType.TREASURE_OPENED, audioManager);
+            eventDispatcher.removeListener(EventType.PUZZLE_SOLVED, audioManager);
+            eventDispatcher.removeListener(EventType.PUZZLE_FAILED, audioManager);
+            eventDispatcher.removeListener(EventType.ENTITY_DAMAGED, audioManager);
+            eventDispatcher.removeListener(EventType.ENTITY_DIED, audioManager);
+            audioManager.dispose();
+        }
+
         if (screen != null)
             screen.dispose();
         if (spriteBatch != null)
@@ -145,5 +178,9 @@ public class HustGame extends Game implements EventListener {
 
     public ScreenTransition getScreenTransition() {
         return screenTransition;
+    }
+
+    public AudioManager getAudioManager() {
+        return audioManager;
     }
 }

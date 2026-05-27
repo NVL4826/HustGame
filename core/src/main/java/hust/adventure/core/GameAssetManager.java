@@ -11,6 +11,8 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import hust.adventure.wave.WaveConfig;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 
 public class GameAssetManager {
     public static final String CHEST_TEXTURE_PATH = "titled/Objects/chest.png";
@@ -54,6 +56,26 @@ public class GameAssetManager {
         for (int i = 47; i <= 51; i++)
             manager.load("Phong_doc/" + i + ".png", Texture.class);
         manager.load("Phong_doc/1.png", Texture.class);
+
+        // Sound effects
+        manager.load("audio/sfx/shoot.wav", Sound.class);
+        manager.load("audio/sfx/whip.wav", Sound.class);
+        manager.load("audio/sfx/magic.wav", Sound.class);
+        manager.load("audio/sfx/player_hit.wav", Sound.class);
+        manager.load("audio/sfx/enemy_hit.wav", Sound.class);
+        manager.load("audio/sfx/enemy_die.wav", Sound.class);
+        manager.load("audio/sfx/level_up.wav", Sound.class);
+        manager.load("audio/sfx/pickup.wav", Sound.class);
+        manager.load("audio/sfx/item_use.wav", Sound.class);
+        manager.load("audio/sfx/ui_click.wav", Sound.class);
+        manager.load("audio/sfx/chest_open.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_solved.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_failed.wav", Sound.class);
+
+        // Music tracks
+        manager.load("audio/music/menu_theme.wav", Music.class);
+        manager.load("audio/music/level_theme.wav", Music.class);
+        manager.load("audio/music/boss_theme.wav", Music.class);
     }
 
     public boolean update() {
@@ -70,6 +92,14 @@ public class GameAssetManager {
 
     public TiledMap getTiledMap(String name) {
         return manager.get(name, TiledMap.class);
+    }
+
+    public Sound getSound(String name) {
+        return manager.get(name, Sound.class);
+    }
+
+    public Music getMusic(String name) {
+        return manager.get(name, Music.class);
     }
 
     public Texture getWhitePixel() {

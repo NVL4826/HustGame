@@ -21,6 +21,7 @@ import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.LootDropService;
 import hust.adventure.core.ScenarioService;
 import hust.adventure.core.config.LevelConfig;
+import hust.adventure.core.config.LevelID;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
@@ -212,6 +213,17 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
                 uiManager.getDamageTextManager(), uiManager.getRouletteUI(), uiManager.getDebugUI(), worldManager);
 
         setupLayerIndices();
+
+        if (game.getAudioManager() != null) {
+            game.getAudioManager().playMusic(getBgmForLevel(config.getLevelId()), true);
+        }
+    }
+
+    private String getBgmForLevel(final LevelID id) {
+        if (id == LevelID.BOSS_ROOM) {
+            return "audio/music/boss_theme.wav";
+        }
+        return "audio/music/level_theme.wav";
     }
 
     private void setupLayerIndices() {
@@ -303,6 +315,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private void handleInput() {
         if (inputReader.isInventoryJustPressed()) {
             ProgressContext.instance.setInventoryOpen(!ProgressContext.instance.isInventoryOpen());
+            EventDispatcher.getInstance().dispatch(
+                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
+            );
         }
         if (inputReader.isDebugJustPressed()) {
             ProgressContext.instance.setShowDebug(!ProgressContext.instance.isShowDebug());

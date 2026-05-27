@@ -29,6 +29,9 @@ public class WhipWeapon extends BaseWeapon {
     protected void executeAttackAction() {
         updateHitArea();
         flashTimer = FLASH_DURATION;
+        hust.adventure.events.EventDispatcher.getInstance().dispatch(
+            new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/whip.wav")
+        );
 
         final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea, CollisionLayer.ENEMY);
         for (final GameEntity target : targets) {

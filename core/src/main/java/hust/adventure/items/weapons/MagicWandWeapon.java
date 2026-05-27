@@ -37,6 +37,9 @@ public class MagicWandWeapon extends BaseWeapon {
 
         if (getOwner().getFactory() != null) {
             getOwner().getFactory().createProjectile(startX, startY, vx, vy, getBaseDamage(), Color.CYAN, true);
+            hust.adventure.events.EventDispatcher.getInstance().dispatch(
+                new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/magic.wav")
+            );
         }
     }
 }
