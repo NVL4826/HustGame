@@ -32,6 +32,8 @@ import hust.adventure.items.weapons.Weaponable;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.items.Gear;
 import hust.adventure.items.GearManager;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Main player character class.
@@ -79,8 +81,8 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.gearManager = new GearManager();
         this.iframeTimer = 0f;
 
-        // Starting weapon
-        weaponManager.addWeapon(WeaponFactory.createWeapon("bun_dau", this));
+        // Restore weapons and gears from global context
+        restoreWeaponsAndGears();
 
         // Composition: Movement behavior
         this.setMovementBehavior(new PlayerMovementBehavior(controller, collisionManager));
@@ -96,8 +98,10 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.showEnemiesTimer = 0f;
         ProgressContext.instance.setPlayer(this);
 
-        // Sync initial HP from global context
+        // Sync initial stats from global context
+        this.setMaxHp(ProgressContext.instance.getMaxHp());
         this.setHp(ProgressContext.instance.getHp());
+        this.setStamina(ProgressContext.instance.getStamina());
     }
 
     private void loadTextures() {
@@ -396,6 +400,59 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
     public void setIframeTimer(final float iframeTimer) {
         this.iframeTimer = iframeTimer;
+    }
+
+    public void saveWeaponsAndGearsToContext() {
+        if (ProgressContext.instance == null) {
+            return;
+        }
+        ProgressContext.instance.getWeaponLevels().clear();
+        for (final Weaponable w : weaponManager.getWeapons()) {
+            ProgressContext.instance.getWeaponLevels().put(w.getId().toLowerCase(), w.getLevel());
+        }
+
+        ProgressContext.instance.getGearLevels().clear();
+        if (gearManager != null) {
+            for (final Gear gear : gearManager.getGears()) {
+                ProgressContext.instance.getGearLevels().put(gear.getId().toLowerCase(), gear.getLevel());
+            }
+        }
+    }
+
+    private void restoreWeaponsAndGears() {
+        final Map<String, Integer> savedWeapons = ProgressContext.instance.getWeaponLevels();
+        final Map<String, Integer> savedGears = ProgressContext.instance.getGearLevels();
+
+        if (savedWeapons.isEmpty()) {
+            // New game initialization
+            final Weaponable defaultWeapon = WeaponFactory.createWeapon("bun_dau", this);
+            weaponManager.addWeapon(defaultWeapon);
+            savedWeapons.put("bun_dau", 1);
+        } else {
+            // Restore saved weapons
+            for (final Map.Entry<String, Integer> entry : savedWeapons.entrySet()) {
+                final String weaponId = entry.getKey();
+                final int targetLevel = entry.getValue();
+                final Weaponable weapon = WeaponFactory.createWeapon(weaponId, this);
+                for (int i = 1; i < targetLevel; i++) {
+                    weapon.upgrade(0f, 0f);
+                }
+                weaponManager.addWeapon(weapon);
+            }
+        }
+
+        // Restore saved gears
+        for (final Map.Entry<String, Integer> entry : savedGears.entrySet()) {
+            final String gearId = entry.getKey();
+            final int targetLevel = entry.getValue();
+            final String gearName = Gear.getDefaultName(gearId);
+            final String gearDesc = Gear.getDefaultDescription(gearId, 1);
+            final Gear gear = new Gear(gearId, gearName, gearDesc);
+            for (int i = 1; i < targetLevel; i++) {
+                gear.upgrade();
+            }
+            gearManager.addGear(gear);
+        }
     }
 
     @Override

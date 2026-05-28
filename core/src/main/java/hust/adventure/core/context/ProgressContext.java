@@ -5,6 +5,8 @@ import hust.adventure.gamestate.PlayingGameState;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.entities.Player;
 import hust.adventure.core.config.LevelConfig;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Manages the global game data and current game flow state.
@@ -47,6 +49,9 @@ public class ProgressContext {
     private boolean enemyBlinkVisible = true; // dùng cho hiệu ứng blink ở lab phase 3
     private LevelConfig currentLevelConfig = null; // màn hiện tại
     private Player player = null;
+
+    private final Map<String, Integer> weaponLevels = new HashMap<>();
+    private final Map<String, Integer> gearLevels = new HashMap<>();
 
     // State Pattern
     private GameState currentState;
@@ -279,6 +284,14 @@ public class ProgressContext {
         this.player = player;
     }
 
+    public Map<String, Integer> getWeaponLevels() {
+        return weaponLevels;
+    }
+
+    public Map<String, Integer> getGearLevels() {
+        return gearLevels;
+    }
+
     public void reset() {
         hp = 100f;
         maxHp = 100f;
@@ -301,6 +314,8 @@ public class ProgressContext {
         showEnemiesTimer = 0f;
         enemyBlinkVisible = true;
         player = null;
+        weaponLevels.clear();
+        gearLevels.clear();
         setGameState(new PlayingGameState());
     }
 }

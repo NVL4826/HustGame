@@ -655,6 +655,13 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     }
 
     @Override
+    public void hide() {
+        if (player != null) {
+            player.saveWeaponsAndGearsToContext();
+        }
+    }
+
+    @Override
     public void dispose() {
         EventDispatcher.getInstance().removeListener(EventType.LEVEL_UP, this);
         EventDispatcher.getInstance().removeListener(EventType.TREASURE_OPENED, this);

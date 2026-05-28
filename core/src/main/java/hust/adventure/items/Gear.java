@@ -54,4 +54,34 @@ public class Gear {
             level++;
         }
     }
+
+    public static String getDefaultName(final String id) {
+        if (id == null) {
+            return "";
+        }
+        switch (id.toLowerCase()) {
+            case "spinach": return "Hành Tây (Spinach)";
+            case "empty_tome": return "Sách Rỗng (Empty Tome)";
+            case "wings": return "Đôi Cánh (Wings)";
+            case "hollow_heart": return "Trái Tim Rỗng (Hollow Heart)";
+            case "candelabrador": return "Chân Nến (Candelabrador)";
+            case "attractorb": return "Nam Châm (Attractorb)";
+            default: return id;
+        }
+    }
+
+    public static String getDefaultDescription(final String id, final int level) {
+        if (id == null) {
+            return "";
+        }
+        switch (id.toLowerCase()) {
+            case "spinach": return "Tăng 10% sát thương cho tất cả vũ khí (Cấp " + level + ").";
+            case "empty_tome": return "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp " + level + ").";
+            case "wings": return "Tăng 10% tốc độ di chuyển của nhân vật (Cấp " + level + ").";
+            case "hollow_heart": return "Tăng 20% lượng HP tối đa (+20 HP) (Cấp " + level + ").";
+            case "candelabrador": return "Tăng 20% phạm vi tấn công của vũ khí (Cấp " + level + ").";
+            case "attractorb": return "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp " + level + ").";
+            default: return "";
+        }
+    }
 }
