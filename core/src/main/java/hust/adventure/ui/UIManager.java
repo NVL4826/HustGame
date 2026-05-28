@@ -9,6 +9,7 @@ import hust.adventure.entities.Player;
  */
 public class UIManager implements UIProvider, Disposable {
     private final HUD hud;
+    private final StatusEffectsHUD statusEffectsHUD;
     private final InventoryUI inventoryUI;
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
@@ -17,6 +18,7 @@ public class UIManager implements UIProvider, Disposable {
 
     public UIManager() {
         this.hud = new HUD();
+        this.statusEffectsHUD = new StatusEffectsHUD();
         this.inventoryUI = new InventoryUI();
         this.levelUpUI = new LevelUpUI();
         this.damageTextManager = new DamageTextManager();
@@ -33,6 +35,10 @@ public class UIManager implements UIProvider, Disposable {
 
     public HUD getHud() {
         return hud;
+    }
+
+    public StatusEffectsHUD getStatusEffectsHUD() {
+        return statusEffectsHUD;
     }
 
     public InventoryUI getInventoryUI() {

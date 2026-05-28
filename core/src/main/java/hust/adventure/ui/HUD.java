@@ -10,9 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.core.TimeProvider;
-import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.Player;
-import hust.adventure.entities.status.StatusFlag;
 
 /**
  * Upgraded HUD – modern bar design with gradient fills, icons, rounded feel,
@@ -61,23 +58,32 @@ public class HUD {
     }
 
     public static void disposeStatic() {
-        if (whitePixel != null) { whitePixel.dispose(); whitePixel = null; }
+        if (whitePixel != null) {
+            whitePixel.dispose();
+            whitePixel = null;
+        }
     }
 
     public void setTimeProvider(TimeProvider timeProvider) {
         this.timeProvider = timeProvider;
     }
 
+    public TimeProvider getTimeProvider() {
+        return timeProvider;
+    }
+
     // ── helpers ────────────────────────────────────────────────────────────
 
-    /** Vẽ thanh bar có nền tối + fill gradient 2 màu (left→right tint). */
+    /**
+     * Draws a status bar with dark background and two-color gradient fill.
+     */
     private void drawBar(ShapeRenderer sr, float x, float y, float w, float h,
                          float percent, Color colLeft, Color colRight, float bgAlpha) {
-        // Nền
+        // Background
         sr.setColor(0.1f, 0.1f, 0.12f, bgAlpha);
         sr.rect(x, y, w, h);
 
-        // Fill gradient bằng cách vẽ nhiều dải mỏng
+        // Fill gradient by drawing thin slices
         if (percent > 0) {
             float fillW = Math.max(2f, w * percent);
             int steps = (int) fillW;
@@ -91,7 +97,7 @@ public class HUD {
             }
         }
 
-        // Viền mỏng
+        // Thin border
         sr.end();
         sr.begin(ShapeRenderer.ShapeType.Line);
         sr.setColor(1f, 1f, 1f, 0.18f);
@@ -100,9 +106,11 @@ public class HUD {
         sr.begin(ShapeRenderer.ShapeType.Filled);
     }
 
-    /** Vẽ panel nền với viền neon mỏng. */
+    /**
+     * Draws background panel with thin neon border.
+     */
     private void drawPanel(ShapeRenderer sr, float x, float y, float w, float h) {
-        // Nền semi-transparent dark
+        // Semi-transparent dark background
         sr.setColor(0.04f, 0.04f, 0.10f, 0.82f);
         sr.rect(x, y, w, h);
         // Inner border glow
@@ -117,27 +125,27 @@ public class HUD {
     }
 
     // ── main render ────────────────────────────────────────────────────────
-    public void render(SpriteBatch batch, ShapeRenderer sr, BitmapFont font) {
+    public void render(SpriteBatch batch, ShapeRenderer sr, BitmapFont font, HUDData data) {
+        if (data == null) {
+            return;
+        }
         sr.setProjectionMatrix(uiCam.combined);
         batch.setProjectionMatrix(uiCam.combined);
 
-        float hpPct = Math.max(0, Math.min(1,
-                ProgressContext.instance.getHp() / ProgressContext.instance.getMaxHp()));
-        float spPct = Math.max(0, Math.min(1,
-                ProgressContext.instance.getStamina() / ProgressContext.instance.getMaxStamina()));
-        float mrPct = Math.max(0, Math.min(1, ProgressContext.instance.getMorale() / 100f));
-        float exPct = Math.max(0, Math.min(1,
-                ProgressContext.instance.getExp() / ProgressContext.instance.getExpToNextLevel()));
+        float hpPct = Math.max(0, Math.min(1, data.getHp() / data.getMaxHp()));
+        float spPct = Math.max(0, Math.min(1, data.getStamina() / data.getMaxStamina()));
+        float mrPct = Math.max(0, Math.min(1, data.getMorale() / 100f));
+        float exPct = Math.max(0, Math.min(1, data.getExp() / data.getExpToNextLevel()));
 
-        // Pulse timer cho HP thấp
+        // Pulse timer for low HP warning
         pulseTimer += Gdx.graphics.getDeltaTime();
         boolean lowHp = hpPct < 0.25f;
-        float pulse = (float)(Math.sin(pulseTimer * 5.0) * 0.5 + 0.5); // 0→1
+        float pulse = (float)(Math.sin(pulseTimer * 5.0) * 0.5 + 0.5); // 0 to 1
 
         // ── ShapeRenderer pass ──────────────────────────────────────────────
         sr.begin(ShapeRenderer.ShapeType.Filled);
 
-        // HP bar: xanh lá → vàng → đỏ theo %
+        // HP bar: green -> yellow -> red based on percentage
         Color hpLeft, hpRight;
         if (hpPct > 0.5f) {
             hpLeft  = new Color(0.1f, 0.9f, 0.3f, 1f);
@@ -146,26 +154,26 @@ public class HUD {
             hpLeft  = new Color(1.0f, 0.65f, 0.0f, 1f);
             hpRight = new Color(1.0f, 0.85f, 0.1f, 1f);
         } else {
-            // Pulse đỏ khi HP cực thấp
+            // Pulse red when HP is critically low
             float pr = 0.8f + pulse * 0.2f;
             hpLeft  = new Color(pr, 0.05f, 0.05f, 1f);
             hpRight = new Color(1.0f, 0.2f + pulse * 0.2f, 0.0f, 1f);
         }
         drawBar(sr, BAR_X, BAR_HP_Y, BAR_W, BAR_H, hpPct, hpLeft, hpRight, 0.55f);
 
-        // SP bar: tím → xanh cyan
+        // SP bar: purple -> cyan
         drawBar(sr, BAR_X, BAR_SP_Y, BAR_W, BAR_H, spPct,
                 new Color(0.5f, 0.1f, 0.9f, 1f), new Color(0.1f, 0.7f, 1.0f, 1f), 0.55f);
 
-        // Morale bar: cam → vàng sáng
+        // Morale bar: orange -> bright yellow
         drawBar(sr, BAR_X, BAR_MR_Y, BAR_W, BAR_H, mrPct,
                 new Color(0.9f, 0.5f, 0.0f, 1f), new Color(1.0f, 0.9f, 0.2f, 1f), 0.55f);
 
-        // EXP bar: tím đậm → hồng
+        // EXP bar: dark purple -> pink
         drawBar(sr, BAR_X, BAR_EX_Y, BAR_W, BAR_H, exPct,
                 new Color(0.5f, 0.0f, 0.7f, 1f), new Color(1.0f, 0.3f, 0.9f, 1f), 0.55f);
 
-        // Viền ngoài cùng panel nhấp nháy đỏ khi HP thấp
+        // Outer panel border pulses red on low HP
         if (lowHp) {
             sr.end();
             sr.begin(ShapeRenderer.ShapeType.Line);
@@ -180,7 +188,7 @@ public class HUD {
         // ── SpriteBatch text pass ───────────────────────────────────────────
         batch.begin();
 
-        // Icon + label icons trái thanh
+        // Icon labels on the left of status bars
         font.setColor(1f, 0.4f, 0.4f, 1f);
         font.draw(batch, "HP", PANEL_X + 3, BAR_HP_Y + BAR_H - 1);
         font.setColor(0.6f, 0.4f, 1.0f, 1f);
@@ -190,72 +198,26 @@ public class HUD {
         font.setColor(0.9f, 0.4f, 1.0f, 1f);
         font.draw(batch, "EX", PANEL_X + 3, BAR_EX_Y + BAR_H - 1);
 
-        // Giá trị số bên phải
+        // Numeric values on the right
         font.setColor(Color.WHITE);
         font.draw(batch,
-                (int)ProgressContext.instance.getHp() + "/" + (int)ProgressContext.instance.getMaxHp(),
+                (int)data.getHp() + "/" + (int)data.getMaxHp(),
                 BAR_X + BAR_W + 4, BAR_HP_Y + BAR_H - 1);
         font.draw(batch,
-                (int)ProgressContext.instance.getStamina() + "/" + (int)ProgressContext.instance.getMaxStamina(),
+                (int)data.getStamina() + "/" + (int)data.getMaxStamina(),
                 BAR_X + BAR_W + 4, BAR_SP_Y + BAR_H - 1);
-        font.draw(batch, (int)ProgressContext.instance.getMorale() + "%",
+        font.draw(batch, (int)data.getMorale() + "%",
                 BAR_X + BAR_W + 4, BAR_MR_Y + BAR_H - 1);
         font.setColor(0.8f, 0.6f, 1f, 1f);
-        font.draw(batch, "LV" + ProgressContext.instance.getLevel(),
+        font.draw(batch, "LV" + data.getLevel(),
                 BAR_X + BAR_W + 4, BAR_EX_Y + BAR_H - 1);
 
-        // Timer
-        if (timeProvider != null) {
-            int totalSeconds = (int) timeProvider.getCurrentTime();
-            int minutes = totalSeconds / 60;
-            int seconds = totalSeconds % 60;
-            font.setColor(0.8f, 0.8f, 0.8f, 1f);
-            font.draw(batch, String.format("%02d:%02d", minutes, seconds), 370, 590);
-        }
-
-        // Artifacts
-        float afx = 14f, afy = 492f;
-        if (ProgressContext.instance.isHasNao()) {
-            font.setColor(1f, 0.85f, 0.2f, 1f);
-            font.draw(batch, "★ Nao 100%", afx, afy);
-            afy -= 16f;
-        }
-        if (ProgressContext.instance.isHasUsb()) {
-            font.setColor(0.3f, 0.8f, 1f, 1f);
-            font.draw(batch, "★ USB", afx, afy);
-            afy -= 16f;
-        }
-
-        // Active spells / status effects
-        float spellY = afy - 4f;
-        if (ProgressContext.instance.getEnemyTimeScale() == 0f) {
-            font.setColor(1f, 0.5f, 0f, 1f);
-            font.draw(batch, "⚡ STUN!", 14, spellY); spellY -= 16f;
-        } else if (ProgressContext.instance.getEnemyTimeScale() == 0.3f) {
-            font.setColor(1f, 0.9f, 0f, 1f);
-            font.draw(batch, "⏱ SLOW", 14, spellY); spellY -= 16f;
-        }
-        if (ProgressContext.instance.getShowEnemiesTimer() > 0f) {
-            font.setColor(0.3f, 1f, 1f, 1f);
-            font.draw(batch, String.format("RADAR %.0fs", ProgressContext.instance.getShowEnemiesTimer()), 14, spellY);
-            spellY -= 16f;
-        }
-
-        Player player = ProgressContext.instance.getPlayer();
-        if (player != null) {
-            if (player.hasStatus(StatusFlag.SPEED_BOOSTED)) {
-                font.setColor(0.3f, 1f, 0.8f, 1f);
-                font.draw(batch, "SPEED+", 14, spellY); spellY -= 16f;
-            }
-            if (player.hasStatus(StatusFlag.REGEN_HP)) {
-                font.setColor(0.3f, 1f, 0.4f, 1f);
-                font.draw(batch, "HP REGEN", 14, spellY); spellY -= 16f;
-            }
-            if (player.hasStatus(StatusFlag.CONFUSED)) {
-                font.setColor(1f, 0.2f, 1f, 1f);
-                font.draw(batch, "CONFUSED!", 14, spellY); spellY -= 16f;
-            }
-        }
+        // Timer display
+        int totalSeconds = (int) data.getCurrentTime();
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        font.setColor(0.8f, 0.8f, 0.8f, 1f);
+        font.draw(batch, String.format("%02d:%02d", minutes, seconds), 370, 590);
 
         font.setColor(Color.WHITE);
         batch.end();

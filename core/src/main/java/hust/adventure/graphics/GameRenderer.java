@@ -18,6 +18,9 @@ import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.status.StatusFlag;
 import hust.adventure.ui.HUD;
+import hust.adventure.ui.HUDData;
+import hust.adventure.ui.StatusEffectsData;
+import hust.adventure.ui.StatusEffectsHUD;
 import hust.adventure.ui.InventoryUI;
 import hust.adventure.ui.LevelUpUI;
 import hust.adventure.ui.DamageTextManager;
@@ -35,6 +38,7 @@ public class GameRenderer {
     private final ShaderProgram silhouetteShader;
     private final ShaderProgram discardShader;
     private final HUD hud;
+    private final StatusEffectsHUD statusEffectsHUD;
     private final InventoryUI inventoryUI;
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
@@ -48,14 +52,16 @@ public class GameRenderer {
 
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
-            final InventoryUI inventoryUI, final LevelUpUI levelUpUI, final DamageTextManager damageTextManager, 
-            final RouletteUI rouletteUI, final DebugUI debugUI, final WorldManager worldManager) {
+            final StatusEffectsHUD statusEffectsHUD, final InventoryUI inventoryUI, final LevelUpUI levelUpUI,
+            final DamageTextManager damageTextManager, final RouletteUI rouletteUI, final DebugUI debugUI,
+            final WorldManager worldManager) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
         this.batch = batch;
         this.silhouetteShader = silhouetteShader;
         this.discardShader = discardShader;
         this.hud = hud;
+        this.statusEffectsHUD = statusEffectsHUD;
         this.inventoryUI = inventoryUI;
         this.levelUpUI = levelUpUI;
         this.damageTextManager = damageTextManager;
@@ -183,7 +189,39 @@ public class GameRenderer {
     private void renderUI(final SpriteBatch batch, final ShapeRenderer shapeRenderer, final BitmapFont font,
             final Player player) {
         if (hud != null) {
-            hud.render(batch, shapeRenderer, font);
+            final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
+            final HUDData hudData = new HUDData(
+                ProgressContext.instance.getHp(),
+                ProgressContext.instance.getMaxHp(),
+                ProgressContext.instance.getStamina(),
+                ProgressContext.instance.getMaxStamina(),
+                ProgressContext.instance.getMorale(),
+                ProgressContext.instance.getExp(),
+                ProgressContext.instance.getExpToNextLevel(),
+                ProgressContext.instance.getLevel(),
+                currentTime
+            );
+            hud.render(batch, shapeRenderer, font, hudData);
+        }
+        if (statusEffectsHUD != null) {
+            boolean isSpeedBoosted = false;
+            boolean isHpRegen = false;
+            boolean isConfused = false;
+            if (player != null) {
+                isSpeedBoosted = player.hasStatus(StatusFlag.SPEED_BOOSTED);
+                isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
+                isConfused = player.hasStatus(StatusFlag.CONFUSED);
+            }
+            final StatusEffectsData statusData = new StatusEffectsData(
+                ProgressContext.instance.isHasNao(),
+                ProgressContext.instance.isHasUsb(),
+                ProgressContext.instance.getEnemyTimeScale(),
+                ProgressContext.instance.getShowEnemiesTimer(),
+                isSpeedBoosted,
+                isHpRegen,
+                isConfused
+            );
+            statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
             inventoryUI.render(player, batch, shapeRenderer, font);

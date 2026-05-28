@@ -211,8 +211,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         gameRenderer = new GameRenderer(cameraManager, entityManager, game.getSpriteBatch(), silhouetteShader,
-                discardShader, uiManager.getHud(), uiManager.getInventoryUI(), uiManager.getLevelUpUI(),
-                uiManager.getDamageTextManager(), uiManager.getRouletteUI(), uiManager.getDebugUI(), worldManager);
+                discardShader, uiManager.getHud(), uiManager.getStatusEffectsHUD(), uiManager.getInventoryUI(),
+                uiManager.getLevelUpUI(), uiManager.getDamageTextManager(), uiManager.getRouletteUI(),
+                uiManager.getDebugUI(), worldManager);
 
         setupLayerIndices();
 
