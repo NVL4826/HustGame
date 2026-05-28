@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
@@ -141,8 +143,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         ProgressContext.instance.setCurrentLevelConfig(config);
 
         lightingManager.setAmbientLight(config.getAmbientColor());
-        worldManager.loadMap(game.getAssetManager().getTiledMap(config.getMapPath()), entityFactory, entityManager,
-                lightingManager);
+        worldManager.loadMap(game.getAssetManager().getTiledMap(config.getMapPath()));
+        spawnMapLightingObjects();
         collisionManager.setMap(worldManager.getCurrentMap(), worldManager.getWalls());
         mapRenderer = new OrthogonalTiledMapRenderer(worldManager.getCurrentMap());
 
@@ -226,6 +228,30 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         final int[][] layers = worldManager.classifyLayers();
         backgroundLayers = layers[0];
         foregroundLayers = layers[1];
+    }
+
+    /**
+     * Spawns static lighting entities from the "LightingObjects" layer of the map.
+     */
+    private void spawnMapLightingObjects() {
+        final TiledMap map = worldManager.getCurrentMap();
+        if (map == null) {
+            return;
+        }
+        final MapLayer lightLayer = map.getLayers().get("LightingObjects");
+        if (lightLayer != null) {
+            for (final MapObject obj : lightLayer.getObjects()) {
+                final float x = obj.getProperties().get("x", 0f, Float.class);
+                final float y = obj.getProperties().get("y", 0f, Float.class);
+                final String name = obj.getName();
+
+                if ("Book".equalsIgnoreCase(name)) {
+                    entityFactory.createFloatingBook(x, y, lightingManager);
+                } else if ("Candle".equalsIgnoreCase(name)) {
+                    entityFactory.createCandle(x, y, lightingManager);
+                }
+            }
+        }
     }
 
     private void initLevel() {

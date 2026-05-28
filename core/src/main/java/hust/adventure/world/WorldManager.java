@@ -10,9 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntArray;
 import hust.adventure.entities.environment.WallEntity;
-import hust.adventure.entities.factory.EntityFactory;
-import hust.adventure.entities.EntityManager;
-import hust.adventure.graphics.LightProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,35 +33,78 @@ public class WorldManager implements Disposable {
         this.portals = new ArrayList<>();
     }
 
-    public void loadMap(final TiledMap map, EntityFactory factory, EntityManager entityManager,
-            LightProvider lightProvider) {
+    /**
+     * Loads the map data including portals and physical walls.
+     *
+     * @param map the TiledMap instance to load
+     */
+    public void loadMap(final TiledMap map) {
         if (map == null)
             throw new IllegalArgumentException("Map cannot be null");
         this.currentMap = map;
 
         setupWalls();
         setupPortals();
-        setupLightingObjects(factory, entityManager, lightProvider);
     }
 
     private void setupWalls() {
         walls.clear();
-        // Thử lần lượt: "collision" (lab/library), "Border" (Final Outside), "Object Layer 1" (map cũ)
-        MapLayer objectLayer = currentMap.getLayers().get("collision");
-        if (objectLayer == null) {
-            objectLayer = currentMap.getLayers().get("Border");
-        }
-        if (objectLayer == null) {
-            objectLayer = currentMap.getLayers().get("Object Layer 1");
-        }
-        if (objectLayer != null) {
-            for (MapObject obj : objectLayer.getObjects()) {
+        
+        // Find collision layers using map properties, layer properties, or fallbacks
+        final List<MapLayer> collisionLayers = findCollisionLayers();
+        for (final MapLayer layer : collisionLayers) {
+            for (final MapObject obj : layer.getObjects()) {
                 if (obj instanceof RectangleMapObject) {
-                    Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                    final Rectangle rect = ((RectangleMapObject) obj).getRectangle();
                     walls.add(new WallEntity(rect));
                 }
             }
         }
+    }
+
+    private List<MapLayer> findCollisionLayers() {
+        final List<MapLayer> foundLayers = new ArrayList<>();
+        if (currentMap == null) {
+            return foundLayers;
+        }
+
+        // 1. Check map properties for a specific collision layer name
+        final String customCollisionLayerName = currentMap.getProperties().get("collisionLayer", String.class);
+        if (customCollisionLayerName != null) {
+            final MapLayer layer = currentMap.getLayers().get(customCollisionLayerName);
+            if (layer != null) {
+                foundLayers.add(layer);
+                return foundLayers;
+            }
+        }
+
+        // 2. Scan all layers for 'collision' or 'isCollision' boolean/string property
+        for (final MapLayer layer : currentMap.getLayers()) {
+            Object collProp = layer.getProperties().get("collision");
+            if (collProp == null) {
+                collProp = layer.getProperties().get("isCollision");
+            }
+            if (collProp instanceof Boolean && (Boolean) collProp) {
+                foundLayers.add(layer);
+            } else if (collProp instanceof String && ("true".equalsIgnoreCase((String) collProp) || "1".equals(collProp))) {
+                foundLayers.add(layer);
+            }
+        }
+        if (!foundLayers.isEmpty()) {
+            return foundLayers;
+        }
+
+        // 3. Fallback to default known collision layer names
+        final String[] defaultLayerNames = {"collision", "Border", "Object Layer 1"};
+        for (final String name : defaultLayerNames) {
+            final MapLayer layer = currentMap.getLayers().get(name);
+            if (layer != null) {
+                foundLayers.add(layer);
+                break; // Prioritize the first matching fallback layer
+            }
+        }
+
+        return foundLayers;
     }
 
     private void setupPortals() {
@@ -78,25 +118,6 @@ public class WorldManager implements Disposable {
                     float spawnX = obj.getProperties().get("spawnX", 0f, Float.class);
                     float spawnY = obj.getProperties().get("spawnY", 0f, Float.class);
                     portals.add(new Portal(rect, target, spawnX, spawnY));
-                }
-            }
-        }
-    }
-
-    private void setupLightingObjects(EntityFactory factory, EntityManager entityManager, LightProvider lightProvider) {
-        if (factory == null || entityManager == null || lightProvider == null)
-            return;
-        MapLayer lightLayer = currentMap.getLayers().get("LightingObjects");
-        if (lightLayer != null) {
-            for (MapObject obj : lightLayer.getObjects()) {
-                float x = obj.getProperties().get("x", 0f, Float.class);
-                float y = obj.getProperties().get("y", 0f, Float.class);
-                String name = obj.getName();
-
-                if ("Book".equalsIgnoreCase(name)) {
-                    factory.createFloatingBook(x, y, lightProvider);
-                } else if ("Candle".equalsIgnoreCase(name)) {
-                    factory.createCandle(x, y, lightProvider);
                 }
             }
         }
@@ -128,18 +149,34 @@ public class WorldManager implements Disposable {
     }
 
     /**
-     * Đọc vị trí spawn của player từ objectgroup "Spawn" trong TMX.
-     * Nếu không có thì trả về null (PlayScreen dùng spawn từ LevelConfig).
+     * Reads the spawn point of the player from the "Spawn" objectgroup in TMX.
+     * Supports custom properties for flexible configuration.
+     *
+     * @return the spawn point coordinates as a Vector2, or null if not found
      */
     public Vector2 getSpawnPoint() {
         if (currentMap == null) return null;
-        MapLayer spawnLayer = currentMap.getLayers().get("Spawn");
+        
+        // Check for custom spawn layer name in map properties, fallback to "Spawn"
+        final String spawnLayerName = currentMap.getProperties().get("spawnLayer", "Spawn", String.class);
+        MapLayer spawnLayer = currentMap.getLayers().get(spawnLayerName);
+        if (spawnLayer == null) {
+            // Also try scanning for any layer with a property "isSpawn" or similar
+            for (final MapLayer layer : currentMap.getLayers()) {
+                if ("true".equalsIgnoreCase(layer.getProperties().get("isSpawn", String.class))
+                 || Boolean.TRUE.equals(layer.getProperties().get("isSpawn", Boolean.class))) {
+                    spawnLayer = layer;
+                    break;
+                }
+            }
+        }
+
         if (spawnLayer == null) return null;
-        for (MapObject obj : spawnLayer.getObjects()) {
+        for (final MapObject obj : spawnLayer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
-                Rectangle rect = ((RectangleMapObject) obj).getRectangle();
-                // Dùng giữa X, nhưng TOP của rect theo trục Y (libGDX đã flip Y)
-                // để tránh spawn bên trong tường đáy của map
+                final Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                // Use the center X, but the top of the rectangle along Y axis (since Y is flipped in libGDX)
+                // to avoid spawning inside the bottom collision of the map
                 return new Vector2(rect.x + rect.width / 2f, rect.y + rect.height);
             }
         }
