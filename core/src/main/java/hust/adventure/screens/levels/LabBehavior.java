@@ -19,8 +19,8 @@ import hust.adventure.items.ItemManager;
  */
 public class LabBehavior implements LevelBehavior, EventListener {
     private static final int MAX_WAVE = 5;
-    private static final float SPAWN_USB_X = 385f;
-    private static final float SPAWN_USB_Y = 285f;
+    private static final float SPAWN_USB_X = 672f;  // giữa map lab (1344 / 2)
+    private static final float SPAWN_USB_Y = 384f;  // giữa map lab (768 / 2)
     private static final float BOSS_SPAWN_X = 400f;
     private static final float BOSS_SPAWN_Y = 100f;
     private static final String BOSS_MAP = "boss_room.tmx";

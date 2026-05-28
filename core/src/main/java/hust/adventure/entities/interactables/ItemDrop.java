@@ -40,6 +40,7 @@ public class ItemDrop extends BaseEntity {
             case "kho_ga":        return "items/kho_ga.png";
             case "usb":           return "items/usb.png";
             case "note":          return "items/usb.png"; // reuse USB icon for note
+            case "brain":         return "items/brain.png";
             default:              return null;
         }
     }

@@ -41,7 +41,7 @@ public class WhipWeapon extends BaseWeapon {
         final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea, CollisionLayer.ENEMY);
         for (final GameEntity target : targets) {
             if (target instanceof Damageable) {
-                ((Damageable) target).takeDamage(getBaseDamage());
+                ((Damageable) target).takeDamage(getEffectiveDamage());
             }
         }
     }

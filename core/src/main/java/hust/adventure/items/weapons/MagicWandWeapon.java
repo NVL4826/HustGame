@@ -40,13 +40,12 @@ public class MagicWandWeapon extends BaseWeapon {
         final float vy = direction.y * PROJECTILE_SPEED;
 
         if (getOwner().getFactory() != null) {
-            final Projectile projectile = getOwner().getFactory()
-                    .createProjectile(startX, startY, vx, vy, getBaseDamage(), Color.CYAN, true);
+            final Projectile projectile = getOwner().getFactory().createProjectile(startX, startY, vx, vy,
+                    getEffectiveDamage(), Color.CYAN, true);
             if (projectile != null) {
                 projectile.setPierce(getPierce());
             }
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(
-                    EventType.PLAY_SFX, "audio/sfx/magic.wav"));
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/magic.wav"));
         }
     }
 

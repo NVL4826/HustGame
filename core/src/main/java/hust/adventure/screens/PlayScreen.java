@@ -190,13 +190,18 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             }
         }
 
+        // Ưu tiên spawn point từ TMX (objectgroup "Spawn"), fallback sang LevelConfig
+        com.badlogic.gdx.math.Vector2 tmxSpawn = worldManager.getSpawnPoint();
+        float spawnX = (tmxSpawn != null) ? tmxSpawn.x : config.getSpawnX();
+        float spawnY = (tmxSpawn != null) ? tmxSpawn.y : config.getSpawnY();
+
         if (player == null) {
-            player = entityFactory.createPlayer(config.getSpawnX(), config.getSpawnY(),
+            player = entityFactory.createPlayer(spawnX, spawnY,
                     ProgressContext.instance.getGlobalInventory(), inputReader);
             cameraManager.setTarget(player);
         } else {
-            player.setX(config.getSpawnX());
-            player.setY(config.getSpawnY());
+            player.setX(spawnX);
+            player.setY(spawnY);
             player.setCollisionManager(collisionManager);
         }
 

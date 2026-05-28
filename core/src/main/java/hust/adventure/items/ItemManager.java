@@ -74,6 +74,7 @@ public final class ItemManager {
 
         register(new BaseItem("note", "Ghi chú", "Một mảnh giấy nhỏ có chữ."));
         register(new BaseItem("usb", "USB", "USB chứa mã nguồn sửa lỗi hệ thống."));
+        register(new BaseItem("brain", "Não Hoạt Động 100%", "Bảo vật từ thư viện – giúp tư duy sáng suốt."));
         register(new BaseItem("whip", "Roi da", "Tấn công kẻ địch trước mặt theo hình chữ nhật."));
         register(new BaseItem("magic_wand", "Gậy phép", "Bắn tia phép vào kẻ địch gần nhất."));
         register(new BaseItem("garlic", "Tỏi bảo hộ", "Tạo vòng hào quang gây sát thương xung quanh."));

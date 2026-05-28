@@ -2,6 +2,7 @@ package hust.adventure.items.weapons;
 
 import hust.adventure.entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import hust.adventure.core.context.ProgressContext;
 
 /**
  * Abstract base class for all weapons. Handles common functionality like cooldown management and level tracking.
@@ -118,6 +119,10 @@ public abstract class BaseWeapon implements Weaponable {
 
     public final float getBaseDamage() {
         return baseDamage * owner.getPowerMultiplier();
+    }
+
+    public final float getEffectiveDamage() {
+        return baseDamage * ProgressContext.instance.getDamageMultiplier();
     }
 
     public final void setBaseDamage(final float baseDamage) {

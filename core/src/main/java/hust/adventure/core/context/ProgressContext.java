@@ -48,6 +48,7 @@ public class ProgressContext {
     private float showEnemiesTimer = 0f;
     private boolean enemyBlinkVisible = true; // dùng cho hiệu ứng blink ở lab phase 3
     private LevelConfig currentLevelConfig = null; // màn hiện tại
+    private float damageMultiplier = 1.0f; // tăng qua level up, reset khi game over
     private Player player = null;
 
     private final Map<String, Integer> weaponLevels = new HashMap<>();
@@ -276,6 +277,14 @@ public class ProgressContext {
         this.currentLevelConfig = currentLevelConfig;
     }
 
+    public float getDamageMultiplier() {
+        return damageMultiplier;
+    }
+
+    public void setDamageMultiplier(float damageMultiplier) {
+        this.damageMultiplier = damageMultiplier;
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -313,6 +322,7 @@ public class ProgressContext {
         lightsOut = false;
         showEnemiesTimer = 0f;
         enemyBlinkVisible = true;
+        damageMultiplier = 1.0f;
         player = null;
         weaponLevels.clear();
         gearLevels.clear();

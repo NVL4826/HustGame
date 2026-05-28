@@ -49,8 +49,8 @@ public class BunDauWeapon extends BaseWeapon {
         }
 
         if (getOwner().getFactory() != null) {
-            final Projectile projectile = getOwner().getFactory().createProjectile(
-                getOwner().getX(), getOwner().getY(), vx, vy, getBaseDamage(), PROJECTILE_COLOR, true);
+            final Projectile projectile = getOwner().getFactory().createProjectile(getOwner().getX(), getOwner().getY(),
+                    vx, vy, getEffectiveDamage(), PROJECTILE_COLOR, true);
             if (projectile != null) {
                 projectile.setPierce(getPierce());
             }
@@ -69,19 +69,19 @@ public class BunDauWeapon extends BaseWeapon {
 
     private void applyLevelStats() {
         switch (getLevel()) {
-            case 2:
-                setAmount(2);
-                break;
-            case 3:
-                setAmount(3);
-                setBaseDamage(11.5f);
-                break;
-            case 4:
-                setAmount(4);
-                break;
-            case 5:
-                setPierce(2);
-                break;
+        case 2:
+            setAmount(2);
+            break;
+        case 3:
+            setAmount(3);
+            setBaseDamage(11.5f);
+            break;
+        case 4:
+            setAmount(4);
+            break;
+        case 5:
+            setPierce(2);
+            break;
         }
     }
 }
