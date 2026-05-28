@@ -1,7 +1,6 @@
 package hust.adventure.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,13 +8,15 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.input.DebugInputHandler;
 
 /**
  * Renders the debug mode overlay panel when debug mode is enabled.
- * Also manages and renders selection sub-menus for maps, items, and monsters.
+ * Queries state from DebugInputHandler to render selection menus.
  */
 public class DebugUI {
     private final OrthographicCamera uiCam;
+    private DebugInputHandler inputHandler;
 
     // UI Layout Constants to avoid magic numbers
     private static final float PANEL_X = 520f;
@@ -37,126 +38,31 @@ public class DebugUI {
     private static final Color TITLE_COLOR = new Color(0.95f, 0.61f, 0.07f, 1f);
     private static final Color HIGHLIGHT_BG = new Color(0.18f, 0.50f, 0.93f, 0.35f);
 
-    public enum SelectionMode {
-        NONE, MAP, ITEM, MONSTER
-    }
-
-    public static class DebugOption {
-        public final String id;
-        public final String displayName;
-
-        public DebugOption(String id, String displayName) {
-            this.id = id;
-            this.displayName = displayName;
-        }
-    }
-
-    private static final DebugOption[] MAP_OPTIONS = {
-        new DebugOption("tang1.tmx", "Floor 1 (tang1)"),
-        new DebugOption("library.tmx", "Library"),
-        new DebugOption("lab.tmx", "Lab"),
-        new DebugOption("boss_room.tmx", "Boss Room"),
-        new DebugOption("Final Outside.tmx", "Final Outside"),
-        new DebugOption("test.tmx", "Test Map"),
-        new DebugOption("tsx/map_1.tmx", "Map 1")
-    };
-
-    private static final DebugOption[] ITEM_OPTIONS = {
-        new DebugOption("coffee_den", "Coffee Den"),
-        new DebugOption("coffee_sua", "Coffee Sua"),
-        new DebugOption("coffee_da", "Coffee Da"),
-        new DebugOption("coffee_chon", "Coffee Chon"),
-        new DebugOption("energy_drink", "Energy Drink"),
-        new DebugOption("kho_ga", "Dried Chicken"),
-        new DebugOption("whip", "Whip (Roi)"),
-        new DebugOption("magic_wand", "Magic Wand (Đua)"),
-        new DebugOption("garlic", "Garlic (Toi)"),
-        new DebugOption("bun_dau", "Bun Dau (Đậu)")
-    };
-
-    private static final DebugOption[] MONSTER_OPTIONS = {
-        new DebugOption("syntax_error", "Syntax Error"),
-        new DebugOption("null_pointer", "Null Pointer"),
-        new DebugOption("infinite_loop", "Infinite Loop"),
-        new DebugOption("stack_overflow", "Stack Overflow"),
-        new DebugOption("libboss", "Library Boss"),
-        new DebugOption("finalboss", "Final Boss (THT)")
-    };
-
-    private SelectionMode activeMode = SelectionMode.NONE;
-    private SelectionMode previousMode = SelectionMode.NONE;
-    private DebugOption[] currentOptions = null;
-    private int selectedIndex = 0;
-
+    /**
+     * Constructs a new DebugUI.
+     */
     public DebugUI() {
         this.uiCam = new OrthographicCamera();
         this.uiCam.setToOrtho(false, CAM_VIEW_WIDTH, CAM_VIEW_HEIGHT);
         this.uiCam.update();
     }
 
-    public void startSelection(SelectionMode mode) {
-        this.activeMode = mode;
-        this.previousMode = mode;
-        this.selectedIndex = 0;
-        switch (mode) {
-            case MAP:
-                this.currentOptions = MAP_OPTIONS;
-                break;
-            case ITEM:
-                this.currentOptions = ITEM_OPTIONS;
-                break;
-            case MONSTER:
-                this.currentOptions = MONSTER_OPTIONS;
-                break;
-            default:
-                this.activeMode = SelectionMode.NONE;
-                this.previousMode = SelectionMode.NONE;
-                this.currentOptions = null;
-                break;
-        }
-    }
-
-    public boolean isActive() {
-        return activeMode != SelectionMode.NONE;
-    }
-
-    public SelectionMode getPreviousMode() {
-        return previousMode;
-    }
-
-    public void cancelSelection() {
-        this.activeMode = SelectionMode.NONE;
-        this.currentOptions = null;
+    /**
+     * Sets the input handler from which the UI queries selection state.
+     *
+     * @param inputHandler the debug input handler
+     */
+    public void setInputHandler(final DebugInputHandler inputHandler) {
+        this.inputHandler = inputHandler;
     }
 
     /**
-     * Updates selection menu input.
-     * @return selected DebugOption if confirmed, null otherwise.
+     * Renders the debug panel overlay and any active selection menus.
+     *
+     * @param batch         the sprite batch
+     * @param shapeRenderer the shape renderer
+     * @param font          the bitmap font
      */
-    public DebugOption handleSelectionInput() {
-        if (!isActive() || currentOptions == null) {
-            return null;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            selectedIndex = (selectedIndex - 1 + currentOptions.length) % currentOptions.length;
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            selectedIndex = (selectedIndex + 1) % currentOptions.length;
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            cancelSelection();
-            return null;
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            DebugOption selection = currentOptions[selectedIndex];
-            cancelSelection();
-            return selection;
-        }
-
-        return null;
-    }
-
     public void render(final SpriteBatch batch, final ShapeRenderer shapeRenderer, final BitmapFont font) {
         if (!ProgressContext.instance.isShowDebug()) {
             return;
@@ -170,6 +76,11 @@ public class DebugUI {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
+        final boolean active = (inputHandler != null && inputHandler.isActive());
+        final DebugOption[] currentOptions = (inputHandler != null) ? inputHandler.getCurrentOptions() : null;
+        final int selectedIndex = (inputHandler != null) ? inputHandler.getSelectedIndex() : 0;
+        final SelectionMode activeMode = (inputHandler != null) ? inputHandler.getActiveMode() : SelectionMode.NONE;
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         
         // Main panel background
@@ -177,7 +88,7 @@ public class DebugUI {
         shapeRenderer.rect(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT);
         
         // Selection panel background if active
-        if (isActive() && currentOptions != null) {
+        if (active && currentOptions != null) {
             shapeRenderer.rect(SELECT_X, SELECT_Y, SELECT_WIDTH, SELECT_HEIGHT);
             
             // Render selected option highlight background
@@ -191,7 +102,7 @@ public class DebugUI {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(BORDER_COLOR);
         shapeRenderer.rect(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT);
-        if (isActive() && currentOptions != null) {
+        if (active && currentOptions != null) {
             shapeRenderer.rect(SELECT_X, SELECT_Y, SELECT_WIDTH, SELECT_HEIGHT);
         }
         shapeRenderer.end();
@@ -258,9 +169,9 @@ public class DebugUI {
         font.draw(batch, "[F8] Spawn Monster", PANEL_X + 15f, PANEL_Y + PANEL_HEIGHT - 330f);
 
         // Render Selection list if active
-        if (isActive() && currentOptions != null) {
+        if (active && currentOptions != null) {
             font.setColor(TITLE_COLOR);
-            String title = "SELECT " + activeMode.name();
+            final String title = "SELECT " + activeMode.name();
             font.draw(batch, title, SELECT_X + 20f, SELECT_Y + SELECT_HEIGHT - 20f);
 
             font.setColor(Color.LIGHT_GRAY);

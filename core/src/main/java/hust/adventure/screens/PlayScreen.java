@@ -102,6 +102,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.inputReader = new InputReader();
         this.lightingManager = new LightingManager();
         this.debugInputHandler = new DebugInputHandler(uiManager, entityFactory, game.getAssetManager());
+        this.uiManager.getDebugUI().setInputHandler(debugInputHandler);
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
         EventDispatcher.getInstance().addListener(EventType.TREASURE_OPENED, this);
