@@ -8,7 +8,6 @@ import hust.adventure.entities.state.IdleState;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
  * Base implementation of a game entity. Provides positioning, bounding box, and basic state management.
@@ -144,7 +143,5 @@ public abstract class BaseEntity implements GameEntity, Collidable {
         return out.set(x - width / 2f, y - height / 2f, width, height);
     }
 
-    public void drawRect(SpriteBatch batch, float x, float y, float width, float height, Color color) {
-        ShapeDrawUtils.drawRect(batch, x, y, width, height, color);
-    }
+
 }

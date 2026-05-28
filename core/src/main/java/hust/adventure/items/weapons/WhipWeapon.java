@@ -12,6 +12,7 @@ import hust.adventure.entities.base.Damageable;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
+import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
  * A whip weapon that hits enemies in a rectangular area in front of the player.
@@ -58,7 +59,7 @@ public class WhipWeapon extends BaseWeapon {
     public void draw(final SpriteBatch batch) {
         if (flashTimer > 0) {
             // Draw a semi-transparent rectangle for the whip effect
-            getOwner().drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height, new Color(1, 1, 1, 0.5f));
+            ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height, new Color(1, 1, 1, 0.5f));
         }
     }
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.entities.components.ChaseBehavior;
+import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
  * Basic enemy that chases the player.
@@ -23,6 +24,6 @@ public class NullPointerEnemy extends BaseEnemy {
 
     @Override
     protected void renderSpecific(SpriteBatch batch) {
-        drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), getColor());
+        ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(), getColor());
     }
 }
