@@ -6,10 +6,9 @@ import hust.adventure.collision.Collider;
 import hust.adventure.entities.state.EntityState;
 import hust.adventure.entities.state.IdleState;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
  * Base implementation of a game entity. Provides positioning, bounding box, and basic state management.
@@ -23,7 +22,6 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     private boolean isDestroyed;
     private EntityState state;
     private Collider collider;
-    private static Texture whitePixel;
 
     public BaseEntity() {
         this.bounds = new Rectangle();
@@ -141,28 +139,12 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     public void dispose() {
     }
 
-    public static void disposeStaticResources() {
-        if (whitePixel != null) {
-            whitePixel.dispose();
-            whitePixel = null;
-        }
-    }
-
     @Override
     public Rectangle getMovementBounds(float x, float y, Rectangle out) {
         return out.set(x - width / 2f, y - height / 2f, width, height);
     }
 
     public void drawRect(SpriteBatch batch, float x, float y, float width, float height, Color color) {
-        if (whitePixel == null) {
-            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pixmap.setColor(Color.WHITE);
-            pixmap.fill();
-            whitePixel = new Texture(pixmap);
-            pixmap.dispose();
-        }
-        batch.setColor(color);
-        batch.draw(whitePixel, x, y, width, height);
-        batch.setColor(Color.WHITE);
+        ShapeDrawUtils.drawRect(batch, x, y, width, height, color);
     }
 }
