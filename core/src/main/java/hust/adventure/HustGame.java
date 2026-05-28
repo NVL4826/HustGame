@@ -21,6 +21,11 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.screens.levels.LevelFactory;
+import hust.adventure.screens.GameOverScreen;
+import hust.adventure.ui.HUD;
+import hust.adventure.ui.InventoryUI;
+import hust.adventure.entities.interactables.ItemDrop;
+import hust.adventure.items.weapons.GarlicAuraWeapon;
 import hust.adventure.core.audio.AudioManager;
 import com.badlogic.gdx.Screen;
 
@@ -148,12 +153,13 @@ public class HustGame extends Game implements EventListener {
             assetManager.dispose();
         if (screenTransition != null)
             screenTransition.dispose();
-        hust.adventure.screens.GameOverScreen.disposeStatic();
-        hust.adventure.ui.HUD.disposeStatic();
-        hust.adventure.ui.InventoryUI.disposeStatic();
-        hust.adventure.entities.interactables.ItemDrop.disposeStaticResources();
+        GameOverScreen.disposeStatic();
+        HUD.disposeStatic();
+        InventoryUI.disposeStatic();
+        ItemDrop.disposeStaticResources();
         Projectile.disposeStaticResources();
         BaseEntity.disposeStaticResources();
+        GarlicAuraWeapon.disposeStatic();
     }
 
     public SpriteBatch getSpriteBatch() {

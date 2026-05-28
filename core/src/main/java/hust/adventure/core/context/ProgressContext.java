@@ -4,6 +4,7 @@ import hust.adventure.gamestate.GameState;
 import hust.adventure.gamestate.PlayingGameState;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.entities.Player;
+import hust.adventure.core.config.LevelConfig;
 
 /**
  * Manages the global game data and current game flow state.
@@ -44,7 +45,7 @@ public class ProgressContext {
     private boolean lightsOut = false;
     private float showEnemiesTimer = 0f;
     private boolean enemyBlinkVisible = true; // dùng cho hiệu ứng blink ở lab phase 3
-    private hust.adventure.core.config.LevelConfig currentLevelConfig = null; // màn hiện tại
+    private LevelConfig currentLevelConfig = null; // màn hiện tại
     private Player player = null;
 
     // State Pattern
@@ -262,11 +263,11 @@ public class ProgressContext {
         this.enemyBlinkVisible = enemyBlinkVisible;
     }
 
-    public hust.adventure.core.config.LevelConfig getCurrentLevelConfig() {
+    public LevelConfig getCurrentLevelConfig() {
         return currentLevelConfig;
     }
 
-    public void setCurrentLevelConfig(hust.adventure.core.config.LevelConfig currentLevelConfig) {
+    public void setCurrentLevelConfig(LevelConfig currentLevelConfig) {
         this.currentLevelConfig = currentLevelConfig;
     }
 

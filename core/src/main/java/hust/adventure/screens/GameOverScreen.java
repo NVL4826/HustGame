@@ -2,6 +2,7 @@ package hust.adventure.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -222,7 +223,7 @@ public class GameOverScreen extends BaseScreen {
                     LevelID.MAP_1.getAmbientColor());
         }
         ProgressContext.instance.reset();
-        com.badlogic.gdx.Screen next = LevelFactory.createLevel(game, savedConfig);
+        Screen next = LevelFactory.createLevel(game, savedConfig);
         if (next != null) {
             game.getScreenTransition().fadeOut(next, 0.5f);
         }

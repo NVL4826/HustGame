@@ -16,6 +16,11 @@ public abstract class BaseWeapon implements Weaponable {
     private final String id;
     private final String name;
     private final String description;
+    private int amount;
+    private int pierce;
+    private float projectileInterval;
+    private int shotsRemaining;
+    private float shotTimer;
 
     public BaseWeapon(final Player owner, final String id, final String name, final String description,
             final float baseDamage, final float cooldown, final float area) {
@@ -40,6 +45,11 @@ public abstract class BaseWeapon implements Weaponable {
         this.cooldown = cooldown;
         this.area = area;
         this.currentCooldownTimer = 0;
+        this.amount = 1;
+        this.pierce = 1;
+        this.projectileInterval = 0.1f;
+        this.shotsRemaining = 0;
+        this.shotTimer = 0f;
     }
 
     @Override
@@ -53,7 +63,16 @@ public abstract class BaseWeapon implements Weaponable {
             currentCooldownTimer -= deltaTime;
         }
 
-        if (isAutoFiring() && currentCooldownTimer <= 0) {
+        if (shotsRemaining > 0) {
+            shotTimer -= deltaTime;
+            if (shotTimer <= 0) {
+                executeAttackAction();
+                shotsRemaining--;
+                shotTimer = projectileInterval;
+            }
+        }
+
+        if (isAutoFiring() && currentCooldownTimer <= 0 && shotsRemaining == 0) {
             fire();
         }
     }
@@ -61,8 +80,13 @@ public abstract class BaseWeapon implements Weaponable {
     @Override
     public final void fire() {
         if (currentCooldownTimer <= 0) {
-            executeAttackAction();
-            currentCooldownTimer = cooldown;
+            if (amount <= 1) {
+                executeAttackAction();
+            } else {
+                shotsRemaining = amount;
+                shotTimer = 0f;
+            }
+            currentCooldownTimer = getCooldown();
         }
     }
 
@@ -93,7 +117,7 @@ public abstract class BaseWeapon implements Weaponable {
     }
 
     public final float getBaseDamage() {
-        return baseDamage;
+        return baseDamage * owner.getPowerMultiplier();
     }
 
     public final void setBaseDamage(final float baseDamage) {
@@ -101,7 +125,7 @@ public abstract class BaseWeapon implements Weaponable {
     }
 
     public final float getCooldown() {
-        return cooldown;
+        return cooldown * owner.getCooldownMultiplier();
     }
 
     public final void setCooldown(final float cooldown) {
@@ -109,11 +133,43 @@ public abstract class BaseWeapon implements Weaponable {
     }
 
     public final float getArea() {
-        return area;
+        return area * owner.getAreaMultiplier();
     }
 
     public final void setArea(final float area) {
         this.area = area;
+    }
+
+    public final int getAmount() {
+        return amount;
+    }
+
+    public final void setAmount(final int amount) {
+        this.amount = amount;
+    }
+
+    public final int getPierce() {
+        return pierce;
+    }
+
+    public final void setPierce(final int pierce) {
+        this.pierce = pierce;
+    }
+
+    public final float getProjectileInterval() {
+        return projectileInterval;
+    }
+
+    public final void setProjectileInterval(final float projectileInterval) {
+        this.projectileInterval = projectileInterval;
+    }
+
+    public final int getShotsRemaining() {
+        return shotsRemaining;
+    }
+
+    protected final void setShotsRemaining(final int shotsRemaining) {
+        this.shotsRemaining = shotsRemaining;
     }
 
     public final float getCurrentCooldownTimer() {

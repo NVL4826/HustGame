@@ -45,6 +45,10 @@ import hust.adventure.ui.components.DamageIncreaseAction;
 import hust.adventure.ui.components.HealAction;
 import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.items.Item;
+import hust.adventure.items.Gear;
+import hust.adventure.items.weapons.Weaponable;
+import hust.adventure.ui.components.WeaponUpgradeAction;
+import hust.adventure.ui.components.GearUpgradeAction;
 import hust.adventure.items.ItemManager;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
@@ -231,7 +235,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         final IntArray fg = new IntArray();
 
         for (int i = 0; i < worldManager.getCurrentMap().getLayers().size(); i++) {
-            final com.badlogic.gdx.maps.MapLayer layer = worldManager.getCurrentMap().getLayers().get(i);
+            final MapLayer layer = worldManager.getCurrentMap().getLayers().get(i);
             if (isBackgroundLayer(layer)) {
                 bg.add(i);
             } else {
@@ -242,7 +246,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         foregroundLayers = fg.toArray();
     }
 
-    private boolean isBackgroundLayer(final com.badlogic.gdx.maps.MapLayer layer) {
+    private boolean isBackgroundLayer(final MapLayer layer) {
         if (layer == null) {
             return false;
         }
@@ -373,11 +377,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private void executeDebugAction(DebugUI.SelectionMode mode, DebugUI.DebugOption option) {
         if (mode == DebugUI.SelectionMode.MAP) {
             String targetMap = option.id;
-            hust.adventure.events.MapTransitionData data = new hust.adventure.events.MapTransitionData(targetMap, 400f,
-                    400f);
-            hust.adventure.events.GameEvent<hust.adventure.events.MapTransitionData> event = new hust.adventure.events.GameEvent<>(
-                    hust.adventure.events.EventType.MAP_TRANSITION, data);
-            hust.adventure.events.EventDispatcher.getInstance().dispatch(event);
+            MapTransitionData data = new MapTransitionData(targetMap, 400f, 400f);
+            GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
+            EventDispatcher.getInstance().dispatch(event);
         } else if (mode == DebugUI.SelectionMode.ITEM) {
             String itemId = option.id;
             Item item = ItemManager.instance.getItem(itemId);
@@ -421,13 +423,135 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
     }
 
+    private Array<UpgradeAction> getLevelUpChoices(final Player player) {
+        final Array<UpgradeAction> possibleChoices = new Array<>();
+
+        // 1. Gather Weapon Choices
+        final String[] weaponIds = {"whip", "magic_wand", "garlic", "bun_dau"};
+        for (final String id : weaponIds) {
+            Weaponable weapon = null;
+            for (final Weaponable w : player.getWeaponManager().getWeapons()) {
+                if (w.getId().equalsIgnoreCase(id)) {
+                    weapon = w;
+                    break;
+                }
+            }
+
+            if (weapon == null) {
+                possibleChoices.add(new WeaponUpgradeAction(id, getWeaponName(id), getWeaponLevelDescription(id, 1), true));
+            } else if (weapon.getLevel() < 5) {
+                final int nextLevel = weapon.getLevel() + 1;
+                possibleChoices.add(new WeaponUpgradeAction(id, getWeaponName(id) + " (Cấp " + nextLevel + ")", getWeaponLevelDescription(id, nextLevel), false));
+            }
+        }
+
+        // 2. Gather Gear Choices
+        final String[] gearIds = {"spinach", "empty_tome", "wings", "hollow_heart", "candelabrador", "attractorb"};
+        for (final String id : gearIds) {
+            final Gear gear = player.getGearManager().getGear(id);
+            if (gear == null) {
+                possibleChoices.add(new GearUpgradeAction(id, getGearName(id), getGearLevelDescription(id, 1), true));
+            } else if (gear.getLevel() < 5) {
+                final int nextLevel = gear.getLevel() + 1;
+                possibleChoices.add(new GearUpgradeAction(id, getGearName(id) + " (Cấp " + nextLevel + ")", getGearLevelDescription(id, nextLevel), false));
+            }
+        }
+
+        // Fallbacks if nothing is available
+        if (possibleChoices.size == 0) {
+            possibleChoices.add(new HealAction());
+            possibleChoices.add(new DamageIncreaseAction());
+        }
+
+        possibleChoices.shuffle();
+        final Array<UpgradeAction> finalChoices = new Array<>();
+        for (int i = 0; i < Math.min(3, possibleChoices.size); i++) {
+            finalChoices.add(possibleChoices.get(i));
+        }
+        return finalChoices;
+    }
+
+    private String getWeaponName(final String id) {
+        switch (id.toLowerCase()) {
+            case "whip": return "Roi Da (Whip)";
+            case "magic_wand": return "Gậy Phép (Magic Wand)";
+            case "garlic": return "Tỏi Bảo Hộ (Garlic)";
+            case "bun_dau": return "Bún Đậu (Knife)";
+            default: return id;
+        }
+    }
+
+    private String getWeaponLevelDescription(final String id, final int level) {
+        switch (id.toLowerCase()) {
+            case "whip":
+                switch (level) {
+                    case 1: return "Tấn công theo chiều ngang, xuyên qua mọi kẻ địch.";
+                    case 2: return "Tấn công thêm 1 lần (ngược hướng).";
+                    case 3: return "Sát thương gốc +5.";
+                    case 4: return "Kích thước vùng đánh +10%, Sát thương gốc +5.";
+                    case 5: return "Sát thương gốc +5.";
+                }
+                break;
+            case "magic_wand":
+                switch (level) {
+                    case 1: return "Bắn tự động vào kẻ địch gần nhất.";
+                    case 2: return "Bắn thêm 1 tia phép.";
+                    case 3: return "Giảm hồi chiêu đi 0.2 giây.";
+                    case 4: return "Bắn thêm 1 tia phép.";
+                    case 5: return "Sát thương gốc +10.";
+                }
+                break;
+            case "garlic":
+                switch (level) {
+                    case 1: return "Tạo vòng bảo hộ gây sát thương xung quanh.";
+                    case 2: return "Phạm vi +40%, Sát thương gốc +2.";
+                    case 3: return "Giảm hồi chiêu đi 0.1s, Sát thương gốc +1.";
+                    case 4: return "Phạm vi +20%, Sát thương gốc +1.";
+                    case 5: return "Giảm hồi chiêu đi 0.1s, Sát thương gốc +2.";
+                }
+                break;
+            case "bun_dau":
+                switch (level) {
+                    case 1: return "Bắn theo hướng di chuyển cuối cùng khi bấm Space.";
+                    case 2: return "Bắn thêm 1 viên đậu.";
+                    case 3: return "Bắn thêm 1 viên đậu, Sát thương gốc +5.";
+                    case 4: return "Bắn thêm 1 viên đậu.";
+                    case 5: return "Viên đậu xuyên qua thêm 1 mục tiêu.";
+                }
+                break;
+        }
+        return "";
+    }
+
+    private String getGearName(final String id) {
+        switch (id.toLowerCase()) {
+            case "spinach": return "Hành Tây (Spinach)";
+            case "empty_tome": return "Sách Rỗng (Empty Tome)";
+            case "wings": return "Đôi Cánh (Wings)";
+            case "hollow_heart": return "Trái Tim Rỗng (Hollow Heart)";
+            case "candelabrador": return "Chân Nến (Candelabrador)";
+            case "attractorb": return "Nam Châm (Attractorb)";
+            default: return id;
+        }
+    }
+
+    private String getGearLevelDescription(final String id, final int level) {
+        switch (id.toLowerCase()) {
+            case "spinach": return "Tăng 10% sát thương cho tất cả vũ khí (Cấp " + level + ").";
+            case "empty_tome": return "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp " + level + ").";
+            case "wings": return "Tăng 10% tốc độ di chuyển của nhân vật (Cấp " + level + ").";
+            case "hollow_heart": return "Tăng 20% lượng HP tối đa (+20 HP) (Cấp " + level + ").";
+            case "candelabrador": return "Tăng 20% phạm vi tấn công của vũ khí (Cấp " + level + ").";
+            case "attractorb": return "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp " + level + ").";
+        }
+        return "";
+    }
+
     @Override
     public void onEvent(GameEvent<?> event) {
         if (event.getType() == EventType.LEVEL_UP) {
             this.state = PlayMode.IN_UI;
-            Array<UpgradeAction> choices = new Array<>();
-            choices.add(new DamageIncreaseAction());
-            choices.add(new HealAction());
+            final Array<UpgradeAction> choices = getLevelUpChoices(player);
             uiManager.getLevelUpUI().setChoices(choices);
             uiManager.getLevelUpUI().setOnResume(() -> {
                 this.state = PlayMode.RUNNING;

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Array;
+import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.base.BaseEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
@@ -24,8 +26,8 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
     private float damage;
     private float startX, startY;
     private static final float MAX_RANGE = 2000f;
-
-    /** Shared bullet texture loaded once, disposed with disposeStaticResources(). */
+    private int pierce = 1;
+    private final Array<GameEntity> hitEntities = new Array<>();
     private static Texture bulletTexture;
 
     public Projectile() {
@@ -48,6 +50,8 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
         this.startX = x;
         this.startY = y;
         setDestroyed(false);
+        this.pierce = 1;
+        this.hitEntities.clear();
     }
 
     /** Lazily load the bullet texture the first time it is needed. */
@@ -74,6 +78,8 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
         damage = 0;
         color = Color.WHITE;
         isPlayerProjectile = false;
+        pierce = 1;
+        hitEntities.clear();
         if (getCollider() != null) {
             getCollider().setListener(null);
         }
@@ -86,13 +92,27 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
             collider.setListener(other -> {
                 if (isPlayerProjectile) {
                     if (other instanceof BaseEnemy) {
-                        ((BaseEnemy) other).takeDamage(damage);
-                        destroy();
+                        final BaseEnemy enemy = (BaseEnemy) other;
+                        if (!hitEntities.contains(enemy, true)) {
+                            hitEntities.add(enemy);
+                            enemy.takeDamage(damage);
+                            pierce--;
+                            if (pierce <= 0) {
+                                destroy();
+                            }
+                        }
                     }
                 } else {
                     if (other instanceof Player) {
-                        ((Player) other).takeDamage(damage);
-                        destroy();
+                        final Player player = (Player) other;
+                        if (!hitEntities.contains(player, true)) {
+                            hitEntities.add(player);
+                            player.takeDamage(damage);
+                            pierce--;
+                            if (pierce <= 0) {
+                                destroy();
+                            }
+                        }
                     }
                 }
                 // Walls or other obstacles can also destroy the projectile
@@ -101,6 +121,14 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
                 }
             });
         }
+    }
+
+    public int getPierce() {
+        return pierce;
+    }
+
+    public void setPierce(final int pierce) {
+        this.pierce = pierce;
     }
 
     @Override

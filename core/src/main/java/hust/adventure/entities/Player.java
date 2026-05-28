@@ -30,6 +30,8 @@ import hust.adventure.items.weapons.WeaponFactory;
 import hust.adventure.items.weapons.WeaponManager;
 import hust.adventure.items.weapons.Weaponable;
 import hust.adventure.entities.base.GameEntity;
+import hust.adventure.items.Gear;
+import hust.adventure.items.GearManager;
 
 /**
  * Main player character class.
@@ -38,6 +40,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
     private final Inventory inventory;
     private final PlayerController controller;
     private final WeaponManager weaponManager;
+    private final GearManager gearManager;
     private CollisionManager collisionManager;
     private EntityFactory entityFactory;
 
@@ -73,6 +76,7 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.controller = controller;
         this.collisionManager = collisionManager;
         this.weaponManager = new WeaponManager(this);
+        this.gearManager = new GearManager();
         this.iframeTimer = 0f;
 
         // Starting weapon
@@ -176,6 +180,15 @@ public class Player extends BaseActor implements Targetable, EventListener {
             ProgressContext.instance.setPlayer(this);
         }
 
+        float wingsSpeedMultiplier = 1.0f;
+        if (gearManager != null) {
+            final Gear wings = gearManager.getGear("wings");
+            if (wings != null) {
+                wingsSpeedMultiplier += wings.getLevel() * 0.10f;
+            }
+        }
+        setSpeedMultiplier(wingsSpeedMultiplier);
+
         super.update(delta);
         // Sync stats to global context for UI/saving
         ProgressContext.instance.setHp(getHp());
@@ -183,7 +196,8 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
         // Magnetic radius for ExpGem
         if (collisionManager != null) {
-            Array<GameEntity> items = collisionManager.getEntitiesInRadius(getX(), getY(), 150f,
+            final float magnetRadius = 150f * getMagnetMultiplier();
+            Array<GameEntity> items = collisionManager.getEntitiesInRadius(getX(), getY(), magnetRadius,
                     CollisionLayer.ITEM);
             for (GameEntity item : items) {
                 if (item instanceof ExpGem) {
@@ -282,6 +296,65 @@ public class Player extends BaseActor implements Targetable, EventListener {
 
     public final WeaponManager getWeaponManager() {
         return weaponManager;
+    }
+
+    public final GearManager getGearManager() {
+        return gearManager;
+    }
+
+
+
+    public float getPowerMultiplier() {
+        float mult = 1.0f;
+        if (gearManager != null) {
+            final Gear spinach = gearManager.getGear("spinach");
+            if (spinach != null) {
+                mult += spinach.getLevel() * 0.10f;
+            }
+        }
+        return mult;
+    }
+
+    public float getCooldownMultiplier() {
+        float mult = 1.0f;
+        if (gearManager != null) {
+            final Gear emptyTome = gearManager.getGear("empty_tome");
+            if (emptyTome != null) {
+                mult -= emptyTome.getLevel() * 0.08f;
+            }
+        }
+        return Math.max(0.2f, mult);
+    }
+
+    public float getAreaMultiplier() {
+        float mult = 1.0f;
+        if (gearManager != null) {
+            final Gear candelabrador = gearManager.getGear("candelabrador");
+            if (candelabrador != null) {
+                mult += candelabrador.getLevel() * 0.20f;
+            }
+        }
+        return mult;
+    }
+
+    public float getMagnetMultiplier() {
+        float mult = 1.0f;
+        if (gearManager != null) {
+            final Gear attractorb = gearManager.getGear("attractorb");
+            if (attractorb != null) {
+                mult += attractorb.getLevel() * 0.20f;
+            }
+        }
+        return mult;
+    }
+
+    public void increaseMaxHp(final float amount) {
+        final float oldMaxHp = getMaxHp();
+        final float newMaxHp = oldMaxHp + amount;
+        setMaxHp(newMaxHp);
+        heal(amount);
+        ProgressContext.instance.setMaxHp(newMaxHp);
+        ProgressContext.instance.setHp(getHp());
     }
 
     public void setFactory(final EntityFactory factory) {

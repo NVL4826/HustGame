@@ -11,6 +11,9 @@ import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.entities.Player;
 import hust.adventure.ui.components.UpgradeAction;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.GameEvent;
+import hust.adventure.events.EventType;
 
 public class LevelUpUI {
     private OrthographicCamera uiCam;
@@ -100,8 +103,8 @@ public class LevelUpUI {
         if (keyPressed > 0 && keyPressed <= currentChoices.size) {
             UpgradeAction action = currentChoices.get(keyPressed - 1);
             action.execute(player);
-            hust.adventure.events.EventDispatcher.getInstance().dispatch(
-                new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
+            EventDispatcher.getInstance().dispatch(
+                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
             );
             if (onResume != null) {
                 onResume.run();

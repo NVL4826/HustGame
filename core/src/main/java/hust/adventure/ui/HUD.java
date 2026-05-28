@@ -1,5 +1,6 @@
 package hust.adventure.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -129,7 +130,7 @@ public class HUD {
                 ProgressContext.instance.getExp() / ProgressContext.instance.getExpToNextLevel()));
 
         // Pulse timer cho HP thấp
-        pulseTimer += com.badlogic.gdx.Gdx.graphics.getDeltaTime();
+        pulseTimer += Gdx.graphics.getDeltaTime();
         boolean lowHp = hpPct < 0.25f;
         float pulse = (float)(Math.sin(pulseTimer * 5.0) * 0.5 + 0.5); // 0→1
 
