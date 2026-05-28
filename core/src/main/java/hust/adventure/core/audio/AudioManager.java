@@ -9,30 +9,32 @@ import com.badlogic.gdx.utils.ObjectMap;
 import hust.adventure.core.GameAssetManager;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
-import hust.adventure.events.EventType;
 import hust.adventure.events.EntityDamagedEvent;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.BaseEnemy;
 
 /**
- * Robust audio management system for Hust Adventure.
- * Handles sound categories, pitch randomization, throttling, and smooth music crossfading.
+ * Robust audio management system for Hust Adventure. Handles sound categories, pitch randomization, throttling, and
+ * smooth music crossfading.
  */
 public class AudioManager implements EventListener, Disposable {
     private final GameAssetManager assetManager;
 
     private float masterVolume = 1.0f;
     private float musicVolume = 0.4f; // Mix Hierarchy: background music is softer
-    private float sfxVolume = 0.8f;   // SFX is prominent
-    private float uiVolume = 0.9f;    // UI is distinct
+    private float sfxVolume = 0.8f; // SFX is prominent
+    private float uiVolume = 0.9f; // UI is distinct
 
     // Music State & Crossfading
     private Music currentMusic;
     private String currentMusicPath;
     private Music nextMusic;
     private String nextMusicPath;
-    
-    private enum FadeState { NONE, FADING_OUT, FADING_IN }
+
+    private enum FadeState {
+        NONE, FADING_OUT, FADING_IN
+    }
+
     private FadeState fadeState = FadeState.NONE;
     private float fadeTimer = 0f;
     private static final float FADE_DURATION = 0.5f; // half a second crossfade
@@ -72,7 +74,7 @@ public class AudioManager implements EventListener, Disposable {
                 currentMusicPath = nextMusicPath;
                 nextMusic = null;
                 nextMusicPath = null;
-                
+
                 if (currentMusic != null) {
                     currentMusic.setVolume(0f);
                     currentMusic.setLooping(true);
@@ -100,7 +102,8 @@ public class AudioManager implements EventListener, Disposable {
     }
 
     public void playSound(final String path, boolean isUi) {
-        if (path == null) return;
+        if (path == null)
+            return;
 
         // Sound Throttling: limit spamming of the same SFX
         long now = System.currentTimeMillis();
@@ -114,7 +117,7 @@ public class AudioManager implements EventListener, Disposable {
             Sound sound = assetManager.getSound(path);
             if (sound != null) {
                 float volume = (isUi ? uiVolume : sfxVolume) * masterVolume;
-                
+
                 // Pitch Randomization to prevent fatigue, except for UI sounds
                 float pitch = 1.0f;
                 if (!isUi && isPitchRandomizable(path)) {
@@ -129,13 +132,13 @@ public class AudioManager implements EventListener, Disposable {
     }
 
     private boolean isPitchRandomizable(String path) {
-        return path.contains("shoot") || path.contains("whip") || 
-               path.contains("magic") || path.contains("hit") || 
-               path.contains("pickup") || path.contains("die");
+        return path.contains("shoot") || path.contains("whip") || path.contains("magic") || path.contains("hit")
+                || path.contains("pickup") || path.contains("die");
     }
 
     public void playMusic(final String path, boolean loop) {
-        if (path == null) return;
+        if (path == null)
+            return;
         if (currentMusicPath != null && currentMusicPath.equals(path)) {
             // Already playing or switching to this music
             return;
@@ -146,7 +149,8 @@ public class AudioManager implements EventListener, Disposable {
 
         try {
             Music loadedMusic = assetManager.getMusic(path);
-            if (loadedMusic == null) return;
+            if (loadedMusic == null)
+                return;
 
             // If no music is currently playing, start immediately
             if (currentMusic == null) {
@@ -216,54 +220,54 @@ public class AudioManager implements EventListener, Disposable {
     @Override
     public void onEvent(final GameEvent<?> event) {
         switch (event.getType()) {
-            case PLAY_SFX:
-                if (event.getData() instanceof String) {
-                    String path = (String) event.getData();
-                    playSound(path, path != null && path.contains("ui"));
+        case PLAY_SFX:
+            if (event.getData() instanceof String) {
+                String path = (String) event.getData();
+                playSound(path, path != null && path.contains("ui"));
+            }
+            break;
+        case PLAY_BGM:
+            if (event.getData() instanceof String) {
+                playMusic((String) event.getData(), true);
+            }
+            break;
+        case LEVEL_UP:
+            playSound("audio/sfx/level_up.wav", false);
+            break;
+        case ITEM_PICKED_UP:
+            playSound("audio/sfx/pickup.wav", false);
+            break;
+        case ITEM_USED:
+            playSound("audio/sfx/item_use.wav", false);
+            break;
+        case TREASURE_OPENED:
+            playSound("audio/sfx/chest_open.wav", false);
+            break;
+        case PUZZLE_SOLVED:
+            playSound("audio/sfx/puzzle_solved.wav", false);
+            break;
+        case PUZZLE_FAILED:
+            playSound("audio/sfx/puzzle_failed.wav", false);
+            break;
+        case ENTITY_DAMAGED:
+            if (event.getData() instanceof EntityDamagedEvent) {
+                EntityDamagedEvent edEvent = (EntityDamagedEvent) event.getData();
+                if (edEvent.getEntity() instanceof Player) {
+                    playSound("audio/sfx/player_hit.wav", false);
+                } else if (edEvent.getEntity() instanceof BaseEnemy) {
+                    playSound("audio/sfx/enemy_hit.wav", false);
                 }
-                break;
-            case PLAY_BGM:
-                if (event.getData() instanceof String) {
-                    playMusic((String) event.getData(), true);
-                }
-                break;
-            case LEVEL_UP:
-                playSound("audio/sfx/level_up.wav", false);
-                break;
-            case ITEM_PICKED_UP:
-                playSound("audio/sfx/pickup.wav", false);
-                break;
-            case ITEM_USED:
-                playSound("audio/sfx/item_use.wav", false);
-                break;
-            case TREASURE_OPENED:
-                playSound("audio/sfx/chest_open.wav", false);
-                break;
-            case PUZZLE_SOLVED:
-                playSound("audio/sfx/puzzle_solved.wav", false);
-                break;
-            case PUZZLE_FAILED:
-                playSound("audio/sfx/puzzle_failed.wav", false);
-                break;
-            case ENTITY_DAMAGED:
-                if (event.getData() instanceof EntityDamagedEvent) {
-                    EntityDamagedEvent edEvent = (EntityDamagedEvent) event.getData();
-                    if (edEvent.getEntity() instanceof Player) {
-                        playSound("audio/sfx/player_hit.wav", false);
-                    } else if (edEvent.getEntity() instanceof BaseEnemy) {
-                        playSound("audio/sfx/enemy_hit.wav", false);
-                    }
-                }
-                break;
-            case ENTITY_DIED:
-                if (event.getData() instanceof Player) {
-                    playSound("audio/sfx/game_over.wav", false);
-                } else if (event.getData() instanceof BaseEnemy) {
-                    playSound("audio/sfx/enemy_die.wav", false);
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        case ENTITY_DIED:
+            if (event.getData() instanceof Player) {
+                playSound("audio/sfx/game_over.wav", false);
+            } else if (event.getData() instanceof BaseEnemy) {
+                playSound("audio/sfx/enemy_die.wav", false);
+            }
+            break;
+        default:
+            break;
         }
     }
 

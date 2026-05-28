@@ -92,7 +92,7 @@ public class HustGame extends Game implements EventListener {
             return;
 
         final LevelConfig config = new LevelConfig(nextId, data.getTargetMap(), data.getSpawnX(), data.getSpawnY(),
-                1.0f, null, nextId.getAmbientColor());
+                1.0f, nextId.getBgmPath(), nextId.getAmbientColor());
         final Screen nextScreen = LevelFactory.createLevel(this, config);
 
         if (nextScreen != null) {

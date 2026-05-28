@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.entities.EntityManager;
-import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.environment.WallEntity;
 
@@ -65,10 +64,22 @@ public class CollisionManager {
 
             float width = 0, height = 0, tileW = 0, tileH = 0;
 
-            if (w instanceof Integer) width = (Integer) w; else if (w instanceof Float) width = (Float) w;
-            if (h instanceof Integer) height = (Integer) h; else if (h instanceof Float) height = (Float) h;
-            if (th instanceof Integer) tileW = (Integer) th; else if (th instanceof Float) tileW = (Float) th;
-            if (tv instanceof Integer) tileH = (Integer) tv; else if (tv instanceof Float) tileH = (Float) tv;
+            if (w instanceof Integer)
+                width = (Integer) w;
+            else if (w instanceof Float)
+                width = (Float) w;
+            if (h instanceof Integer)
+                height = (Integer) h;
+            else if (h instanceof Float)
+                height = (Float) h;
+            if (th instanceof Integer)
+                tileW = (Integer) th;
+            else if (th instanceof Float)
+                tileW = (Float) th;
+            if (tv instanceof Integer)
+                tileH = (Integer) tv;
+            else if (tv instanceof Float)
+                tileH = (Float) tv;
 
             if (width > 0 && tileW > 0)
                 this.mapWidth = width * tileW;
@@ -79,7 +90,7 @@ public class CollisionManager {
                 this.mapHeight = height * tileH;
             else
                 this.mapHeight = 2000f; // Default fallback
-                
+
             Gdx.app.log("CollisionManager", "Map bounds set to: " + mapWidth + "x" + mapHeight);
         }
     }
@@ -203,7 +214,8 @@ public class CollisionManager {
             // Handle objects overlapping multiple cells using their bounding box
             float minX, maxX, minY, maxY;
             if (collider.getShape() == Collider.Shape.RECTANGLE) {
-                // For rectangles, bounds are (x - width/2, y - height/2) to (x + width/2, y + height/2) based on BaseEntity getBounds()
+                // For rectangles, bounds are (x - width/2, y - height/2) to (x + width/2, y + height/2) based on
+                // BaseEntity getBounds()
                 minX = entity.getBounds().x;
                 maxX = entity.getBounds().x + entity.getBounds().width;
                 minY = entity.getBounds().y;
@@ -317,7 +329,8 @@ public class CollisionManager {
     /**
      * Finds all entities within a circular radius that match the layer mask.
      */
-    public Array<GameEntity> getEntitiesInRadius(final float cx, final float cy, final float radius, final int layerMask) {
+    public Array<GameEntity> getEntitiesInRadius(final float cx, final float cy, final float radius,
+            final int layerMask) {
         final Array<GameEntity> result = new Array<>();
         final int startX = (int) ((cx - radius) / cellSize);
         final int startY = (int) ((cy - radius) / cellSize);
@@ -348,8 +361,8 @@ public class CollisionManager {
     }
 
     /**
-     * Finds the nearest entity to a point within a maximum range that matches the layer mask.
-     * Uses spatial hashing to expand the search radius efficiently.
+     * Finds the nearest entity to a point within a maximum range that matches the layer mask. Uses spatial hashing to
+     * expand the search radius efficiently.
      */
     public GameEntity getNearestEntity(final float cx, final float cy, final float maxRange, final int layerMask) {
         GameEntity nearest = null;
@@ -384,7 +397,7 @@ public class CollisionManager {
                     }
                 }
             }
-            // If we found something in this ring, and the ring's boundary is further than 
+            // If we found something in this ring, and the ring's boundary is further than
             // the min distance found, we can stop.
             if (foundInRange && (r * cellSize) * (r * cellSize) > minDistanceSq) {
                 break;

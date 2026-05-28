@@ -37,7 +37,9 @@ public class GameAssetManager {
         manager.load("Boss Room.jpg", Texture.class);
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);
-        manager.load("4.png", Texture.class);
+        for (int i = 4; i <= 25; i++) {
+            manager.load(i + ".png", Texture.class);
+        }
         manager.load(CHEST_TEXTURE_PATH, Texture.class);
 
         // Maps
@@ -71,6 +73,7 @@ public class GameAssetManager {
         manager.load("audio/sfx/chest_open.wav", Sound.class);
         manager.load("audio/sfx/puzzle_solved.wav", Sound.class);
         manager.load("audio/sfx/puzzle_failed.wav", Sound.class);
+        manager.load("audio/sfx/game_over.wav", Sound.class);
 
         // Music tracks
         manager.load("audio/music/menu_theme.wav", Music.class);

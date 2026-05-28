@@ -41,6 +41,18 @@ public enum LevelID {
         }
     }
 
+    /**
+     * Gets the BGM file path corresponding to the level.
+     *
+     * @return the background music file path.
+     */
+    public String getBgmPath() {
+        if (this == BOSS_ROOM) {
+            return "audio/music/boss_theme.wav";
+        }
+        return "audio/music/level_theme.wav";
+    }
+
     public boolean isInfinite() {
         return this == MAP_1;
     }

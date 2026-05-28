@@ -1,10 +1,8 @@
 package hust.adventure.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,17 +12,16 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.LootDropService;
 import hust.adventure.core.ScenarioService;
 import hust.adventure.core.config.LevelConfig;
-import hust.adventure.core.config.LevelID;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
+import hust.adventure.entities.PlayerPersistenceService;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.factory.EntityFactory;
@@ -35,21 +32,14 @@ import hust.adventure.gamestate.PlayMode;
 import hust.adventure.graphics.CameraManager;
 import hust.adventure.graphics.GameRenderer;
 import hust.adventure.graphics.LightingManager;
+import hust.adventure.input.DebugInputHandler;
 import hust.adventure.input.InputReader;
 import hust.adventure.screens.levels.LevelBehavior;
 import hust.adventure.screens.levels.LevelContext;
 import hust.adventure.stats.LevelManager;
 import hust.adventure.ui.UIManager;
-import hust.adventure.ui.DebugUI;
-import hust.adventure.ui.components.DamageIncreaseAction;
-import hust.adventure.ui.components.HealAction;
+import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.components.UpgradeAction;
-import hust.adventure.items.Item;
-import hust.adventure.items.Gear;
-import hust.adventure.items.weapons.Weaponable;
-import hust.adventure.ui.components.WeaponUpgradeAction;
-import hust.adventure.ui.components.GearUpgradeAction;
-import hust.adventure.items.ItemManager;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
 import hust.adventure.world.WorldManager;
@@ -69,6 +59,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private final InputReader inputReader;
     private final EntityFactory entityFactory;
     private final CollisionManager collisionManager;
+    private final DebugInputHandler debugInputHandler;
 
     private CameraManager cameraManager;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -110,6 +101,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.uiManager = new UIManager();
         this.inputReader = new InputReader();
         this.lightingManager = new LightingManager();
+        this.debugInputHandler = new DebugInputHandler(uiManager, entityFactory, game.getAssetManager());
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
         EventDispatcher.getInstance().addListener(EventType.TREASURE_OPENED, this);
@@ -196,8 +188,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         float spawnY = (tmxSpawn != null) ? tmxSpawn.y : config.getSpawnY();
 
         if (player == null) {
-            player = entityFactory.createPlayer(spawnX, spawnY,
-                    ProgressContext.instance.getGlobalInventory(), inputReader);
+            player = entityFactory.createPlayer(spawnX, spawnY, ProgressContext.instance.getGlobalInventory(),
+                    inputReader);
             cameraManager.setTarget(player);
         } else {
             player.setX(spawnX);
@@ -223,52 +215,15 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
         setupLayerIndices();
 
-        if (game.getAudioManager() != null) {
-            game.getAudioManager().playMusic(getBgmForLevel(config.getLevelId()), true);
+        if (game.getAudioManager() != null && config.getBgmPath() != null) {
+            game.getAudioManager().playMusic(config.getBgmPath(), true);
         }
-    }
-
-    private String getBgmForLevel(final LevelID id) {
-        if (id == LevelID.BOSS_ROOM) {
-            return "audio/music/boss_theme.wav";
-        }
-        return "audio/music/level_theme.wav";
     }
 
     private void setupLayerIndices() {
-        final IntArray bg = new IntArray();
-        final IntArray fg = new IntArray();
-
-        for (int i = 0; i < worldManager.getCurrentMap().getLayers().size(); i++) {
-            final MapLayer layer = worldManager.getCurrentMap().getLayers().get(i);
-            if (isBackgroundLayer(layer)) {
-                bg.add(i);
-            } else {
-                fg.add(i);
-            }
-        }
-        backgroundLayers = bg.toArray();
-        foregroundLayers = fg.toArray();
-    }
-
-    private boolean isBackgroundLayer(final MapLayer layer) {
-        if (layer == null) {
-            return false;
-        }
-        final Object isBgProp = layer.getProperties().get("isBackground");
-        if (isBgProp instanceof Boolean) {
-            return (Boolean) isBgProp;
-        }
-        if (isBgProp instanceof String) {
-            return "true".equalsIgnoreCase((String) isBgProp) || "1".equals(isBgProp);
-        }
-        
-        final String name = layer.getName();
-        if (name == null) {
-            return false;
-        }
-        return name.equals("Via He") || name.equals("Duong") || name.equals("Grass") || name.equals("Nha1")
-                || name.equals("Background") || name.equals("Floor") || name.equals("Tile Layer 1");
+        final int[][] layers = worldManager.classifyLayers();
+        backgroundLayers = layers[0];
+        foregroundLayers = layers[1];
     }
 
     private void initLevel() {
@@ -286,8 +241,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     @Override
     public void render(float delta) {
         // ── Check player death ──────────────────────────────────────────────
-        if (player != null && ProgressContext.instance.getHp() <= 0
-                && !game.getScreenTransition().isTransitioning()) {
+        if (player != null && ProgressContext.instance.getHp() <= 0 && !game.getScreenTransition().isTransitioning()) {
             game.getScreenTransition().fadeOut(new GameOverScreen(game), 0.8f);
             return;
         }
@@ -324,16 +278,12 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private void handleInput() {
         if (inputReader.isInventoryJustPressed()) {
             ProgressContext.instance.setInventoryOpen(!ProgressContext.instance.isInventoryOpen());
-            EventDispatcher.getInstance().dispatch(
-                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
-            );
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
         }
         if (inputReader.isDebugJustPressed()) {
             ProgressContext.instance.setShowDebug(!ProgressContext.instance.isShowDebug());
             if (!ProgressContext.instance.isShowDebug()) {
-                if (uiManager.getDebugUI() != null) {
-                    uiManager.getDebugUI().cancelSelection();
-                }
+                debugInputHandler.cancelDebug();
                 if (state == PlayMode.IN_UI) {
                     state = PlayMode.RUNNING;
                 }
@@ -343,67 +293,10 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             ProgressContext.instance.setShowHitbox(!ProgressContext.instance.isShowHitbox());
         }
 
-        if (ProgressContext.instance.isShowDebug() && uiManager.getDebugUI() != null) {
-            DebugUI debugUI = uiManager.getDebugUI();
-
-            if (debugUI.isActive()) {
-                DebugUI.DebugOption selected = debugUI.handleSelectionInput();
-                if (selected != null) {
-                    executeDebugAction(debugUI.getPreviousMode(), selected);
-                    state = PlayMode.RUNNING;
-                } else if (!debugUI.isActive()) {
-                    // Cancelled selection via ESC
-                    state = PlayMode.RUNNING;
-                }
-                return; // Suppress other actions while selection is active
-            }
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) {
-                ProgressContext.instance.setGodMode(!ProgressContext.instance.isGodMode());
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
-                ProgressContext.instance.setFastRun(!ProgressContext.instance.isFastRun());
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.F6)) {
-                debugUI.startSelection(DebugUI.SelectionMode.MAP);
-                state = PlayMode.IN_UI;
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.F7)) {
-                debugUI.startSelection(DebugUI.SelectionMode.ITEM);
-                state = PlayMode.IN_UI;
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.F8)) {
-                debugUI.startSelection(DebugUI.SelectionMode.MONSTER);
-                state = PlayMode.IN_UI;
-            }
-        }
-    }
-
-    private void executeDebugAction(DebugUI.SelectionMode mode, DebugUI.DebugOption option) {
-        if (mode == DebugUI.SelectionMode.MAP) {
-            String targetMap = option.id;
-            MapTransitionData data = new MapTransitionData(targetMap, 400f, 400f);
-            GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
-            EventDispatcher.getInstance().dispatch(event);
-        } else if (mode == DebugUI.SelectionMode.ITEM) {
-            String itemId = option.id;
-            Item item = ItemManager.instance.getItem(itemId);
-            if (item != null) {
-                entityFactory.createItemDrop(player.getX() + 32f, player.getY(), item, Color.WHITE);
-            }
-        } else if (mode == DebugUI.SelectionMode.MONSTER) {
-            String enemyId = option.id;
-            try {
-                if (enemyId.equals("libboss")) {
-                    entityFactory.createLibraryBoss(player.getX() + 64f, player.getY());
-                } else if (enemyId.equals("finalboss")) {
-                    entityFactory.createFinalBoss(player.getX() + 64f, player.getY(),
-                            game.getAssetManager().getTexture("Boss THT.png"));
-                } else {
-                    entityFactory.createEnemy(enemyId, player.getX() + 64f, player.getY());
-                }
-            } catch (Exception e) {
-                Gdx.app.log("DebugMode", "Failed to spawn enemy: " + enemyId, e);
+        if (ProgressContext.instance.isShowDebug()) {
+            final PlayMode newState = debugInputHandler.handleDebugInput(player, state);
+            if (newState != null) {
+                state = newState;
             }
         }
     }
@@ -428,135 +321,11 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
     }
 
-    private Array<UpgradeAction> getLevelUpChoices(final Player player) {
-        final Array<UpgradeAction> possibleChoices = new Array<>();
-
-        // 1. Gather Weapon Choices
-        final String[] weaponIds = {"whip", "magic_wand", "garlic", "bun_dau"};
-        for (final String id : weaponIds) {
-            Weaponable weapon = null;
-            for (final Weaponable w : player.getWeaponManager().getWeapons()) {
-                if (w.getId().equalsIgnoreCase(id)) {
-                    weapon = w;
-                    break;
-                }
-            }
-
-            if (weapon == null) {
-                possibleChoices.add(new WeaponUpgradeAction(id, getWeaponName(id), getWeaponLevelDescription(id, 1), true));
-            } else if (weapon.getLevel() < 5) {
-                final int nextLevel = weapon.getLevel() + 1;
-                possibleChoices.add(new WeaponUpgradeAction(id, getWeaponName(id) + " (Cấp " + nextLevel + ")", getWeaponLevelDescription(id, nextLevel), false));
-            }
-        }
-
-        // 2. Gather Gear Choices
-        final String[] gearIds = {"spinach", "empty_tome", "wings", "hollow_heart", "candelabrador", "attractorb"};
-        for (final String id : gearIds) {
-            final Gear gear = player.getGearManager().getGear(id);
-            if (gear == null) {
-                possibleChoices.add(new GearUpgradeAction(id, getGearName(id), getGearLevelDescription(id, 1), true));
-            } else if (gear.getLevel() < 5) {
-                final int nextLevel = gear.getLevel() + 1;
-                possibleChoices.add(new GearUpgradeAction(id, getGearName(id) + " (Cấp " + nextLevel + ")", getGearLevelDescription(id, nextLevel), false));
-            }
-        }
-
-        // Fallbacks if nothing is available
-        if (possibleChoices.size == 0) {
-            possibleChoices.add(new HealAction());
-            possibleChoices.add(new DamageIncreaseAction());
-        }
-
-        possibleChoices.shuffle();
-        final Array<UpgradeAction> finalChoices = new Array<>();
-        for (int i = 0; i < Math.min(3, possibleChoices.size); i++) {
-            finalChoices.add(possibleChoices.get(i));
-        }
-        return finalChoices;
-    }
-
-    private String getWeaponName(final String id) {
-        switch (id.toLowerCase()) {
-            case "whip": return "Roi Da (Whip)";
-            case "magic_wand": return "Gậy Phép (Magic Wand)";
-            case "garlic": return "Tỏi Bảo Hộ (Garlic)";
-            case "bun_dau": return "Bún Đậu (Knife)";
-            default: return id;
-        }
-    }
-
-    private String getWeaponLevelDescription(final String id, final int level) {
-        switch (id.toLowerCase()) {
-            case "whip":
-                switch (level) {
-                    case 1: return "Tấn công theo chiều ngang, xuyên qua mọi kẻ địch.";
-                    case 2: return "Tấn công thêm 1 lần (ngược hướng).";
-                    case 3: return "Sát thương gốc +5.";
-                    case 4: return "Kích thước vùng đánh +10%, Sát thương gốc +5.";
-                    case 5: return "Sát thương gốc +5.";
-                }
-                break;
-            case "magic_wand":
-                switch (level) {
-                    case 1: return "Bắn tự động vào kẻ địch gần nhất.";
-                    case 2: return "Bắn thêm 1 tia phép.";
-                    case 3: return "Giảm hồi chiêu đi 0.2 giây.";
-                    case 4: return "Bắn thêm 1 tia phép.";
-                    case 5: return "Sát thương gốc +10.";
-                }
-                break;
-            case "garlic":
-                switch (level) {
-                    case 1: return "Tạo vòng bảo hộ gây sát thương xung quanh.";
-                    case 2: return "Phạm vi +40%, Sát thương gốc +2.";
-                    case 3: return "Giảm hồi chiêu đi 0.1s, Sát thương gốc +1.";
-                    case 4: return "Phạm vi +20%, Sát thương gốc +1.";
-                    case 5: return "Giảm hồi chiêu đi 0.1s, Sát thương gốc +2.";
-                }
-                break;
-            case "bun_dau":
-                switch (level) {
-                    case 1: return "Bắn theo hướng di chuyển cuối cùng khi bấm Space.";
-                    case 2: return "Bắn thêm 1 viên đậu.";
-                    case 3: return "Bắn thêm 1 viên đậu, Sát thương gốc +5.";
-                    case 4: return "Bắn thêm 1 viên đậu.";
-                    case 5: return "Viên đậu xuyên qua thêm 1 mục tiêu.";
-                }
-                break;
-        }
-        return "";
-    }
-
-    private String getGearName(final String id) {
-        switch (id.toLowerCase()) {
-            case "spinach": return "Hành Tây (Spinach)";
-            case "empty_tome": return "Sách Rỗng (Empty Tome)";
-            case "wings": return "Đôi Cánh (Wings)";
-            case "hollow_heart": return "Trái Tim Rỗng (Hollow Heart)";
-            case "candelabrador": return "Chân Nến (Candelabrador)";
-            case "attractorb": return "Nam Châm (Attractorb)";
-            default: return id;
-        }
-    }
-
-    private String getGearLevelDescription(final String id, final int level) {
-        switch (id.toLowerCase()) {
-            case "spinach": return "Tăng 10% sát thương cho tất cả vũ khí (Cấp " + level + ").";
-            case "empty_tome": return "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp " + level + ").";
-            case "wings": return "Tăng 10% tốc độ di chuyển của nhân vật (Cấp " + level + ").";
-            case "hollow_heart": return "Tăng 20% lượng HP tối đa (+20 HP) (Cấp " + level + ").";
-            case "candelabrador": return "Tăng 20% phạm vi tấn công của vũ khí (Cấp " + level + ").";
-            case "attractorb": return "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp " + level + ").";
-        }
-        return "";
-    }
-
     @Override
     public void onEvent(GameEvent<?> event) {
         if (event.getType() == EventType.LEVEL_UP) {
             this.state = PlayMode.IN_UI;
-            final Array<UpgradeAction> choices = getLevelUpChoices(player);
+            final Array<UpgradeAction> choices = LevelUpChoiceBuilder.getLevelUpChoices(player);
             uiManager.getLevelUpUI().setChoices(choices);
             uiManager.getLevelUpUI().setOnResume(() -> {
                 this.state = PlayMode.RUNNING;
@@ -662,7 +431,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     @Override
     public void hide() {
         if (player != null) {
-            player.saveWeaponsAndGearsToContext();
+            PlayerPersistenceService.saveWeaponsAndGears(player);
         }
     }
 

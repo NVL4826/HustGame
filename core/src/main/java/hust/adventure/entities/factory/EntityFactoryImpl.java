@@ -57,7 +57,7 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public Player createPlayer(float x, float y, Inventory inventory, PlayerController controller) {
-        Player player = new Player(x, y, inventory, controller, collisionManager);
+        Player player = new Player(x, y, inventory, controller, collisionManager, assetManager);
         player.setFactory(this);
         player.setCollider(new Collider(player, CollisionLayer.PLAYER, Collider.Shape.RECTANGLE));
         entityManager.addEntity(player);

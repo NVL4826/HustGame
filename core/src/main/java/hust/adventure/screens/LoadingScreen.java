@@ -17,8 +17,8 @@ public class LoadingScreen extends BaseScreen {
         drawProgressBar();
 
         if (game.getAssetManager().update()) {
-            LevelConfig config = new LevelConfig(LevelID.MAP_1, "Final Outside.tmx", 400f, 400f, 1.0f, null,
-                    LevelID.MAP_1.getAmbientColor());
+            LevelConfig config = new LevelConfig(LevelID.MAP_1, "Final Outside.tmx", 400f, 400f, 1.0f,
+                    LevelID.MAP_1.getBgmPath(), LevelID.MAP_1.getAmbientColor());
             game.setScreen(LevelFactory.createLevel(game, config));
         }
     }

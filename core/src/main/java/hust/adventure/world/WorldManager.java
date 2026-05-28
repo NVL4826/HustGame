@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.IntArray;
 import hust.adventure.entities.environment.WallEntity;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.EntityManager;
@@ -15,11 +16,16 @@ import hust.adventure.graphics.LightProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Manages the game world state, including the map, collisions, and portals.
  */
 public class WorldManager implements Disposable {
+    private static final Set<String> KNOWN_BACKGROUND_LAYERS = Set.of(
+        "Via He", "Duong", "Grass", "Nha1", "Background", "Floor", "Tile Layer 1"
+    );
+
     private TiledMap currentMap;
     private final List<WallEntity> walls;
     private final List<Portal> portals;
@@ -138,6 +144,43 @@ public class WorldManager implements Disposable {
             }
         }
         return null;
+    }
+
+    /**
+     * Analyzes map layers and classifies them into background/foreground.
+     * Prioritizes the "isBackground" property on each layer, falling back to a known name list.
+     *
+     * @return a 2D array where index [0] contains background layers and index [1] contains foreground layers.
+     */
+    public int[][] classifyLayers() {
+        final IntArray bg = new IntArray();
+        final IntArray fg = new IntArray();
+        if (currentMap != null) {
+            for (int i = 0; i < currentMap.getLayers().size(); i++) {
+                final MapLayer layer = currentMap.getLayers().get(i);
+                if (isBackgroundLayer(layer)) {
+                    bg.add(i);
+                } else {
+                    fg.add(i);
+                }
+            }
+        }
+        return new int[][] { bg.toArray(), fg.toArray() };
+    }
+
+    private boolean isBackgroundLayer(final MapLayer layer) {
+        if (layer == null) {
+            return false;
+        }
+        final Object isBgProp = layer.getProperties().get("isBackground");
+        if (isBgProp instanceof Boolean) {
+            return (Boolean) isBgProp;
+        }
+        if (isBgProp instanceof String) {
+            return "true".equalsIgnoreCase((String) isBgProp) || "1".equals(isBgProp);
+        }
+        final String name = layer.getName();
+        return name != null && KNOWN_BACKGROUND_LAYERS.contains(name);
     }
 
     @Override

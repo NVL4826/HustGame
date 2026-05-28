@@ -7,38 +7,29 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+import hust.adventure.core.GameAssetManager;
 import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.base.Targetable;
 import hust.adventure.entities.components.PlayerMovementBehavior;
+import hust.adventure.entities.components.SpellController;
 import hust.adventure.entities.state.MovingState;
-import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventListener;
-import hust.adventure.events.EventType;
-import hust.adventure.events.GameEvent;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
-import hust.adventure.items.Item;
-import hust.adventure.items.ItemManager;
-import hust.adventure.items.Consumable;
-import hust.adventure.events.ItemPickedUpEvent;
-import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.factory.EntityFactory;
-import hust.adventure.items.weapons.WeaponFactory;
 import hust.adventure.items.weapons.WeaponManager;
 import hust.adventure.items.weapons.Weaponable;
 import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.items.Gear;
 import hust.adventure.items.GearManager;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Main player character class.
  */
-public class Player extends BaseActor implements Targetable, EventListener {
+public class Player extends BaseActor implements Targetable {
     private final Inventory inventory;
     private final PlayerController controller;
     private final WeaponManager weaponManager;
@@ -58,21 +49,12 @@ public class Player extends BaseActor implements Targetable, EventListener {
     private static final float DRAW_SIZE = 50f;
     private static final float MAX_HP = 100f;
 
-    // Spells Constants
-    private static final float SLOW_MOTION_DURATION = 3f;
-    private static final float SLOW_MOTION_TIME_SCALE = 0.3f;
-    private static final float STUN_DURATION = 2f;
-    private static final float STUN_STAMINA_COST = 20f;
-    private static final float RADAR_DURATION = 5f;
-    private static final float RADAR_STAMINA_COST = 10f;
-
-    // Spells Timers
-    private float slowMotionTimer;
-    private float stunTimer;
-    private float showEnemiesTimer;
+    // Delegated controllers and handlers
+    private final SpellController spellController;
+    private final PlayerEventHandler eventHandler;
 
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
-            final CollisionManager collisionManager) {
+            final CollisionManager collisionManager, final GameAssetManager assetManager) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
         this.inventory = inventory;
         this.controller = controller;
@@ -81,35 +63,28 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.gearManager = new GearManager();
         this.iframeTimer = 0f;
 
-        // Restore weapons and gears from global context
-        restoreWeaponsAndGears();
+        // Restore weapons and gears from global context via persistence service
+        PlayerPersistenceService.restoreWeaponsAndGears(this);
 
         // Composition: Movement behavior
         this.setMovementBehavior(new PlayerMovementBehavior(controller, collisionManager));
-        loadTextures();
+        loadTextures(assetManager);
 
-        // Register for events
-        EventDispatcher.getInstance().addListener(EventType.PUZZLE_FAILED, this);
-        EventDispatcher.getInstance().addListener(EventType.ITEM_USED, this);
-        EventDispatcher.getInstance().addListener(EventType.ITEM_PICKED_UP, this);
+        // Delegate event handling
+        this.eventHandler = new PlayerEventHandler(this);
 
-        this.slowMotionTimer = 0f;
-        this.stunTimer = 0f;
-        this.showEnemiesTimer = 0f;
+        // Initialize spell controller
+        this.spellController = new SpellController();
         ProgressContext.instance.setPlayer(this);
 
-        // Sync initial stats from global context
-        this.setMaxHp(ProgressContext.instance.getMaxHp());
-        this.setHp(ProgressContext.instance.getHp());
-        this.setStamina(ProgressContext.instance.getStamina());
+        // Sync initial stats from global context via persistence service
+        PlayerPersistenceService.restoreStats(this);
     }
 
-    private void loadTextures() {
-        // Ideally these should come from an AssetManager, but keeping for now as
-        // requested
+    private void loadTextures(final GameAssetManager assetManager) {
         this.allTextures = new Texture[22];
         for (int i = 0; i < 22; i++) {
-            allTextures[i] = new Texture((i + 4) + ".png");
+            allTextures[i] = assetManager.getTexture((i + 4) + ".png");
         }
 
         final TextureRegion[] frames = new TextureRegion[22];
@@ -144,41 +119,8 @@ public class Player extends BaseActor implements Targetable, EventListener {
             iframeTimer = Math.max(0f, iframeTimer - delta);
         }
 
-        // Skill key checks
-        if (ProgressContext.instance.isHasNao() && controller.isSkillQJustPressed()) {
-            slowMotionTimer = SLOW_MOTION_DURATION;
-        }
-
-        if (controller.isSkillEJustPressed() && getStamina() >= STUN_STAMINA_COST) {
-            setStamina(getStamina() - STUN_STAMINA_COST);
-            stunTimer = STUN_DURATION;
-        }
-
-        if (controller.isSkillFJustPressed() && getStamina() >= RADAR_STAMINA_COST) {
-            setStamina(getStamina() - RADAR_STAMINA_COST);
-            showEnemiesTimer = RADAR_DURATION;
-        }
-
-        // Timer updates
-        if (slowMotionTimer > 0) {
-            slowMotionTimer = Math.max(0f, slowMotionTimer - delta);
-        }
-        if (stunTimer > 0) {
-            stunTimer = Math.max(0f, stunTimer - delta);
-        }
-        if (showEnemiesTimer > 0) {
-            showEnemiesTimer = Math.max(0f, showEnemiesTimer - delta);
-        }
-
-        // Propagate active timer states to global ProgressContext
-        float enemyTimeScale = 1.0f;
-        if (stunTimer > 0) {
-            enemyTimeScale = 0f;
-        } else if (slowMotionTimer > 0) {
-            enemyTimeScale = SLOW_MOTION_TIME_SCALE;
-        }
-        ProgressContext.instance.setEnemyTimeScale(enemyTimeScale);
-        ProgressContext.instance.setShowEnemiesTimer(showEnemiesTimer);
+        // Update spells through the delegated controller
+        spellController.update(this, controller, delta);
 
         if (ProgressContext.instance.getPlayer() != this) {
             ProgressContext.instance.setPlayer(this);
@@ -194,9 +136,9 @@ public class Player extends BaseActor implements Targetable, EventListener {
         setSpeedMultiplier(wingsSpeedMultiplier);
 
         super.update(delta);
-        // Sync stats to global context for UI/saving
-        ProgressContext.instance.setHp(getHp());
-        ProgressContext.instance.setStamina(getStamina());
+        
+        // Sync core stats to global context via persistence service
+        PlayerPersistenceService.saveStats(this);
 
         // Magnetic radius for ExpGem
         if (collisionManager != null) {
@@ -306,8 +248,6 @@ public class Player extends BaseActor implements Targetable, EventListener {
         return gearManager;
     }
 
-
-
     public float getPowerMultiplier() {
         float mult = 1.0f;
         if (gearManager != null) {
@@ -357,8 +297,16 @@ public class Player extends BaseActor implements Targetable, EventListener {
         final float newMaxHp = oldMaxHp + amount;
         setMaxHp(newMaxHp);
         heal(amount);
-        ProgressContext.instance.setMaxHp(newMaxHp);
-        ProgressContext.instance.setHp(getHp());
+        // Sync stats to context
+        PlayerPersistenceService.saveStats(this);
+    }
+
+    public void setPlayerHp(final float hp) {
+        super.setHp(hp);
+    }
+
+    public void setPlayerMaxHp(final float maxHp) {
+        super.setMaxHp(maxHp);
     }
 
     public void setFactory(final EntityFactory factory) {
@@ -390,8 +338,8 @@ public class Player extends BaseActor implements Targetable, EventListener {
         if (!ignoreIFrames) {
             iframeTimer = IFRAME_DURATION;
         }
-        // Sync to global context
-        ProgressContext.instance.setHp(getHp());
+        // Sync stats to context
+        PlayerPersistenceService.saveStats(this);
     }
 
     public float getIframeTimer() {
@@ -402,91 +350,16 @@ public class Player extends BaseActor implements Targetable, EventListener {
         this.iframeTimer = iframeTimer;
     }
 
-    public void saveWeaponsAndGearsToContext() {
-        if (ProgressContext.instance == null) {
-            return;
-        }
-        ProgressContext.instance.getWeaponLevels().clear();
-        for (final Weaponable w : weaponManager.getWeapons()) {
-            ProgressContext.instance.getWeaponLevels().put(w.getId().toLowerCase(), w.getLevel());
-        }
-
-        ProgressContext.instance.getGearLevels().clear();
-        if (gearManager != null) {
-            for (final Gear gear : gearManager.getGears()) {
-                ProgressContext.instance.getGearLevels().put(gear.getId().toLowerCase(), gear.getLevel());
-            }
-        }
-    }
-
-    private void restoreWeaponsAndGears() {
-        final Map<String, Integer> savedWeapons = ProgressContext.instance.getWeaponLevels();
-        final Map<String, Integer> savedGears = ProgressContext.instance.getGearLevels();
-
-        if (savedWeapons.isEmpty()) {
-            // New game initialization
-            final Weaponable defaultWeapon = WeaponFactory.createWeapon("bun_dau", this);
-            weaponManager.addWeapon(defaultWeapon);
-            savedWeapons.put("bun_dau", 1);
-        } else {
-            // Restore saved weapons
-            for (final Map.Entry<String, Integer> entry : savedWeapons.entrySet()) {
-                final String weaponId = entry.getKey();
-                final int targetLevel = entry.getValue();
-                final Weaponable weapon = WeaponFactory.createWeapon(weaponId, this);
-                for (int i = 1; i < targetLevel; i++) {
-                    weapon.upgrade(0f, 0f);
-                }
-                weaponManager.addWeapon(weapon);
-            }
-        }
-
-        // Restore saved gears
-        for (final Map.Entry<String, Integer> entry : savedGears.entrySet()) {
-            final String gearId = entry.getKey();
-            final int targetLevel = entry.getValue();
-            final String gearName = Gear.getDefaultName(gearId);
-            final String gearDesc = Gear.getDefaultDescription(gearId, 1);
-            final Gear gear = new Gear(gearId, gearName, gearDesc);
-            for (int i = 1; i < targetLevel; i++) {
-                gear.upgrade();
-            }
-            gearManager.addGear(gear);
-        }
-    }
-
-    @Override
-    public void onEvent(final GameEvent<?> event) {
-        if (event.getType() == EventType.PUZZLE_FAILED) {
-            final Float damage = (Float) event.getData();
-            takeDamage(damage);
-        } else if (event.getType() == EventType.ITEM_USED) {
-            final String itemId = (String) event.getData();
-            final Item item = ItemManager.instance.getItem(itemId);
-            if (item instanceof Consumable) {
-                if (inventory.removeItem(item, 1)) {
-                    ((Consumable) item).consume(this);
-                }
-            }
-        } else if (event.getType() == EventType.ITEM_PICKED_UP) {
-            final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
-            if (data.getPicker() == this) {
-                inventory.addItem(data.getItem(), 1);
-            }
-        }
+    public SpellController getSpellController() {
+        return spellController;
     }
 
     @Override
     public void dispose() {
         ProgressContext.instance.setPlayer(null);
-        EventDispatcher.getInstance().removeListener(EventType.PUZZLE_FAILED, this);
-        EventDispatcher.getInstance().removeListener(EventType.ITEM_USED, this);
-        EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
-        if (allTextures != null) {
-            for (final Texture t : allTextures) {
-                if (t != null)
-                    t.dispose();
-            }
+        if (eventHandler != null) {
+            eventHandler.dispose();
         }
+        allTextures = null;
     }
 }

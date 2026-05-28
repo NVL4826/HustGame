@@ -219,8 +219,8 @@ public class GameOverScreen extends BaseScreen {
         LevelConfig savedConfig = ProgressContext.instance.getCurrentLevelConfig();
         if (savedConfig == null) {
             // Fallback nếu chưa lưu được (ví dụ: chết ngay màn đầu)
-            savedConfig = new LevelConfig(LevelID.MAP_1, "Final Outside.tmx", 400f, 400f, 1.0f, null,
-                    LevelID.MAP_1.getAmbientColor());
+            savedConfig = new LevelConfig(LevelID.MAP_1, "Final Outside.tmx", 400f, 400f, 1.0f,
+                    LevelID.MAP_1.getBgmPath(), LevelID.MAP_1.getAmbientColor());
         }
         ProgressContext.instance.reset();
         Screen next = LevelFactory.createLevel(game, savedConfig);

@@ -3,7 +3,6 @@ package hust.adventure.entities.components;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.BaseEnemy;
-import hust.adventure.collision.CollisionManager;
 
 public class FleeBehavior implements AIBehavior {
     private final float safeDistance;

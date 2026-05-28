@@ -1,7 +1,6 @@
 package hust.adventure.input;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 
 /**
  * System for handling player input and mapping it to game actions.
