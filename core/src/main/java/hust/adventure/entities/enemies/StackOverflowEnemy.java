@@ -17,7 +17,8 @@ public class StackOverflowEnemy extends BaseEnemy {
     }
  
     public StackOverflowEnemy(float x, float y, CollisionManager collisionManager) {
-        super(x, y, 40, 40, 50, "StackOvfl", Color.RED, collisionManager);
+        super(x, y, 40, 40, 50, "StackOvfl", Color.RED, collisionManager, 20f);
+        setSpeed(25f);
         setBehavior(new BouncingBehavior(100, 100, 800, 600));
     }
  

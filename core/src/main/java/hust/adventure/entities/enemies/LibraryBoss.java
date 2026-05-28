@@ -16,8 +16,9 @@ public class LibraryBoss extends BaseEnemy {
     }
  
     public LibraryBoss(float x, float y, CollisionManager collisionManager) {
-        super(x, y, 64, 64, 500, "LibBoss", Color.DARK_GRAY, collisionManager);
-        setBehavior(new ChaseBehavior(40f));
+        super(x, y, 64, 64, 500, "LibBoss", Color.CYAN, collisionManager, 30f);
+        setSpeed(35f);
+        setBehavior(new ChaseBehavior());
     }
  
 

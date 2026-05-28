@@ -15,8 +15,9 @@ public class NullPointerEnemy extends BaseEnemy {
     }
  
     public NullPointerEnemy(float x, float y, CollisionManager collisionManager) {
-        super(x, y, 32, 32, 30, "NullPtr", Color.GREEN, collisionManager);
-        setBehavior(new ChaseBehavior(60f));
+        super(x, y, 32, 32, 10, "NullPtr", Color.GREEN, collisionManager, 10f);
+        setSpeed(60f);
+        setBehavior(new ChaseBehavior());
     }
  
 

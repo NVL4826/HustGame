@@ -5,10 +5,8 @@ import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.BaseEnemy;
 
 public class ChaseBehavior implements AIBehavior {
-    private float speed;
 
-    public ChaseBehavior(float speed) {
-        this.speed = speed;
+    public ChaseBehavior() {
     }
 
     @Override
@@ -18,8 +16,8 @@ public class ChaseBehavior implements AIBehavior {
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (dist > 0) {
-            enemy.setX(enemy.getX() + (dx / dist) * speed * delta);
-            enemy.setY(enemy.getY() + (dy / dist) * speed * delta);
+            enemy.setX(enemy.getX() + (dx / dist) * enemy.getSpeed() * delta);
+            enemy.setY(enemy.getY() + (dy / dist) * enemy.getSpeed() * delta);
         }
     }
 }

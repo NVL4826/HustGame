@@ -6,11 +6,9 @@ import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.collision.CollisionManager;
  
 public class FleeBehavior implements AIBehavior {
-    private final float speed;
     private final float safeDistance;
  
-    public FleeBehavior(float speed, float safeDistance) {
-        this.speed = speed;
+    public FleeBehavior(float safeDistance) {
         this.safeDistance = safeDistance;
     }
  
@@ -21,8 +19,8 @@ public class FleeBehavior implements AIBehavior {
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
  
         if (dist < safeDistance && dist > 0) {
-            float nextX = enemy.getX() - (dx / dist) * speed * delta;
-            float nextY = enemy.getY() - (dy / dist) * speed * delta;
+            float nextX = enemy.getX() - (dx / dist) * enemy.getSpeed() * delta;
+            float nextY = enemy.getY() - (dy / dist) * enemy.getSpeed() * delta;
             
             CollisionManager cm = enemy.getCollisionManager();
             if (cm != null && cm.canMove(enemy, nextX, nextY)) {

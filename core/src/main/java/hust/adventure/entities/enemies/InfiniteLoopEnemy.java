@@ -15,8 +15,9 @@ public class InfiniteLoopEnemy extends BaseEnemy {
     }
  
     public InfiniteLoopEnemy(float x, float y, CollisionManager collisionManager) {
-        super(x, y, 32, 32, 200, "InfLoop", Color.PURPLE, collisionManager);
-        setBehavior(new FleeBehavior(80f, 150f));
+        super(x, y, 32, 32, 200, "InfLoop", Color.PURPLE, collisionManager, 15f);
+        setSpeed(80f);
+        setBehavior(new FleeBehavior(150f));
     }
  
 

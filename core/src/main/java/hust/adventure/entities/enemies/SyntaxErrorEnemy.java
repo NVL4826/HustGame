@@ -19,8 +19,9 @@ public class SyntaxErrorEnemy extends BaseEnemy {
     }
 
     public SyntaxErrorEnemy(float x, float y, CollisionManager collisionManager) {
-        super(x, y, 30, 30, 25, "SyntaxErr", Color.ORANGE, collisionManager);
-        setBehavior(new FleeBehavior(30f, 200f));
+        super(x, y, 30, 30, 15, "SyntaxErr", Color.ORANGE, collisionManager, 0f);
+        setSpeed(35f);
+        setBehavior(new FleeBehavior(200f));
     }
 
 
