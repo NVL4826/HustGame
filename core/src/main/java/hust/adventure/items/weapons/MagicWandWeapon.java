@@ -36,7 +36,7 @@ public class MagicWandWeapon extends BaseWeapon {
         final float vy = direction.y * PROJECTILE_SPEED;
 
         if (getOwner().getFactory() != null) {
-            getOwner().getFactory().createProjectile(startX, startY, vx, vy, getBaseDamage(), Color.CYAN, true);
+            getOwner().getFactory().createProjectile(startX, startY, vx, vy, getEffectiveDamage(), Color.CYAN, true);
         }
     }
 }

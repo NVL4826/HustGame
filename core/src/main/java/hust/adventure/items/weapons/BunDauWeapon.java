@@ -45,7 +45,7 @@ public class BunDauWeapon extends BaseWeapon {
         }
 
         if (getOwner().getFactory() != null) {
-            getOwner().getFactory().createProjectile(getOwner().getX(), getOwner().getY(), vx, vy, getBaseDamage(), PROJECTILE_COLOR, true);
+            getOwner().getFactory().createProjectile(getOwner().getX(), getOwner().getY(), vx, vy, getEffectiveDamage(), PROJECTILE_COLOR, true);
         }
     }
 }

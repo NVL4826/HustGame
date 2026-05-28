@@ -96,6 +96,11 @@ public abstract class BaseWeapon implements Weaponable {
         return baseDamage;
     }
 
+    /** Tr\u1ea3 v\u1ec1 damage th\u1ef1c t\u1ebf \u0111\u00e3 nh\u00e2n v\u1edbi damageMultiplier t\u1eeb ProgressContext (persist qua map transition). */
+    public final float getEffectiveDamage() {
+        return baseDamage * hust.adventure.core.context.ProgressContext.instance.getDamageMultiplier();
+    }
+
     public final void setBaseDamage(final float baseDamage) {
         this.baseDamage = baseDamage;
     }

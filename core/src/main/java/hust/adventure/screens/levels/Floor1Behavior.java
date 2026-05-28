@@ -19,9 +19,6 @@ public class Floor1Behavior implements LevelBehavior {
         context.getEntityFactory().createItemDrop(300f, 150f, im.getItem("coffee_den"), Color.BROWN);
         context.getEntityFactory().createItemDrop(350f, 180f, im.getItem("coffee_sua"), Color.YELLOW);
 
-        // Create Note Items
-        context.getEntityFactory().createItemDrop(500f, 150f, im.getItem("note"), Color.WHITE);
-
         // Create NPCs
         context.getEntityManager().addEntity(new StaticNPC(200f, 300f, "Guard", Color.BLUE));
         context.getEntityManager().addEntity(new StaticNPC(600f, 300f, "Staff", Color.CYAN));

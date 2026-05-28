@@ -67,6 +67,11 @@ public class BossFightBehavior implements LevelBehavior {
     private boolean victory = false;
     private float victoryTimer = 0f;
 
+    // Screen shake
+    private float shakeTimer = 0f;
+    private static final float SHAKE_DURATION = 0.5f;
+    private static final float SHAKE_MAGNITUDE = 7f;
+
     static class Question {
         final String text;
         final String[] answers;
@@ -143,6 +148,11 @@ public class BossFightBehavior implements LevelBehavior {
 
     @Override
     public void update(final LevelContext context, final float delta) {
+        // Cập nhật shake timer
+        if (shakeTimer > 0) {
+            shakeTimer -= delta;
+        }
+
         float dt = delta;
         if (ProgressContext.instance.isHasNao() && context.getInputReader().isQJustPressed()) {
             dt *= 0.3f;
@@ -185,7 +195,8 @@ public class BossFightBehavior implements LevelBehavior {
             }
 
             if (answerTimer <= 0) {
-                context.getPlayer().takeDamage(TIME_OUT_DAMAGE, false, true);
+                context.getPlayer().takeDamage(TIME_OUT_DAMAGE);
+                shakeTimer = SHAKE_DURATION;
                 nextQuestion();
             } else if (context.getInputReader().isSpaceJustPressed()) {
                 handleAnswerInput(context);
@@ -224,7 +235,8 @@ public class BossFightBehavior implements LevelBehavior {
                     context.getPlayer().heal(ANSWER_HEAL);
                     finalBoss.takeDamage(ANSWER_DAMAGE_DEALT);
                 } else {
-                    context.getPlayer().takeDamage(WRONG_ANSWER_DAMAGE, false, true);
+                    context.getPlayer().takeDamage(WRONG_ANSWER_DAMAGE);
+                    shakeTimer = SHAKE_DURATION;
                 }
                 nextQuestion();
                 break;
@@ -255,7 +267,8 @@ public class BossFightBehavior implements LevelBehavior {
                     textField.setVisible(false);
                     Gdx.input.setInputProcessor(context.getInputReader());
                 } else {
-                    context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE, false, true);
+                    context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
+                    shakeTimer = SHAKE_DURATION;
                     textField.setText("");
                 }
             }
@@ -273,6 +286,15 @@ public class BossFightBehavior implements LevelBehavior {
 
     @Override
     public void draw(final LevelContext context) {
+        // ── Camera shake ──────────────────────────────────────────────────
+        float shakeX = 0f, shakeY = 0f;
+        if (shakeTimer > 0) {
+            float intensity = shakeTimer / SHAKE_DURATION;
+            shakeX = MathUtils.random(-SHAKE_MAGNITUDE * intensity, SHAKE_MAGNITUDE * intensity);
+            shakeY = MathUtils.random(-SHAKE_MAGNITUDE * intensity, SHAKE_MAGNITUDE * intensity);
+            context.getCamera().position.add(shakeX, shakeY, 0);
+            context.getCamera().update();
+        }
 
         // ── Boss HP bar (top-center, styled) ─────────────────────────────
         if (phase != PHASE_VICTORY && finalBoss != null) {
@@ -301,13 +323,13 @@ public class BossFightBehavior implements LevelBehavior {
             context.getShapeRenderer().rect(barX, barY, barW, barH);
             context.getShapeRenderer().end();
 
-            // Label
+            // Label – chỉ hiện HP, không hiện tên T.H.T
             context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
             context.getGame().getSpriteBatch().begin();
             context.getGame().getFont().setColor(1f, 0.5f, 0.2f, 1f);
             context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    "BOSS THT  " + (int) finalBoss.getHp() + " / " + (int) finalBoss.getMaxHp(),
-                    barX, barY + barH + 14f);
+                    (int) finalBoss.getHp() + " / " + (int) finalBoss.getMaxHp(),
+                    barX + barW / 2f - 30f, barY + barH + 14f);
             context.getGame().getSpriteBatch().end();
         }
 
@@ -326,6 +348,9 @@ public class BossFightBehavior implements LevelBehavior {
             drawVictory(context);
             break;
         }
+
+        // Kh\u00f4i ph\u1ee5c camera sau khi draw xong
+        restoreCamera(context, shakeX, shakeY);
     }
 
     private void drawCutscene(final LevelContext context) {
@@ -559,6 +584,14 @@ public class BossFightBehavior implements LevelBehavior {
     public void dispose(final LevelContext context) {
         if (stage != null) {
             stage.dispose();
+        }
+    }
+
+    /** Gọi sau khi draw() xong để khôi phục camera về vị trí gốc (undo shake). */
+    private void restoreCamera(final LevelContext context, float shakeX, float shakeY) {
+        if (shakeX != 0f || shakeY != 0f) {
+            context.getCamera().position.add(-shakeX, -shakeY, 0);
+            context.getCamera().update();
         }
     }
 }

@@ -23,12 +23,8 @@ public class FleeBehavior implements AIBehavior {
         if (dist < safeDistance && dist > 0) {
             float nextX = enemy.getX() - (dx / dist) * speed * delta;
             float nextY = enemy.getY() - (dy / dist) * speed * delta;
-            
-            CollisionManager cm = enemy.getCollisionManager();
-            if (cm != null && cm.canMove(enemy, nextX, nextY)) {
-                enemy.setX(nextX);
-                enemy.setY(nextY);
-            }
+            enemy.setX(nextX);
+            enemy.setY(nextY);
         }
     }
 }

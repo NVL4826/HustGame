@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import hust.adventure.entities.environment.WallEntity;
 import hust.adventure.entities.factory.EntityFactory;
@@ -42,7 +43,14 @@ public class WorldManager implements Disposable {
 
     private void setupWalls() {
         walls.clear();
-        MapLayer objectLayer = currentMap.getLayers().get("Object Layer 1");
+        // Thử lần lượt: "collision" (lab/library), "Border" (Final Outside), "Object Layer 1" (map cũ)
+        MapLayer objectLayer = currentMap.getLayers().get("collision");
+        if (objectLayer == null) {
+            objectLayer = currentMap.getLayers().get("Border");
+        }
+        if (objectLayer == null) {
+            objectLayer = currentMap.getLayers().get("Object Layer 1");
+        }
         if (objectLayer != null) {
             for (MapObject obj : objectLayer.getObjects()) {
                 if (obj instanceof RectangleMapObject) {
@@ -111,6 +119,25 @@ public class WorldManager implements Disposable {
 
     public List<Portal> getPortals() {
         return portals;
+    }
+
+    /**
+     * Đọc vị trí spawn của player từ objectgroup "Spawn" trong TMX.
+     * Nếu không có thì trả về null (PlayScreen dùng spawn từ LevelConfig).
+     */
+    public Vector2 getSpawnPoint() {
+        if (currentMap == null) return null;
+        MapLayer spawnLayer = currentMap.getLayers().get("Spawn");
+        if (spawnLayer == null) return null;
+        for (MapObject obj : spawnLayer.getObjects()) {
+            if (obj instanceof RectangleMapObject) {
+                Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                // Dùng giữa X, nhưng TOP của rect theo trục Y (libGDX đã flip Y)
+                // để tránh spawn bên trong tường đáy của map
+                return new Vector2(rect.x + rect.width / 2f, rect.y + rect.height);
+            }
+        }
+        return null;
     }
 
     @Override

@@ -76,7 +76,7 @@ public class WanderMovementBehavior implements MovementBehavior {
                 break;
             }
 
-            // Just updating position naively for Wander. Collision could be added.
+            // Di chuyển trực tiếp, không chặn bởi tường
             actor.setX(newX);
             actor.setY(newY);
         }

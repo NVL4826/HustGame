@@ -4,11 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.BaseEnemy;
-import hust.adventure.collision.CollisionManager;
 
 /**
- * CPU-optimized behavior for swarm enemies. Moves directly towards the player using a simple vector and respects walls.
- * Implements Poolable to avoid GC overhead.
+ * CPU-optimized behavior for swarm enemies. Moves directly towards the player.
+ * Enemies pass through walls and each other to optimize CPU.
  */
 public class SimpleSwarmBehavior implements AIBehavior {
     private static final Vector2 tmpVector = new Vector2();
@@ -28,19 +27,10 @@ public class SimpleSwarmBehavior implements AIBehavior {
         final float distance = tmpVector.len();
 
         if (distance > 0) {
-            // Normalize and scale by enemy's speed
+            // Normalize and scale by enemy's speed – di chuyển trực tiếp, xuyên tường
             tmpVector.nor().scl(enemy.getSpeed() * delta);
-
-            final float nextX = enemy.getX() + tmpVector.x;
-            final float nextY = enemy.getY() + tmpVector.y;
-
-            // Check collision with walls (static environment)
-            // Enemies pass through each other to optimize CPU
-            CollisionManager collisionManager = enemy.getCollisionManager();
-            if (collisionManager != null && collisionManager.canMove(enemy, nextX, nextY)) {
-                enemy.setX(nextX);
-                enemy.setY(nextY);
-            }
+            enemy.setX(enemy.getX() + tmpVector.x);
+            enemy.setY(enemy.getY() + tmpVector.y);
         }
     }
 
