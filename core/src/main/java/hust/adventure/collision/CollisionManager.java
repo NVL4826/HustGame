@@ -250,14 +250,22 @@ public class CollisionManager {
         for (final Array<Collider> cellContent : grid.values()) {
             for (int i = 0; i < cellContent.size; i++) {
                 final Collider c1 = cellContent.get(i);
+                if (c1.getOwner().isDestroyed()) {
+                    continue;
+                }
                 for (int j = i + 1; j < cellContent.size; j++) {
                     final Collider c2 = cellContent.get(j);
+                    if (c2.getOwner().isDestroyed()) {
+                        continue;
+                    }
 
                     if (canCollide(c1, c2)) {
                         if (c1.intersects(c2)) {
                             try {
                                 c1.handleCollision(c2.getOwner());
-                                c2.handleCollision(c1.getOwner());
+                                if (!c1.getOwner().isDestroyed() && !c2.getOwner().isDestroyed()) {
+                                    c2.handleCollision(c1.getOwner());
+                                }
                             } catch (Exception e) {
                                 Gdx.app.error("CollisionManager", "Error handling collision", e);
                             }

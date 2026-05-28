@@ -90,6 +90,9 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
         super.setCollider(collider);
         if (collider != null) {
             collider.setListener(other -> {
+                if (isDestroyed() || pierce <= 0) {
+                    return;
+                }
                 if (isPlayerProjectile) {
                     if (other instanceof BaseEnemy) {
                         final BaseEnemy enemy = (BaseEnemy) other;
