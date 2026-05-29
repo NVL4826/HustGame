@@ -10,19 +10,15 @@ import java.util.HashMap;
 
 /**
  * Manages the global game data and current game flow state.
+ * Refactored to delegate domain-specific states to PlayerStats, DebugContext, and SpellState.
  */
 public class ProgressContext {
     public static ProgressContext instance = new ProgressContext();
 
-    // Player stats (Encapsulated)
-    private float hp = 100f;
-    private float maxHp = 100f;
-    private float stamina = 100f;
-    private float maxStamina = 100f;
-    private float morale = 100f;
-    private int level = 1;
-    private float exp = 0;
-    private float expToNextLevel = 100f;
+    // Domain sub-contexts (SRP Separation)
+    private final PlayerStats playerStats = new PlayerStats();
+    private final DebugContext debugContext = new DebugContext();
+    private final SpellState spellState = new SpellState();
 
     private Inventory globalInventory = new Inventory();
 
@@ -38,17 +34,7 @@ public class ProgressContext {
 
     // Systems
     private boolean isInventoryOpen = false;
-    private boolean showDebug = false;
-    private boolean showHitbox = false;
-    private boolean godMode = false;
-    private boolean fastRun = false;
-    // Global Spells / Timers / Context
-    private float enemyTimeScale = 1.0f;
-    private boolean lightsOut = false;
-    private float showEnemiesTimer = 0f;
-    private boolean enemyBlinkVisible = true; // dùng cho hiệu ứng blink ở lab phase 3
-    private LevelConfig currentLevelConfig = null; // màn hiện tại
-    private float damageMultiplier = 1.0f; // tăng qua level up, reset khi game over
+    private LevelConfig currentLevelConfig = null; // Current level configuration
     private Player player = null;
 
     private final Map<String, Integer> weaponLevels = new HashMap<>();
@@ -59,6 +45,33 @@ public class ProgressContext {
 
     private ProgressContext() {
         this.currentState = new PlayingGameState();
+    }
+
+    /**
+     * Gets the player stats sub-context.
+     *
+     * @return the PlayerStats instance.
+     */
+    public PlayerStats getPlayerStats() {
+        return playerStats;
+    }
+
+    /**
+     * Gets the debug options sub-context.
+     *
+     * @return the DebugContext instance.
+     */
+    public DebugContext getDebugContext() {
+        return debugContext;
+    }
+
+    /**
+     * Gets the spell states and timers sub-context.
+     *
+     * @return the SpellState instance.
+     */
+    public SpellState getSpellState() {
+        return spellState;
     }
 
     public void update(float delta) {
@@ -86,67 +99,67 @@ public class ProgressContext {
     }
 
     public float getHp() {
-        return hp;
+        return playerStats.getHp();
     }
 
     public void setHp(float hp) {
-        this.hp = hp;
+        playerStats.setHp(hp);
     }
 
     public float getMaxHp() {
-        return maxHp;
+        return playerStats.getMaxHp();
     }
 
     public void setMaxHp(float maxHp) {
-        this.maxHp = maxHp;
+        playerStats.setMaxHp(maxHp);
     }
 
     public float getStamina() {
-        return stamina;
+        return playerStats.getStamina();
     }
 
     public void setStamina(float stamina) {
-        this.stamina = stamina;
+        playerStats.setStamina(stamina);
     }
 
     public float getMaxStamina() {
-        return maxStamina;
+        return playerStats.getMaxStamina();
     }
 
     public void setMaxStamina(float maxStamina) {
-        this.maxStamina = maxStamina;
+        playerStats.setMaxStamina(maxStamina);
     }
 
     public float getMorale() {
-        return morale;
+        return playerStats.getMorale();
     }
 
     public void setMorale(float morale) {
-        this.morale = morale;
+        playerStats.setMorale(morale);
     }
 
     public int getLevel() {
-        return level;
+        return playerStats.getLevel();
     }
 
     public void setLevel(int level) {
-        this.level = level;
+        playerStats.setLevel(level);
     }
 
     public float getExp() {
-        return exp;
+        return playerStats.getExp();
     }
 
     public void setExp(float exp) {
-        this.exp = exp;
+        playerStats.setExp(exp);
     }
 
     public float getExpToNextLevel() {
-        return expToNextLevel;
+        return playerStats.getExpToNextLevel();
     }
 
     public void setExpToNextLevel(float expToNextLevel) {
-        this.expToNextLevel = expToNextLevel;
+        playerStats.setExpToNextLevel(expToNextLevel);
     }
 
     public Inventory getGlobalInventory() {
@@ -206,67 +219,67 @@ public class ProgressContext {
     }
 
     public boolean isShowDebug() {
-        return showDebug;
+        return debugContext.isShowDebug();
     }
 
     public void setShowDebug(boolean showDebug) {
-        this.showDebug = showDebug;
+        debugContext.setShowDebug(showDebug);
     }
 
     public boolean isGodMode() {
-        return godMode;
+        return debugContext.isGodMode();
     }
 
     public void setGodMode(boolean godMode) {
-        this.godMode = godMode;
+        debugContext.setGodMode(godMode);
     }
 
     public boolean isFastRun() {
-        return fastRun;
+        return debugContext.isFastRun();
     }
 
     public void setFastRun(boolean fastRun) {
-        this.fastRun = fastRun;
+        debugContext.setFastRun(fastRun);
     }
 
     public boolean isShowHitbox() {
-        return showHitbox;
+        return debugContext.isShowHitbox();
     }
 
     public void setShowHitbox(boolean showHitbox) {
-        this.showHitbox = showHitbox;
+        debugContext.setShowHitbox(showHitbox);
     }
 
     public float getEnemyTimeScale() {
-        return enemyTimeScale;
+        return spellState.getEnemyTimeScale();
     }
 
     public void setEnemyTimeScale(float enemyTimeScale) {
-        this.enemyTimeScale = enemyTimeScale;
+        spellState.setEnemyTimeScale(enemyTimeScale);
     }
 
     public boolean isLightsOut() {
-        return lightsOut;
+        return spellState.isLightsOut();
     }
 
     public void setLightsOut(boolean lightsOut) {
-        this.lightsOut = lightsOut;
+        spellState.setLightsOut(lightsOut);
     }
 
     public float getShowEnemiesTimer() {
-        return showEnemiesTimer;
+        return spellState.getShowEnemiesTimer();
     }
 
     public void setShowEnemiesTimer(float showEnemiesTimer) {
-        this.showEnemiesTimer = showEnemiesTimer;
+        spellState.setShowEnemiesTimer(showEnemiesTimer);
     }
 
     public boolean isEnemyBlinkVisible() {
-        return enemyBlinkVisible;
+        return spellState.isEnemyBlinkVisible();
     }
 
     public void setEnemyBlinkVisible(boolean enemyBlinkVisible) {
-        this.enemyBlinkVisible = enemyBlinkVisible;
+        spellState.setEnemyBlinkVisible(enemyBlinkVisible);
     }
 
     public LevelConfig getCurrentLevelConfig() {
@@ -278,11 +291,11 @@ public class ProgressContext {
     }
 
     public float getDamageMultiplier() {
-        return damageMultiplier;
+        return playerStats.getDamageMultiplier();
     }
 
     public void setDamageMultiplier(float damageMultiplier) {
-        this.damageMultiplier = damageMultiplier;
+        playerStats.setDamageMultiplier(damageMultiplier);
     }
 
     public Player getPlayer() {
@@ -302,27 +315,14 @@ public class ProgressContext {
     }
 
     public void reset() {
-        hp = 100f;
-        maxHp = 100f;
-        stamina = 100f;
-        maxStamina = 100f;
-        morale = 100f;
-        level = 1;
-        exp = 0;
-        expToNextLevel = 100f;
+        playerStats.reset();
+        debugContext.reset();
+        spellState.reset();
         hasNao = false;
         hasUsb = false;
         coffeeCount = 0;
         libraryCleared = false;
         labCleared = false;
-        showHitbox = false;
-        godMode = false;
-        fastRun = false;
-        enemyTimeScale = 1.0f;
-        lightsOut = false;
-        showEnemiesTimer = 0f;
-        enemyBlinkVisible = true;
-        damageMultiplier = 1.0f;
         player = null;
         weaponLevels.clear();
         gearLevels.clear();
