@@ -19,12 +19,12 @@ import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.factory.EntityFactory;
-import hust.adventure.items.weapons.WeaponManager;
-import hust.adventure.items.weapons.Weaponable;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.items.Gear;
 import hust.adventure.items.GearManager;
+import hust.adventure.weapons.WeaponManager;
+import hust.adventure.weapons.Weaponable;
 
 /**
  * Main player character class.
@@ -136,7 +136,7 @@ public class Player extends BaseActor implements Targetable {
         setSpeedMultiplier(wingsSpeedMultiplier);
 
         super.update(delta);
-        
+
         // Sync core stats to global context via persistence service
         PlayerPersistenceService.saveStats(this);
 

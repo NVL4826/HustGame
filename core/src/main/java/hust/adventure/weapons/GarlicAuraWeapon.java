@@ -1,4 +1,4 @@
-package hust.adventure.items.weapons;
+package hust.adventure.weapons;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,8 +10,8 @@ import hust.adventure.entities.base.Damageable;
 import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
- * A garlic weapon that creates an aura damaging all nearby enemies periodically.
- * Renders three rotating concentric dashed rings around the player.
+ * A garlic weapon that creates an aura damaging all nearby enemies periodically. Renders three rotating concentric
+ * dashed rings around the player.
  */
 public class GarlicAuraWeapon extends BaseWeapon {
     private float rotationAngle = 0f;
@@ -24,8 +24,8 @@ public class GarlicAuraWeapon extends BaseWeapon {
     @Override
     protected void executeAttackAction() {
         final float radius = getArea(); // Using 'area' stat as radius
-        final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInRadius(getOwner().getX(), getOwner().getY(),
-                radius, CollisionLayer.ENEMY);
+        final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInRadius(getOwner().getX(),
+                getOwner().getY(), radius, CollisionLayer.ENEMY);
 
         for (final GameEntity target : targets) {
             if (target instanceof Damageable) {
@@ -47,9 +47,12 @@ public class GarlicAuraWeapon extends BaseWeapon {
         final float baseRadius = getArea();
 
         // Draw 3 rotating concentric circles
-        ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.6f, rotationAngle, new Color(0.85f, 0.95f, 0.75f, 0.3f));
-        ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.8f, -rotationAngle * 0.7f, new Color(0.85f, 0.95f, 0.75f, 0.25f));
-        ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 1.0f, rotationAngle * 0.4f, new Color(0.85f, 0.95f, 0.75f, 0.15f));
+        ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.6f, rotationAngle,
+                new Color(0.85f, 0.95f, 0.75f, 0.3f));
+        ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.8f, -rotationAngle * 0.7f,
+                new Color(0.85f, 0.95f, 0.75f, 0.25f));
+        ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 1.0f, rotationAngle * 0.4f,
+                new Color(0.85f, 0.95f, 0.75f, 0.15f));
     }
 
     @Override
@@ -63,22 +66,22 @@ public class GarlicAuraWeapon extends BaseWeapon {
 
     private void applyLevelStats() {
         switch (getLevel()) {
-            case 2:
-                setArea(60f * 1.4f);
-                setBaseDamage(7f);
-                break;
-            case 3:
-                setCooldown(1.2f);
-                setBaseDamage(8f);
-                break;
-            case 4:
-                setArea(60f * 1.6f);
-                setBaseDamage(9f);
-                break;
-            case 5:
-                setCooldown(1.1f);
-                setBaseDamage(11f);
-                break;
+        case 2:
+            setArea(60f * 1.4f);
+            setBaseDamage(7f);
+            break;
+        case 3:
+            setCooldown(1.2f);
+            setBaseDamage(8f);
+            break;
+        case 4:
+            setArea(60f * 1.6f);
+            setBaseDamage(9f);
+            break;
+        case 5:
+            setCooldown(1.1f);
+            setBaseDamage(11f);
+            break;
         }
     }
 }

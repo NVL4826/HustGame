@@ -1,8 +1,8 @@
 package hust.adventure.ui.components;
 
 import hust.adventure.entities.Player;
-import hust.adventure.items.weapons.WeaponFactory;
-import hust.adventure.items.weapons.Weaponable;
+import hust.adventure.weapons.WeaponFactory;
+import hust.adventure.weapons.Weaponable;
 
 /**
  * Action representing a choice to unlock a new weapon or upgrade an existing one.
@@ -13,7 +13,8 @@ public class WeaponUpgradeAction implements UpgradeAction {
     private final String description;
     private final boolean isUnlock;
 
-    public WeaponUpgradeAction(final String weaponId, final String name, final String description, final boolean isUnlock) {
+    public WeaponUpgradeAction(final String weaponId, final String name, final String description,
+            final boolean isUnlock) {
         if (weaponId == null) {
             throw new IllegalArgumentException("Weapon ID cannot be null");
         }

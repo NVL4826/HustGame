@@ -3,7 +3,7 @@ package hust.adventure.screens.levels;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.enemies.LibraryBoss;
+import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
@@ -43,7 +43,7 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
     // State
     private LevelContext context;
     private BookPuzzle   puzzle;
-    private LibraryBoss  libraryBoss;
+    private BaseEnemy    libraryBoss;
 
     private boolean puzzleSolved   = false;
     private boolean enemiesSpawned = false;
@@ -114,7 +114,7 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
         puzzleSolved = true;
 
         // Spawn boss
-        libraryBoss = (LibraryBoss) context.getEntityFactory()
+        libraryBoss = (BaseEnemy) context.getEntityFactory()
                 .createLibraryBoss(BOSS_SPAWN_X, BOSS_SPAWN_Y);
 
         // Spawn quái thường xung quanh boss

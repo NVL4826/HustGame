@@ -1,4 +1,4 @@
-package hust.adventure.items.weapons;
+package hust.adventure.weapons;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,8 +15,8 @@ import hust.adventure.events.EventType;
 import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
- * A whip weapon that hits enemies in a rectangular area in front of the player.
- * Supports area scaling and burst strikes in alternating directions.
+ * A whip weapon that hits enemies in a rectangular area in front of the player. Supports area scaling and burst strikes
+ * in alternating directions.
  */
 public class WhipWeapon extends BaseWeapon {
     private final Rectangle hitArea;
@@ -35,11 +35,10 @@ public class WhipWeapon extends BaseWeapon {
         final boolean isSecondStrike = (getAmount() > 1 && getShotsRemaining() == 1);
         updateHitArea(isSecondStrike);
         flashTimer = FLASH_DURATION;
-        EventDispatcher.getInstance().dispatch(
-            new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/whip.wav")
-        );
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/whip.wav"));
 
-        final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea, CollisionLayer.ENEMY);
+        final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea,
+                CollisionLayer.ENEMY);
         for (final GameEntity target : targets) {
             if (target instanceof Damageable) {
                 ((Damageable) target).takeDamage(getEffectiveDamage());
@@ -59,7 +58,8 @@ public class WhipWeapon extends BaseWeapon {
     public void draw(final SpriteBatch batch) {
         if (flashTimer > 0) {
             // Draw a semi-transparent rectangle for the whip effect
-            ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height, new Color(1, 1, 1, 0.5f));
+            ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height,
+                    new Color(1, 1, 1, 0.5f));
         }
     }
 
@@ -68,11 +68,16 @@ public class WhipWeapon extends BaseWeapon {
             return Direction.DOWN;
         }
         switch (dir) {
-            case RIGHT: return Direction.LEFT;
-            case LEFT: return Direction.RIGHT;
-            case UP: return Direction.DOWN;
-            case DOWN: return Direction.UP;
-            default: return Direction.DOWN;
+        case RIGHT:
+            return Direction.LEFT;
+        case LEFT:
+            return Direction.RIGHT;
+        case UP:
+            return Direction.DOWN;
+        case DOWN:
+            return Direction.UP;
+        default:
+            return Direction.DOWN;
         }
     }
 
@@ -115,19 +120,19 @@ public class WhipWeapon extends BaseWeapon {
 
     private void applyLevelStats() {
         switch (getLevel()) {
-            case 2:
-                setAmount(2);
-                break;
-            case 3:
-                setBaseDamage(15f);
-                break;
-            case 4:
-                setArea(1.1f); // area +10%
-                setBaseDamage(20f);
-                break;
-            case 5:
-                setBaseDamage(25f);
-                break;
+        case 2:
+            setAmount(2);
+            break;
+        case 3:
+            setBaseDamage(15f);
+            break;
+        case 4:
+            setArea(1.1f); // area +10%
+            setBaseDamage(20f);
+            break;
+        case 5:
+            setBaseDamage(25f);
+            break;
         }
     }
 }

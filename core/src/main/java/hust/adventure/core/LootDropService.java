@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
-import hust.adventure.entities.enemies.FinalBoss;
-import hust.adventure.entities.enemies.LibraryBoss;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
@@ -34,7 +32,7 @@ public class LootDropService implements EventListener, Disposable {
             
             if (deadEntity instanceof BaseEnemy) {
                 // Determine drop
-                if (deadEntity instanceof LibraryBoss || deadEntity instanceof FinalBoss) {
+                if (((BaseEnemy) deadEntity).isBoss()) {
                     Texture tex = assetManager.getTexture(GameAssetManager.CHEST_TEXTURE_PATH);
                     entityFactory.createTreasureChest(deadEntity.getX(), deadEntity.getY(), tex);
                 } else {

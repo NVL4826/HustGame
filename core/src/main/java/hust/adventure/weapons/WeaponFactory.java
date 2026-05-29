@@ -1,4 +1,4 @@
-package hust.adventure.items.weapons;
+package hust.adventure.weapons;
 
 import hust.adventure.entities.Player;
 

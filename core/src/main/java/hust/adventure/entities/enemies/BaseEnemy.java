@@ -11,14 +11,19 @@ import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.base.BaseActor;
 import hust.adventure.entities.components.AIBehavior;
+import hust.adventure.entities.components.AttackBehavior;
+import hust.adventure.entities.components.BehaviorRegistry;
+import hust.adventure.entities.components.DeathBehavior;
+import hust.adventure.entities.components.EnemyBehaviors;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.base.Damageable;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
  * Base class for all enemy types. Inherits core living entity logic from BaseActor.
  */
-public abstract class BaseEnemy extends BaseActor {
+public class BaseEnemy extends BaseActor {
     private static final float HP_BAR_OFFSET_Y = 5f;
     private static final float HP_BAR_HEIGHT = 5f;
     private static final float NAME_TEXT_OFFSET_Y = 25f;
@@ -28,8 +33,12 @@ public abstract class BaseEnemy extends BaseActor {
     private Color color;
     private CollisionManager collisionManager;
     private EntityFactory factory;
-    private AIBehavior behavior;
+    private AIBehavior movementBehavior;
+    private AttackBehavior attackBehavior;
     private float contactDamage;
+    private boolean split;
+    private boolean boss;
+    private DeathBehavior deathBehavior;
 
     public BaseEnemy() {
         super();
@@ -45,6 +54,27 @@ public abstract class BaseEnemy extends BaseActor {
             final Color color, final CollisionManager collisionManager, final float contactDamage) {
         super(x, y, w, h, maxHp);
         init(x, y, w, h, maxHp, name, color, collisionManager, contactDamage);
+    }
+
+    /**
+     * Constructs a BaseEnemy from its configuration data.
+     *
+     * @param x                horizontal spawn position
+     * @param y                vertical spawn position
+     * @param collisionManager standard collision manager
+     * @param config           the loaded configuration parameters
+     */
+    public BaseEnemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config) {
+        super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());
+        init(x, y, config.getWidth(), config.getHeight(), config.getMaxHp(), config.getName(),
+                config.getColor(), collisionManager, config.getContactDamage());
+        setSpeed(config.getSpeed());
+        this.boss = config.isBoss();
+
+        final EnemyBehaviors behaviors = BehaviorRegistry.create(config);
+        setMovementBehavior(behaviors.getMovementBehavior());
+        setAttackBehavior(behaviors.getAttackBehavior());
+        setDeathBehavior(behaviors.getDeathBehavior());
     }
 
     /**
@@ -105,8 +135,11 @@ public abstract class BaseEnemy extends BaseActor {
         if (isDead())
             return;
 
-        if (behavior != null) {
-            behavior.execute(this, delta, player, entityManager);
+        if (movementBehavior != null) {
+            movementBehavior.execute(this, delta, player, entityManager);
+        }
+        if (attackBehavior != null) {
+            attackBehavior.execute(this, delta, player, entityManager);
         }
 
         // Clamp to map boundaries after movement updates
@@ -130,8 +163,22 @@ public abstract class BaseEnemy extends BaseActor {
         }
     }
 
-    public final void setBehavior(final AIBehavior behavior) {
-        this.behavior = behavior;
+    /**
+     * Sets the movement/AI behavior strategy.
+     *
+     * @param movementBehavior the movement behavior strategy
+     */
+    public final void setMovementBehavior(final AIBehavior movementBehavior) {
+        this.movementBehavior = movementBehavior;
+    }
+
+    /**
+     * Sets the attack behavior strategy.
+     *
+     * @param attackBehavior the attack behavior strategy
+     */
+    public final void setAttackBehavior(final AttackBehavior attackBehavior) {
+        this.attackBehavior = attackBehavior;
     }
 
     @Override
@@ -160,9 +207,15 @@ public abstract class BaseEnemy extends BaseActor {
     }
 
     /**
-     * Template method for subclass-specific rendering.
+     * Renders the enemy's visual sprite or geometry. Default implementation
+     * draws a colored rectangle. Override for custom sprites.
+     *
+     * @param batch the active SpriteBatch
      */
-    protected abstract void renderSpecific(SpriteBatch batch);
+    protected void renderSpecific(final SpriteBatch batch) {
+        ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(),
+                getHeight(), getColor());
+    }
 
     public void drawDebug(final ShapeRenderer sr, final SpriteBatch batch, final BitmapFont font) {
         sr.setColor(color);
@@ -193,8 +246,64 @@ public abstract class BaseEnemy extends BaseActor {
         this.factory = factory;
     }
 
-    protected final EntityFactory getFactory() {
+    public final EntityFactory getFactory() {
         return factory;
+    }
+
+    /**
+     * Checks if this enemy is a child split of another enemy.
+     *
+     * @return true if it is a split child, false otherwise
+     */
+    public final boolean isSplit() {
+        return split;
+    }
+
+    /**
+     * Sets whether this enemy is a child split of another enemy.
+     *
+     * @param split true if split child, false otherwise
+     */
+    public final void setSplit(final boolean split) {
+        this.split = split;
+    }
+
+    /**
+     * Checks if this enemy is classified as a boss.
+     *
+     * @return true if boss, false otherwise
+     */
+    public boolean isBoss() {
+        return boss;
+    }
+
+    /**
+     * Sets whether this enemy is classified as a boss.
+     *
+     * @param boss true if boss, false otherwise
+     */
+    public final void setBoss(final boolean boss) {
+        this.boss = boss;
+    }
+
+    /**
+     * Sets the death behavior for this enemy.
+     *
+     * @param deathBehavior the death behavior to execute on destruction
+     */
+    public final void setDeathBehavior(final DeathBehavior deathBehavior) {
+        this.deathBehavior = deathBehavior;
+    }
+
+    @Override
+    public void destroy() {
+        if (isDestroyed()) {
+            return;
+        }
+        super.destroy();
+        if (deathBehavior != null) {
+            deathBehavior.onDestroy(this);
+        }
     }
 
 }

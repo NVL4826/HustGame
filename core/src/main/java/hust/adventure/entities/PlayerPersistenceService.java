@@ -2,8 +2,8 @@ package hust.adventure.entities;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.items.Gear;
-import hust.adventure.items.weapons.WeaponFactory;
-import hust.adventure.items.weapons.Weaponable;
+import hust.adventure.weapons.WeaponFactory;
+import hust.adventure.weapons.Weaponable;
 
 import java.util.Map;
 

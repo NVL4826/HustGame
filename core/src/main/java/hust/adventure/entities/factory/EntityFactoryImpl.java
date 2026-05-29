@@ -7,11 +7,14 @@ import com.badlogic.gdx.utils.Array;
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
+import hust.adventure.core.EnemyDataManager;
 import hust.adventure.core.GameAssetManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.base.BaseEntity;
 import hust.adventure.entities.combat.Projectile;
-import hust.adventure.entities.enemies.*;
+import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.EnemyConfig;
+import hust.adventure.entities.enemies.FinalBoss;
 import hust.adventure.entities.environment.LibraryArtifact;
 import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.interactables.ExpGem;
@@ -33,20 +36,32 @@ public class EntityFactoryImpl implements EntityFactory {
     private final GameAssetManager assetManager;
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
+    private final EnemyDataManager enemyDataManager;
     private final Array<Texture> bookTextures = new Array<>();
 
-    public EntityFactoryImpl(GameAssetManager assetManager, EntityManager entityManager,
-            CollisionManager collisionManager) {
+    /**
+     * Constructs the EntityFactoryImpl.
+     *
+     * @param assetManager     the global asset manager
+     * @param entityManager    the global entity manager
+     * @param collisionManager the spatial collision manager
+     * @param enemyDataManager the configuration loader for enemies
+     */
+    public EntityFactoryImpl(final GameAssetManager assetManager, final EntityManager entityManager,
+            final CollisionManager collisionManager, final EnemyDataManager enemyDataManager) {
         if (assetManager == null)
             throw new NullPointerException("assetManager cannot be null");
         if (entityManager == null)
             throw new NullPointerException("entityManager cannot be null");
         if (collisionManager == null)
             throw new NullPointerException("collisionManager cannot be null");
+        if (enemyDataManager == null)
+            throw new NullPointerException("enemyDataManager cannot be null");
 
         this.assetManager = assetManager;
         this.entityManager = entityManager;
         this.collisionManager = collisionManager;
+        this.enemyDataManager = enemyDataManager;
 
         // Pre-cache book textures for easy random access
         for (int i = 19; i <= 29; i++)
@@ -65,24 +80,12 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public BaseEntity createEnemy(String type, float x, float y) {
-        BaseEnemy enemy;
-        switch (type.toLowerCase()) {
-        case "syntax_error":
-            enemy = new SyntaxErrorEnemy(x, y, collisionManager);
-            break;
-        case "null_pointer":
-            enemy = new NullPointerEnemy(x, y, collisionManager);
-            break;
-        case "infinite_loop":
-            enemy = new InfiniteLoopEnemy(x, y, collisionManager);
-            break;
-        case "stack_overflow":
-            enemy = new StackOverflowEnemy(x, y, collisionManager);
-            break;
-        default:
+    public BaseEntity createEnemy(final String type, final float x, final float y) {
+        final EnemyConfig config = enemyDataManager.getEnemyConfig(type);
+        if (config == null) {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
+        final BaseEnemy enemy = new BaseEnemy(x, y, collisionManager, config);
         enemy.setFactory(this);
         enemy.setCollider(new Collider(enemy, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
         entityManager.addEntity(enemy);
@@ -141,16 +144,12 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public BaseEntity createLibraryBoss(float x, float y) {
-        LibraryBoss boss = new LibraryBoss(x, y, collisionManager);
-        boss.setFactory(this);
-        boss.setCollider(new Collider(boss, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
-        entityManager.addEntity(boss);
-        return boss;
+    public BaseEntity createLibraryBoss(final float x, final float y) {
+        return createEnemy("library_boss", x, y);
     }
 
     @Override
-    public BaseEntity createLibraryArtifact(float x, float y) {
+    public BaseEntity createLibraryArtifact(final float x, final float y) {
         BaseEntity artifact = new LibraryArtifact(x, y);
         artifact.setCollider(new Collider(artifact, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
         entityManager.addEntity(artifact);
@@ -158,8 +157,12 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public FinalBoss createFinalBoss(float x, float y, Texture texture) {
-        FinalBoss boss = new FinalBoss(x, y, collisionManager, texture);
+    public FinalBoss createFinalBoss(final float x, final float y, final Texture texture) {
+        final EnemyConfig config = enemyDataManager.getEnemyConfig("final_boss");
+        if (config == null) {
+            throw new IllegalStateException("Config for final_boss is missing!");
+        }
+        final FinalBoss boss = new FinalBoss(x, y, collisionManager, texture, config);
         boss.setFactory(this);
         boss.setCollider(new Collider(boss, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
         entityManager.addEntity(boss);

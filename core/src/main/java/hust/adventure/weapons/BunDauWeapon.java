@@ -1,4 +1,4 @@
-package hust.adventure.items.weapons;
+package hust.adventure.weapons;
 
 import com.badlogic.gdx.graphics.Color;
 import hust.adventure.entities.Player;

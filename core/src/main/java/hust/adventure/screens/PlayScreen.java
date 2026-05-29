@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
+import hust.adventure.core.EnemyDataManager;
 import hust.adventure.core.LootDropService;
 import hust.adventure.core.ScenarioService;
 import hust.adventure.core.config.LevelConfig;
@@ -28,7 +29,6 @@ import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.enemies.BaseEnemy;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
-import hust.adventure.items.weapons.WeaponUpgradeService;
 import hust.adventure.events.*;
 import hust.adventure.gamestate.PlayMode;
 import hust.adventure.graphics.CameraManager;
@@ -42,6 +42,7 @@ import hust.adventure.stats.LevelManager;
 import hust.adventure.ui.UIManager;
 import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.components.UpgradeAction;
+import hust.adventure.weapons.WeaponUpgradeService;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
 import hust.adventure.world.WorldManager;
@@ -99,7 +100,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.entityManager = new EntityManager();
         this.collisionManager = new CollisionManager(entityManager, 64f);
 
-        this.entityFactory = new EntityFactoryImpl(game.getAssetManager(), entityManager, collisionManager);
+        final EnemyDataManager enemyDataManager = new EnemyDataManager("configs/enemies.json");
+        this.entityFactory = new EntityFactoryImpl(game.getAssetManager(), entityManager, collisionManager,
+                enemyDataManager);
         this.uiManager = new UIManager();
         this.inputReader = new InputReader();
         this.lightingManager = new LightingManager();
