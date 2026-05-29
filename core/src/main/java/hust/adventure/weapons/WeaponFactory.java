@@ -1,13 +1,40 @@
 package hust.adventure.weapons;
 
+import com.badlogic.gdx.utils.ObjectMap;
+import hust.adventure.core.WeaponDataManager;
 import hust.adventure.entities.Player;
 
 /**
- * Factory for creating weapons.
+ * Factory for creating weapons using a data-driven approach and registry pattern.
  */
 public class WeaponFactory {
+    private final WeaponDataManager weaponDataManager;
+    private final ObjectMap<String, WeaponProvider> providers;
 
-    public static Weaponable createWeapon(final String id, final Player player) {
+    /**
+     * Functional interface for weapon creation.
+     */
+    public interface WeaponProvider {
+        Weaponable create(Player player, WeaponConfig config);
+    }
+
+    public WeaponFactory(final WeaponDataManager weaponDataManager) {
+        if (weaponDataManager == null) {
+            throw new IllegalArgumentException("WeaponDataManager cannot be null");
+        }
+        this.weaponDataManager = weaponDataManager;
+        this.providers = new ObjectMap<>();
+        registerDefaultProviders();
+    }
+
+    private void registerDefaultProviders() {
+        providers.put("whip", WhipWeapon::new);
+        providers.put("magic_wand", MagicWandWeapon::new);
+        providers.put("garlic", GarlicAuraWeapon::new);
+        providers.put("bun_dau", BunDauWeapon::new);
+    }
+
+    public Weaponable createWeapon(final String id, final Player player) {
         if (id == null) {
             throw new IllegalArgumentException("Weapon ID cannot be null");
         }
@@ -15,17 +42,16 @@ public class WeaponFactory {
             throw new IllegalArgumentException("Player cannot be null");
         }
 
-        switch (id.toLowerCase()) {
-        case "whip":
-            return new WhipWeapon(player, 10f, 1.35f, 1.0f);
-        case "magic_wand":
-            return new MagicWandWeapon(player, 10f, 1.2f, 1.0f);
-        case "garlic":
-            return new GarlicAuraWeapon(player, 5f, 1.3f, 60f);
-        case "bun_dau":
-            return new BunDauWeapon(player, 6.5f, 1.0f, 1.0f);
-        default:
-            throw new IllegalArgumentException("Unknown weapon id: " + id);
+        final WeaponConfig config = weaponDataManager.getConfig(id);
+        if (config == null) {
+            throw new IllegalArgumentException("No configuration found for weapon ID: " + id);
         }
+
+        final WeaponProvider provider = providers.get(id);
+        if (provider == null) {
+            throw new IllegalArgumentException("Unknown weapon id or missing provider: " + id);
+        }
+
+        return provider.create(player, config);
     }
 }

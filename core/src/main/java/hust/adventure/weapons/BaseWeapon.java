@@ -9,42 +9,31 @@ import hust.adventure.core.context.ProgressContext;
  */
 public abstract class BaseWeapon implements Weaponable {
     private final Player owner;
+    private final WeaponConfig config;
     private float baseDamage;
     private float cooldown;
     private float area;
     private int level;
     private float currentCooldownTimer;
-    private final String id;
-    private final String name;
-    private final String description;
     private int amount;
     private int pierce;
     private float projectileInterval;
     private int shotsRemaining;
     private float shotTimer;
 
-    public BaseWeapon(final Player owner, final String id, final String name, final String description,
-            final float baseDamage, final float cooldown, final float area) {
+    public BaseWeapon(final Player owner, final WeaponConfig config) {
         if (owner == null) {
             throw new IllegalArgumentException("Owner cannot be null");
         }
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
-        if (name == null) {
-            throw new IllegalArgumentException("Name cannot be null");
-        }
-        if (description == null) {
-            throw new IllegalArgumentException("Description cannot be null");
+        if (config == null) {
+            throw new IllegalArgumentException("Config cannot be null");
         }
         this.owner = owner;
-        this.id = id;
-        this.name = name;
-        this.description = description;
+        this.config = config;
         this.level = 1;
-        this.baseDamage = baseDamage;
-        this.cooldown = cooldown;
-        this.area = area;
+        this.baseDamage = config.getBaseDamage();
+        this.cooldown = config.getCooldown();
+        this.area = config.getArea();
         this.currentCooldownTimer = 0;
         this.amount = 1;
         this.pierce = 1;
@@ -103,9 +92,23 @@ public abstract class BaseWeapon implements Weaponable {
 
     @Override
     public void upgrade(final float damageBonus, final float cooldownReduction) {
+        if (this.level >= config.getMaxLevel()) {
+            return;
+        }
         this.level++;
         this.baseDamage += damageBonus;
         this.cooldown = Math.max(0.1f, this.cooldown - cooldownReduction);
+
+        if (config.getLevels() != null && config.getLevels().size >= this.level) {
+            final WeaponLevelConfig levelCfg = config.getLevels().get(this.level - 1);
+            if (levelCfg != null) {
+                if (levelCfg.getBaseDamage() > 0) this.baseDamage = levelCfg.getBaseDamage();
+                if (levelCfg.getCooldown() > 0) this.cooldown = levelCfg.getCooldown();
+                if (levelCfg.getArea() > 0) this.area = levelCfg.getArea();
+                if (levelCfg.getAmount() > 0) this.amount = levelCfg.getAmount();
+                if (levelCfg.getPierce() > 0) this.pierce = levelCfg.getPierce();
+            }
+        }
     }
 
     @Override
@@ -191,17 +194,17 @@ public abstract class BaseWeapon implements Weaponable {
 
     @Override
     public final String getId() {
-        return id;
+        return config.getId();
     }
 
     @Override
     public final String getName() {
-        return name;
+        return config.getName();
     }
 
     @Override
     public final String getDescription() {
-        return description;
+        return config.getDescription();
     }
 
     @Override

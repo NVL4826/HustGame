@@ -37,6 +37,9 @@ import hust.adventure.items.UpgradeCatalog;
 import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.components.GearUpgradeAction;
 import hust.adventure.entities.PlayerPersistenceService;
+import hust.adventure.core.WeaponDataManager;
+import hust.adventure.weapons.WeaponFactory;
+import hust.adventure.ui.components.WeaponUpgradeAction;
 
 /**
  * Lớp gốc quản lý vòng đời ứng dụng và lưu trữ các phân hệ trung tâm.
@@ -95,6 +98,14 @@ public class HustGame extends Game implements EventListener {
         LevelUpChoiceBuilder.setGearDataManager(gearDataManager);
         GearUpgradeAction.setGearFactory(gearFactory);
         PlayerPersistenceService.setGearFactory(gearFactory);
+
+        // Nạp và đăng ký cấu hình Weapons từ JSON
+        final WeaponDataManager weaponDataManager = new WeaponDataManager("configs/weapons.json");
+        final WeaponFactory weaponFactory = new WeaponFactory(weaponDataManager);
+        UpgradeCatalog.setWeaponDataManager(weaponDataManager);
+        LevelUpChoiceBuilder.setWeaponDataManager(weaponDataManager);
+        WeaponUpgradeAction.setWeaponFactory(weaponFactory);
+        PlayerPersistenceService.setWeaponFactory(weaponFactory);
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));

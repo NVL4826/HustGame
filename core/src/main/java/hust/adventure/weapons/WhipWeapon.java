@@ -25,8 +25,8 @@ public class WhipWeapon extends BaseWeapon {
     private float flashTimer = 0f;
     private static final float FLASH_DURATION = 0.15f;
 
-    public WhipWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
-        super(owner, "whip", "Roi da", "Tấn công kẻ địch trước mặt theo hình chữ nhật.", baseDamage, cooldown, area);
+    public WhipWeapon(final Player owner, final WeaponConfig config) {
+        super(owner, config);
         this.hitArea = new Rectangle();
     }
 
@@ -109,30 +109,4 @@ public class WhipWeapon extends BaseWeapon {
         }
     }
 
-    @Override
-    public void upgrade(final float damageBonus, final float cooldownReduction) {
-        if (getLevel() >= 5) {
-            return;
-        }
-        super.upgrade(damageBonus, cooldownReduction);
-        applyLevelStats();
-    }
-
-    private void applyLevelStats() {
-        switch (getLevel()) {
-        case 2:
-            setAmount(2);
-            break;
-        case 3:
-            setBaseDamage(15f);
-            break;
-        case 4:
-            setArea(1.1f); // area +10%
-            setBaseDamage(20f);
-            break;
-        case 5:
-            setBaseDamage(25f);
-            break;
-        }
-    }
 }

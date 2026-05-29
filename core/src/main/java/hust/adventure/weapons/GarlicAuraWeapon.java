@@ -16,9 +16,8 @@ import hust.adventure.graphics.ShapeDrawUtils;
 public class GarlicAuraWeapon extends BaseWeapon {
     private float rotationAngle = 0f;
 
-    public GarlicAuraWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
-        super(owner, "garlic", "Tỏi bảo hộ", "Tạo vòng hào quang gây sát thương xung quanh.", baseDamage, cooldown,
-                area);
+    public GarlicAuraWeapon(final Player owner, final WeaponConfig config) {
+        super(owner, config);
     }
 
     @Override
@@ -55,33 +54,4 @@ public class GarlicAuraWeapon extends BaseWeapon {
                 new Color(0.85f, 0.95f, 0.75f, 0.15f));
     }
 
-    @Override
-    public void upgrade(final float damageBonus, final float cooldownReduction) {
-        if (getLevel() >= 5) {
-            return;
-        }
-        super.upgrade(damageBonus, cooldownReduction);
-        applyLevelStats();
-    }
-
-    private void applyLevelStats() {
-        switch (getLevel()) {
-        case 2:
-            setArea(60f * 1.4f);
-            setBaseDamage(7f);
-            break;
-        case 3:
-            setCooldown(1.2f);
-            setBaseDamage(8f);
-            break;
-        case 4:
-            setArea(60f * 1.6f);
-            setBaseDamage(9f);
-            break;
-        case 5:
-            setCooldown(1.1f);
-            setBaseDamage(11f);
-            break;
-        }
-    }
 }

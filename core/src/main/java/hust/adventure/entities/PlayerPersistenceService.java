@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public class PlayerPersistenceService {
     private static GearFactory gearFactory;
+    private static WeaponFactory weaponFactory;
 
     /**
      * Sets the GearFactory instance used for restoring gear instances.
@@ -21,6 +22,15 @@ public class PlayerPersistenceService {
      */
     public static void setGearFactory(final GearFactory factory) {
         gearFactory = factory;
+    }
+
+    /**
+     * Sets the WeaponFactory instance used for restoring weapon instances.
+     *
+     * @param factory the WeaponFactory instance
+     */
+    public static void setWeaponFactory(final WeaponFactory factory) {
+        weaponFactory = factory;
     }
 
     /**
@@ -62,18 +72,22 @@ public class PlayerPersistenceService {
         // Restore weapons
         if (savedWeapons.isEmpty()) {
             // Initialize with default weapon for a new game
-            final Weaponable defaultWeapon = WeaponFactory.createWeapon("bun_dau", player);
-            player.getWeaponManager().addWeapon(defaultWeapon);
+            if (weaponFactory != null) {
+                final Weaponable defaultWeapon = weaponFactory.createWeapon("bun_dau", player);
+                player.getWeaponManager().addWeapon(defaultWeapon);
+            }
             savedWeapons.put("bun_dau", 1);
         } else {
             for (final Map.Entry<String, Integer> entry : savedWeapons.entrySet()) {
                 final String weaponId = entry.getKey();
                 final int targetLevel = entry.getValue();
-                final Weaponable weapon = WeaponFactory.createWeapon(weaponId, player);
-                for (int i = 1; i < targetLevel; i++) {
-                    weapon.upgrade(0f, 0f);
+                if (weaponFactory != null) {
+                    final Weaponable weapon = weaponFactory.createWeapon(weaponId, player);
+                    for (int i = 1; i < targetLevel; i++) {
+                        weapon.upgrade(0f, 0f);
+                    }
+                    player.getWeaponManager().addWeapon(weapon);
                 }
-                player.getWeaponManager().addWeapon(weapon);
             }
         }
 

@@ -12,6 +12,11 @@ public class WeaponUpgradeAction implements UpgradeAction {
     private final String name;
     private final String description;
     private final boolean isUnlock;
+    private static WeaponFactory weaponFactory;
+
+    public static void setWeaponFactory(final WeaponFactory factory) {
+        weaponFactory = factory;
+    }
 
     public WeaponUpgradeAction(final String weaponId, final String name, final String description,
             final boolean isUnlock) {
@@ -46,7 +51,9 @@ public class WeaponUpgradeAction implements UpgradeAction {
             return;
         }
         if (isUnlock) {
-            player.getWeaponManager().addWeapon(WeaponFactory.createWeapon(weaponId, player));
+            if (weaponFactory != null) {
+                player.getWeaponManager().addWeapon(weaponFactory.createWeapon(weaponId, player));
+            }
         } else {
             for (final Weaponable w : player.getWeaponManager().getWeapons()) {
                 if (w.getId().equalsIgnoreCase(weaponId)) {

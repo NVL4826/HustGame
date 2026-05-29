@@ -17,8 +17,8 @@ public class MagicWandWeapon extends BaseWeapon {
     private static final float PROJECTILE_SPEED = 200f;
     private static final float MAX_RANGE = 400f;
 
-    public MagicWandWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
-        super(owner, "magic_wand", "Gậy phép", "Bắn tia phép vào kẻ địch gần nhất.", baseDamage, cooldown, area);
+    public MagicWandWeapon(final Player owner, final WeaponConfig config) {
+        super(owner, config);
     }
 
     @Override
@@ -49,29 +49,4 @@ public class MagicWandWeapon extends BaseWeapon {
         }
     }
 
-    @Override
-    public void upgrade(final float damageBonus, final float cooldownReduction) {
-        if (getLevel() >= 5) {
-            return;
-        }
-        super.upgrade(damageBonus, cooldownReduction);
-        applyLevelStats();
-    }
-
-    private void applyLevelStats() {
-        switch (getLevel()) {
-        case 2:
-            setAmount(2);
-            break;
-        case 3:
-            setCooldown(1.0f);
-            break;
-        case 4:
-            setAmount(3);
-            break;
-        case 5:
-            setBaseDamage(20f);
-            break;
-        }
-    }
 }

@@ -15,9 +15,8 @@ public class BunDauWeapon extends BaseWeapon {
     private static final float PROJECTILE_SPEED = 350f;
     private static final Color PROJECTILE_COLOR = Color.YELLOW;
 
-    public BunDauWeapon(final Player owner, final float baseDamage, final float cooldown, final float area) {
-        super(owner, "bun_dau", "Bun Dau", "Bắn một viên đậu theo hướng nhìn hiện tại khi nhấn phím Space.", baseDamage,
-                cooldown, area);
+    public BunDauWeapon(final Player owner, final WeaponConfig config) {
+        super(owner, config);
     }
 
     @Override
@@ -58,30 +57,4 @@ public class BunDauWeapon extends BaseWeapon {
         }
     }
 
-    @Override
-    public void upgrade(final float damageBonus, final float cooldownReduction) {
-        if (getLevel() >= 5) {
-            return;
-        }
-        super.upgrade(damageBonus, cooldownReduction);
-        applyLevelStats();
-    }
-
-    private void applyLevelStats() {
-        switch (getLevel()) {
-        case 2:
-            setAmount(2);
-            break;
-        case 3:
-            setAmount(3);
-            setBaseDamage(11.5f);
-            break;
-        case 4:
-            setAmount(4);
-            break;
-        case 5:
-            setPierce(2);
-            break;
-        }
-    }
 }

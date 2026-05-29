@@ -2,6 +2,7 @@ package hust.adventure.ui;
 
 import com.badlogic.gdx.utils.Array;
 import hust.adventure.core.GearDataManager;
+import hust.adventure.core.WeaponDataManager;
 import hust.adventure.entities.Player;
 import hust.adventure.items.Gear;
 import hust.adventure.items.UpgradeCatalog;
@@ -18,6 +19,7 @@ import hust.adventure.ui.components.WeaponUpgradeAction;
  */
 public final class LevelUpChoiceBuilder {
     private static GearDataManager gearDataManager;
+    private static WeaponDataManager weaponDataManager;
 
     private LevelUpChoiceBuilder() {
         // Prevent instantiation
@@ -30,6 +32,15 @@ public final class LevelUpChoiceBuilder {
      */
     public static void setGearDataManager(final GearDataManager manager) {
         gearDataManager = manager;
+    }
+
+    /**
+     * Sets the WeaponDataManager instance used for retrieving available weapons.
+     *
+     * @param manager the WeaponDataManager instance
+     */
+    public static void setWeaponDataManager(final WeaponDataManager manager) {
+        weaponDataManager = manager;
     }
 
     /**
@@ -46,7 +57,9 @@ public final class LevelUpChoiceBuilder {
         final Array<UpgradeAction> possibleChoices = new Array<>();
 
         // 1. Gather Weapon Choices
-        final String[] weaponIds = { "whip", "magic_wand", "garlic", "bun_dau" };
+        final Array<String> weaponIds = weaponDataManager != null
+                ? weaponDataManager.getAllWeaponIds()
+                : new Array<>(new String[] { "whip", "magic_wand", "garlic", "bun_dau" });
         for (final String id : weaponIds) {
             Weaponable weapon = null;
             for (final Weaponable w : player.getWeaponManager().getWeapons()) {
