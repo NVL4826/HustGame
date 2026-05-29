@@ -32,10 +32,8 @@ public class BossFightBehavior implements LevelBehavior {
     private static final int PHASE_VICTORY = 4;
 
     // Boss fight parameter constants
-    private static final float INITIAL_BOSS_HP = 1000f;
     private static final float QUESTION_TIMER_RESET = 5f;
     private static final float ANSWER_HEAL = 10f;
-    private static final float ANSWER_DAMAGE_DEALT = 150f;
     private static final float WRONG_ANSWER_DAMAGE = 25f;
     private static final float TIME_OUT_DAMAGE = 25f;
     private static final float FINAL_PHASE_WRONG_DAMAGE = 30f;
@@ -233,7 +231,6 @@ public class BossFightBehavior implements LevelBehavior {
             if (answerRects[i].contains(context.getPlayer().getX(), context.getPlayer().getY())) {
                 if (i == questions.get(currentQuestionIndex).correctIndex) {
                     context.getPlayer().heal(ANSWER_HEAL);
-                    finalBoss.takeDamage(ANSWER_DAMAGE_DEALT);
                 } else {
                     context.getPlayer().takeDamage(WRONG_ANSWER_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
@@ -276,10 +273,10 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     private void checkPhase() {
-        if (finalBoss.getHp() <= 700f && phase == PHASE_QA) {
+        if (currentQuestionIndex >= 2 && phase == PHASE_QA) {
             phase = PHASE_DODGE;
         }
-        if (finalBoss.getHp() <= 350f || currentQuestionIndex >= questions.size()) {
+        if (currentQuestionIndex >= questions.size()) {
             phase = PHASE_FINAL;
         }
     }
@@ -294,43 +291,6 @@ public class BossFightBehavior implements LevelBehavior {
             shakeY = MathUtils.random(-SHAKE_MAGNITUDE * intensity, SHAKE_MAGNITUDE * intensity);
             context.getCamera().position.add(shakeX, shakeY, 0);
             context.getCamera().update();
-        }
-
-        // ── Boss HP bar (top-center, styled) ─────────────────────────────
-        if (phase != PHASE_VICTORY && finalBoss != null) {
-            float bossHpPct = finalBoss.getHp() / finalBoss.getMaxHp();
-            float barX = 150f, barY = 575f, barW = 500f, barH = 14f;
-
-            context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
-            context.getShapeRenderer().begin(ShapeType.Filled);
-
-            // Dark background
-            context.getShapeRenderer().setColor(0.08f, 0.02f, 0.02f, 1f);
-            context.getShapeRenderer().rect(barX - 2, barY - 2, barW + 4, barH + 4);
-
-            // Gradient fill: orange-red → red
-            int steps = (int)(barW * bossHpPct);
-            for (int i = 0; i < steps; i++) {
-                float t = i / (float) steps;
-                context.getShapeRenderer().setColor(1f - t * 0.3f, 0.15f * (1f - t), 0f, 1f);
-                context.getShapeRenderer().rect(barX + i, barY, 1f, barH);
-            }
-            context.getShapeRenderer().end();
-
-            // Border
-            context.getShapeRenderer().begin(ShapeType.Line);
-            context.getShapeRenderer().setColor(0.9f, 0.2f, 0.2f, 0.9f);
-            context.getShapeRenderer().rect(barX, barY, barW, barH);
-            context.getShapeRenderer().end();
-
-            // Label – chỉ hiện HP, không hiện tên T.H.T
-            context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
-            context.getGame().getSpriteBatch().begin();
-            context.getGame().getFont().setColor(1f, 0.5f, 0.2f, 1f);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    (int) finalBoss.getHp() + " / " + (int) finalBoss.getMaxHp(),
-                    barX + barW / 2f - 30f, barY + barH + 14f);
-            context.getGame().getSpriteBatch().end();
         }
 
         switch (phase) {
@@ -380,17 +340,18 @@ public class BossFightBehavior implements LevelBehavior {
         context.getGame().getSpriteBatch().begin();
         // Speaker name
         context.getGame().getFont().setColor(1f, 0.65f, 0.2f, 1f);
-        context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "Tạ Hải Tùng", BOX_X + 10f, BOX_Y + BOX_H - 6f);
+        context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "Tạ Hải Tùng", BOX_X + 10f,
+                BOX_Y + BOX_H - 6f);
         // Dialogue
         if (dialogueIndex < dialogue.length) {
             context.getGame().getFont().setColor(Color.WHITE);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    "\"" + dialogue[dialogueIndex] + "\"", BOX_X + 14f, BOX_Y + BOX_H - 34f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "\"" + dialogue[dialogueIndex] + "\"",
+                    BOX_X + 14f, BOX_Y + BOX_H - 34f);
             // Blink hint
             float blink = (System.currentTimeMillis() / 500) % 2 == 0 ? 1f : 0.3f;
             context.getGame().getFont().setColor(0.7f, 0.7f, 0.7f, blink);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    "▶ Nhấn ENTER để tiếp tục", BOX_X + BOX_W - 230f, BOX_Y + 18f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "▶ Nhấn ENTER để tiếp tục",
+                    BOX_X + BOX_W - 230f, BOX_Y + 18f);
         }
         context.getGame().getSpriteBatch().end();
     }
@@ -400,9 +361,9 @@ public class BossFightBehavior implements LevelBehavior {
             final Question q = questions.get(currentQuestionIndex);
 
             final float QX = 70f, QY = 310f, QW = 660f, QH = 55f;
-            final float[] ANS_X = {80f,  300f, 520f};
+            final float[] ANS_X = { 80f, 300f, 520f };
             final float ANS_Y = 220f, ANS_W = 195f, ANS_H = 55f;
-            final String[] LABELS = {"A", "B", "C"};
+            final String[] LABELS = { "A", "B", "C" };
 
             context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
             context.getShapeRenderer().begin(ShapeType.Filled);
@@ -416,8 +377,7 @@ public class BossFightBehavior implements LevelBehavior {
 
             // ── Answer slots ───────────────────────────────────────────────
             for (int i = 0; i < 3; i++) {
-                boolean playerInside = answerRects[i].contains(
-                        context.getPlayer().getX(), context.getPlayer().getY());
+                boolean playerInside = answerRects[i].contains(context.getPlayer().getX(), context.getPlayer().getY());
                 if (playerInside) {
                     context.getShapeRenderer().setColor(0.25f, 0.55f, 0.95f, 0.95f);
                 } else {
@@ -436,7 +396,7 @@ public class BossFightBehavior implements LevelBehavior {
             context.getShapeRenderer().setColor(0.1f, 0.05f, 0.05f, 1f);
             context.getShapeRenderer().rect(QX, QY - 10f, QW, 7f);
             // Fill gradient green→red
-            int tSteps = (int)(QW * timerPct);
+            int tSteps = (int) (QW * timerPct);
             for (int i = 0; i < tSteps; i++) {
                 float t = 1f - (i / (float) tSteps);
                 context.getShapeRenderer().setColor(t, 1f - t * 0.8f, 0f, 1f);
@@ -450,8 +410,7 @@ public class BossFightBehavior implements LevelBehavior {
             context.getShapeRenderer().setColor(0.3f, 0.6f, 1.0f, 0.8f);
             context.getShapeRenderer().rect(QX, QY, QW, QH);
             for (int i = 0; i < 3; i++) {
-                boolean playerInside = answerRects[i].contains(
-                        context.getPlayer().getX(), context.getPlayer().getY());
+                boolean playerInside = answerRects[i].contains(context.getPlayer().getX(), context.getPlayer().getY());
                 context.getShapeRenderer().setColor(playerInside ? Color.WHITE : new Color(0.3f, 0.5f, 0.9f, 0.7f));
                 context.getShapeRenderer().rect(ANS_X[i], ANS_Y, ANS_W, ANS_H);
             }
@@ -468,25 +427,24 @@ public class BossFightBehavior implements LevelBehavior {
 
             // Question text
             context.getGame().getFont().setColor(Color.WHITE);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    q.text, QX + 90f, QY + QH - 4f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), q.text, QX + 90f, QY + QH - 4f);
 
             // Answer texts + letter badge
             for (int i = 0; i < q.answers.length; i++) {
                 // Badge letter
                 context.getGame().getFont().setColor(Color.WHITE);
-                context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                        LABELS[i], ANS_X[i] + 4f, ANS_Y + ANS_H - 4f);
+                context.getGame().getFont().draw(context.getGame().getSpriteBatch(), LABELS[i], ANS_X[i] + 4f,
+                        ANS_Y + ANS_H - 4f);
                 // Answer text
                 context.getGame().getFont().setColor(0.9f, 0.9f, 1.0f, 1f);
-                context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                        q.answers[i], ANS_X[i] + 8f, ANS_Y + ANS_H - 24f);
+                context.getGame().getFont().draw(context.getGame().getSpriteBatch(), q.answers[i], ANS_X[i] + 8f,
+                        ANS_Y + ANS_H - 24f);
             }
 
             // Hint
             context.getGame().getFont().setColor(0.5f, 0.6f, 0.8f, 1f);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    "Di chuyển vào ô đáp án → nhấn SPACE", 220f, 175f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "Di chuyển vào ô đáp án → nhấn SPACE",
+                    220f, 175f);
 
             context.getGame().getFont().setColor(Color.WHITE);
             context.getGame().getSpriteBatch().end();
@@ -502,7 +460,8 @@ public class BossFightBehavior implements LevelBehavior {
                 context.getShapeRenderer().rect(paper.rect.x, paper.rect.y, paper.rect.width, paper.rect.height);
                 // Red top strip
                 context.getShapeRenderer().setColor(0.9f, 0.1f, 0.1f, 1f);
-                context.getShapeRenderer().rect(paper.rect.x, paper.rect.y + paper.rect.height - 7f, paper.rect.width, 7f);
+                context.getShapeRenderer().rect(paper.rect.x, paper.rect.y + paper.rect.height - 7f, paper.rect.width,
+                        7f);
             }
             context.getShapeRenderer().end();
 
@@ -517,8 +476,8 @@ public class BossFightBehavior implements LevelBehavior {
             context.getGame().getSpriteBatch().begin();
             context.getGame().getFont().setColor(0.8f, 0.05f, 0.05f, 1f);
             for (final FallingPaper paper : fallingPapers) {
-                context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                        paper.text, paper.rect.x + 5f, paper.rect.y + 20f);
+                context.getGame().getFont().draw(context.getGame().getSpriteBatch(), paper.text, paper.rect.x + 5f,
+                        paper.rect.y + 20f);
             }
             context.getGame().getFont().setColor(Color.WHITE);
             context.getGame().getSpriteBatch().end();

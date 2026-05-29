@@ -33,24 +33,6 @@ public class SyntaxErrorEnemy extends BaseEnemy {
         float dy = p.getY() - getY();
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
-        // Map bounds check handled by CollisionManager
-        CollisionManager cm = getCollisionManager();
-        if (cm != null && cm.getMapWidth() > 0 && !cm.isInfinite()) {
-            float minX = getWidth() / 2f;
-            float maxX = cm.getMapWidth() - getWidth() / 2f;
-            float minY = getHeight() / 2f;
-            float maxY = cm.getMapHeight() - getHeight() / 2f;
-
-            if (getX() < minX)
-                setX(minX);
-            if (getX() > maxX)
-                setX(maxX);
-            if (getY() < minY)
-                setY(minY);
-            if (getY() > maxY)
-                setY(maxY);
-        }
-
         fireTimer += delta;
         if (fireTimer >= 1.5f) {
             fireTimer = 0;

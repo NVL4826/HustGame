@@ -50,8 +50,13 @@ public class CameraManager {
                 float halfWidth = (camera.viewportWidth * camera.zoom) / 2f;
                 float halfHeight = (camera.viewportHeight * camera.zoom) / 2f;
 
-                camera.position.x = MathUtils.clamp(camera.position.x, halfWidth, mapWidth - halfWidth);
-                camera.position.y = MathUtils.clamp(camera.position.y, halfHeight, mapHeight - halfHeight);
+                if (mapWidth > camera.viewportWidth * camera.zoom) {
+                    camera.position.x = MathUtils.clamp(camera.position.x, halfWidth, mapWidth - halfWidth);
+                }
+
+                if (mapHeight > camera.viewportHeight * camera.zoom) {
+                    camera.position.y = MathUtils.clamp(camera.position.y, halfHeight, mapHeight - halfHeight);
+                }
             }
         }
         camera.update();

@@ -54,13 +54,26 @@ public abstract class BaseEnemy extends BaseActor {
             final Color color, final CollisionManager collisionManager, final float contactDamage) {
         this.width = w;
         this.height = h;
-        setX(x);
-        setY(y);
+        this.collisionManager = collisionManager;
+
+        float clampedX = x;
+        float clampedY = y;
+        if (collisionManager != null && collisionManager.getMapWidth() > 0 && !collisionManager.isInfinite()) {
+            final float minX = w / 2f;
+            final float maxX = collisionManager.getMapWidth() - w / 2f;
+            final float minY = h / 2f;
+            final float maxY = collisionManager.getMapHeight() - h / 2f;
+
+            clampedX = Math.max(minX, Math.min(maxX, clampedX));
+            clampedY = Math.max(minY, Math.min(maxY, clampedY));
+        }
+
+        setX(clampedX);
+        setY(clampedY);
         this.setMaxHp(maxHp);
         this.setHp(maxHp);
         this.name = name;
         this.color = color;
-        this.collisionManager = collisionManager;
         this.contactDamage = contactDamage;
         setDestroyed(false);
     }
@@ -94,6 +107,26 @@ public abstract class BaseEnemy extends BaseActor {
 
         if (behavior != null) {
             behavior.execute(this, delta, player, entityManager);
+        }
+
+        // Clamp to map boundaries after movement updates
+        if (collisionManager != null && collisionManager.getMapWidth() > 0 && !collisionManager.isInfinite()) {
+            final float minX = getWidth() / 2f;
+            final float maxX = collisionManager.getMapWidth() - getWidth() / 2f;
+            final float minY = getHeight() / 2f;
+            final float maxY = collisionManager.getMapHeight() - getHeight() / 2f;
+
+            if (getX() < minX) {
+                setX(minX);
+            } else if (getX() > maxX) {
+                setX(maxX);
+            }
+
+            if (getY() < minY) {
+                setY(minY);
+            } else if (getY() > maxY) {
+                setY(maxY);
+            }
         }
     }
 
