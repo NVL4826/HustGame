@@ -1,6 +1,7 @@
 package hust.adventure.ui;
 
 import com.badlogic.gdx.utils.Array;
+import hust.adventure.core.GearDataManager;
 import hust.adventure.entities.Player;
 import hust.adventure.items.Gear;
 import hust.adventure.items.UpgradeCatalog;
@@ -16,9 +17,19 @@ import hust.adventure.ui.components.WeaponUpgradeAction;
  * weapons and gears to determine possible upgrades.
  */
 public final class LevelUpChoiceBuilder {
+    private static GearDataManager gearDataManager;
 
     private LevelUpChoiceBuilder() {
         // Prevent instantiation
+    }
+
+    /**
+     * Sets the GearDataManager instance used for retrieving available gears.
+     *
+     * @param manager the GearDataManager instance
+     */
+    public static void setGearDataManager(final GearDataManager manager) {
+        gearDataManager = manager;
     }
 
     /**
@@ -57,7 +68,9 @@ public final class LevelUpChoiceBuilder {
         }
 
         // 2. Gather Gear Choices
-        final String[] gearIds = { "spinach", "empty_tome", "wings", "hollow_heart", "candelabrador", "attractorb" };
+        final Array<String> gearIds = gearDataManager != null
+                ? gearDataManager.getAllGearIds()
+                : new Array<>(new String[] { "spinach", "empty_tome", "wings", "hollow_heart", "candelabrador", "attractorb" });
         for (final String id : gearIds) {
             final Gear gear = player.getGearManager().getGear(id);
             if (gear == null) {

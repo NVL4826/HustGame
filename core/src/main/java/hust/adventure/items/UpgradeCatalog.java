@@ -1,13 +1,25 @@
 package hust.adventure.items;
 
+import hust.adventure.core.GearDataManager;
+
 /**
  * Catalog for weapon names, upgrade descriptions, and gear properties.
  * Provides unified access to upgrade descriptions for level up screens.
  */
 public final class UpgradeCatalog {
+    private static GearDataManager gearDataManager;
 
     private UpgradeCatalog() {
         // Prevent instantiation
+    }
+
+    /**
+     * Sets the GearDataManager instance used for retrieving gear details.
+     *
+     * @param manager the GearDataManager instance
+     */
+    public static void setGearDataManager(final GearDataManager manager) {
+        gearDataManager = manager;
     }
 
     /**
@@ -89,7 +101,10 @@ public final class UpgradeCatalog {
      * @return The localized display name of the gear.
      */
     public static String getGearName(final String id) {
-        return Gear.getDefaultName(id);
+        if (gearDataManager == null) {
+            return id;
+        }
+        return gearDataManager.getGearName(id);
     }
 
     /**
@@ -100,6 +115,9 @@ public final class UpgradeCatalog {
      * @return The description of the upgrade/unlock effect for that level.
      */
     public static String getGearLevelDescription(final String id, final int level) {
-        return Gear.getDefaultDescription(id, level);
+        if (gearDataManager == null) {
+            return "";
+        }
+        return gearDataManager.getGearLevelDescription(id, level);
     }
 }

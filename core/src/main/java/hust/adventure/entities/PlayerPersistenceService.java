@@ -2,6 +2,7 @@ package hust.adventure.entities;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.items.Gear;
+import hust.adventure.items.GearFactory;
 import hust.adventure.weapons.WeaponFactory;
 import hust.adventure.weapons.Weaponable;
 
@@ -11,6 +12,16 @@ import java.util.Map;
  * Service to handle saving and restoring Player stats, weapons, and gears to/from the global ProgressContext.
  */
 public class PlayerPersistenceService {
+    private static GearFactory gearFactory;
+
+    /**
+     * Sets the GearFactory instance used for restoring gear instances.
+     *
+     * @param factory the GearFactory instance
+     */
+    public static void setGearFactory(final GearFactory factory) {
+        gearFactory = factory;
+    }
 
     /**
      * Saves the player's active weapons and gears levels to the ProgressContext.
@@ -71,9 +82,9 @@ public class PlayerPersistenceService {
             for (final Map.Entry<String, Integer> entry : savedGears.entrySet()) {
                 final String gearId = entry.getKey();
                 final int targetLevel = entry.getValue();
-                final String gearName = Gear.getDefaultName(gearId);
-                final String gearDesc = Gear.getDefaultDescription(gearId, 1);
-                final Gear gear = new Gear(gearId, gearName, gearDesc);
+                final Gear gear = gearFactory != null
+                        ? gearFactory.createGear(gearId)
+                        : new Gear(gearId, gearId, "");
                 for (int i = 1; i < targetLevel; i++) {
                     gear.upgrade();
                 }

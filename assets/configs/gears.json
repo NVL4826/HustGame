@@ -1,0 +1,84 @@
+{
+  "gears": [
+    {
+      "id": "spinach",
+      "name": "Hành Tây (Spinach)",
+      "description": "Tăng sát thương cho tất cả vũ khí.",
+      "levelDescriptions": [
+        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 1).",
+        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 2).",
+        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 3).",
+        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 4).",
+        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 5)."
+      ],
+      "maxLevel": 5
+    },
+    {
+      "id": "empty_tome",
+      "name": "Sách Rỗng (Empty Tome)",
+      "description": "Giảm thời gian hồi chiêu của vũ khí.",
+      "levelDescriptions": [
+        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 1).",
+        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 2).",
+        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 3).",
+        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 4).",
+        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 5)."
+      ],
+      "maxLevel": 5
+    },
+    {
+      "id": "wings",
+      "name": "Đôi Cánh (Wings)",
+      "description": "Tăng tốc độ di chuyển của nhân vật.",
+      "levelDescriptions": [
+        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 1).",
+        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 2).",
+        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 3).",
+        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 4).",
+        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 5)."
+      ],
+      "maxLevel": 5
+    },
+    {
+      "id": "hollow_heart",
+      "name": "Trái Tim Rỗng (Hollow Heart)",
+      "description": "Tăng lượng HP tối đa.",
+      "levelDescriptions": [
+        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 1).",
+        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 2).",
+        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 3).",
+        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 4).",
+        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 5)."
+      ],
+      "maxLevel": 5,
+      "onEquipEffect": "increase_max_hp",
+      "onEquipValue": 20
+    },
+    {
+      "id": "candelabrador",
+      "name": "Chân Nến (Candelabrador)",
+      "description": "Tăng phạm vi tấn công của vũ khí.",
+      "levelDescriptions": [
+        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 1).",
+        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 2).",
+        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 3).",
+        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 4).",
+        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 5)."
+      ],
+      "maxLevel": 5
+    },
+    {
+      "id": "attractorb",
+      "name": "Nam Châm (Attractorb)",
+      "description": "Tăng phạm vi hút ngọc kinh nghiệm.",
+      "levelDescriptions": [
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 1).",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 2).",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 3).",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 4).",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 5)."
+      ],
+      "maxLevel": 5
+    }
+  ]
+}

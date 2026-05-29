@@ -2,11 +2,14 @@ package hust.adventure.ui.components;
 
 import hust.adventure.entities.Player;
 import hust.adventure.items.Gear;
+import hust.adventure.items.GearFactory;
 
 /**
  * Action representing a choice to unlock a new gear or upgrade an existing one.
  */
 public class GearUpgradeAction implements UpgradeAction {
+    private static GearFactory gearFactory;
+
     private final String gearId;
     private final String name;
     private final String description;
@@ -26,6 +29,15 @@ public class GearUpgradeAction implements UpgradeAction {
         this.name = name;
         this.description = description;
         this.isUnlock = isUnlock;
+    }
+
+    /**
+     * Sets the GearFactory instance used to instantiate gears and apply effects.
+     *
+     * @param factory the GearFactory instance
+     */
+    public static void setGearFactory(final GearFactory factory) {
+        gearFactory = factory;
     }
 
     @Override
@@ -53,8 +65,8 @@ public class GearUpgradeAction implements UpgradeAction {
         }
 
         // Trigger immediate side-effects
-        if (gearId.equalsIgnoreCase("hollow_heart")) {
-            player.increaseMaxHp(20f);
+        if (gearFactory != null) {
+            gearFactory.applyEquipEffect(gearId, player);
         }
     }
 }

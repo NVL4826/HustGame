@@ -28,9 +28,15 @@ import hust.adventure.graphics.ShapeDrawUtils;
 import hust.adventure.core.audio.AudioManager;
 import com.badlogic.gdx.Screen;
 import hust.adventure.core.ItemDataManager;
+import hust.adventure.core.GearDataManager;
 import hust.adventure.items.ItemConfig;
 import hust.adventure.items.ItemFactory;
 import hust.adventure.items.ItemManager;
+import hust.adventure.items.GearFactory;
+import hust.adventure.items.UpgradeCatalog;
+import hust.adventure.ui.LevelUpChoiceBuilder;
+import hust.adventure.ui.components.GearUpgradeAction;
+import hust.adventure.entities.PlayerPersistenceService;
 
 /**
  * Lớp gốc quản lý vòng đời ứng dụng và lưu trữ các phân hệ trung tâm.
@@ -81,6 +87,14 @@ public class HustGame extends Game implements EventListener {
         for (final ItemConfig config : itemDataManager.getAllConfigs()) {
             ItemManager.instance.register(itemFactory.createItem(config));
         }
+
+        // Nạp và đăng ký cấu hình Gears từ JSON
+        final GearDataManager gearDataManager = new GearDataManager("configs/gears.json");
+        final GearFactory gearFactory = new GearFactory(gearDataManager);
+        UpgradeCatalog.setGearDataManager(gearDataManager);
+        LevelUpChoiceBuilder.setGearDataManager(gearDataManager);
+        GearUpgradeAction.setGearFactory(gearFactory);
+        PlayerPersistenceService.setGearFactory(gearFactory);
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));
