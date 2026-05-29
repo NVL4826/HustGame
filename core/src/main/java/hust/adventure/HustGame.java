@@ -27,6 +27,10 @@ import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.graphics.ShapeDrawUtils;
 import hust.adventure.core.audio.AudioManager;
 import com.badlogic.gdx.Screen;
+import hust.adventure.core.ItemDataManager;
+import hust.adventure.items.ItemConfig;
+import hust.adventure.items.ItemFactory;
+import hust.adventure.items.ItemManager;
 
 /**
  * Lớp gốc quản lý vòng đời ứng dụng và lưu trữ các phân hệ trung tâm.
@@ -47,7 +51,7 @@ public class HustGame extends Game implements EventListener {
         assetManager = new GameAssetManager();
         eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.addListener(EventType.MAP_TRANSITION, this);
-        
+
         audioManager = new AudioManager(assetManager);
         eventDispatcher.addListener(EventType.PLAY_SFX, audioManager);
         eventDispatcher.addListener(EventType.PLAY_BGM, audioManager);
@@ -70,6 +74,13 @@ public class HustGame extends Game implements EventListener {
                 + "àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ";
         font = generator.generateFont(parameter);
         generator.dispose();
+
+        // Nạp và đăng ký các vật phẩm từ cấu hình JSON
+        final ItemDataManager itemDataManager = new ItemDataManager("configs/items.json");
+        final ItemFactory itemFactory = new ItemFactory();
+        for (final ItemConfig config : itemDataManager.getAllConfigs()) {
+            ItemManager.instance.register(itemFactory.createItem(config));
+        }
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));

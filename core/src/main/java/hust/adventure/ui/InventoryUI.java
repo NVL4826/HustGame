@@ -23,51 +23,54 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Upgraded Inventory UI – grid layout with item sprites, hover tooltip,
- * and a modern dark-academic panel style.
+ * Upgraded Inventory UI – grid layout with item sprites, hover tooltip, and a modern dark-academic panel style.
  */
 public class InventoryUI {
     private final OrthographicCamera uiCam;
 
     // Panel geometry
-    private static final float PNL_W  = 460f;
-    private static final float PNL_H  = 340f;
-    private static final float PNL_X  = (800 - PNL_W) / 2f;
-    private static final float PNL_Y  = (600 - PNL_H) / 2f;
+    private static final float PNL_W = 460f;
+    private static final float PNL_H = 340f;
+    private static final float PNL_X = (800 - PNL_W) / 2f;
+    private static final float PNL_Y = (600 - PNL_H) / 2f;
 
     // Grid slots
-    private static final int   COLS   = 5;
-    private static final float SLOT_S = 90f;   // slot size (square)
+    private static final int COLS = 5;
+    private static final float SLOT_S = 90f; // slot size (square)
     private static final float SLOT_PAD = 6f;
     private static final float GRID_X = PNL_X + (PNL_W - COLS * (SLOT_S + SLOT_PAD)) / 2f + SLOT_PAD / 2f;
     private static final float GRID_Y = PNL_Y + 60f;
 
     // Sprite cache (ID → texture path)
     private static final Map<String, String> SPRITE_PATHS = new HashMap<>();
-    private static final Map<String, Texture> spriteCache  = new HashMap<>();
+    private static final Map<String, Texture> spriteCache = new HashMap<>();
 
     static {
-        SPRITE_PATHS.put("coffee_den",   "items/coffee.png");
-        SPRITE_PATHS.put("coffee_sua",   "items/coffee.png");
-        SPRITE_PATHS.put("coffee_da",    "items/coffee.png");
-        SPRITE_PATHS.put("coffee_chon",  "items/coffee.png");
+        SPRITE_PATHS.put("coffee_den", "items/coffee.png");
+        SPRITE_PATHS.put("coffee_sua", "items/coffee.png");
+        SPRITE_PATHS.put("coffee_da", "items/coffee.png");
+        SPRITE_PATHS.put("coffee_chon", "items/coffee.png");
         SPRITE_PATHS.put("energy_drink", "items/energy_drink.png");
-        SPRITE_PATHS.put("kho_ga",       "items/kho_ga.png");
-        SPRITE_PATHS.put("usb",          "items/usb.png");
-        SPRITE_PATHS.put("note",         "items/usb.png");
+        SPRITE_PATHS.put("kho_ga", "items/kho_ga.png");
+        SPRITE_PATHS.put("usb", "items/usb.png");
+        SPRITE_PATHS.put("note", "items/usb.png");
     }
 
     private static Texture getSprite(String id) {
         String path = SPRITE_PATHS.get(id);
-        if (path == null) return null;
+        if (path == null)
+            return null;
         return spriteCache.computeIfAbsent(path, p -> {
-            if (Gdx.files.internal(p).exists()) return new Texture(Gdx.files.internal(p));
+            if (Gdx.files.internal(p).exists())
+                return new Texture(Gdx.files.internal(p));
             return null;
         });
     }
 
     public static void disposeStatic() {
-        for (Texture t : spriteCache.values()) if (t != null) t.dispose();
+        for (Texture t : spriteCache.values())
+            if (t != null)
+                t.dispose();
         spriteCache.clear();
     }
 
@@ -81,7 +84,8 @@ public class InventoryUI {
     }
 
     public void render(Player player, SpriteBatch batch, ShapeRenderer sr, BitmapFont font) {
-        if (!ProgressContext.instance.isInventoryOpen()) return;
+        if (!ProgressContext.instance.isInventoryOpen())
+            return;
 
         sr.setProjectionMatrix(uiCam.combined);
         batch.setProjectionMatrix(uiCam.combined);
@@ -131,7 +135,7 @@ public class InventoryUI {
         for (int i = 0; i < totalSlots; i++) {
             float[] pos = slotPos(i);
             boolean isOccupied = i < itemList.size();
-            boolean isHovered  = (i == hoveredIndex);
+            boolean isHovered = (i == hoveredIndex);
             if (isHovered) {
                 sr.setColor(0.3f, 0.2f, 0.6f, 0.9f);
             } else if (isOccupied) {
@@ -230,11 +234,12 @@ public class InventoryUI {
         int row = i / COLS;
         float x = GRID_X + col * (SLOT_S + SLOT_PAD);
         float y = GRID_Y + row * (SLOT_S + SLOT_PAD);
-        return new float[]{x, y};
+        return new float[] { x, y };
     }
 
     public void update(Player player) {
-        if (!ProgressContext.instance.isInventoryOpen() || player == null) return;
+        if (!ProgressContext.instance.isInventoryOpen() || player == null)
+            return;
 
         int keyPressed = player.getController().getJustPressedNum();
         if (keyPressed > 0) {
