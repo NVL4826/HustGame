@@ -10,8 +10,13 @@ public class BaseItem implements Item {
     private final String id;
     private final String name;
     private final String description;
+    private final String spritePath;
 
     public BaseItem(final String id, final String name, final String description) {
+        this(id, name, description, null);
+    }
+
+    public BaseItem(final String id, final String name, final String description, final String spritePath) {
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -24,6 +29,7 @@ public class BaseItem implements Item {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.spritePath = spritePath;
     }
 
     @Override
@@ -39,6 +45,11 @@ public class BaseItem implements Item {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String getSpritePath() {
+        return spritePath;
     }
 
     @Override

@@ -5,6 +5,7 @@
       "id": "coffee_den",
       "name": "Cà Phê Đen",
       "description": "Hồi 10 HP, 30 Thể lực, tăng tốc trong 30s.",
+      "spritePath": "items/coffee.png",
       "effects": [
         {
           "effect": "heal",
@@ -52,6 +53,7 @@
       "id": "coffee_sua",
       "name": "Cà Phê Sữa",
       "description": "Hồi 20 HP, 25 Thể lực, tăng tốc và hồi máu theo thời gian.",
+      "spritePath": "items/coffee.png",
       "effects": [
         {
           "effect": "heal",
@@ -104,6 +106,7 @@
       "id": "coffee_da",
       "name": "Cà Phê Đá",
       "description": "Hồi 10 Thể lực.",
+      "spritePath": "items/coffee.png",
       "effects": [
         {
           "effect": "restore_stamina",
@@ -128,6 +131,7 @@
       "id": "coffee_chon",
       "name": "Cà Phê Chồn",
       "description": "Hồi 60 Thể lực, siêu tăng tốc nhưng gây ảo giác.",
+      "spritePath": "items/coffee.png",
       "effects": [
         {
           "effect": "heal",
@@ -186,6 +190,7 @@
       "id": "energy_drink",
       "name": "Nước tăng lực",
       "description": "Hồi 40 Thể lực.",
+      "spritePath": "items/energy_drink.png",
       "effects": [
         {
           "effect": "restore_stamina",
@@ -207,6 +212,7 @@
       "id": "kho_ga",
       "name": "Khô gà lá chanh",
       "description": "Hồi 25 HP.",
+      "spritePath": "items/kho_ga.png",
       "effects": [
         {
           "effect": "heal",
@@ -227,19 +233,22 @@
       "type": "base",
       "id": "note",
       "name": "Ghi chú",
-      "description": "Một mảnh giấy nhỏ có chữ."
+      "description": "Một mảnh giấy nhỏ có chữ.",
+      "spritePath": "items/usb.png"
     },
     {
       "type": "base",
       "id": "usb",
       "name": "USB",
-      "description": "USB chứa mã nguồn sửa lỗi hệ thống."
+      "description": "USB chứa mã nguồn sửa lỗi hệ thống.",
+      "spritePath": "items/usb.png"
     },
     {
       "type": "base",
       "id": "brain",
       "name": "Não Hoạt Động 100%",
-      "description": "Bảo vật từ thư viện - giúp tư duy sáng suốt."
+      "description": "Bảo vật từ thư viện - giúp tư duy sáng suốt.",
+      "spritePath": "items/brain.png"
     },
     {
       "type": "base",

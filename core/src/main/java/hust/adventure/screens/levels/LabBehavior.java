@@ -24,11 +24,6 @@ public class LabBehavior implements LevelBehavior, EventListener {
     private static final float BOSS_SPAWN_X = 400f;
     private static final float BOSS_SPAWN_Y = 100f;
     private static final String BOSS_MAP = "boss_room.tmx";
-    
-    private static final String ENEMY_NULL_POINTER = "null_pointer";
-    private static final String ENEMY_SYNTAX_ERROR = "syntax_error";
-    private static final String ENEMY_INFINITE_LOOP = "infinite_loop";
-    private static final String ENEMY_STACK_OVERFLOW = "stack_overflow";
 
     private static final int LIGHTS_OUT_WAVE = 4;
     private static final float LIGHTS_OUT_AMBIENT = 0.15f;
@@ -122,35 +117,35 @@ public class LabBehavior implements LevelBehavior, EventListener {
         switch (wave) {
             case 1:
                 for (int i = 0; i < 5; i++) {
-                    spawnLabEnemy(context, ENEMY_NULL_POINTER, MathUtils.random(100, 700), MathUtils.random(300, 500));
+                    spawnLabEnemy(context, "null_pointer", MathUtils.random(100, 700), MathUtils.random(300, 500));
                 }
                 break;
             case 2:
                 for (int i = 0; i < 3; i++) {
-                    spawnLabEnemy(context, ENEMY_NULL_POINTER, MathUtils.random(100, 700), MathUtils.random(300, 500));
+                    spawnLabEnemy(context, "null_pointer", MathUtils.random(100, 700), MathUtils.random(300, 500));
                 }
                 for (int i = 0; i < 2; i++) {
-                    spawnLabEnemy(context, ENEMY_SYNTAX_ERROR, MathUtils.random(100, 700), MathUtils.random(300, 500));
+                    spawnLabEnemy(context, "syntax_error", MathUtils.random(100, 700), MathUtils.random(300, 500));
                 }
                 break;
             case 3:
-                spawnLabEnemy(context, ENEMY_INFINITE_LOOP, 400, 400);
+                spawnLabEnemy(context, "infinite_loop", 400, 400);
                 for (int i = 0; i < 4; i++) {
-                    spawnLabEnemy(context, ENEMY_NULL_POINTER, MathUtils.random(100, 700), MathUtils.random(300, 500));
+                    spawnLabEnemy(context, "null_pointer", MathUtils.random(100, 700), MathUtils.random(300, 500));
                 }
                 break;
             case 4:
                 for (int i = 0; i < 2; i++) {
-                    spawnLabEnemy(context, ENEMY_INFINITE_LOOP, MathUtils.random(100, 700), MathUtils.random(300, 500));
+                    spawnLabEnemy(context, "infinite_loop", MathUtils.random(100, 700), MathUtils.random(300, 500));
                 }
                 for (int i = 0; i < 2; i++) {
-                    spawnLabEnemy(context, ENEMY_SYNTAX_ERROR, MathUtils.random(100, 700), MathUtils.random(300, 500));
+                    spawnLabEnemy(context, "syntax_error", MathUtils.random(100, 700), MathUtils.random(300, 500));
                 }
                 break;
             case 5:
-                spawnLabEnemy(context, ENEMY_STACK_OVERFLOW, 400, 400);
-                spawnLabEnemy(context, ENEMY_NULL_POINTER, 200, 400);
-                spawnLabEnemy(context, ENEMY_SYNTAX_ERROR, 600, 400);
+                spawnLabEnemy(context, "stack_overflow", 400, 400);
+                spawnLabEnemy(context, "null_pointer", 200, 400);
+                spawnLabEnemy(context, "syntax_error", 600, 400);
                 break;
         }
     }

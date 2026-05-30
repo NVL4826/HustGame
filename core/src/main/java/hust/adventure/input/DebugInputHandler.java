@@ -206,9 +206,9 @@ public class DebugInputHandler {
             final String enemyId = option.id;
             try {
                 if (player != null) {
-                    if (enemyId.equals("libboss")) {
+                    if (enemyId.equals("library_boss")) {
                         entityFactory.createLibraryBoss(player.getX() + 64f, player.getY());
-                    } else if (enemyId.equals("finalboss")) {
+                    } else if (enemyId.equals("final_boss")) {
                         entityFactory.createFinalBoss(player.getX() + 64f, player.getY(),
                                 assetManager.getTexture("Boss THT.png"));
                     } else {

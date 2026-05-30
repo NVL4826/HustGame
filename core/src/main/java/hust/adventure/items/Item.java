@@ -9,4 +9,5 @@ public interface Item {
     String getId();
     String getName();
     String getDescription();
+    String getSpritePath();
 }

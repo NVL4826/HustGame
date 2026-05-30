@@ -29,15 +29,11 @@ public class TestBehavior implements LevelBehavior {
 
         // Spawn Items in a row
         final float itemY = 200f;
-        final String[] itemIds = {
-                "coffee_den", "coffee_sua", "coffee_da", "coffee_chon",
-                "energy_drink", "kho_ga", "note"
-        };
-
-        for (int i = 0; i < itemIds.length; i++) {
-            final Item item = ItemManager.instance.getItem(itemIds[i]);
-            if (item != null) {
-                context.getEntityFactory().createItemDrop(100f + i * 100f, itemY, item, Color.WHITE);
+        int index = 0;
+        for (final Item item : ItemManager.instance.getAllItems()) {
+            if (item != null && item.getSpritePath() != null && !item.getSpritePath().isEmpty()) {
+                context.getEntityFactory().createItemDrop(100f + index * 100f, itemY, item, Color.WHITE);
+                index++;
             }
         }
     }

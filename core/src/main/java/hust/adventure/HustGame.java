@@ -35,6 +35,7 @@ import hust.adventure.items.ItemManager;
 import hust.adventure.items.GearFactory;
 import hust.adventure.items.UpgradeCatalog;
 import hust.adventure.ui.LevelUpChoiceBuilder;
+import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.components.GearUpgradeAction;
 import hust.adventure.entities.PlayerPersistenceService;
 import hust.adventure.core.WeaponDataManager;
@@ -86,6 +87,7 @@ public class HustGame extends Game implements EventListener {
 
         // Nạp và đăng ký các vật phẩm từ cấu hình JSON
         final ItemDataManager itemDataManager = new ItemDataManager("configs/items.json");
+        DebugOptionRegistry.setItemDataManager(itemDataManager);
         final ItemFactory itemFactory = new ItemFactory();
         for (final ItemConfig config : itemDataManager.getAllConfigs()) {
             ItemManager.instance.register(itemFactory.createItem(config));
@@ -93,6 +95,7 @@ public class HustGame extends Game implements EventListener {
 
         // Nạp và đăng ký cấu hình Gears từ JSON
         final GearDataManager gearDataManager = new GearDataManager("configs/gears.json");
+        DebugOptionRegistry.setGearDataManager(gearDataManager);
         final GearFactory gearFactory = new GearFactory(gearDataManager);
         UpgradeCatalog.setGearDataManager(gearDataManager);
         LevelUpChoiceBuilder.setGearDataManager(gearDataManager);
@@ -101,6 +104,7 @@ public class HustGame extends Game implements EventListener {
 
         // Nạp và đăng ký cấu hình Weapons từ JSON
         final WeaponDataManager weaponDataManager = new WeaponDataManager("configs/weapons.json");
+        DebugOptionRegistry.setWeaponDataManager(weaponDataManager);
         final WeaponFactory weaponFactory = new WeaponFactory(weaponDataManager);
         UpgradeCatalog.setWeaponDataManager(weaponDataManager);
         LevelUpChoiceBuilder.setWeaponDataManager(weaponDataManager);

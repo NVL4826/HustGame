@@ -14,12 +14,12 @@ public class ConsumableItem extends BaseItem implements Consumable {
     private final Consumer<BaseActor> consumptionEffect;
     private final List<FloatingTextInfo> floatingTexts;
 
-    public ConsumableItem(final String id, final String name, final String description, final Consumer<BaseActor> consumptionEffect) {
-        this(id, name, description, consumptionEffect, Collections.emptyList());
+    public ConsumableItem(final String id, final String name, final String description, final String spritePath, final Consumer<BaseActor> consumptionEffect) {
+        this(id, name, description, spritePath, consumptionEffect, Collections.emptyList());
     }
 
-    public ConsumableItem(final String id, final String name, final String description, final Consumer<BaseActor> consumptionEffect, final List<FloatingTextInfo> floatingTexts) {
-        super(id, name, description);
+    public ConsumableItem(final String id, final String name, final String description, final String spritePath, final Consumer<BaseActor> consumptionEffect, final List<FloatingTextInfo> floatingTexts) {
+        super(id, name, description, spritePath);
         if (consumptionEffect == null) {
             throw new IllegalArgumentException("Consumption effect cannot be null");
         }

@@ -3,12 +3,14 @@ package hust.adventure.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Array;
+
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.entities.enemies.EnemyConfigCatalog;
 
 /**
- * Manages the loading and retrieval of game data configurations (e.g. enemy definitions).
- * Decouples JSON parsing and data management from entity and factory classes (SRP).
+ * Manages the loading and retrieval of game data configurations (e.g. enemy definitions). Decouples JSON parsing and
+ * data management from entity and factory classes (SRP).
  */
 public class EnemyDataManager {
     private final ObjectMap<String, EnemyConfig> enemyConfigs = new ObjectMap<>();
@@ -47,5 +49,18 @@ public class EnemyDataManager {
             return null;
         }
         return enemyConfigs.get(type.toLowerCase());
+    }
+
+    /**
+     * Retrieves all loaded enemy types.
+     *
+     * @return an array of all enemy types
+     */
+    public Array<String> getAllEnemyTypes() {
+        final Array<String> types = new Array<>();
+        for (final ObjectMap.Entry<String, EnemyConfig> entry : enemyConfigs.entries()) {
+            types.add(entry.key);
+        }
+        return types;
     }
 }

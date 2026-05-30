@@ -28,7 +28,7 @@ public class UIManager implements UIProvider, Disposable {
 
     public void update(final float delta, final Player player) {
         damageTextManager.update(delta);
-        rouletteUI.update(delta);
+        rouletteUI.update(delta, player);
         inventoryUI.update(player);
         levelUpUI.update(player);
     }

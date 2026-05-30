@@ -38,4 +38,13 @@ public final class ItemManager {
         }
         return items.get(id);
     }
+
+    /**
+     * Retrieves all registered items.
+     *
+     * @return a collection of all registered Item definitions
+     */
+    public java.util.Collection<Item> getAllItems() {
+        return items.values();
+    }
 }

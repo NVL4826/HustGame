@@ -11,7 +11,10 @@ import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.items.ItemManager;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import hust.adventure.items.Item;
+import hust.adventure.items.Consumable;
 
 public class LootDropService implements EventListener, Disposable {
     private static final float DEFAULT_EXP_GEM_VALUE = 10f;
@@ -38,13 +41,18 @@ public class LootDropService implements EventListener, Disposable {
                 } else {
                     entityFactory.createExpGem(deadEntity.getX(), deadEntity.getY(), DEFAULT_EXP_GEM_VALUE);
                     
-                    // 30% chance to drop a random consumable (previously in LabBehavior)
+                    // 30% chance to drop a random consumable
                     if (MathUtils.random() < 0.3f) {
-                        final String[] items = { "coffee_den", "energy_drink", "kho_ga" };
-                        final Color[] colors = { Color.YELLOW, Color.GREEN, Color.BROWN };
-                        final int idx = MathUtils.random(0, 2);
-                        entityFactory.createItemDrop(deadEntity.getX(), deadEntity.getY(),
-                                ItemManager.instance.getItem(items[idx]), colors[idx]);
+                        final Array<Item> consumables = new Array<>();
+                        for (final Item item : ItemManager.instance.getAllItems()) {
+                            if (item instanceof Consumable) {
+                                consumables.add(item);
+                            }
+                        }
+                        if (consumables.size > 0) {
+                            final Item chosen = consumables.random();
+                            entityFactory.createItemDrop(deadEntity.getX(), deadEntity.getY(), chosen, Color.WHITE);
+                        }
                     }
                 }
             }

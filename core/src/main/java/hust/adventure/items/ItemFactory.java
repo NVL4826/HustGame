@@ -47,7 +47,7 @@ public class ItemFactory {
         if (config instanceof ConsumableItemConfig) {
             return createConsumableItem((ConsumableItemConfig) config);
         } else {
-            return new BaseItem(config.getId(), config.getName(), config.getDescription());
+            return new BaseItem(config.getId(), config.getName(), config.getDescription(), config.getSpritePath());
         }
     }
 
@@ -58,6 +58,7 @@ public class ItemFactory {
                 config.getId(),
                 config.getName(),
                 config.getDescription(),
+                config.getSpritePath(),
                 compositeEffect,
                 floatingTexts
         );

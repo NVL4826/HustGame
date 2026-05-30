@@ -8,6 +8,25 @@ public class ItemConfig {
     private String name;
     private String description;
     private String type;
+    private String spritePath;
+
+    /**
+     * Gets the sprite/icon asset path of the item.
+     *
+     * @return the sprite path
+     */
+    public String getSpritePath() {
+        return spritePath;
+    }
+
+    /**
+     * Sets the sprite/icon asset path of the item.
+     *
+     * @param spritePath the sprite path
+     */
+    public void setSpritePath(final String spritePath) {
+        this.spritePath = spritePath;
+    }
 
     /**
      * Gets the unique identifier of the item.

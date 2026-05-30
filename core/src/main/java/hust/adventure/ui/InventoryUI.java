@@ -41,24 +41,14 @@ public class InventoryUI {
     private static final float GRID_X = PNL_X + (PNL_W - COLS * (SLOT_S + SLOT_PAD)) / 2f + SLOT_PAD / 2f;
     private static final float GRID_Y = PNL_Y + 60f;
 
-    // Sprite cache (ID → texture path)
-    private static final Map<String, String> SPRITE_PATHS = new HashMap<>();
+    // Sprite cache (path → Texture)
     private static final Map<String, Texture> spriteCache = new HashMap<>();
 
-    static {
-        SPRITE_PATHS.put("coffee_den", "items/coffee.png");
-        SPRITE_PATHS.put("coffee_sua", "items/coffee.png");
-        SPRITE_PATHS.put("coffee_da", "items/coffee.png");
-        SPRITE_PATHS.put("coffee_chon", "items/coffee.png");
-        SPRITE_PATHS.put("energy_drink", "items/energy_drink.png");
-        SPRITE_PATHS.put("kho_ga", "items/kho_ga.png");
-        SPRITE_PATHS.put("usb", "items/usb.png");
-        SPRITE_PATHS.put("note", "items/usb.png");
-    }
-
-    private static Texture getSprite(String id) {
-        String path = SPRITE_PATHS.get(id);
-        if (path == null)
+    private static Texture getSprite(Item item) {
+        if (item == null)
+            return null;
+        String path = item.getSpritePath();
+        if (path == null || path.isEmpty())
             return null;
         return spriteCache.computeIfAbsent(path, p -> {
             if (Gdx.files.internal(p).exists())
@@ -187,7 +177,7 @@ public class InventoryUI {
             Item item = itemList.get(i).getKey();
             int count = itemList.get(i).getValue();
 
-            Texture sprite = getSprite(item.getId());
+            Texture sprite = getSprite(item);
             if (sprite != null) {
                 float pad = 4f;
                 batch.setColor(Color.WHITE);

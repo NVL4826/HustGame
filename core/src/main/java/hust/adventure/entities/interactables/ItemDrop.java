@@ -29,25 +29,10 @@ public class ItemDrop extends BaseEntity {
     /** Shared sprite cache – loaded lazily, disposed with disposeStaticResources(). */
     private static final Map<String, Texture> spriteCache = new HashMap<>();
 
-    /** Maps item ID → sprite file path under assets/. */
-    private static String spritePathFor(String itemId) {
-        switch (itemId) {
-            case "coffee_den":
-            case "coffee_sua":
-            case "coffee_da":
-            case "coffee_chon": return "items/coffee.png";
-            case "energy_drink":  return "items/energy_drink.png";
-            case "kho_ga":        return "items/kho_ga.png";
-            case "usb":           return "items/usb.png";
-            case "note":          return "items/usb.png"; // reuse USB icon for note
-            case "brain":         return "items/brain.png";
-            default:              return null;
-        }
-    }
-
-    private static Texture getSprite(String itemId) {
-        String path = spritePathFor(itemId);
-        if (path == null) return null;
+    private static Texture getSprite(Item item) {
+        if (item == null) return null;
+        String path = item.getSpritePath();
+        if (path == null || path.isEmpty()) return null;
         if (!spriteCache.containsKey(path)) {
             if (Gdx.files.internal(path).exists()) {
                 spriteCache.put(path, new Texture(Gdx.files.internal(path)));
@@ -114,7 +99,7 @@ public class ItemDrop extends BaseEntity {
         float drawX = getX() - getWidth() / 2f;
         float drawY = getY() - getHeight() / 2f + bob;
 
-        Texture sprite = getSprite(item.getId());
+        Texture sprite = getSprite(item);
         if (sprite != null) {
             batch.setColor(Color.WHITE);
             batch.draw(sprite, drawX, drawY, getWidth(), getHeight());

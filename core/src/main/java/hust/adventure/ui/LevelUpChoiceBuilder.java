@@ -1,5 +1,6 @@
 package hust.adventure.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import hust.adventure.core.GearDataManager;
 import hust.adventure.core.WeaponDataManager;
@@ -57,9 +58,12 @@ public final class LevelUpChoiceBuilder {
         final Array<UpgradeAction> possibleChoices = new Array<>();
 
         // 1. Gather Weapon Choices
+        if (weaponDataManager == null) {
+            Gdx.app.error("LevelUpChoiceBuilder", "WeaponDataManager is null!");
+        }
         final Array<String> weaponIds = weaponDataManager != null
                 ? weaponDataManager.getAllWeaponIds()
-                : new Array<>(new String[] { "whip", "magic_wand", "garlic", "bun_dau" });
+                : new Array<>();
         for (final String id : weaponIds) {
             Weaponable weapon = null;
             for (final Weaponable w : player.getWeaponManager().getWeapons()) {
@@ -81,9 +85,12 @@ public final class LevelUpChoiceBuilder {
         }
 
         // 2. Gather Gear Choices
+        if (gearDataManager == null) {
+            Gdx.app.error("LevelUpChoiceBuilder", "GearDataManager is null!");
+        }
         final Array<String> gearIds = gearDataManager != null
                 ? gearDataManager.getAllGearIds()
-                : new Array<>(new String[] { "spinach", "empty_tome", "wings", "hollow_heart", "candelabrador", "attractorb" });
+                : new Array<>();
         for (final String id : gearIds) {
             final Gear gear = player.getGearManager().getGear(id);
             if (gear == null) {

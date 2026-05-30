@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Vector2;
 
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
@@ -41,6 +42,7 @@ import hust.adventure.screens.levels.LevelContext;
 import hust.adventure.stats.LevelManager;
 import hust.adventure.ui.UIManager;
 import hust.adventure.ui.LevelUpChoiceBuilder;
+import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.weapons.WeaponUpgradeService;
 import hust.adventure.world.InfiniteMapRenderer;
@@ -101,6 +103,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.collisionManager = new CollisionManager(entityManager, 64f);
 
         final EnemyDataManager enemyDataManager = new EnemyDataManager("configs/enemies.json");
+        DebugOptionRegistry.setEnemyDataManager(enemyDataManager);
         this.entityFactory = new EntityFactoryImpl(game.getAssetManager(), entityManager, collisionManager,
                 enemyDataManager);
         this.uiManager = new UIManager();
@@ -189,7 +192,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         // Ưu tiên spawn point từ TMX (objectgroup "Spawn"), fallback sang LevelConfig
-        com.badlogic.gdx.math.Vector2 tmxSpawn = worldManager.getSpawnPoint();
+        Vector2 tmxSpawn = worldManager.getSpawnPoint();
         float spawnX = (tmxSpawn != null) ? tmxSpawn.x : config.getSpawnX();
         float spawnY = (tmxSpawn != null) ? tmxSpawn.y : config.getSpawnY();
 
