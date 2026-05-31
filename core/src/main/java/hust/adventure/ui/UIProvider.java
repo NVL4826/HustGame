@@ -12,7 +12,5 @@ public interface UIProvider {
 
     DamageTextManager getDamageTextManager();
 
-    RouletteUI getRouletteUI();
-
     DebugUI getDebugUI();
 }

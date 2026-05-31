@@ -15,7 +15,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
 
 public class GameAssetManager {
-    public static final String CHEST_TEXTURE_PATH = "titled/Objects/chest.png";
     private final AssetManager manager;
     private Texture whitePixel;
     private final Json json;
@@ -40,7 +39,6 @@ public class GameAssetManager {
         for (int i = 4; i <= 25; i++) {
             manager.load(i + ".png", Texture.class);
         }
-        manager.load(CHEST_TEXTURE_PATH, Texture.class);
 
         // Maps
         manager.load("Final Outside.tmx", TiledMap.class);
@@ -70,7 +68,6 @@ public class GameAssetManager {
         manager.load("audio/sfx/pickup.wav", Sound.class);
         manager.load("audio/sfx/item_use.wav", Sound.class);
         manager.load("audio/sfx/ui_click.wav", Sound.class);
-        manager.load("audio/sfx/chest_open.wav", Sound.class);
         manager.load("audio/sfx/puzzle_solved.wav", Sound.class);
         manager.load("audio/sfx/puzzle_failed.wav", Sound.class);
         manager.load("audio/sfx/game_over.wav", Sound.class);

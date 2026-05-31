@@ -20,7 +20,6 @@ import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.EnemyDataManager;
 import hust.adventure.core.LootDropService;
-import hust.adventure.core.ScenarioService;
 import hust.adventure.core.config.LevelConfig;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
@@ -43,7 +42,6 @@ import hust.adventure.ui.UIManager;
 import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.components.UpgradeAction;
-import hust.adventure.weapons.WeaponUpgradeService;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
 import hust.adventure.world.WorldManager;
@@ -77,9 +75,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private ShaderProgram silhouetteShader;
     private ShaderProgram discardShader;
 
-    private ScenarioService scenarioService;
     private LootDropService lootDropService;
-    private WeaponUpgradeService weaponUpgradeService;
 
     private static final float VIEW_WIDTH = 800f;
     private static final float VIEW_HEIGHT = 600f;
@@ -112,8 +108,6 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.uiManager.getDebugUI().setInputHandler(debugInputHandler);
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
-        EventDispatcher.getInstance().addListener(EventType.TREASURE_OPENED, this);
-        EventDispatcher.getInstance().addListener(EventType.REWARD_SELECTED, this);
 
         initShaders();
     }
@@ -205,21 +199,13 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             player.setCollisionManager(collisionManager);
         }
 
-        if (scenarioService == null) {
-            scenarioService = new ScenarioService(entityFactory, player, game.getAssetManager());
-        }
-
         if (lootDropService == null) {
             lootDropService = new LootDropService(entityFactory, game.getAssetManager());
         }
 
-        if (weaponUpgradeService == null) {
-            weaponUpgradeService = new WeaponUpgradeService(player);
-        }
-
         gameRenderer = new GameRenderer(cameraManager, entityManager, game.getSpriteBatch(), silhouetteShader,
                 discardShader, uiManager.getHud(), uiManager.getStatusEffectsHUD(), uiManager.getInventoryUI(),
-                uiManager.getLevelUpUI(), uiManager.getDamageTextManager(), uiManager.getRouletteUI(),
+                uiManager.getLevelUpUI(), uiManager.getDamageTextManager(),
                 uiManager.getDebugUI(), worldManager);
 
         setupLayerIndices();
@@ -363,10 +349,6 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             uiManager.getLevelUpUI().setOnResume(() -> {
                 this.state = PlayMode.RUNNING;
             });
-        } else if (event.getType() == EventType.TREASURE_OPENED) {
-            this.state = PlayMode.IN_UI;
-        } else if (event.getType() == EventType.REWARD_SELECTED) {
-            this.state = PlayMode.RUNNING;
         }
 
         // Delegate to behavior if it listens to events
@@ -449,16 +431,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         return lightingManager;
     }
 
-    public ScenarioService getScenarioService() {
-        return scenarioService;
-    }
-
     public LootDropService getLootDropService() {
         return lootDropService;
-    }
-
-    public WeaponUpgradeService getWeaponUpgradeService() {
-        return weaponUpgradeService;
     }
 
     @Override
@@ -471,8 +445,6 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     @Override
     public void dispose() {
         EventDispatcher.getInstance().removeListener(EventType.LEVEL_UP, this);
-        EventDispatcher.getInstance().removeListener(EventType.TREASURE_OPENED, this);
-        EventDispatcher.getInstance().removeListener(EventType.REWARD_SELECTED, this);
 
         if (behavior != null) {
             behavior.dispose(this);
@@ -482,14 +454,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         worldManager.dispose();
         entityManager.dispose();
         uiManager.dispose();
-        if (scenarioService != null) {
-            scenarioService.dispose();
-        }
         if (lootDropService != null) {
             lootDropService.dispose();
-        }
-        if (weaponUpgradeService != null) {
-            weaponUpgradeService.dispose();
         }
         if (mapRenderer != null) {
             mapRenderer.dispose();

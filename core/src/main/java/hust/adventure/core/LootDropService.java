@@ -36,8 +36,7 @@ public class LootDropService implements EventListener, Disposable {
             if (deadEntity instanceof Enemy) {
                 // Determine drop
                 if (((Enemy) deadEntity).isBoss()) {
-                    Texture tex = assetManager.getTexture(GameAssetManager.CHEST_TEXTURE_PATH);
-                    entityFactory.createTreasureChest(deadEntity.getX(), deadEntity.getY(), tex);
+                    // Boss drops nothing
                 } else {
                     entityFactory.createExpGem(deadEntity.getX(), deadEntity.getY(), DEFAULT_EXP_GEM_VALUE);
 

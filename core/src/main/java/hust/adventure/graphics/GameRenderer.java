@@ -24,7 +24,6 @@ import hust.adventure.ui.StatusEffectsHUD;
 import hust.adventure.ui.InventoryUI;
 import hust.adventure.ui.LevelUpUI;
 import hust.adventure.ui.DamageTextManager;
-import hust.adventure.ui.RouletteUI;
 import hust.adventure.ui.DebugUI;
 import hust.adventure.world.WorldManager;
 
@@ -42,7 +41,6 @@ public class GameRenderer {
     private final InventoryUI inventoryUI;
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
-    private final RouletteUI rouletteUI;
     private final DebugUI debugUI;
     private final WorldManager worldManager;
     private static final Matrix4 uiMatrix = new Matrix4();
@@ -53,7 +51,7 @@ public class GameRenderer {
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
             final StatusEffectsHUD statusEffectsHUD, final InventoryUI inventoryUI, final LevelUpUI levelUpUI,
-            final DamageTextManager damageTextManager, final RouletteUI rouletteUI, final DebugUI debugUI,
+            final DamageTextManager damageTextManager, final DebugUI debugUI,
             final WorldManager worldManager) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
@@ -65,7 +63,6 @@ public class GameRenderer {
         this.inventoryUI = inventoryUI;
         this.levelUpUI = levelUpUI;
         this.damageTextManager = damageTextManager;
-        this.rouletteUI = rouletteUI;
         this.debugUI = debugUI;
         this.worldManager = worldManager;
     }
@@ -218,9 +215,7 @@ public class GameRenderer {
         if (levelUpUI != null && player != null) {
             levelUpUI.render(player, batch, shapeRenderer, font);
         }
-        if (rouletteUI != null) {
-            rouletteUI.render(batch, shapeRenderer, font);
-        }
+
         if (debugUI != null) {
             debugUI.render(batch, shapeRenderer, font);
         }

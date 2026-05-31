@@ -1,7 +1,6 @@
 package hust.adventure.entities.factory;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import hust.adventure.entities.interactables.ExpGem;
 
 import hust.adventure.entities.Player;
@@ -10,7 +9,6 @@ import hust.adventure.entities.combat.Projectile;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.entities.interactables.ItemDrop;
-import hust.adventure.entities.interactables.TreasureChest;
 import hust.adventure.graphics.LightProvider;
 import hust.adventure.items.Item;
 
@@ -27,10 +25,6 @@ public interface EntityFactory {
     ItemDrop createItemDrop(float x, float y, Item item, Color color);
 
     ExpGem createExpGem(float x, float y, float amount);
-
-    TreasureChest createTreasureChest(float x, float y, Texture texture);
-
-    MapObject createLibraryArtifact(float x, float y);
 
     MapObject createFloatingBook(float x, float y, LightProvider lightProvider);
 

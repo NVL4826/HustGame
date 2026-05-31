@@ -240,9 +240,6 @@ public class AudioManager implements EventListener, Disposable {
         case ITEM_USED:
             playSound("audio/sfx/item_use.wav", false);
             break;
-        case TREASURE_OPENED:
-            playSound("audio/sfx/chest_open.wav", false);
-            break;
         case PUZZLE_SOLVED:
             playSound("audio/sfx/puzzle_solved.wav", false);
             break;

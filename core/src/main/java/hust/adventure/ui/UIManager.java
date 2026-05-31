@@ -13,7 +13,6 @@ public class UIManager implements UIProvider, Disposable {
     private final InventoryUI inventoryUI;
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
-    private final RouletteUI rouletteUI;
     private final DebugUI debugUI;
 
     public UIManager() {
@@ -22,13 +21,11 @@ public class UIManager implements UIProvider, Disposable {
         this.inventoryUI = new InventoryUI();
         this.levelUpUI = new LevelUpUI();
         this.damageTextManager = new DamageTextManager();
-        this.rouletteUI = new RouletteUI();
         this.debugUI = new DebugUI();
     }
 
     public void update(final float delta, final Player player) {
         damageTextManager.update(delta);
-        rouletteUI.update(delta, player);
         inventoryUI.update(player);
         levelUpUI.update(player);
     }
@@ -53,9 +50,7 @@ public class UIManager implements UIProvider, Disposable {
         return damageTextManager;
     }
 
-    public RouletteUI getRouletteUI() {
-        return rouletteUI;
-    }
+
 
     public DebugUI getDebugUI() {
         return debugUI;
@@ -67,7 +62,6 @@ public class UIManager implements UIProvider, Disposable {
         inventoryUI.dispose();
         levelUpUI.dispose();
         damageTextManager.dispose();
-        rouletteUI.dispose();
     }
 }
 

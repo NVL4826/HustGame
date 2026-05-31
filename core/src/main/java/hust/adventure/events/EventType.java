@@ -18,8 +18,6 @@ public enum EventType {
     LEVEL_UP,
     ENTITY_DAMAGED,
     TIME_LIMIT_REACHED,
-    TREASURE_OPENED,
-    REWARD_SELECTED,
     PLAY_SFX,
     PLAY_BGM
 }

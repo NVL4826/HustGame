@@ -16,10 +16,8 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.enemies.EnemyConfig;
-import hust.adventure.entities.environment.LibraryArtifact;
 import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.interactables.ExpGem;
-import hust.adventure.entities.interactables.TreasureChest;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.entities.environment.FloatingBook;
@@ -95,7 +93,8 @@ public class EntityFactoryImpl implements EntityFactory {
                     enemy.setStaticSprite(new TextureRegion(texture));
                 }
             } catch (final Exception e) {
-                com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl", "Failed to load static sprite: " + config.getSpritePath(), e);
+                com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl",
+                        "Failed to load static sprite: " + config.getSpritePath(), e);
             }
         }
 
@@ -163,23 +162,6 @@ public class EntityFactoryImpl implements EntityFactory {
         gem.setCollider(new Collider(gem, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
         entityManager.addEntity(gem);
         return gem;
-    }
-
-    @Override
-    public TreasureChest createTreasureChest(float x, float y, Texture texture) {
-        TreasureChest chest = new TreasureChest();
-        chest.init(x, y, texture);
-        chest.setCollider(new Collider(chest, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
-        entityManager.addEntity(chest);
-        return chest;
-    }
-
-    @Override
-    public MapObject createLibraryArtifact(final float x, final float y) {
-        MapObject artifact = new LibraryArtifact(x, y);
-        artifact.setCollider(new Collider(artifact, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
-        entityManager.addEntity(artifact);
-        return artifact;
     }
 
     @Override
