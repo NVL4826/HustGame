@@ -9,7 +9,6 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
-import hust.adventure.entities.enemies.FinalBoss;
 import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.interactables.TreasureChest;
 import hust.adventure.graphics.LightProvider;
@@ -31,11 +30,7 @@ public interface EntityFactory {
 
     TreasureChest createTreasureChest(float x, float y, Texture texture);
 
-    MapObject createLibraryBoss(float x, float y);
-
     MapObject createLibraryArtifact(float x, float y);
-
-    FinalBoss createFinalBoss(float x, float y, Texture texture);
 
     MapObject createFloatingBook(float x, float y, LightProvider lightProvider);
 

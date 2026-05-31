@@ -14,7 +14,6 @@ public class EnemyConfig {
     private float maxHp;
     private float speed;
     private float contactDamage;
-    private String colorHex;
     private boolean boss;
 
     // Movement & AI Behavior parameters
@@ -37,6 +36,11 @@ public class EnemyConfig {
     private String splitType;
     private int splitCount;
     private float splitOffset;
+
+    // Sprite & Animation parameters
+    private String spritePath;
+    private String[] animationFrames;
+    private float frameDuration;
 
     /**
      * Gets the unique identifier of the enemy type.
@@ -165,37 +169,12 @@ public class EnemyConfig {
     }
 
     /**
-     * Gets the raw hex color representation.
+     * Resolves the color of the enemy.
      *
-     * @return the hex color string
-     */
-    public String getColorHex() {
-        return colorHex;
-    }
-
-    /**
-     * Sets the raw hex color representation.
-     *
-     * @param colorHex the hex color string
-     */
-    public void setColorHex(final String colorHex) {
-        this.colorHex = colorHex;
-    }
-
-    /**
-     * Resolves the color of the enemy from its hex color code.
-     *
-     * @return the libGDX Color representation, or Color.WHITE if invalid
+     * @return the libGDX Color representation
      */
     public Color getColor() {
-        if (colorHex == null || colorHex.trim().isEmpty()) {
-            return Color.WHITE;
-        }
-        try {
-            return Color.valueOf(colorHex);
-        } catch (final Exception e) {
-            return Color.WHITE;
-        }
+        return Color.ORANGE;
     }
 
     /**
@@ -484,5 +463,29 @@ public class EnemyConfig {
      */
     public void setSplitOffset(final float splitOffset) {
         this.splitOffset = splitOffset;
+    }
+
+    public String getSpritePath() {
+        return spritePath;
+    }
+
+    public void setSpritePath(final String spritePath) {
+        this.spritePath = spritePath;
+    }
+
+    public String[] getAnimationFrames() {
+        return animationFrames;
+    }
+
+    public void setAnimationFrames(final String[] animationFrames) {
+        this.animationFrames = animationFrames;
+    }
+
+    public float getFrameDuration() {
+        return frameDuration;
+    }
+
+    public void setFrameDuration(final float frameDuration) {
+        this.frameDuration = frameDuration;
     }
 }

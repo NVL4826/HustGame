@@ -125,11 +125,13 @@ public class GameRenderer {
                         }
                     }
 
-                    font.setColor(enemy.getColor());
-                    layout.setText(font, enemy.getName());
-                    final float tx = enemy.getX() - layout.width / 2f;
-                    final float ty = enemy.getY() + enemy.getHeight() / 2f + ENEMY_NAME_OFFSET_Y;
-                    font.draw(batch, enemy.getName(), tx, ty);
+                    if (!enemy.hasSprite()) {
+                        font.setColor(enemy.getColor());
+                        layout.setText(font, enemy.getName());
+                        final float tx = enemy.getX() - layout.width / 2f;
+                        final float ty = enemy.getY() + enemy.getHeight() / 2f + ENEMY_NAME_OFFSET_Y;
+                        font.draw(batch, enemy.getName(), tx, ty);
+                    }
                 }
             }
         }

@@ -23,9 +23,8 @@ public class TestBehavior implements LevelBehavior {
 
         // Spawn Bosses
         final float bossY = 400f;
-        context.getEntityFactory().createLibraryBoss(200f, bossY);
-        context.getEntityFactory().createFinalBoss(500f, bossY,
-                context.getGame().getAssetManager().getTexture("Boss THT.png"));
+        context.getEntityFactory().createEnemy("library_boss", 200f, bossY);
+        context.getEntityFactory().createEnemy("final_boss", 500f, bossY);
 
         // Spawn Items in a row
         final float itemY = 200f;

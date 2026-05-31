@@ -46,6 +46,7 @@ public abstract class Character extends MapObject implements Damageable {
 
     @Override
     public void update(float delta) {
+        super.update(delta);
         if (isDead())
             return;
 

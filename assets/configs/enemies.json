@@ -8,7 +8,6 @@
       "maxHp": 15.0,
       "speed": 35.0,
       "contactDamage": 0.0,
-      "colorHex": "FFA500",
       "movementBehavior": "flee",
       "attackBehavior": "shooting",
       "safeDistance": 200.0,
@@ -24,7 +23,6 @@
       "maxHp": 10.0,
       "speed": 60.0,
       "contactDamage": 10.0,
-      "colorHex": "00FF00",
       "movementBehavior": "chase"
     },
     {
@@ -35,7 +33,6 @@
       "maxHp": 200.0,
       "speed": 80.0,
       "contactDamage": 15.0,
-      "colorHex": "800080",
       "movementBehavior": "flee",
       "safeDistance": 150.0
     },
@@ -47,7 +44,6 @@
       "maxHp": 50.0,
       "speed": 25.0,
       "contactDamage": 20.0,
-      "colorHex": "FF0000",
       "movementBehavior": "bouncing",
       "vx": 100.0,
       "vy": 100.0,
@@ -66,7 +62,6 @@
       "maxHp": 500.0,
       "speed": 35.0,
       "contactDamage": 30.0,
-      "colorHex": "00FFFF",
       "movementBehavior": "wander",
       "attackBehavior": "radial_rotating_shooting",
       "fireInterval": 0.5,
@@ -82,9 +77,8 @@
       "maxHp": 1000.0,
       "speed": 0.0,
       "contactDamage": 0.0,
-      "colorHex": "FF0000",
-      "movementBehavior": "chase",
-      "boss": true
+      "boss": true,
+      "spritePath": "Boss THT.png"
     }
   ]
 }

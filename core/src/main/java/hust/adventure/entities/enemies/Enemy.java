@@ -3,6 +3,7 @@ package hust.adventure.entities.enemies;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.collision.Collider;
@@ -214,8 +215,20 @@ public class Enemy extends Character {
      * @param batch the active SpriteBatch
      */
     protected void renderSpecific(final SpriteBatch batch) {
-        ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(),
-                getColor());
+        if (hasSprite()) {
+            TextureRegion frame = null;
+            if (animation != null) {
+                frame = animation.getKeyFrame(stateTime, true);
+            } else if (staticSprite != null) {
+                frame = staticSprite;
+            }
+            if (frame != null) {
+                batch.draw(frame, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight());
+            }
+        } else {
+            ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(),
+                    Color.ORANGE);
+        }
     }
 
     public void drawDebug(final ShapeRenderer sr, final SpriteBatch batch, final BitmapFont font) {

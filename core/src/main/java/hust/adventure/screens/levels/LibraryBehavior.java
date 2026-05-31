@@ -109,7 +109,7 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
         puzzleSolved = true;
 
         // Spawn boss
-        libraryBoss = (Enemy) context.getEntityFactory().createLibraryBoss(BOSS_SPAWN_X, BOSS_SPAWN_Y);
+        libraryBoss = (Enemy) context.getEntityFactory().createEnemy("library_boss", BOSS_SPAWN_X, BOSS_SPAWN_Y);
 
         // Spawn quái thường xung quanh boss
         for (int i = 0; i < MINION_COUNT; i++) {

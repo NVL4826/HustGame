@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.enemies.FinalBoss;
+import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.screens.LoadingScreen;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class BossFightBehavior implements LevelBehavior {
 
     private static final String[] PAPER_TEXTS = { "SAI", "CHINH LAI", "THIEU REF" };
 
-    private FinalBoss finalBoss;
+    private Enemy finalBoss;
     private int phase = PHASE_CUTSCENE;
 
     private final String[] dialogue = { "...Em da den.", "Ta nghe noi em da vuot qua thu vien... va phong lab.",
@@ -94,8 +94,7 @@ public class BossFightBehavior implements LevelBehavior {
 
     @Override
     public void init(final LevelContext context) {
-        finalBoss = context.getEntityFactory().createFinalBoss(350, 450,
-                context.getGame().getAssetManager().getTexture("Boss THT.png"));
+        finalBoss = (Enemy) context.getEntityFactory().createEnemy("final_boss", 370, 450);
 
         bgTexture = context.getGame().getAssetManager().getTexture("Boss Room.jpg");
 

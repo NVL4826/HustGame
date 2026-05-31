@@ -1,6 +1,8 @@
 package hust.adventure.entities.base;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.collision.Collider;
 import hust.adventure.entities.state.EntityState;
@@ -23,6 +25,10 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     private EntityState state;
     private Collider collider;
 
+    protected Animation<TextureRegion> animation;
+    protected TextureRegion staticSprite;
+    protected float stateTime = 0f;
+
     public MapObject() {
         super();
         this.bounds = new Rectangle();
@@ -41,7 +47,9 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         this.state = new IdleState();
     }
 
-    public abstract void update(float delta);
+    public void update(float delta) {
+        this.stateTime += delta;
+    }
 
     public abstract void draw(SpriteBatch batch);
 
@@ -138,5 +146,31 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         return out.set(x - width / 2f, y - height / 2f, width, height);
     }
 
+    public void setAnimation(final Animation<TextureRegion> animation) {
+        this.animation = animation;
+    }
 
+    public Animation<TextureRegion> getAnimation() {
+        return animation;
+    }
+
+    public void setStaticSprite(final TextureRegion staticSprite) {
+        this.staticSprite = staticSprite;
+    }
+
+    public TextureRegion getStaticSprite() {
+        return staticSprite;
+    }
+
+    public boolean hasSprite() {
+        return staticSprite != null || animation != null;
+    }
+
+    public float getStateTime() {
+        return stateTime;
+    }
+
+    public void setStateTime(final float stateTime) {
+        this.stateTime = stateTime;
+    }
 }

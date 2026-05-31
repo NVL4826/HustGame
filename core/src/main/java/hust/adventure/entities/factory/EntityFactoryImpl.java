@@ -2,6 +2,8 @@ package hust.adventure.entities.factory;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.collision.Collider;
@@ -14,7 +16,6 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.enemies.EnemyConfig;
-import hust.adventure.entities.enemies.FinalBoss;
 import hust.adventure.entities.environment.LibraryArtifact;
 import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.interactables.ExpGem;
@@ -86,6 +87,36 @@ public class EntityFactoryImpl implements EntityFactory {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
         final Enemy enemy = new Enemy(x, y, collisionManager, config);
+
+        if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
+            try {
+                final Texture texture = assetManager.getTexture(config.getSpritePath());
+                if (texture != null) {
+                    enemy.setStaticSprite(new TextureRegion(texture));
+                }
+            } catch (final Exception e) {
+                com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl", "Failed to load static sprite: " + config.getSpritePath(), e);
+            }
+        }
+
+        if (config.getAnimationFrames() != null && config.getAnimationFrames().length > 0) {
+            try {
+                final Array<TextureRegion> frames = new Array<>();
+                for (final String framePath : config.getAnimationFrames()) {
+                    final Texture texture = assetManager.getTexture(framePath);
+                    if (texture != null) {
+                        frames.add(new TextureRegion(texture));
+                    }
+                }
+                if (frames.size > 0) {
+                    final float dur = config.getFrameDuration() > 0 ? config.getFrameDuration() : 0.1f;
+                    enemy.setAnimation(new Animation<>(dur, frames));
+                }
+            } catch (final Exception e) {
+                com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl", "Failed to load animation frames", e);
+            }
+        }
+
         enemy.setFactory(this);
         enemy.setCollider(new Collider(enemy, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
         entityManager.addEntity(enemy);
@@ -144,29 +175,11 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public MapObject createLibraryBoss(final float x, final float y) {
-        return createEnemy("library_boss", x, y);
-    }
-
-    @Override
     public MapObject createLibraryArtifact(final float x, final float y) {
         MapObject artifact = new LibraryArtifact(x, y);
         artifact.setCollider(new Collider(artifact, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
         entityManager.addEntity(artifact);
         return artifact;
-    }
-
-    @Override
-    public FinalBoss createFinalBoss(final float x, final float y, final Texture texture) {
-        final EnemyConfig config = enemyDataManager.getEnemyConfig("final_boss");
-        if (config == null) {
-            throw new IllegalStateException("Config for final_boss is missing!");
-        }
-        final FinalBoss boss = new FinalBoss(x, y, collisionManager, texture, config);
-        boss.setFactory(this);
-        boss.setCollider(new Collider(boss, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
-        entityManager.addEntity(boss);
-        return boss;
     }
 
     @Override
