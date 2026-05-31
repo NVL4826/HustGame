@@ -11,7 +11,7 @@ import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.EntityDamagedEvent;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 /**
  * Robust audio management system for Hust Adventure. Handles sound categories, pitch randomization, throttling, and
@@ -254,7 +254,7 @@ public class AudioManager implements EventListener, Disposable {
                 EntityDamagedEvent edEvent = (EntityDamagedEvent) event.getData();
                 if (edEvent.getEntity() instanceof Player) {
                     playSound("audio/sfx/player_hit.wav", false);
-                } else if (edEvent.getEntity() instanceof BaseEnemy) {
+                } else if (edEvent.getEntity() instanceof Enemy) {
                     playSound("audio/sfx/enemy_hit.wav", false);
                 }
             }
@@ -262,7 +262,7 @@ public class AudioManager implements EventListener, Disposable {
         case ENTITY_DIED:
             if (event.getData() instanceof Player) {
                 playSound("audio/sfx/game_over.wav", false);
-            } else if (event.getData() instanceof BaseEnemy) {
+            } else if (event.getData() instanceof Enemy) {
                 playSound("audio/sfx/enemy_die.wav", false);
             }
             break;

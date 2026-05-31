@@ -8,14 +8,14 @@ import hust.adventure.core.context.ProgressContext;
 import hust.adventure.effects.types.ConfusionEffect;
 import hust.adventure.effects.types.RegenEffect;
 import hust.adventure.effects.types.SpeedBoostEffect;
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Factory class for creating Item instances from their configurations.
- * Uses a registry-based provider pattern (similar to BehaviorRegistry) for mapping effects.
+ * Factory class for creating Item instances from their configurations. Uses a registry-based provider pattern (similar
+ * to BehaviorRegistry) for mapping effects.
  */
 public class ItemFactory {
     private static final ObjectMap<String, EffectProvider> effectProviders = new ObjectMap<>();
@@ -23,14 +23,14 @@ public class ItemFactory {
     static {
         effectProviders.put("heal", config -> consumer -> consumer.heal(config.getValue()));
         effectProviders.put("restore_stamina", config -> consumer -> consumer.restoreStamina(config.getValue()));
-        effectProviders.put("speed_boost", config -> consumer -> consumer.getStatusEffectManager().addEffect(
-                new SpeedBoostEffect(config.getDuration(), config.getMultiplier())));
-        effectProviders.put("regen", config -> consumer -> consumer.getStatusEffectManager().addEffect(
-                new RegenEffect(config.getDuration(), config.getValue())));
-        effectProviders.put("confusion", config -> consumer -> consumer.getStatusEffectManager().addEffect(
-                new ConfusionEffect(config.getDuration())));
-        effectProviders.put("coffee", config -> consumer -> ProgressContext.instance.setCoffeeCount(
-                ProgressContext.instance.getCoffeeCount() + 1));
+        effectProviders.put("speed_boost", config -> consumer -> consumer.getStatusEffectManager()
+                .addEffect(new SpeedBoostEffect(config.getDuration(), config.getMultiplier())));
+        effectProviders.put("regen", config -> consumer -> consumer.getStatusEffectManager()
+                .addEffect(new RegenEffect(config.getDuration(), config.getValue())));
+        effectProviders.put("confusion", config -> consumer -> consumer.getStatusEffectManager()
+                .addEffect(new ConfusionEffect(config.getDuration())));
+        effectProviders.put("coffee", config -> consumer -> ProgressContext.instance
+                .setCoffeeCount(ProgressContext.instance.getCoffeeCount() + 1));
     }
 
     /**
@@ -47,31 +47,26 @@ public class ItemFactory {
         if (config instanceof ConsumableItemConfig) {
             return createConsumableItem((ConsumableItemConfig) config);
         } else {
-            return new BaseItem(config.getId(), config.getName(), config.getDescription(), config.getSpritePath());
+            return new Item(config.getId(), config.getName(), config.getDescription(), config.getSpritePath());
         }
     }
 
     private ConsumableItem createConsumableItem(final ConsumableItemConfig config) {
-        final Consumer<BaseActor> compositeEffect = buildEffect(config.getEffects());
+        final Consumer<Character> compositeEffect = buildEffect(config.getEffects());
         final List<FloatingTextInfo> floatingTexts = buildFloatingTexts(config.getFloatingTexts());
-        return new ConsumableItem(
-                config.getId(),
-                config.getName(),
-                config.getDescription(),
-                config.getSpritePath(),
-                compositeEffect,
-                floatingTexts
-        );
+        return new ConsumableItem(config.getId(), config.getName(), config.getDescription(), config.getSpritePath(),
+                compositeEffect, floatingTexts);
     }
 
-    private Consumer<BaseActor> buildEffect(final Array<EffectConfig> effects) {
-        Consumer<BaseActor> compositeEffect = consumer -> {};
+    private Consumer<Character> buildEffect(final Array<EffectConfig> effects) {
+        Consumer<Character> compositeEffect = consumer -> {
+        };
         if (effects == null) {
             return compositeEffect;
         }
 
         for (final EffectConfig effectConfig : effects) {
-            final Consumer<BaseActor> effectConsumer = createSingleEffect(effectConfig);
+            final Consumer<Character> effectConsumer = createSingleEffect(effectConfig);
             if (effectConsumer != null) {
                 compositeEffect = compositeEffect.andThen(effectConsumer);
             }
@@ -79,7 +74,7 @@ public class ItemFactory {
         return compositeEffect;
     }
 
-    private Consumer<BaseActor> createSingleEffect(final EffectConfig config) {
+    private Consumer<Character> createSingleEffect(final EffectConfig config) {
         if (config == null || config.getEffect() == null) {
             return null;
         }
@@ -108,13 +103,8 @@ public class ItemFactory {
                 } catch (final Exception e) {
                     color = Color.WHITE;
                 }
-                list.add(new FloatingTextInfo(
-                        config.getText(),
-                        color,
-                        config.getDuration(),
-                        config.getOffsetX(),
-                        config.getStartVy()
-                ));
+                list.add(new FloatingTextInfo(config.getText(), color, config.getDuration(), config.getOffsetX(),
+                        config.getStartVy()));
             }
         }
         return list;
@@ -130,6 +120,6 @@ public class ItemFactory {
          * @param config the configuration of the effect
          * @return the consumer representing the effect logic
          */
-        Consumer<BaseActor> create(EffectConfig config);
+        Consumer<Character> create(EffectConfig config);
     }
 }

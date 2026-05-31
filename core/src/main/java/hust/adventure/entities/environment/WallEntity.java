@@ -5,12 +5,12 @@ import com.badlogic.gdx.math.Rectangle;
 
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 
 /**
  * Static wall entity for collisions.
  */
-public class WallEntity extends BaseEntity {
+public class WallEntity extends MapObject {
     public WallEntity(Rectangle rect) {
         // Wall positions in TMX are usually bottom-left, Entity constructor assumes center.
         // We'll adjust to match the TMX Rectangle perfectly.

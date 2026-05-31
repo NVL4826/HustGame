@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
@@ -23,7 +23,7 @@ public class MagicWandWeapon extends BaseWeapon {
 
     @Override
     protected void executeAttackAction() {
-        final GameEntity target = getOwner().getCollisionManager().getNearestEntity(getOwner().getX(),
+        final MapObject target = getOwner().getCollisionManager().getNearestEntity(getOwner().getX(),
                 getOwner().getY(), MAX_RANGE, CollisionLayer.ENEMY);
 
         if (target != null) {
@@ -31,7 +31,7 @@ public class MagicWandWeapon extends BaseWeapon {
         }
     }
 
-    private void fireAt(final GameEntity target) {
+    private void fireAt(final MapObject target) {
         final float startX = getOwner().getX();
         final float startY = getOwner().getY();
 

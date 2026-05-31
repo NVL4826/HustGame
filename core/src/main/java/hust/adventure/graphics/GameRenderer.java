@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.enemies.BaseEnemy;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.enemies.Enemy;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.status.StatusFlag;
 import hust.adventure.ui.HUD;
 import hust.adventure.ui.HUDData;
@@ -108,9 +108,9 @@ public class GameRenderer {
         entityManager.draw(batch);
 
         // Vẽ tên của quái vật
-        for (final GameEntity entity : entityManager.getEntities()) {
-            if (entity instanceof BaseEnemy) {
-                final BaseEnemy enemy = (BaseEnemy) entity;
+        for (final MapObject entity : entityManager.getEntities()) {
+            if (entity instanceof Enemy) {
+                final Enemy enemy = (Enemy) entity;
                 if (!enemy.isDead()) {
                     // Flashlight culling check in lights out mode
                     if (ProgressContext.instance.isLightsOut()
@@ -190,17 +190,10 @@ public class GameRenderer {
             final Player player) {
         if (hud != null) {
             final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
-            final HUDData hudData = new HUDData(
-                ProgressContext.instance.getHp(),
-                ProgressContext.instance.getMaxHp(),
-                ProgressContext.instance.getStamina(),
-                ProgressContext.instance.getMaxStamina(),
-                ProgressContext.instance.getMorale(),
-                ProgressContext.instance.getExp(),
-                ProgressContext.instance.getExpToNextLevel(),
-                ProgressContext.instance.getLevel(),
-                currentTime
-            );
+            final HUDData hudData = new HUDData(ProgressContext.instance.getHp(), ProgressContext.instance.getMaxHp(),
+                    ProgressContext.instance.getStamina(), ProgressContext.instance.getMaxStamina(),
+                    ProgressContext.instance.getMorale(), ProgressContext.instance.getExp(),
+                    ProgressContext.instance.getExpToNextLevel(), ProgressContext.instance.getLevel(), currentTime);
             hud.render(batch, shapeRenderer, font, hudData);
         }
         if (statusEffectsHUD != null) {
@@ -212,15 +205,9 @@ public class GameRenderer {
                 isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
                 isConfused = player.hasStatus(StatusFlag.CONFUSED);
             }
-            final StatusEffectsData statusData = new StatusEffectsData(
-                ProgressContext.instance.isHasNao(),
-                ProgressContext.instance.isHasUsb(),
-                ProgressContext.instance.getEnemyTimeScale(),
-                ProgressContext.instance.getShowEnemiesTimer(),
-                isSpeedBoosted,
-                isHpRegen,
-                isConfused
-            );
+            final StatusEffectsData statusData = new StatusEffectsData(ProgressContext.instance.isHasNao(),
+                    ProgressContext.instance.isHasUsb(), ProgressContext.instance.getEnemyTimeScale(),
+                    ProgressContext.instance.getShowEnemiesTimer(), isSpeedBoosted, isHpRegen, isConfused);
             statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
@@ -244,7 +231,7 @@ public class GameRenderer {
     private void renderDebugHitboxes(final ShapeRenderer shapeRenderer) {
         shapeRenderer.setProjectionMatrix(cameraManager.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (final GameEntity entity : entityManager.getEntities()) {
+        for (final MapObject entity : entityManager.getEntities()) {
             entity.drawHitbox(shapeRenderer);
         }
         shapeRenderer.end();

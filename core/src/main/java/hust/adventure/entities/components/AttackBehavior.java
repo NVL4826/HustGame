@@ -2,7 +2,7 @@ package hust.adventure.entities.components;
 
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 /**
  * Polymorphic interface representing combat/attack logic to execute during the update loop.
@@ -16,5 +16,5 @@ public interface AttackBehavior {
      * @param player        the player target
      * @param entityManager the global entity manager
      */
-    void execute(final BaseEnemy enemy, final float delta, final Player player, final EntityManager entityManager);
+    void execute(final Enemy enemy, final float delta, final Player player, final EntityManager entityManager);
 }

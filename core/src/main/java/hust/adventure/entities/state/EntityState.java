@@ -1,14 +1,14 @@
 package hust.adventure.entities.state;
 
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 
 /**
  * Interface for GameEntity states (State Pattern).
  */
 public interface EntityState {
-    void enter(GameEntity entity);
-    void update(GameEntity entity, float delta);
-    void exit(GameEntity entity);
+    void enter(MapObject entity);
+    void update(MapObject entity, float delta);
+    void exit(MapObject entity);
     
     // For compatibility with old enum checks if needed, or just use instanceof
     String getStateName();

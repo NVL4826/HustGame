@@ -1,7 +1,7 @@
 package hust.adventure.effects.types;
 
 import hust.adventure.effects.StatusEffect;
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 import hust.adventure.entities.status.StatusFlag;
 
 public class RegenEffect implements StatusEffect {
@@ -14,11 +14,11 @@ public class RegenEffect implements StatusEffect {
     }
 
     @Override
-    public void onStart(BaseActor target) {
+    public void onStart(Character target) {
     }
 
     @Override
-    public void update(BaseActor target, float delta) {
+    public void update(Character target, float delta) {
         if (duration > 0) {
             target.heal(amountPerSecond * delta);
             duration -= delta;
@@ -26,7 +26,7 @@ public class RegenEffect implements StatusEffect {
     }
 
     @Override
-    public void onEnd(BaseActor target) {
+    public void onEnd(Character target) {
     }
 
     @Override

@@ -2,7 +2,7 @@ package hust.adventure.entities.components;
 
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 /**
  * Attack behavior that periodically fires projectiles towards the player.
@@ -27,8 +27,7 @@ public class ShootingBehavior implements AttackBehavior {
     }
 
     @Override
-    public void execute(final BaseEnemy enemy, final float delta, final Player player,
-                        final EntityManager entityManager) {
+    public void execute(final Enemy enemy, final float delta, final Player player, final EntityManager entityManager) {
         if (enemy == null || player == null || enemy.getFactory() == null || enemy.isDead()) {
             return;
         }
@@ -43,8 +42,8 @@ public class ShootingBehavior implements AttackBehavior {
             if (dist > 0f) {
                 final float vx = (dx / dist) * projectileSpeed;
                 final float vy = (dy / dist) * projectileSpeed;
-                enemy.getFactory().createProjectile(enemy.getX(), enemy.getY(), vx, vy,
-                        projectileDamage, enemy.getColor(), false);
+                enemy.getFactory().createProjectile(enemy.getX(), enemy.getY(), vx, vy, projectileDamage,
+                        enemy.getColor(), false);
             }
         }
     }

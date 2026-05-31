@@ -2,12 +2,12 @@ package hust.adventure.entities.environment;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 
 /**
  * A non-playable character that stays in one place.
  */
-public class StaticNPC extends BaseEntity {
+public class StaticNPC extends MapObject {
     private final String name;
     private final Color color;
 

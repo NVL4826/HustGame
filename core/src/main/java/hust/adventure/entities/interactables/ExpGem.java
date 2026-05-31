@@ -3,14 +3,14 @@ package hust.adventure.entities.interactables;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Pool;
 import hust.adventure.collision.Collider;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.base.Targetable;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.ExpGainedEvent;
 import hust.adventure.events.GameEvent;
 
-public class ExpGem extends BaseEntity implements Pool.Poolable {
+public class ExpGem extends MapObject implements Pool.Poolable {
     private float amount;
     private Targetable target;
     private float speed = 300f; // Speed when attracted

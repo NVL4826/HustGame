@@ -37,7 +37,7 @@ public final class WeaponUpgradeService implements EventListener, Disposable {
                 return;
             }
 
-            for (final Weaponable w : player.getWeaponManager().getWeapons()) {
+            for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
                 if (weaponId.equalsIgnoreCase(w.getId())) {
                     w.upgrade(0, 0); // Upgrade weapon level by 1 using config specifications
                 }

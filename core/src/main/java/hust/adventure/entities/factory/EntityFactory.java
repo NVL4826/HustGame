@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import hust.adventure.entities.interactables.ExpGem;
 
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
@@ -21,7 +21,7 @@ import hust.adventure.items.Item;
 public interface EntityFactory {
     Player createPlayer(float x, float y, Inventory inventory, PlayerController controller);
 
-    BaseEntity createEnemy(String type, float x, float y);
+    MapObject createEnemy(String type, float x, float y);
 
     Projectile createProjectile(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer);
 
@@ -31,15 +31,15 @@ public interface EntityFactory {
 
     TreasureChest createTreasureChest(float x, float y, Texture texture);
 
-    BaseEntity createLibraryBoss(float x, float y);
+    MapObject createLibraryBoss(float x, float y);
 
-    BaseEntity createLibraryArtifact(float x, float y);
+    MapObject createLibraryArtifact(float x, float y);
 
     FinalBoss createFinalBoss(float x, float y, Texture texture);
 
-    BaseEntity createFloatingBook(float x, float y, LightProvider lightProvider);
+    MapObject createFloatingBook(float x, float y, LightProvider lightProvider);
 
-    BaseEntity createCandle(float x, float y, LightProvider lightProvider);
+    MapObject createCandle(float x, float y, LightProvider lightProvider);
 
-    void freeEntity(BaseEntity entity);
+    void freeEntity(MapObject entity);
 }

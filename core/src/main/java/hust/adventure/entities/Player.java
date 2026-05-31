@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.core.GameAssetManager;
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 import hust.adventure.entities.base.Targetable;
 import hust.adventure.entities.components.PlayerMovementBehavior;
 import hust.adventure.entities.components.SpellController;
@@ -19,17 +19,17 @@ import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.factory.EntityFactory;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.items.Gear;
 import hust.adventure.items.GearManager;
 import hust.adventure.weapons.WeaponManager;
-import hust.adventure.weapons.Weaponable;
+import hust.adventure.weapons.BaseWeapon;
 
 /**
  * Main player character class.
  */
-public class Player extends BaseActor implements Targetable {
+public class Player extends Character implements Targetable {
     private final Inventory inventory;
     private final PlayerController controller;
     private final WeaponManager weaponManager;
@@ -56,6 +56,9 @@ public class Player extends BaseActor implements Targetable {
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
+        setId("player");
+        setName("Player");
+        setSpritePath("player_textures");
         this.inventory = inventory;
         this.controller = controller;
         this.collisionManager = collisionManager;
@@ -143,9 +146,9 @@ public class Player extends BaseActor implements Targetable {
         // Magnetic radius for ExpGem
         if (collisionManager != null) {
             final float magnetRadius = 150f * getMagnetMultiplier();
-            Array<GameEntity> items = collisionManager.getEntitiesInRadius(getX(), getY(), magnetRadius,
+            Array<MapObject> items = collisionManager.getEntitiesInRadius(getX(), getY(), magnetRadius,
                     CollisionLayer.ITEM);
-            for (GameEntity item : items) {
+            for (MapObject item : items) {
                 if (item instanceof ExpGem) {
                     ((ExpGem) item).setTarget(this);
                 }
@@ -176,7 +179,7 @@ public class Player extends BaseActor implements Targetable {
         }
 
         if (controller.isSpaceJustPressed()) {
-            for (final Weaponable weapon : weaponManager.getWeapons()) {
+            for (final BaseWeapon weapon : weaponManager.getWeapons()) {
                 if (!weapon.isAutoFiring()) {
                     weapon.fire();
                 }

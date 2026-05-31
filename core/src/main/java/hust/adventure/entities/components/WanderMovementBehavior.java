@@ -2,8 +2,8 @@ package hust.adventure.entities.components;
 
 import com.badlogic.gdx.math.MathUtils;
 
-import hust.adventure.entities.base.BaseActor;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.Character;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.base.Direction;
 import hust.adventure.entities.state.IdleState;
 import hust.adventure.entities.state.MovingState;
@@ -38,10 +38,10 @@ public class WanderMovementBehavior implements MovementBehavior {
     }
 
     @Override
-    public void update(BaseEntity entity, float delta) {
-        if (!(entity instanceof BaseActor))
+    public void update(MapObject entity, float delta) {
+        if (!(entity instanceof Character))
             return;
-        BaseActor actor = (BaseActor) entity;
+        Character actor = (Character) entity;
 
         wanderTimer -= delta;
 

@@ -1,7 +1,7 @@
 package hust.adventure.effects.types;
 
 import hust.adventure.effects.StatusEffect;
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 import hust.adventure.entities.status.StatusFlag;
 
 public class SpeedBoostEffect implements StatusEffect {
@@ -14,19 +14,19 @@ public class SpeedBoostEffect implements StatusEffect {
     }
 
     @Override
-    public void onStart(BaseActor target) {
+    public void onStart(Character target) {
         target.setSpeedMultiplier(multiplier);
     }
 
     @Override
-    public void update(BaseActor target, float delta) {
+    public void update(Character target, float delta) {
         if (duration > 0) {
             duration -= delta;
         }
     }
 
     @Override
-    public void onEnd(BaseActor target) {
+    public void onEnd(Character target) {
         if (target.getStatusEffectManager().getEffectCount(StatusFlag.SPEED_BOOSTED) <= 1) {
             target.setSpeedMultiplier(1.0f);
         }

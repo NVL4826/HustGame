@@ -3,8 +3,8 @@ package hust.adventure.core;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import hust.adventure.entities.base.GameEntity;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.base.MapObject;
+import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
@@ -31,16 +31,16 @@ public class LootDropService implements EventListener, Disposable {
     @Override
     public void onEvent(GameEvent<?> event) {
         if (event.getType() == EventType.ENTITY_DIED) {
-            GameEntity deadEntity = (GameEntity) event.getData();
-            
-            if (deadEntity instanceof BaseEnemy) {
+            MapObject deadEntity = (MapObject) event.getData();
+
+            if (deadEntity instanceof Enemy) {
                 // Determine drop
-                if (((BaseEnemy) deadEntity).isBoss()) {
+                if (((Enemy) deadEntity).isBoss()) {
                     Texture tex = assetManager.getTexture(GameAssetManager.CHEST_TEXTURE_PATH);
                     entityFactory.createTreasureChest(deadEntity.getX(), deadEntity.getY(), tex);
                 } else {
                     entityFactory.createExpGem(deadEntity.getX(), deadEntity.getY(), DEFAULT_EXP_GEM_VALUE);
-                    
+
                     // 30% chance to drop a random consumable
                     if (MathUtils.random() < 0.3f) {
                         final Array<Item> consumables = new Array<>();

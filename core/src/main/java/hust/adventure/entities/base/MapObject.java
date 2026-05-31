@@ -8,11 +8,12 @@ import hust.adventure.entities.state.IdleState;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Disposable;
 
 /**
  * Base implementation of a game entity. Provides positioning, bounding box, and basic state management.
  */
-public abstract class BaseEntity implements GameEntity, Collidable {
+public abstract class MapObject extends GameObject implements Collidable, Disposable {
     protected float x;
     protected float y;
     protected float width;
@@ -22,13 +23,15 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     private EntityState state;
     private Collider collider;
 
-    public BaseEntity() {
+    public MapObject() {
+        super();
         this.bounds = new Rectangle();
         this.isDestroyed = false;
         this.state = new IdleState();
     }
 
-    public BaseEntity(final float x, final float y, final float width, final float height) {
+    public MapObject(final float x, final float y, final float width, final float height) {
+        super();
         this.x = x;
         this.y = y;
         this.width = width;
@@ -38,13 +41,10 @@ public abstract class BaseEntity implements GameEntity, Collidable {
         this.state = new IdleState();
     }
 
-    @Override
     public abstract void update(float delta);
 
-    @Override
     public abstract void draw(SpriteBatch batch);
 
-    @Override
     public void drawHitbox(ShapeRenderer sr) {
         if (collider == null)
             return;
@@ -57,12 +57,10 @@ public abstract class BaseEntity implements GameEntity, Collidable {
         }
     }
 
-    @Override
     public void destroy() {
         this.isDestroyed = true;
     }
 
-    @Override
     public boolean isDestroyed() {
         return isDestroyed;
     }
@@ -124,12 +122,10 @@ public abstract class BaseEntity implements GameEntity, Collidable {
         this.state.enter(this);
     }
 
-    @Override
     public final Collider getCollider() {
         return collider;
     }
 
-    @Override
     public void setCollider(final Collider collider) {
         this.collider = collider;
     }
@@ -138,7 +134,6 @@ public abstract class BaseEntity implements GameEntity, Collidable {
     public void dispose() {
     }
 
-    @Override
     public Rectangle getMovementBounds(float x, float y, Rectangle out) {
         return out.set(x - width / 2f, y - height / 2f, width, height);
     }

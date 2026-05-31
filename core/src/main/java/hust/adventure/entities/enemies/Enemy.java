@@ -9,7 +9,7 @@ import hust.adventure.collision.Collider;
 
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 import hust.adventure.entities.components.AIBehavior;
 import hust.adventure.entities.components.AttackBehavior;
 import hust.adventure.entities.components.BehaviorRegistry;
@@ -23,13 +23,12 @@ import hust.adventure.graphics.ShapeDrawUtils;
 /**
  * Base class for all enemy types. Inherits core living entity logic from BaseActor.
  */
-public class BaseEnemy extends BaseActor {
+public class Enemy extends Character {
     private static final float HP_BAR_OFFSET_Y = 5f;
     private static final float HP_BAR_HEIGHT = 5f;
     private static final float NAME_TEXT_OFFSET_Y = 25f;
     private static final float FLASHLIGHT_RADIUS_SQ = 10000f; // 100f * 100f
 
-    private String name;
     private Color color;
     private CollisionManager collisionManager;
     private EntityFactory factory;
@@ -40,19 +39,21 @@ public class BaseEnemy extends BaseActor {
     private boolean boss;
     private DeathBehavior deathBehavior;
 
-    public BaseEnemy() {
+    public Enemy() {
         super();
     }
 
-    public BaseEnemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
+    public Enemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
             final Color color, final CollisionManager collisionManager) {
         super(x, y, w, h, maxHp);
+        setId("enemy");
         init(x, y, w, h, maxHp, name, color, collisionManager, 0f);
     }
 
-    public BaseEnemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
+    public Enemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
             final Color color, final CollisionManager collisionManager, final float contactDamage) {
         super(x, y, w, h, maxHp);
+        setId("enemy");
         init(x, y, w, h, maxHp, name, color, collisionManager, contactDamage);
     }
 
@@ -64,10 +65,11 @@ public class BaseEnemy extends BaseActor {
      * @param collisionManager standard collision manager
      * @param config           the loaded configuration parameters
      */
-    public BaseEnemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config) {
+    public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config) {
         super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());
-        init(x, y, config.getWidth(), config.getHeight(), config.getMaxHp(), config.getName(),
-                config.getColor(), collisionManager, config.getContactDamage());
+        setId(config.getType());
+        init(x, y, config.getWidth(), config.getHeight(), config.getMaxHp(), config.getName(), config.getColor(),
+                collisionManager, config.getContactDamage());
         setSpeed(config.getSpeed());
         this.boss = config.isBoss();
 
@@ -102,7 +104,7 @@ public class BaseEnemy extends BaseActor {
         setY(clampedY);
         this.setMaxHp(maxHp);
         this.setHp(maxHp);
-        this.name = name;
+        setName(name);
         this.color = color;
         this.contactDamage = contactDamage;
         setDestroyed(false);
@@ -185,10 +187,9 @@ public class BaseEnemy extends BaseActor {
     public final void draw(final SpriteBatch batch) {
         if (isDead())
             return;
-        
+
         // Flashlight culling in lights out mode (if showEnemiesTimer / radar is not active)
-        if (ProgressContext.instance.isLightsOut()
-                && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
+        if (ProgressContext.instance.isLightsOut() && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
             final Player p = ProgressContext.instance.getPlayer();
             if (p != null) {
                 final float dx = getX() - p.getX();
@@ -202,19 +203,19 @@ public class BaseEnemy extends BaseActor {
         // Blink effect: skip render khi enemyBlinkVisible == false
         if (!ProgressContext.instance.isEnemyBlinkVisible())
             return;
-        
+
         renderSpecific(batch);
     }
 
     /**
-     * Renders the enemy's visual sprite or geometry. Default implementation
-     * draws a colored rectangle. Override for custom sprites.
+     * Renders the enemy's visual sprite or geometry. Default implementation draws a colored rectangle. Override for
+     * custom sprites.
      *
      * @param batch the active SpriteBatch
      */
     protected void renderSpecific(final SpriteBatch batch) {
-        ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(),
-                getHeight(), getColor());
+        ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(),
+                getColor());
     }
 
     public void drawDebug(final ShapeRenderer sr, final SpriteBatch batch, final BitmapFont font) {
@@ -227,11 +228,7 @@ public class BaseEnemy extends BaseActor {
 
         // Note: batch.begin()/end() should be called by the caller of this method
         // to avoid multiple flushes during batch processing of multiple entities.
-        font.draw(batch, name, getX(), getY() + getHeight() + NAME_TEXT_OFFSET_Y);
-    }
-
-    public final String getName() {
-        return name;
+        font.draw(batch, getName(), getX(), getY() + getHeight() + NAME_TEXT_OFFSET_Y);
     }
 
     public final Color getColor() {

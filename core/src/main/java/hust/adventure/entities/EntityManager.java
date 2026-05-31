@@ -4,9 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
-import hust.adventure.entities.base.GameEntity;
-import hust.adventure.entities.base.BaseEntity;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.base.MapObject;
+import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
 import java.util.Comparator;
 
@@ -14,9 +13,9 @@ import java.util.Comparator;
  * Manages the lifecycle, updates, and rendering of all game entities. Implements Y-sorting for 2D top-down perspective.
  */
 public class EntityManager implements Disposable {
-    private final Array<GameEntity> entities;
-    private final Array<GameEntity> pendingAdd;
-    private final Comparator<GameEntity> yComparator;
+    private final Array<MapObject> entities;
+    private final Array<MapObject> pendingAdd;
+    private final Comparator<MapObject> yComparator;
 
     public EntityManager() {
         this.entities = new Array<>();
@@ -24,7 +23,7 @@ public class EntityManager implements Disposable {
         this.yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
     }
 
-    public void addEntity(final GameEntity entity) {
+    public void addEntity(final MapObject entity) {
         if (entity == null)
             throw new IllegalArgumentException("Entity cannot be null");
         pendingAdd.add(entity);
@@ -36,19 +35,19 @@ public class EntityManager implements Disposable {
             entities.addAll(pendingAdd);
             pendingAdd.clear();
         }
- 
+
         // Update and cleanup destroyed entities
         for (int i = entities.size - 1; i >= 0; i--) {
-            final GameEntity entity = entities.get(i);
+            final MapObject entity = entities.get(i);
             entity.update(delta);
- 
+
             if (entity.isDestroyed()) {
                 entity.dispose();
                 entities.removeIndex(i);
- 
+
                 // Return to pool if it's a BaseEntity and Poolable
-                if (factory != null && entity instanceof BaseEntity && entity instanceof Pool.Poolable) {
-                    factory.freeEntity((BaseEntity) entity);
+                if (factory != null && entity instanceof Pool.Poolable) {
+                    factory.freeEntity(entity);
                 }
             }
         }
@@ -58,14 +57,14 @@ public class EntityManager implements Disposable {
         // Y-sorting for depth perception
         entities.sort(yComparator);
 
-        for (final GameEntity entity : entities) {
+        for (final MapObject entity : entities) {
             entity.draw(batch);
         }
     }
 
     @Override
     public void dispose() {
-        for (final GameEntity entity : entities) {
+        for (final MapObject entity : entities) {
             entity.dispose();
         }
         entities.clear();
@@ -74,21 +73,21 @@ public class EntityManager implements Disposable {
 
     public boolean hasActiveEnemies() {
         for (int i = 0; i < entities.size; i++) {
-            final GameEntity e = entities.get(i);
-            if (e instanceof BaseEnemy && !e.isDestroyed()) {
+            final MapObject e = entities.get(i);
+            if (e instanceof Enemy && !e.isDestroyed()) {
                 return true;
             }
         }
         for (int i = 0; i < pendingAdd.size; i++) {
-            final GameEntity e = pendingAdd.get(i);
-            if (e instanceof BaseEnemy && !e.isDestroyed()) {
+            final MapObject e = pendingAdd.get(i);
+            if (e instanceof Enemy && !e.isDestroyed()) {
                 return true;
             }
         }
         return false;
     }
 
-    public Array<GameEntity> getEntities() {
+    public Array<MapObject> getEntities() {
         return entities;
     }
 }

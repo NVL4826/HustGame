@@ -1,6 +1,6 @@
 package hust.adventure.entities.components;
 
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 /**
  * Implementation of DeathBehavior that handles spawning child split enemies upon parent death.
@@ -24,7 +24,7 @@ public class SplitDeathBehavior implements DeathBehavior {
     }
 
     @Override
-    public void onDestroy(final BaseEnemy enemy) {
+    public void onDestroy(final Enemy enemy) {
         if (enemy == null || enemy.isSplit() || enemy.getFactory() == null) {
             return;
         }
@@ -34,7 +34,8 @@ public class SplitDeathBehavior implements DeathBehavior {
 
         for (int i = 0; i < splitCount; i++) {
             final float offsetVal = (i == 0) ? -splitOffset : splitOffset;
-            final BaseEnemy child = (BaseEnemy) enemy.getFactory().createEnemy(splitType, enemy.getX() + offsetVal, enemy.getY());
+            final Enemy child = (Enemy) enemy.getFactory().createEnemy(splitType, enemy.getX() + offsetVal,
+                    enemy.getY());
             if (child != null) {
                 child.setSplit(true);
             }

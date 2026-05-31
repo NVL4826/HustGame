@@ -8,12 +8,12 @@ import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 
 /**
  * Entity representing the artifact dropped by the Library Boss.
  */
-public class LibraryArtifact extends BaseEntity {
+public class LibraryArtifact extends MapObject {
     public LibraryArtifact(float x, float y) {
         super(x, y, 30, 30);
 

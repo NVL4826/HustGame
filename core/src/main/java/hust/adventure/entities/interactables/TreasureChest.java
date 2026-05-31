@@ -1,24 +1,24 @@
 package hust.adventure.entities.interactables;
- 
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.TreasureOpenedEvent;
 import hust.adventure.collision.Collider;
- 
-public class TreasureChest extends BaseEntity implements Interactable {
+
+public class TreasureChest extends MapObject implements Interactable {
     private Texture texture;
     private boolean opened = false;
- 
+
     public TreasureChest() {
         super(0, 0, 32, 32);
     }
- 
+
     public void init(float x, float y, Texture texture) {
         setX(x);
         setY(y);
@@ -26,7 +26,7 @@ public class TreasureChest extends BaseEntity implements Interactable {
         this.opened = false;
         setDestroyed(false);
     }
- 
+
     @Override
     public void setCollider(Collider collider) {
         super.setCollider(collider);
@@ -38,7 +38,7 @@ public class TreasureChest extends BaseEntity implements Interactable {
             });
         }
     }
- 
+
     @Override
     public void interact(Player player) {
         if (!opened) {
@@ -46,15 +46,15 @@ public class TreasureChest extends BaseEntity implements Interactable {
             TreasureOpenedEvent data = new TreasureOpenedEvent();
             GameEvent<TreasureOpenedEvent> event = new GameEvent<>(EventType.TREASURE_OPENED, data);
             EventDispatcher.getInstance().dispatch(event);
-            
+
             destroy();
         }
     }
- 
+
     @Override
     public void update(float delta) {
     }
- 
+
     @Override
     public void draw(SpriteBatch batch) {
         if (!opened && texture != null) {

@@ -8,10 +8,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
-import hust.adventure.entities.base.GameEntity;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.BaseEntity;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.base.MapObject;
+import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.Collider;
 import hust.adventure.core.context.ProgressContext;
@@ -19,7 +18,7 @@ import hust.adventure.core.context.ProgressContext;
 /**
  * Represents a projectile fired by a player or enemy.
  */
-public class Projectile extends BaseEntity implements Pool.Poolable {
+public class Projectile extends MapObject implements Pool.Poolable {
     private float vx, vy;
     private Color color;
     private boolean isPlayerProjectile;
@@ -27,7 +26,7 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
     private float startX, startY;
     private static final float MAX_RANGE = 2000f;
     private int pierce = 1;
-    private final Array<GameEntity> hitEntities = new Array<>();
+    private final Array<MapObject> hitEntities = new Array<>();
     private static Texture bulletTexture;
 
     public Projectile() {
@@ -94,8 +93,8 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
                     return;
                 }
                 if (isPlayerProjectile) {
-                    if (other instanceof BaseEnemy) {
-                        final BaseEnemy enemy = (BaseEnemy) other;
+                    if (other instanceof Enemy) {
+                        final Enemy enemy = (Enemy) other;
                         if (!hitEntities.contains(enemy, true)) {
                             hitEntities.add(enemy);
                             enemy.takeDamage(damage);
@@ -166,16 +165,14 @@ public class Projectile extends BaseEntity implements Pool.Poolable {
         }
 
         batch.setColor(Color.WHITE); // draw without tint so the sprite's own colours show
-        batch.draw(
-            tex,
-            getX() - originX, getY() - originY, // position (bottom-left)
-            originX, originY,                    // origin for rotation
-            w, h,                                // size
-            1f, 1f,                              // scale
-            angle,                               // rotation in degrees
-            0, 0,                                // source rect start
-            tex.getWidth(), tex.getHeight(),     // source rect size
-            false, false                         // flip
+        batch.draw(tex, getX() - originX, getY() - originY, // position (bottom-left)
+                originX, originY, // origin for rotation
+                w, h, // size
+                1f, 1f, // scale
+                angle, // rotation in degrees
+                0, 0, // source rect start
+                tex.getWidth(), tex.getHeight(), // source rect size
+                false, false // flip
         );
     }
 

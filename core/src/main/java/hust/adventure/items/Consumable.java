@@ -1,14 +1,15 @@
 package hust.adventure.items;
 
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 
 /**
  * Interface for items that can be consumed by an actor.
  */
-public interface Consumable extends Item {
+public interface Consumable {
     /**
      * Consumes the item, applying its effects to the consumer.
+     * 
      * @param consumer The actor consuming the item.
      */
-    void consume(BaseActor consumer);
+    void consume(Character consumer);
 }

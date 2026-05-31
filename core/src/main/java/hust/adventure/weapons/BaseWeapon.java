@@ -4,10 +4,12 @@ import hust.adventure.entities.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import hust.adventure.core.context.ProgressContext;
 
+import hust.adventure.items.EquipmentItem;
+
 /**
  * Abstract base class for all weapons. Handles common functionality like cooldown management and level tracking.
  */
-public abstract class BaseWeapon implements Weaponable {
+public abstract class BaseWeapon extends EquipmentItem {
     private final Player owner;
     private final WeaponConfig config;
     private float baseDamage;
@@ -22,6 +24,7 @@ public abstract class BaseWeapon implements Weaponable {
     private float shotTimer;
 
     public BaseWeapon(final Player owner, final WeaponConfig config) {
+        super(config.getId(), config.getName(), config.getDescription(), null);
         if (owner == null) {
             throw new IllegalArgumentException("Owner cannot be null");
         }
@@ -42,12 +45,10 @@ public abstract class BaseWeapon implements Weaponable {
         this.shotTimer = 0f;
     }
 
-    @Override
     public boolean isAutoFiring() {
         return true;
     }
 
-    @Override
     public void updateTimer(final float deltaTime) {
         if (currentCooldownTimer > 0) {
             currentCooldownTimer -= deltaTime;
@@ -67,7 +68,6 @@ public abstract class BaseWeapon implements Weaponable {
         }
     }
 
-    @Override
     public final void fire() {
         if (currentCooldownTimer <= 0) {
             if (amount <= 1) {
@@ -85,12 +85,10 @@ public abstract class BaseWeapon implements Weaponable {
      */
     protected abstract void executeAttackAction();
 
-    @Override
     public void draw(SpriteBatch batch) {
         // Default implementation does nothing
     }
 
-    @Override
     public void upgrade(final float damageBonus, final float cooldownReduction) {
         if (this.level >= config.getMaxLevel()) {
             return;
@@ -111,7 +109,6 @@ public abstract class BaseWeapon implements Weaponable {
         }
     }
 
-    @Override
     public final int getLevel() {
         return level;
     }
@@ -211,9 +208,9 @@ public abstract class BaseWeapon implements Weaponable {
     public boolean equals(final Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Weaponable))
+        if (!(o instanceof BaseWeapon))
             return false;
-        final Weaponable weapon = (Weaponable) o;
+        final BaseWeapon weapon = (BaseWeapon) o;
         return java.util.Objects.equals(getId(), weapon.getId());
     }
 

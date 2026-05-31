@@ -10,7 +10,7 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.RewardSelectedEvent;
 import hust.adventure.entities.Player;
-import hust.adventure.weapons.Weaponable;
+import hust.adventure.weapons.BaseWeapon;
 import com.badlogic.gdx.utils.Array;
  
 public class RouletteUI implements EventListener {
@@ -38,7 +38,7 @@ public class RouletteUI implements EventListener {
                 String selectedWeaponId = null;
                 if (player != null && player.getWeaponManager() != null) {
                     Array<String> upgradableWeaponIds = new Array<>();
-                    for (Weaponable w : player.getWeaponManager().getWeapons()) {
+                    for (BaseWeapon w : player.getWeaponManager().getWeapons()) {
                         if (w.getLevel() < 5) {
                             upgradableWeaponIds.add(w.getId());
                         }

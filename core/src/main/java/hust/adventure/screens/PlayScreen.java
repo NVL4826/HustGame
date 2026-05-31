@@ -26,8 +26,7 @@ import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.PlayerPersistenceService;
-import hust.adventure.entities.base.GameEntity;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
 import hust.adventure.events.*;
@@ -283,9 +282,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (state == PlayMode.RUNNING && !game.getScreenTransition().isTransitioning()) {
             entityManager.update(delta, entityFactory);
 
-            for (GameEntity e : entityManager.getEntities()) {
-                if (e instanceof BaseEnemy) {
-                    ((BaseEnemy) e).handleUpdate(delta * ProgressContext.instance.getEnemyTimeScale(), player,
+            for (var e : entityManager.getEntities()) {
+                if (e instanceof Enemy) {
+                    ((Enemy) e).handleUpdate(delta * ProgressContext.instance.getEnemyTimeScale(), player,
                             entityManager);
                 }
             }

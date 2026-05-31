@@ -3,8 +3,8 @@ package hust.adventure.entities;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.items.Gear;
 import hust.adventure.items.GearFactory;
+import hust.adventure.weapons.BaseWeapon;
 import hust.adventure.weapons.WeaponFactory;
-import hust.adventure.weapons.Weaponable;
 
 import java.util.Map;
 
@@ -44,7 +44,7 @@ public class PlayerPersistenceService {
         }
 
         ProgressContext.instance.getWeaponLevels().clear();
-        for (final Weaponable w : player.getWeaponManager().getWeapons()) {
+        for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
             ProgressContext.instance.getWeaponLevels().put(w.getId().toLowerCase(), w.getLevel());
         }
 
@@ -73,7 +73,7 @@ public class PlayerPersistenceService {
         if (savedWeapons.isEmpty()) {
             // Initialize with default weapon for a new game
             if (weaponFactory != null) {
-                final Weaponable defaultWeapon = weaponFactory.createWeapon("bun_dau", player);
+                final BaseWeapon defaultWeapon = weaponFactory.createWeapon("bun_dau", player);
                 player.getWeaponManager().addWeapon(defaultWeapon);
             }
             savedWeapons.put("bun_dau", 1);
@@ -82,7 +82,7 @@ public class PlayerPersistenceService {
                 final String weaponId = entry.getKey();
                 final int targetLevel = entry.getValue();
                 if (weaponFactory != null) {
-                    final Weaponable weapon = weaponFactory.createWeapon(weaponId, player);
+                    final BaseWeapon weapon = weaponFactory.createWeapon(weaponId, player);
                     for (int i = 1; i < targetLevel; i++) {
                         weapon.upgrade(0f, 0f);
                     }

@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.entities.Player;
 import hust.adventure.entities.base.Direction;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.base.Damageable;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
@@ -37,9 +37,9 @@ public class WhipWeapon extends BaseWeapon {
         flashTimer = FLASH_DURATION;
         EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/whip.wav"));
 
-        final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea,
+        final Array<MapObject> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea,
                 CollisionLayer.ENEMY);
-        for (final GameEntity target : targets) {
+        for (final MapObject target : targets) {
             if (target instanceof Damageable) {
                 ((Damageable) target).takeDamage(getEffectiveDamage());
             }

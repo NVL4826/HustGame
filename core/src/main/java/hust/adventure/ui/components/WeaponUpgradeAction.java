@@ -2,7 +2,7 @@ package hust.adventure.ui.components;
 
 import hust.adventure.entities.Player;
 import hust.adventure.weapons.WeaponFactory;
-import hust.adventure.weapons.Weaponable;
+import hust.adventure.weapons.BaseWeapon;
 
 /**
  * Action representing a choice to unlock a new weapon or upgrade an existing one.
@@ -55,7 +55,7 @@ public class WeaponUpgradeAction implements UpgradeAction {
                 player.getWeaponManager().addWeapon(weaponFactory.createWeapon(weaponId, player));
             }
         } else {
-            for (final Weaponable w : player.getWeaponManager().getWeapons()) {
+            for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
                 if (w.getId().equalsIgnoreCase(weaponId)) {
                     w.upgrade(0f, 0f);
                     break;

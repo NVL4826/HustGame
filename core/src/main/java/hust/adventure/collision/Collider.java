@@ -2,7 +2,7 @@ package hust.adventure.collision;
 
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 
 /**
  * Component for handling physical hitboxes and collision detection.
@@ -13,7 +13,7 @@ public class Collider {
         RECTANGLE
     }
 
-    private GameEntity owner;
+    private MapObject owner;
     private int layer;
     private Shape shape;
     private float radius; 
@@ -21,10 +21,10 @@ public class Collider {
     private CollisionListener listener;
 
     public interface CollisionListener {
-        void onCollision(GameEntity other);
+        void onCollision(MapObject other);
     }
 
-    public Collider(GameEntity owner, int layer, Shape shape) {
+    public Collider(MapObject owner, int layer, Shape shape) {
         this.owner = owner;
         this.layer = layer;
         this.shape = shape;
@@ -34,7 +34,7 @@ public class Collider {
         }
     }
 
-    public Collider(GameEntity owner, int layer, Shape shape, float radius) {
+    public Collider(MapObject owner, int layer, Shape shape, float radius) {
         this.owner = owner;
         this.layer = layer;
         this.shape = shape;
@@ -44,7 +44,7 @@ public class Collider {
         }
     }
 
-    public GameEntity getOwner() {
+    public MapObject getOwner() {
         return owner;
     }
 
@@ -68,7 +68,7 @@ public class Collider {
         this.listener = listener;
     }
 
-    public void handleCollision(GameEntity other) {
+    public void handleCollision(MapObject other) {
         if (listener != null) {
             listener.onCollision(other);
         }

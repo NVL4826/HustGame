@@ -7,7 +7,7 @@ import hust.adventure.core.WeaponDataManager;
 import hust.adventure.entities.Player;
 import hust.adventure.items.Gear;
 import hust.adventure.items.UpgradeCatalog;
-import hust.adventure.weapons.Weaponable;
+import hust.adventure.weapons.BaseWeapon;
 import hust.adventure.ui.components.DamageIncreaseAction;
 import hust.adventure.ui.components.GearUpgradeAction;
 import hust.adventure.ui.components.HealAction;
@@ -65,8 +65,8 @@ public final class LevelUpChoiceBuilder {
                 ? weaponDataManager.getAllWeaponIds()
                 : new Array<>();
         for (final String id : weaponIds) {
-            Weaponable weapon = null;
-            for (final Weaponable w : player.getWeaponManager().getWeapons()) {
+            BaseWeapon weapon = null;
+            for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
                 if (w.getId().equalsIgnoreCase(id)) {
                     weapon = w;
                     break;

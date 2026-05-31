@@ -9,7 +9,7 @@ import hust.adventure.entities.Player;
  */
 public class WeaponManager {
     private final Player player;
-    private final Array<Weaponable> weapons;
+    private final Array<BaseWeapon> weapons;
 
     public WeaponManager(final Player player) {
         if (player == null) {
@@ -25,7 +25,7 @@ public class WeaponManager {
      * @param delta Time elapsed.
      */
     public void update(final float delta) {
-        for (final Weaponable weapon : weapons) {
+        for (final BaseWeapon weapon : weapons) {
             weapon.updateTimer(delta);
         }
     }
@@ -36,7 +36,7 @@ public class WeaponManager {
      * @param batch The SpriteBatch to use.
      */
     public void draw(final SpriteBatch batch) {
-        for (final Weaponable weapon : weapons) {
+        for (final BaseWeapon weapon : weapons) {
             weapon.draw(batch);
         }
     }
@@ -46,14 +46,14 @@ public class WeaponManager {
      * 
      * @param weapon The weapon to add.
      */
-    public void addWeapon(final Weaponable weapon) {
+    public void addWeapon(final BaseWeapon weapon) {
         if (weapon == null) {
             throw new IllegalArgumentException("Weapon cannot be null");
         }
         weapons.add(weapon);
     }
 
-    public Array<Weaponable> getWeapons() {
+    public Array<BaseWeapon> getWeapons() {
         return weapons;
     }
 }

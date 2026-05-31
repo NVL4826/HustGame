@@ -15,7 +15,7 @@ public class WeaponFactory {
      * Functional interface for weapon creation.
      */
     public interface WeaponProvider {
-        Weaponable create(Player player, WeaponConfig config);
+        BaseWeapon create(Player player, WeaponConfig config);
     }
 
     public WeaponFactory(final WeaponDataManager weaponDataManager) {
@@ -34,7 +34,7 @@ public class WeaponFactory {
         providers.put("bun_dau", BunDauWeapon::new);
     }
 
-    public Weaponable createWeapon(final String id, final Player player) {
+    public BaseWeapon createWeapon(final String id, final Player player) {
         if (id == null) {
             throw new IllegalArgumentException("Weapon ID cannot be null");
         }

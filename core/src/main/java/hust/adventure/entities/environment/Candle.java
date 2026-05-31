@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.graphics.LightProvider;
 
 /**
  * Environmental entity: A static candle that emits a flickering light.
  */
-public class Candle extends BaseEntity {
+public class Candle extends MapObject {
     private final Texture texture;
     private final PointLight light;
     private float stateTime;
@@ -22,7 +22,8 @@ public class Candle extends BaseEntity {
         this.stateTime = MathUtils.random(10f);
 
         // Request light from provider
-        this.light = lightProvider.createPointLight(64, new Color(1f, 0.6f, 0.2f, 0.8f), 60f, x + texture.getWidth()/2f, y + texture.getHeight()/2f);
+        this.light = lightProvider.createPointLight(64, new Color(1f, 0.6f, 0.2f, 0.8f), 60f,
+                x + texture.getWidth() / 2f, y + texture.getHeight() / 2f);
     }
 
     @Override

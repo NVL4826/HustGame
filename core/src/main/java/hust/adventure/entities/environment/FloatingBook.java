@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.graphics.LightProvider;
 
 /**
  * Environmental entity: A book that floats with a sine wave motion and emits light.
  */
-public class FloatingBook extends BaseEntity {
+public class FloatingBook extends MapObject {
     private final Texture texture;
     private final PointLight light;
     private final float baseY;

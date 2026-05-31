@@ -14,7 +14,7 @@ import hust.adventure.events.GameEvent;
 /**
  * Base class for all living and moving entities. Combines positioning with health and movement logic.
  */
-public abstract class BaseActor extends BaseEntity implements Damageable {
+public abstract class Character extends MapObject implements Damageable {
     private float maxHp;
     private float hp;
     private float maxStamina;
@@ -25,14 +25,14 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
     private MovementBehavior movementBehavior;
     private StatusEffectManager statusEffectManager;
 
-    public BaseActor() {
+    public Character() {
         super();
         this.statusEffectManager = new StatusEffectManager(this);
         this.speedMultiplier = 1.0f;
         this.direction = Direction.DOWN;
     }
 
-    public BaseActor(final float x, final float y, final float width, final float height, final float maxHp) {
+    public Character(final float x, final float y, final float width, final float height, final float maxHp) {
         super(x, y, width, height);
         this.maxHp = maxHp;
         this.hp = maxHp;
@@ -75,7 +75,7 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
         EventDispatcher.getInstance().dispatch(event);
 
         if (isDead()) {
-            GameEvent<GameEntity> deathEvent = new GameEvent<>(EventType.ENTITY_DIED, this);
+            GameEvent<MapObject> deathEvent = new GameEvent<>(EventType.ENTITY_DIED, this);
             EventDispatcher.getInstance().dispatch(deathEvent);
             destroy();
         }

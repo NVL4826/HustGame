@@ -3,11 +3,11 @@ package hust.adventure.entities.components;
 import com.badlogic.gdx.math.Vector2;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 /**
- * CPU-optimized behavior for swarm enemies. Moves directly towards the player.
- * Enemies pass through walls and each other to optimize CPU.
+ * CPU-optimized behavior for swarm enemies. Moves directly towards the player. Enemies pass through walls and each
+ * other to optimize CPU.
  */
 public class SimpleSwarmBehavior implements AIBehavior {
     private static final Vector2 tmpVector = new Vector2();
@@ -16,8 +16,7 @@ public class SimpleSwarmBehavior implements AIBehavior {
     }
 
     @Override
-    public void execute(final BaseEnemy enemy, final float delta, final Player player,
-            final EntityManager entityManager) {
+    public void execute(final Enemy enemy, final float delta, final Player player, final EntityManager entityManager) {
         if (player == null || enemy == null || entityManager == null) {
             return;
         }

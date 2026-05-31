@@ -1,6 +1,6 @@
 package hust.adventure.entities.components;
 
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 /**
  * Polymorphic interface representing custom logic to execute upon enemy destruction.
@@ -11,5 +11,5 @@ public interface DeathBehavior {
      *
      * @param enemy the enemy being destroyed
      */
-    void onDestroy(final BaseEnemy enemy);
+    void onDestroy(final Enemy enemy);
 }

@@ -1,6 +1,6 @@
 package hust.adventure.events;
  
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.items.Item;
  
 /**
@@ -8,9 +8,9 @@ import hust.adventure.items.Item;
  */
 public class ItemPickedUpEvent {
     private final Item item;
-    private final GameEntity picker;
+    private final MapObject picker;
  
-    public ItemPickedUpEvent(Item item, GameEntity picker) {
+    public ItemPickedUpEvent(Item item, MapObject picker) {
         if (item == null) throw new NullPointerException("item cannot be null");
         if (picker == null) throw new NullPointerException("picker cannot be null");
         this.item = item;
@@ -21,7 +21,7 @@ public class ItemPickedUpEvent {
         return item;
     }
  
-    public GameEntity getPicker() {
+    public MapObject getPicker() {
         return picker;
     }
 }

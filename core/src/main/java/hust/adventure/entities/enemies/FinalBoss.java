@@ -10,16 +10,16 @@ import hust.adventure.entities.Player;
 /**
  * Entity representing the final boss (T.H.T) in the Boss Room.
  */
-public class FinalBoss extends BaseEnemy {
+public class FinalBoss extends Enemy {
     private Texture texture;
- 
+
     /**
      * Default constructor.
      */
     public FinalBoss() {
         super();
     }
- 
+
     /**
      * Constructs the FinalBoss using a texture and its configuration data.
      *
@@ -30,11 +30,11 @@ public class FinalBoss extends BaseEnemy {
      * @param config           the loaded configuration parameters
      */
     public FinalBoss(final float x, final float y, final CollisionManager collisionManager, final Texture texture,
-                     final EnemyConfig config) {
+            final EnemyConfig config) {
         super(x, y, collisionManager, config);
         this.texture = texture;
     }
- 
+
     /**
      * Sets the texture of the boss.
      *
@@ -43,7 +43,7 @@ public class FinalBoss extends BaseEnemy {
     public void setTexture(final Texture texture) {
         this.texture = texture;
     }
- 
+
     @Override
     public void handleUpdate(final float delta, final Player player, final EntityManager entityManager) {
         // Boss logic (stationary for now)

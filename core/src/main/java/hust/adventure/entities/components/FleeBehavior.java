@@ -2,7 +2,7 @@ package hust.adventure.entities.components;
 
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 
 public class FleeBehavior implements AIBehavior {
     private final float safeDistance;
@@ -12,7 +12,7 @@ public class FleeBehavior implements AIBehavior {
     }
 
     @Override
-    public void execute(BaseEnemy enemy, float delta, Player player, EntityManager entityManager) {
+    public void execute(Enemy enemy, float delta, Player player, EntityManager entityManager) {
         float dx = player.getX() - enemy.getX();
         float dy = player.getY() - enemy.getY();
         float dist = (float) Math.sqrt(dx * dx + dy * dy);

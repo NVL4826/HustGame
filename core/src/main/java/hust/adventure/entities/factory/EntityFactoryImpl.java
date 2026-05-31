@@ -10,9 +10,9 @@ import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.EnemyDataManager;
 import hust.adventure.core.GameAssetManager;
 import hust.adventure.entities.Player;
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
-import hust.adventure.entities.enemies.BaseEnemy;
+import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.entities.enemies.FinalBoss;
 import hust.adventure.entities.environment.LibraryArtifact;
@@ -80,12 +80,12 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public BaseEntity createEnemy(final String type, final float x, final float y) {
+    public MapObject createEnemy(final String type, final float x, final float y) {
         final EnemyConfig config = enemyDataManager.getEnemyConfig(type);
         if (config == null) {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
-        final BaseEnemy enemy = new BaseEnemy(x, y, collisionManager, config);
+        final Enemy enemy = new Enemy(x, y, collisionManager, config);
         enemy.setFactory(this);
         enemy.setCollider(new Collider(enemy, CollisionLayer.ENEMY, Collider.Shape.RECTANGLE));
         entityManager.addEntity(enemy);
@@ -111,7 +111,7 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public void freeEntity(BaseEntity entity) {
+    public void freeEntity(MapObject entity) {
         // GamePools.free will only actually free if it's Projectile or ExpGem
         GamePools.free(entity);
     }
@@ -144,13 +144,13 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public BaseEntity createLibraryBoss(final float x, final float y) {
+    public MapObject createLibraryBoss(final float x, final float y) {
         return createEnemy("library_boss", x, y);
     }
 
     @Override
-    public BaseEntity createLibraryArtifact(final float x, final float y) {
-        BaseEntity artifact = new LibraryArtifact(x, y);
+    public MapObject createLibraryArtifact(final float x, final float y) {
+        MapObject artifact = new LibraryArtifact(x, y);
         artifact.setCollider(new Collider(artifact, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
         entityManager.addEntity(artifact);
         return artifact;
@@ -170,7 +170,7 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public BaseEntity createFloatingBook(float x, float y, LightProvider lightProvider) {
+    public MapObject createFloatingBook(float x, float y, LightProvider lightProvider) {
         if (bookTextures.size == 0)
             return null;
         Texture texture = bookTextures.random();
@@ -180,7 +180,7 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public BaseEntity createCandle(float x, float y, LightProvider lightProvider) {
+    public MapObject createCandle(float x, float y, LightProvider lightProvider) {
         Texture texture = assetManager.getTexture("Phong_doc/1.png");
         Candle candle = new Candle(x, y, texture, lightProvider);
         entityManager.addEntity(candle);

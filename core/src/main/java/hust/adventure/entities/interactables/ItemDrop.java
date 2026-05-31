@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import hust.adventure.entities.base.BaseEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.collision.Collider;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
@@ -18,11 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents a physical item dropped in the world.
- * Renders using a per-item sprite from assets/items/ when available,
+ * Represents a physical item dropped in the world. Renders using a per-item sprite from assets/items/ when available,
  * falling back to a colored rectangle.
  */
-public class ItemDrop extends BaseEntity {
+public class ItemDrop extends MapObject {
     private Item item;
     private Color color;
 
@@ -30,9 +29,11 @@ public class ItemDrop extends BaseEntity {
     private static final Map<String, Texture> spriteCache = new HashMap<>();
 
     private static Texture getSprite(Item item) {
-        if (item == null) return null;
+        if (item == null)
+            return null;
         String path = item.getSpritePath();
-        if (path == null || path.isEmpty()) return null;
+        if (path == null || path.isEmpty())
+            return null;
         if (!spriteCache.containsKey(path)) {
             if (Gdx.files.internal(path).exists()) {
                 spriteCache.put(path, new Texture(Gdx.files.internal(path)));
@@ -45,14 +46,15 @@ public class ItemDrop extends BaseEntity {
 
     public static void disposeStaticResources() {
         for (Texture t : spriteCache.values()) {
-            if (t != null) t.dispose();
+            if (t != null)
+                t.dispose();
         }
         spriteCache.clear();
     }
 
     // ── Bob animation ────────────────────────────────────────────────────────
     private float bobTimer = 0f;
-    private static final float BOB_SPEED  = 2.5f;
+    private static final float BOB_SPEED = 2.5f;
     private static final float BOB_AMOUNT = 3f;
 
     public ItemDrop() {
@@ -69,7 +71,7 @@ public class ItemDrop extends BaseEntity {
         setY(y);
         this.item = item;
         this.color = color;
-        this.bobTimer = (float)(Math.random() * Math.PI * 2); // random phase
+        this.bobTimer = (float) (Math.random() * Math.PI * 2); // random phase
         setDestroyed(false);
     }
 
@@ -93,7 +95,8 @@ public class ItemDrop extends BaseEntity {
 
     @Override
     public void draw(SpriteBatch batch) {
-        if (item == null) return;
+        if (item == null)
+            return;
 
         float bob = (float) Math.sin(bobTimer * BOB_SPEED) * BOB_AMOUNT;
         float drawX = getX() - getWidth() / 2f;

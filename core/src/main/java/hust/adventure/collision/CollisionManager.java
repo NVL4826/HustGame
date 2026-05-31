@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.entities.EntityManager;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.environment.WallEntity;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class CollisionManager {
     private final ObjectMap<Long, Array<Collider>> grid;
     private final int[] collisionMatrix;
     private final EntityManager entityManager;
-    private final Array<GameEntity> allCollidables;
+    private final Array<MapObject> allCollidables;
     private final Array<WallEntity> staticWalls;
     private final Rectangle tempRect;
     private float mapWidth, mapHeight;
@@ -119,7 +119,7 @@ public class CollisionManager {
      * @param nextY  The target Y coordinate.
      * @return True if the move is valid, false otherwise.
      */
-    public boolean canMove(final GameEntity entity, final float nextX, final float nextY) {
+    public boolean canMove(final MapObject entity, final float nextX, final float nextY) {
         // 1. Boundary check
         if (!isInfinite && (nextX < entity.getWidth() / 2f || nextX > mapWidth - entity.getWidth() / 2f
                 || nextY < entity.getHeight() / 2f || nextY > mapHeight - entity.getHeight() / 2f)) {
@@ -176,7 +176,7 @@ public class CollisionManager {
         allCollidables.clear();
 
         // Add dynamic entities
-        final Array<GameEntity> entities = entityManager.getEntities();
+        final Array<MapObject> entities = entityManager.getEntities();
         for (int i = 0; i < entities.size; i++) {
             allCollidables.add(entities.get(i));
         }
@@ -192,11 +192,11 @@ public class CollisionManager {
         checkCollisions();
     }
 
-    private void rebuildGrid(final Array<GameEntity> entities) {
+    private void rebuildGrid(final Array<MapObject> entities) {
         grid.clear();
 
         for (int i = 0; i < entities.size; i++) {
-            final GameEntity entity = entities.get(i);
+            final MapObject entity = entities.get(i);
             if (entity.isDestroyed()) {
                 continue;
             }
@@ -302,8 +302,8 @@ public class CollisionManager {
     /**
      * Finds all entities within a rectangular area that match the layer mask.
      */
-    public Array<GameEntity> getEntitiesInArea(final Rectangle area, final int layerMask) {
-        final Array<GameEntity> result = new Array<>();
+    public Array<MapObject> getEntitiesInArea(final Rectangle area, final int layerMask) {
+        final Array<MapObject> result = new Array<>();
         final int startX = (int) (area.x / cellSize);
         final int startY = (int) (area.y / cellSize);
         final int endX = (int) ((area.x + area.width) / cellSize);
@@ -329,9 +329,9 @@ public class CollisionManager {
     /**
      * Finds all entities within a circular radius that match the layer mask.
      */
-    public Array<GameEntity> getEntitiesInRadius(final float cx, final float cy, final float radius,
+    public Array<MapObject> getEntitiesInRadius(final float cx, final float cy, final float radius,
             final int layerMask) {
-        final Array<GameEntity> result = new Array<>();
+        final Array<MapObject> result = new Array<>();
         final int startX = (int) ((cx - radius) / cellSize);
         final int startY = (int) ((cy - radius) / cellSize);
         final int endX = (int) ((cx + radius) / cellSize);
@@ -364,8 +364,8 @@ public class CollisionManager {
      * Finds the nearest entity to a point within a maximum range that matches the layer mask. Uses spatial hashing to
      * expand the search radius efficiently.
      */
-    public GameEntity getNearestEntity(final float cx, final float cy, final float maxRange, final int layerMask) {
-        GameEntity nearest = null;
+    public MapObject getNearestEntity(final float cx, final float cy, final float maxRange, final int layerMask) {
+        MapObject nearest = null;
         float minDistanceSq = maxRange * maxRange;
 
         final int centerX = (int) (cx / cellSize);

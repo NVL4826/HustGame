@@ -2,14 +2,14 @@ package hust.adventure.graphics;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
-import hust.adventure.entities.base.GameEntity;
+import hust.adventure.entities.base.MapObject;
 
 /**
  * System for managing the game camera, including following targets and clamping to map bounds.
  */
 public class CameraManager {
     private OrthographicCamera camera;
-    private GameEntity target;
+    private MapObject target;
     private float mapWidth, mapHeight;
     private float lerp = 0.1f;
     private boolean isInfinite;
@@ -19,7 +19,7 @@ public class CameraManager {
         camera.setToOrtho(false, viewportWidth, viewportHeight);
     }
 
-    public void setTarget(GameEntity target) {
+    public void setTarget(MapObject target) {
         this.target = target;
     }
 

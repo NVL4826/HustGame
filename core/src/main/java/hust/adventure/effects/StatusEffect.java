@@ -1,6 +1,6 @@
 package hust.adventure.effects;
 
-import hust.adventure.entities.base.BaseActor;
+import hust.adventure.entities.base.Character;
 import hust.adventure.entities.status.StatusFlag;
 
 /**
@@ -12,7 +12,7 @@ public interface StatusEffect {
      * 
      * @param target The actor receiving the effect.
      */
-    void onStart(BaseActor target);
+    void onStart(Character target);
 
     /**
      * Called every frame to update the effect logic.
@@ -20,14 +20,14 @@ public interface StatusEffect {
      * @param target The actor receiving the effect.
      * @param delta  Time since last frame.
      */
-    void update(BaseActor target, float delta);
+    void update(Character target, float delta);
 
     /**
      * Called when the effect ends.
      * 
      * @param target The actor that had the effect.
      */
-    void onEnd(BaseActor target);
+    void onEnd(Character target);
 
     /**
      * @return Current remaining duration of the effect.
