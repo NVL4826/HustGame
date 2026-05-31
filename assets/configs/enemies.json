@@ -67,7 +67,11 @@
       "speed": 35.0,
       "contactDamage": 30.0,
       "colorHex": "00FFFF",
-      "movementBehavior": "chase",
+      "movementBehavior": "wander",
+      "attackBehavior": "radial_rotating_shooting",
+      "fireInterval": 0.5,
+      "projectileSpeed": 150.0,
+      "projectileDamage": 15.0,
       "boss": true
     },
     {

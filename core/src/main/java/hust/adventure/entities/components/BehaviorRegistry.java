@@ -19,10 +19,13 @@ public final class BehaviorRegistry {
         movementProviders.put("bouncing", config -> new BouncingBehavior(config.getVx(), config.getVy(),
                 config.getWorldWidth(), config.getWorldHeight()));
         movementProviders.put("simple_swarm", config -> new SimpleSwarmBehavior());
+        movementProviders.put("wander", config -> new WanderAIBehavior());
 
         // Combat/attack behaviors mapping
         attackProviders.put("shooting", config -> new ShootingBehavior(config.getFireInterval(),
                 config.getProjectileSpeed(), config.getProjectileDamage()));
+        attackProviders.put("radial_rotating_shooting", config -> new RadialRotatingShootingBehavior(
+                config.getFireInterval(), config.getProjectileSpeed(), config.getProjectileDamage()));
 
         // Death behaviors mapping
         deathProviders.put("split", config -> new SplitDeathBehavior(config.getSplitType(),
