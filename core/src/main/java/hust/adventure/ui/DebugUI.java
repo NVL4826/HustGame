@@ -7,12 +7,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.input.DebugInputHandler;
 
 /**
- * Renders the debug mode overlay panel when debug mode is enabled.
- * Queries state from DebugInputHandler to render selection menus.
+ * Renders the debug mode overlay panel when debug mode is enabled. Queries state from DebugInputHandler to render
+ * selection menus.
  */
 public class DebugUI {
     private final OrthographicCamera uiCam;
@@ -28,7 +29,7 @@ public class DebugUI {
     private static final float SELECT_Y = 230f;
     private static final float SELECT_WIDTH = 260f;
     private static final float SELECT_HEIGHT = 350f;
-    
+
     private static final float CAM_VIEW_WIDTH = 800f;
     private static final float CAM_VIEW_HEIGHT = 600f;
 
@@ -82,15 +83,15 @@ public class DebugUI {
         final SelectionMode activeMode = (inputHandler != null) ? inputHandler.getActiveMode() : SelectionMode.NONE;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        
+
         // Main panel background
         shapeRenderer.setColor(BG_COLOR);
         shapeRenderer.rect(PANEL_X, PANEL_Y, PANEL_WIDTH, PANEL_HEIGHT);
-        
+
         // Selection panel background if active
         if (active && currentOptions != null) {
             shapeRenderer.rect(SELECT_X, SELECT_Y, SELECT_WIDTH, SELECT_HEIGHT);
-            
+
             // Render selected option highlight background
             shapeRenderer.setColor(HIGHLIGHT_BG);
             float itemY = SELECT_Y + SELECT_HEIGHT - 75f - (selectedIndex * 30f);
@@ -111,7 +112,7 @@ public class DebugUI {
 
         // Render text elements
         batch.begin();
-        
+
         // Main panel title and info
         font.setColor(TITLE_COLOR);
         font.draw(batch, "=== DEBUG MENU ===", PANEL_X + 30f, PANEL_Y + PANEL_HEIGHT - 20f);
@@ -180,10 +181,12 @@ public class DebugUI {
             for (int i = 0; i < currentOptions.length; i++) {
                 if (i == selectedIndex) {
                     font.setColor(Color.WHITE);
-                    font.draw(batch, "> " + currentOptions[i].displayName, SELECT_X + 20f, SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
+                    font.draw(batch, "> " + currentOptions[i].displayName, SELECT_X + 20f,
+                            SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
                 } else {
                     font.setColor(Color.LIGHT_GRAY);
-                    font.draw(batch, "  " + currentOptions[i].displayName, SELECT_X + 20f, SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
+                    font.draw(batch, "  " + currentOptions[i].displayName, SELECT_X + 20f,
+                            SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
                 }
             }
         }

@@ -18,16 +18,16 @@ import com.badlogic.gdx.math.Vector2;
 
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
-import hust.adventure.core.EnemyDataManager;
 import hust.adventure.core.LootDropService;
 import hust.adventure.core.config.LevelConfig;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.data.EnemyDataManager;
 import hust.adventure.entities.EntityManager;
-import hust.adventure.entities.Player;
-import hust.adventure.entities.PlayerPersistenceService;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
+import hust.adventure.entities.player.Player;
+import hust.adventure.entities.player.PlayerPersistenceService;
 import hust.adventure.events.*;
 import hust.adventure.gamestate.PlayMode;
 import hust.adventure.graphics.CameraManager;
@@ -205,8 +205,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
         gameRenderer = new GameRenderer(cameraManager, entityManager, game.getSpriteBatch(), silhouetteShader,
                 discardShader, uiManager.getHud(), uiManager.getStatusEffectsHUD(), uiManager.getInventoryUI(),
-                uiManager.getLevelUpUI(), uiManager.getDamageTextManager(),
-                uiManager.getDebugUI(), worldManager);
+                uiManager.getLevelUpUI(), uiManager.getDamageTextManager(), uiManager.getDebugUI(), worldManager);
 
         setupLayerIndices();
 

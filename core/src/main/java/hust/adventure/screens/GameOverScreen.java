@@ -18,9 +18,7 @@ import hust.adventure.core.context.ProgressContext;
 import hust.adventure.screens.levels.LevelFactory;
 
 /**
- * Game Over screen – hiện ra khi player chết.
- * Nhấn R → restart từ MAP_1 + reset ProgressContext.
- * Nhấn ESC → thoát game.
+ * Game Over screen – hiện ra khi player chết. Nhấn R → restart từ MAP_1 + reset ProgressContext. Nhấn ESC → thoát game.
  */
 public class GameOverScreen extends BaseScreen {
 
@@ -31,8 +29,8 @@ public class GameOverScreen extends BaseScreen {
     private static Texture whitePixel;
 
     // Fade-in
-    private float fadeAlpha  = 1f;  // bắt đầu tối, dần sáng
-    private float fadeTimer  = 0f;
+    private float fadeAlpha = 1f; // bắt đầu tối, dần sáng
+    private float fadeTimer = 0f;
     private static final float FADE_DURATION = 1.0f;
 
     // Pulse hiệu ứng chữ GAME OVER
@@ -43,11 +41,11 @@ public class GameOverScreen extends BaseScreen {
     private static final float BTN_H = 48f;
     private static final float BTN_RESTART_X = UI_W / 2f - BTN_W - 20f;
     private static final float BTN_RESTART_Y = UI_H / 2f - 100f;
-    private static final float BTN_QUIT_X    = UI_W / 2f + 20f;
-    private static final float BTN_QUIT_Y    = UI_H / 2f - 100f;
+    private static final float BTN_QUIT_X = UI_W / 2f + 20f;
+    private static final float BTN_QUIT_Y = UI_H / 2f - 100f;
 
     private boolean restartHover = false;
-    private boolean quitHover    = false;
+    private boolean quitHover = false;
 
     public GameOverScreen(HustGame game) {
         super(game);
@@ -69,7 +67,10 @@ public class GameOverScreen extends BaseScreen {
     }
 
     public static void disposeStatic() {
-        if (whitePixel != null) { whitePixel.dispose(); whitePixel = null; }
+        if (whitePixel != null) {
+            whitePixel.dispose();
+            whitePixel = null;
+        }
     }
 
     // ── Screen lifecycle ────────────────────────────────────────────────────
@@ -94,7 +95,7 @@ public class GameOverScreen extends BaseScreen {
         float mx = Gdx.input.getX();
         float my = UI_H - Gdx.input.getY();
         restartHover = inButton(mx, my, BTN_RESTART_X, BTN_RESTART_Y);
-        quitHover    = inButton(mx, my, BTN_QUIT_X,    BTN_QUIT_Y);
+        quitHover = inButton(mx, my, BTN_QUIT_X, BTN_QUIT_Y);
 
         // Input
         if (fadeTimer > FADE_DURATION) {
@@ -147,7 +148,8 @@ public class GameOverScreen extends BaseScreen {
 
         // Nút CHƠI LẠI
         float restartAlpha = restartHover ? 0.95f : 0.7f;
-        shapeRenderer.setColor(restartHover ? new Color(0.2f, 0.7f, 0.2f, restartAlpha) : new Color(0.1f, 0.4f, 0.1f, 0.7f));
+        shapeRenderer
+                .setColor(restartHover ? new Color(0.2f, 0.7f, 0.2f, restartAlpha) : new Color(0.1f, 0.4f, 0.1f, 0.7f));
         shapeRenderer.rect(BTN_RESTART_X, BTN_RESTART_Y, BTN_W, BTN_H);
 
         // Nút THOÁT
@@ -177,7 +179,7 @@ public class GameOverScreen extends BaseScreen {
         GlyphLayout layout = new GlyphLayout();
 
         // Tiêu đề GAME OVER – pulse màu đỏ ↔ cam
-        float pulse = (float)(Math.sin(pulseTimer * 3.0) * 0.5 + 0.5);
+        float pulse = (float) (Math.sin(pulseTimer * 3.0) * 0.5 + 0.5);
         font.setColor(1f, pulse * 0.4f, 0f, 1f);
         layout.setText(font, "GAME OVER");
         font.draw(batch, layout, (UI_W - layout.width) / 2f, UI_H / 2f + 120f);
@@ -189,8 +191,8 @@ public class GameOverScreen extends BaseScreen {
 
         // Stats
         font.setColor(0.7f, 0.7f, 0.7f, 1f);
-        layout.setText(font, "Cap do: " + ProgressContext.instance.getLevel()
-                + "   EXP: " + (int) ProgressContext.instance.getExp());
+        layout.setText(font, "Cap do: " + ProgressContext.instance.getLevel() + "   EXP: "
+                + (int) ProgressContext.instance.getExp());
         font.draw(batch, layout, (UI_W - layout.width) / 2f, UI_H / 2f + 20f);
 
         // Nút text
@@ -230,16 +232,20 @@ public class GameOverScreen extends BaseScreen {
     }
 
     @Override
-    public void resize(int width, int height) { }
+    public void resize(int width, int height) {
+    }
 
     @Override
-    public void pause() { }
+    public void pause() {
+    }
 
     @Override
-    public void resume() { }
+    public void resume() {
+    }
 
     @Override
-    public void hide() { }
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

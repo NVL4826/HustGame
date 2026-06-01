@@ -13,10 +13,10 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.EntityManager;
-import hust.adventure.entities.Player;
 import hust.adventure.entities.enemies.Enemy;
+import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.entities.status.StatusFlag;
+import hust.adventure.entities.base.StatusFlag;
 import hust.adventure.ui.HUD;
 import hust.adventure.ui.HUDData;
 import hust.adventure.ui.StatusEffectsData;
@@ -51,8 +51,7 @@ public class GameRenderer {
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
             final StatusEffectsHUD statusEffectsHUD, final InventoryUI inventoryUI, final LevelUpUI levelUpUI,
-            final DamageTextManager damageTextManager, final DebugUI debugUI,
-            final WorldManager worldManager) {
+            final DamageTextManager damageTextManager, final DebugUI debugUI, final WorldManager worldManager) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
         this.batch = batch;

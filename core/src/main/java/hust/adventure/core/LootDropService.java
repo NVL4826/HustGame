@@ -1,8 +1,9 @@
 package hust.adventure.core;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+
+import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
@@ -10,11 +11,12 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.items.ItemManager;
+import hust.adventure.items.base.Item;
+import hust.adventure.items.base.ItemManager;
+import hust.adventure.items.consumable.Consumable;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import hust.adventure.items.Item;
-import hust.adventure.items.Consumable;
 
 public class LootDropService implements EventListener, Disposable {
     private static final float DEFAULT_EXP_GEM_VALUE = 10f;

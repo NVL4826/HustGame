@@ -8,12 +8,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Array;
-import hust.adventure.entities.Player;
+
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.enemies.Enemy;
+import hust.adventure.entities.player.Player;
 import hust.adventure.collision.CollisionLayer;
-import hust.adventure.collision.Collider;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.collision.Collider;
 
 /**
  * Represents a projectile fired by a player or enemy.

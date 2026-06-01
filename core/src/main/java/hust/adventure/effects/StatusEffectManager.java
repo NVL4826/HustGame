@@ -3,7 +3,7 @@ package hust.adventure.effects;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import hust.adventure.entities.base.Character;
-import hust.adventure.entities.status.StatusFlag;
+import hust.adventure.entities.base.StatusFlag;
 
 /**
  * Manages active status effects for a specific BaseActor.

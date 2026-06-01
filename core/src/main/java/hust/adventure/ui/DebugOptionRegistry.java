@@ -1,12 +1,12 @@
 package hust.adventure.ui;
 
-import hust.adventure.core.EnemyDataManager;
-import hust.adventure.core.ItemDataManager;
-import hust.adventure.core.WeaponDataManager;
-import hust.adventure.core.GearDataManager;
 import hust.adventure.core.config.LevelID;
+import hust.adventure.core.data.EnemyDataManager;
+import hust.adventure.core.data.GearDataManager;
+import hust.adventure.core.data.ItemDataManager;
+import hust.adventure.core.data.WeaponDataManager;
 import hust.adventure.entities.enemies.EnemyConfig;
-import hust.adventure.items.ItemConfig;
+import hust.adventure.items.base.ItemConfig;
 
 import java.util.ArrayList;
 import java.util.List;

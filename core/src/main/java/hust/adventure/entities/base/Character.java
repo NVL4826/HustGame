@@ -3,9 +3,8 @@ package hust.adventure.entities.base;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
+import hust.adventure.behavior.movement.MovementBehavior;
 import hust.adventure.effects.StatusEffectManager;
-import hust.adventure.entities.components.MovementBehavior;
-import hust.adventure.entities.status.StatusFlag;
 import hust.adventure.events.EntityDamagedEvent;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;

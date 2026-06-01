@@ -3,26 +3,26 @@ package hust.adventure.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import hust.adventure.core.GameAssetManager;
+
+import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.Player;
 import hust.adventure.entities.factory.EntityFactory;
+import hust.adventure.entities.player.Player;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.gamestate.PlayMode;
-import hust.adventure.items.Item;
-import hust.adventure.items.ItemManager;
+import hust.adventure.items.base.Item;
+import hust.adventure.items.base.ItemManager;
 import hust.adventure.ui.DebugOption;
 import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.SelectionMode;
 import hust.adventure.ui.UIManager;
 
 /**
- * Handles debug shortcut keys (F4-F8), manages selection states for debug options,
- * and executes corresponding debug actions such as map transition, item spawning,
- * and monster spawning.
+ * Handles debug shortcut keys (F4-F8), manages selection states for debug options, and executes corresponding debug
+ * actions such as map transition, item spawning, and monster spawning.
  */
 public class DebugInputHandler {
     private final UIManager uiManager;
@@ -42,7 +42,7 @@ public class DebugInputHandler {
      * @param assetManager  the game asset manager
      */
     public DebugInputHandler(final UIManager uiManager, final EntityFactory entityFactory,
-                             final GameAssetManager assetManager) {
+            final GameAssetManager assetManager) {
         this.uiManager = uiManager;
         this.entityFactory = entityFactory;
         this.assetManager = assetManager;

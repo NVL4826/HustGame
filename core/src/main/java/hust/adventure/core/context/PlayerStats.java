@@ -1,8 +1,8 @@
 package hust.adventure.core.context;
 
 /**
- * Encapsulates the core progression and combat statistics of the Player.
- * Part of the SRP refactoring of ProgressContext.
+ * Encapsulates the core progression and combat statistics of the Player. Part of the SRP refactoring of
+ * ProgressContext.
  */
 public class PlayerStats {
     private float hp = 100f;

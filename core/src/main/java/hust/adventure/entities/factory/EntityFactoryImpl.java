@@ -9,23 +9,23 @@ import com.badlogic.gdx.utils.Array;
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
-import hust.adventure.core.EnemyDataManager;
-import hust.adventure.core.GameAssetManager;
-import hust.adventure.entities.Player;
+import hust.adventure.core.assets.GameAssetManager;
+import hust.adventure.core.data.EnemyDataManager;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.entities.interactables.ItemDrop;
+import hust.adventure.entities.player.Player;
 import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
+import hust.adventure.items.base.Item;
 import hust.adventure.entities.environment.FloatingBook;
 import hust.adventure.entities.environment.Candle;
 import hust.adventure.graphics.LightProvider;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.utils.GamePools;
-import hust.adventure.items.Item;
 
 /**
  * Concrete implementation of the EntityFactory. Uses GamePools for high-frequency objects (Projectiles, ExpGems) and

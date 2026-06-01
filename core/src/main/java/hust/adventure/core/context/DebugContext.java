@@ -1,8 +1,7 @@
 package hust.adventure.core.context;
 
 /**
- * Encapsulates the debug configuration and options for the game.
- * Part of the SRP refactoring of ProgressContext.
+ * Encapsulates the debug configuration and options for the game. Part of the SRP refactoring of ProgressContext.
  */
 public class DebugContext {
     private boolean showDebug = false;

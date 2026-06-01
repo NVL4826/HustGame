@@ -1,8 +1,7 @@
 package hust.adventure.core.context;
 
 /**
- * Encapsulates active spell status effect states and timers.
- * Part of the SRP refactoring of ProgressContext.
+ * Encapsulates active spell status effect states and timers. Part of the SRP refactoring of ProgressContext.
  */
 public class SpellState {
     private float enemyTimeScale = 1.0f;

@@ -1,7 +1,7 @@
 package hust.adventure.ui.components;
 
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.Player;
+import hust.adventure.entities.player.Player;
 
 public class DamageIncreaseAction implements UpgradeAction {
     @Override

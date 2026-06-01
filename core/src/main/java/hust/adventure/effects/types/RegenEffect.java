@@ -2,7 +2,7 @@ package hust.adventure.effects.types;
 
 import hust.adventure.effects.StatusEffect;
 import hust.adventure.entities.base.Character;
-import hust.adventure.entities.status.StatusFlag;
+import hust.adventure.entities.base.StatusFlag;
 
 public class RegenEffect implements StatusEffect {
     private float duration;

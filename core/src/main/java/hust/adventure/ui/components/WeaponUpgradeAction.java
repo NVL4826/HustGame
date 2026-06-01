@@ -1,7 +1,7 @@
 package hust.adventure.ui.components;
 
-import hust.adventure.entities.Player;
 import hust.adventure.weapons.WeaponFactory;
+import hust.adventure.entities.player.Player;
 import hust.adventure.weapons.BaseWeapon;
 
 /**

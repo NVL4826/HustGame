@@ -6,19 +6,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.collision.CollisionManager;
+import hust.adventure.core.context.ProgressContext;
+import hust.adventure.behavior.BehaviorRegistry;
+import hust.adventure.behavior.EnemyBehaviors;
+import hust.adventure.behavior.ai.AIBehavior;
+import hust.adventure.behavior.attack.AttackBehavior;
+import hust.adventure.behavior.death.DeathBehavior;
 import hust.adventure.collision.Collider;
 
 import hust.adventure.entities.EntityManager;
-import hust.adventure.entities.Player;
 import hust.adventure.entities.base.Character;
-import hust.adventure.entities.components.AIBehavior;
-import hust.adventure.entities.components.AttackBehavior;
-import hust.adventure.entities.components.BehaviorRegistry;
-import hust.adventure.entities.components.DeathBehavior;
-import hust.adventure.entities.components.EnemyBehaviors;
 import hust.adventure.entities.factory.EntityFactory;
+import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.Damageable;
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.graphics.ShapeDrawUtils;
 
 /**

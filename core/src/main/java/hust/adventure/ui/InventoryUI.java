@@ -11,11 +11,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.Player;
+import hust.adventure.entities.player.Player;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.items.Item;
+import hust.adventure.items.base.Item;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,10 +1,10 @@
 package hust.adventure.weapons;
 
-import hust.adventure.entities.Player;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.entities.player.Player;
+import hust.adventure.items.base.EquipmentItem;
 
-import hust.adventure.items.EquipmentItem;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * Abstract base class for all weapons. Handles common functionality like cooldown management and level tracking.
@@ -100,11 +100,16 @@ public abstract class BaseWeapon extends EquipmentItem {
         if (config.getLevels() != null && config.getLevels().size >= this.level) {
             final WeaponLevelConfig levelCfg = config.getLevels().get(this.level - 1);
             if (levelCfg != null) {
-                if (levelCfg.getBaseDamage() > 0) this.baseDamage = levelCfg.getBaseDamage();
-                if (levelCfg.getCooldown() > 0) this.cooldown = levelCfg.getCooldown();
-                if (levelCfg.getArea() > 0) this.area = levelCfg.getArea();
-                if (levelCfg.getAmount() > 0) this.amount = levelCfg.getAmount();
-                if (levelCfg.getPierce() > 0) this.pierce = levelCfg.getPierce();
+                if (levelCfg.getBaseDamage() > 0)
+                    this.baseDamage = levelCfg.getBaseDamage();
+                if (levelCfg.getCooldown() > 0)
+                    this.cooldown = levelCfg.getCooldown();
+                if (levelCfg.getArea() > 0)
+                    this.area = levelCfg.getArea();
+                if (levelCfg.getAmount() > 0)
+                    this.amount = levelCfg.getAmount();
+                if (levelCfg.getPierce() > 0)
+                    this.pierce = levelCfg.getPierce();
             }
         }
     }

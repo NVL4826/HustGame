@@ -2,6 +2,7 @@ package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.events.EventDispatcher;
@@ -10,7 +11,7 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.events.MapTransitionData;
-import hust.adventure.items.ItemManager;
+import hust.adventure.items.base.ItemManager;
 import hust.adventure.ui.BookPuzzle;
 
 /**

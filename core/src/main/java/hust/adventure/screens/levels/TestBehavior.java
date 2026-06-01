@@ -1,8 +1,9 @@
 package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
-import hust.adventure.items.Item;
-import hust.adventure.items.ItemManager;
+
+import hust.adventure.items.base.Item;
+import hust.adventure.items.base.ItemManager;
 
 /**
  * Behavior class for the Test level, spawning all entities and items for debugging.

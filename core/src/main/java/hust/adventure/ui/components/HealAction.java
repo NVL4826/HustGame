@@ -1,6 +1,6 @@
 package hust.adventure.ui.components;
 
-import hust.adventure.entities.Player;
+import hust.adventure.entities.player.Player;
 
 public class HealAction implements UpgradeAction {
     @Override

@@ -2,7 +2,7 @@ package hust.adventure.ui;
 
 import com.badlogic.gdx.utils.Disposable;
 
-import hust.adventure.entities.Player;
+import hust.adventure.entities.player.Player;
 
 /**
  * Manages UI components and their visibility.
@@ -50,8 +50,6 @@ public class UIManager implements UIProvider, Disposable {
         return damageTextManager;
     }
 
-
-
     public DebugUI getDebugUI() {
         return debugUI;
     }
@@ -64,4 +62,3 @@ public class UIManager implements UIProvider, Disposable {
         damageTextManager.dispose();
     }
 }
-

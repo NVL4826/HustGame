@@ -2,7 +2,7 @@ package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
 import hust.adventure.entities.environment.StaticNPC;
-import hust.adventure.items.ItemManager;
+import hust.adventure.items.base.ItemManager;
 
 /**
  * Behavior class for Floor 1 (Tang 1) of the game.

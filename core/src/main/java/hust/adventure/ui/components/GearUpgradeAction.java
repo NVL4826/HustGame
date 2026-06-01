@@ -1,8 +1,8 @@
 package hust.adventure.ui.components;
 
-import hust.adventure.entities.Player;
-import hust.adventure.items.Gear;
-import hust.adventure.items.GearFactory;
+import hust.adventure.entities.player.Player;
+import hust.adventure.items.gear.Gear;
+import hust.adventure.items.gear.GearFactory;
 
 /**
  * Action representing a choice to unlock a new gear or upgrade an existing one.

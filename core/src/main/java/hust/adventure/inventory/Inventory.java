@@ -1,15 +1,15 @@
 package hust.adventure.inventory;
 
-import hust.adventure.items.Item;
-import hust.adventure.items.ItemManager;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import hust.adventure.items.base.Item;
+import hust.adventure.items.base.ItemManager;
+
 /**
- * Lớp quản lý túi đồ của người chơi.
- * Lưu trữ danh sách các vật phẩm và số lượng tương ứng.
- * Tuân thủ Flyweight pattern: chỉ lưu trữ tham chiếu đến Item và số lượng.
+ * Lớp quản lý túi đồ của người chơi. Lưu trữ danh sách các vật phẩm và số lượng tương ứng. Tuân thủ Flyweight pattern:
+ * chỉ lưu trữ tham chiếu đến Item và số lượng.
  */
 public class Inventory {
 
@@ -23,7 +23,7 @@ public class Inventory {
     /**
      * Thêm vật phẩm vào túi đồ.
      *
-     * @param item Đối tượng vật phẩm
+     * @param item   Đối tượng vật phẩm
      * @param amount Số lượng muốn thêm
      */
     public void addItem(Item item, int amount) {
@@ -48,7 +48,7 @@ public class Inventory {
     /**
      * Xóa vật phẩm khỏi túi đồ.
      *
-     * @param item Đối tượng vật phẩm
+     * @param item   Đối tượng vật phẩm
      * @param amount Số lượng muốn xóa
      * @return true nếu xóa thành công, false nếu không đủ.
      */
@@ -92,8 +92,7 @@ public class Inventory {
     }
 
     /**
-     * Lấy toàn bộ danh sách vật phẩm dưới dạng Read-only để đảm bảo tính đóng gói.
-     * Thích hợp dùng cho UI.
+     * Lấy toàn bộ danh sách vật phẩm dưới dạng Read-only để đảm bảo tính đóng gói. Thích hợp dùng cho UI.
      */
     public Map<Item, Integer> getReadOnlyItems() {
         return Collections.unmodifiableMap(items);

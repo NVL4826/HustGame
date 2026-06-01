@@ -12,7 +12,7 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
-import hust.adventure.items.Item;
+import hust.adventure.items.base.Item;
 
 import java.util.HashMap;
 import java.util.Map;

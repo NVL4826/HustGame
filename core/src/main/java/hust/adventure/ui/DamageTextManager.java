@@ -12,12 +12,12 @@ import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.utils.GamePools;
-import hust.adventure.entities.Player;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.items.Item;
-import hust.adventure.items.ItemManager;
-import hust.adventure.items.ConsumableItem;
-import hust.adventure.items.FloatingTextInfo;
+import hust.adventure.entities.player.Player;
+import hust.adventure.items.base.Item;
+import hust.adventure.items.base.ItemManager;
+import hust.adventure.items.consumable.ConsumableItem;
+import hust.adventure.items.loot.FloatingTextInfo;
 
 public class DamageTextManager implements EventListener {
     private final Array<DamageText> activeTexts;
@@ -51,7 +51,7 @@ public class DamageTextManager implements EventListener {
     public void onEvent(GameEvent<?> event) {
         if (event.getType() == EventType.ENTITY_DAMAGED) {
             EntityDamagedEvent data = (EntityDamagedEvent) event.getData();
-            
+
             float vx = MathUtils.random(-30f, 30f);
             float vy = MathUtils.random(50f, 100f);
             Color color = data.isCrit() ? Color.YELLOW : Color.WHITE;
@@ -59,8 +59,8 @@ public class DamageTextManager implements EventListener {
 
             DamageText dt = GamePools.obtain(DamageText.class);
             // Spawn slightly above the entity
-            dt.init(data.getEntity().getX(), data.getEntity().getY() + data.getEntity().getHeight() / 2, 
-                    vx, vy, text, color, 1.0f);
+            dt.init(data.getEntity().getX(), data.getEntity().getY() + data.getEntity().getHeight() / 2, vx, vy, text,
+                    color, 1.0f);
             activeTexts.add(dt);
         } else if (event.getType() == EventType.ITEM_USED) {
             final String itemId = (String) event.getData();
@@ -72,7 +72,8 @@ public class DamageTextManager implements EventListener {
 
                     if (item instanceof ConsumableItem) {
                         for (final FloatingTextInfo ftInfo : ((ConsumableItem) item).getFloatingTexts()) {
-                            showFloatingText(player, ftInfo.getText(), ftInfo.getColor(), ftInfo.getDuration(), ftInfo.getOffsetX(), ftInfo.getStartVy());
+                            showFloatingText(player, ftInfo.getText(), ftInfo.getColor(), ftInfo.getDuration(),
+                                    ftInfo.getOffsetX(), ftInfo.getStartVy());
                         }
                     }
                 }
@@ -80,12 +81,12 @@ public class DamageTextManager implements EventListener {
         }
     }
 
-    private void showFloatingText(Player player, String text, Color color, float duration, float offsetX, float startVy) {
+    private void showFloatingText(Player player, String text, Color color, float duration, float offsetX,
+            float startVy) {
         float vx = MathUtils.random(-15f, 15f);
         float vy = startVy + MathUtils.random(-5f, 5f);
         DamageText dt = GamePools.obtain(DamageText.class);
-        dt.init(player.getX() + offsetX, player.getY() + player.getHeight() / 2, 
-                vx, vy, text, color, duration);
+        dt.init(player.getX() + offsetX, player.getY() + player.getHeight() / 2, vx, vy, text, color, duration);
         activeTexts.add(dt);
     }
 

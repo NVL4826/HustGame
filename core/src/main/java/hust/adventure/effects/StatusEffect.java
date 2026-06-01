@@ -1,7 +1,7 @@
 package hust.adventure.effects;
 
 import hust.adventure.entities.base.Character;
-import hust.adventure.entities.status.StatusFlag;
+import hust.adventure.entities.base.StatusFlag;
 
 /**
  * Interface representing a status effect (buff/debuff) on a BaseActor.

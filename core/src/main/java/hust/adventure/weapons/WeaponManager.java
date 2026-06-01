@@ -2,7 +2,8 @@ package hust.adventure.weapons;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import hust.adventure.entities.Player;
+
+import hust.adventure.entities.player.Player;
 
 /**
  * Manages the collection of weapons for the player.

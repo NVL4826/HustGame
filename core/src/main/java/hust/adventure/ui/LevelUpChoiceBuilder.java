@@ -2,11 +2,12 @@ package hust.adventure.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import hust.adventure.core.GearDataManager;
-import hust.adventure.core.WeaponDataManager;
-import hust.adventure.entities.Player;
-import hust.adventure.items.Gear;
-import hust.adventure.items.UpgradeCatalog;
+
+import hust.adventure.core.data.GearDataManager;
+import hust.adventure.core.data.WeaponDataManager;
+import hust.adventure.entities.player.Player;
+import hust.adventure.items.gear.Gear;
+import hust.adventure.items.loot.UpgradeCatalog;
 import hust.adventure.weapons.BaseWeapon;
 import hust.adventure.ui.components.DamageIncreaseAction;
 import hust.adventure.ui.components.GearUpgradeAction;
@@ -61,9 +62,7 @@ public final class LevelUpChoiceBuilder {
         if (weaponDataManager == null) {
             Gdx.app.error("LevelUpChoiceBuilder", "WeaponDataManager is null!");
         }
-        final Array<String> weaponIds = weaponDataManager != null
-                ? weaponDataManager.getAllWeaponIds()
-                : new Array<>();
+        final Array<String> weaponIds = weaponDataManager != null ? weaponDataManager.getAllWeaponIds() : new Array<>();
         for (final String id : weaponIds) {
             BaseWeapon weapon = null;
             for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
@@ -88,9 +87,7 @@ public final class LevelUpChoiceBuilder {
         if (gearDataManager == null) {
             Gdx.app.error("LevelUpChoiceBuilder", "GearDataManager is null!");
         }
-        final Array<String> gearIds = gearDataManager != null
-                ? gearDataManager.getAllGearIds()
-                : new Array<>();
+        final Array<String> gearIds = gearDataManager != null ? gearDataManager.getAllGearIds() : new Array<>();
         for (final String id : gearIds) {
             final Gear gear = player.getGearManager().getGear(id);
             if (gear == null) {
