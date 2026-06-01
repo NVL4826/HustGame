@@ -15,8 +15,8 @@ public class LoadingScreen extends BaseScreen {
         drawProgressBar();
 
         if (game.getAssetManager().update()) {
-            LevelConfig template = game.getLevelDataManager().getLevelConfig("MAP_1");
-            LevelConfig config = new LevelConfig("MAP_1", template.getName(), template.getMapPath(),
+            LevelConfig template = game.getLevelDataManager().getLevelConfig("FINAL_OUTSIDE");
+            LevelConfig config = new LevelConfig("FINAL_OUTSIDE", template.getName(), template.getMapPath(),
                     template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
                     template.getAmbientColor(), template.isInfinite());
             game.setScreen(LevelFactory.createLevel(game, config));

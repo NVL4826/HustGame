@@ -219,8 +219,8 @@ public class GameOverScreen extends BaseScreen {
         LevelConfig savedConfig = ProgressContext.instance.getCurrentLevelConfig();
         if (savedConfig == null) {
             // Fallback nếu chưa lưu được (ví dụ: chết ngay màn đầu)
-            LevelConfig template = game.getLevelDataManager().getLevelConfig("MAP_1");
-            savedConfig = new LevelConfig("MAP_1", template.getName(), template.getMapPath(),
+            LevelConfig template = game.getLevelDataManager().getLevelConfig("FINAL_OUTSIDE");
+            savedConfig = new LevelConfig("FINAL_OUTSIDE", template.getName(), template.getMapPath(),
                     template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
                     template.getAmbientColor(), template.isInfinite());
         }

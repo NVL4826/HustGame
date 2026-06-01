@@ -94,6 +94,8 @@ public class PlayerMovementBehavior implements MovementBehavior {
                 player.setX(newX);
                 player.setY(newY);
             }
+        } else {
+            player.setState(new IdleState());
         }
     }
 }
