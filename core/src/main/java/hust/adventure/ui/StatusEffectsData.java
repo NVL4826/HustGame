@@ -12,9 +12,8 @@ public class StatusEffectsData {
     private final boolean isHpRegen;
     private final boolean isConfused;
 
-    public StatusEffectsData(boolean hasNao, boolean hasUsb, float enemyTimeScale,
-                             float showEnemiesTimer, boolean isSpeedBoosted,
-                             boolean isHpRegen, boolean isConfused) {
+    public StatusEffectsData(boolean hasNao, boolean hasUsb, float enemyTimeScale, float showEnemiesTimer,
+            boolean isSpeedBoosted, boolean isHpRegen, boolean isConfused) {
         this.hasNao = hasNao;
         this.hasUsb = hasUsb;
         this.enemyTimeScale = enemyTimeScale;

@@ -36,7 +36,6 @@ import hust.adventure.input.DebugInputHandler;
 import hust.adventure.input.InputReader;
 import hust.adventure.screens.levels.LevelBehavior;
 import hust.adventure.screens.levels.LevelContext;
-import hust.adventure.stats.LevelManager;
 import hust.adventure.ui.UIManager;
 import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.DebugOptionRegistry;

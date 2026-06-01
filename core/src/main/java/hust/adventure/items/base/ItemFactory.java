@@ -10,11 +10,12 @@ import hust.adventure.effects.types.ConfusionEffect;
 import hust.adventure.effects.types.RegenEffect;
 import hust.adventure.effects.types.SpeedBoostEffect;
 import hust.adventure.entities.base.Character;
+import hust.adventure.entities.player.Player;
 import hust.adventure.items.consumable.ConsumableItem;
 import hust.adventure.items.consumable.ConsumableItemConfig;
-import hust.adventure.items.loot.EffectConfig;
-import hust.adventure.items.loot.FloatingTextConfig;
-import hust.adventure.items.loot.FloatingTextInfo;
+import hust.adventure.items.consumable.EffectConfig;
+import hust.adventure.items.consumable.FloatingTextConfig;
+import hust.adventure.ui.FloatingTextInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,11 @@ public class ItemFactory {
 
     static {
         effectProviders.put("heal", config -> consumer -> consumer.heal(config.getValue()));
-        effectProviders.put("restore_stamina", config -> consumer -> consumer.restoreStamina(config.getValue()));
+        effectProviders.put("restore_stamina", config -> consumer -> {
+            if (consumer instanceof Player) {
+                ((Player) consumer).restoreStamina(config.getValue());
+            }
+        });
         effectProviders.put("speed_boost", config -> consumer -> consumer.getStatusEffectManager()
                 .addEffect(new SpeedBoostEffect(config.getDuration(), config.getMultiplier())));
         effectProviders.put("regen", config -> consumer -> consumer.getStatusEffectManager()

@@ -3,6 +3,7 @@ package hust.adventure.effects.types;
 import hust.adventure.effects.StatusEffect;
 import hust.adventure.entities.base.Character;
 import hust.adventure.entities.base.StatusFlag;
+import hust.adventure.entities.player.Player;
 
 public class StaEffect implements StatusEffect {
     private float duration;
@@ -20,7 +21,9 @@ public class StaEffect implements StatusEffect {
     @Override
     public void update(Character target, float delta) {
         if (duration > 0) {
-            target.restoreStamina(amountPerSecond * delta);
+            if (target instanceof Player) {
+                ((Player) target).restoreStamina(amountPerSecond * delta);
+            }
             duration -= delta;
         }
     }

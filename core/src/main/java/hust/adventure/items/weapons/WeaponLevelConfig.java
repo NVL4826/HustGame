@@ -1,4 +1,4 @@
-package hust.adventure.weapons;
+package hust.adventure.items.weapons;
 
 /**
  * Data Object representing stat overrides for a specific weapon level.

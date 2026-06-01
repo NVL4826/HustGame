@@ -1,4 +1,4 @@
-package hust.adventure.weapons;
+package hust.adventure.items.weapons;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;

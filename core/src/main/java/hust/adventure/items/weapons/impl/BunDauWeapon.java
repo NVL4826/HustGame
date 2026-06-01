@@ -1,4 +1,4 @@
-package hust.adventure.weapons.impl;
+package hust.adventure.items.weapons.impl;
 
 import com.badlogic.gdx.graphics.Color;
 
@@ -6,8 +6,8 @@ import hust.adventure.entities.base.Direction;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.weapons.BaseWeapon;
-import hust.adventure.weapons.WeaponConfig;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponConfig;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.player.Player;
 

@@ -30,7 +30,7 @@ public class PlayerStats {
      * @param hp new HP.
      */
     public void setHp(float hp) {
-        this.hp = hp;
+        this.hp = Math.max(0, Math.min(this.maxHp, hp));
     }
 
     /**
@@ -49,6 +49,7 @@ public class PlayerStats {
      */
     public void setMaxHp(float maxHp) {
         this.maxHp = maxHp;
+        this.hp = Math.min(this.hp, this.maxHp);
     }
 
     /**
@@ -66,7 +67,7 @@ public class PlayerStats {
      * @param stamina new stamina.
      */
     public void setStamina(float stamina) {
-        this.stamina = stamina;
+        this.stamina = Math.max(0, Math.min(this.maxStamina, stamina));
     }
 
     /**
@@ -85,6 +86,7 @@ public class PlayerStats {
      */
     public void setMaxStamina(float maxStamina) {
         this.maxStamina = maxStamina;
+        this.stamina = Math.min(this.stamina, this.maxStamina);
     }
 
     /**

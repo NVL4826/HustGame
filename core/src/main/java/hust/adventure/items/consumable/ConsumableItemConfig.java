@@ -3,8 +3,6 @@ package hust.adventure.items.consumable;
 import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.items.base.ItemConfig;
-import hust.adventure.items.loot.EffectConfig;
-import hust.adventure.items.loot.FloatingTextConfig;
 
 /**
  * Configuration class representing a consumable item, extending base item configurations.

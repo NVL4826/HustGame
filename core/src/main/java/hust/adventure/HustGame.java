@@ -37,11 +37,11 @@ import hust.adventure.items.base.ItemConfig;
 import hust.adventure.items.base.ItemFactory;
 import hust.adventure.items.base.ItemManager;
 import hust.adventure.items.gear.GearFactory;
-import hust.adventure.items.loot.UpgradeCatalog;
+import hust.adventure.items.UpgradeCatalog;
+import hust.adventure.items.weapons.WeaponFactory;
 import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.components.GearUpgradeAction;
-import hust.adventure.weapons.WeaponFactory;
 import hust.adventure.ui.components.WeaponUpgradeAction;
 
 /**

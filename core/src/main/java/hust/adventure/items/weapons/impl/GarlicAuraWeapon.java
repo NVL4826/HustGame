@@ -1,4 +1,4 @@
-package hust.adventure.weapons.impl;
+package hust.adventure.items.weapons.impl;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,8 +8,8 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.Damageable;
 import hust.adventure.graphics.ShapeDrawUtils;
-import hust.adventure.weapons.BaseWeapon;
-import hust.adventure.weapons.WeaponConfig;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponConfig;
 
 /**
  * A garlic weapon that creates an aura damaging all nearby enemies periodically. Renders three rotating concentric

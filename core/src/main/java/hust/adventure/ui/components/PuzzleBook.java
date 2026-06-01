@@ -11,11 +11,12 @@ public class PuzzleBook {
     private final int targetSemester;
     private final float initialX;
     private final float initialY;
-    
+
     private boolean placedCorrectly = false;
     private boolean isDragging = false;
 
-    public PuzzleBook(final String name, final float x, final float y, final float width, final float height, final int targetSemester) {
+    public PuzzleBook(final String name, final float x, final float y, final float width, final float height,
+            final int targetSemester) {
         this.subjectName = name;
         this.rect = new Rectangle(x, y, width, height);
         this.targetSemester = targetSemester;

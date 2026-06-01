@@ -1,4 +1,4 @@
-package hust.adventure.weapons;
+package hust.adventure.items.weapons;
 
 import com.badlogic.gdx.utils.Array;
 

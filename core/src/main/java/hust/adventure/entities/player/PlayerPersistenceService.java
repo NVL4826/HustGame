@@ -3,8 +3,8 @@ package hust.adventure.entities.player;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.items.gear.GearFactory;
-import hust.adventure.weapons.BaseWeapon;
-import hust.adventure.weapons.WeaponFactory;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponFactory;
 
 import java.util.Map;
 
@@ -105,31 +105,5 @@ public class PlayerPersistenceService {
         }
     }
 
-    /**
-     * Saves the player's core stats to the ProgressContext.
-     *
-     * @param player The player entity instance.
-     */
-    public static void saveStats(final Player player) {
-        if (ProgressContext.instance == null || player == null) {
-            return;
-        }
-        ProgressContext.instance.setHp(player.getHp());
-        ProgressContext.instance.setMaxHp(player.getMaxHp());
-        ProgressContext.instance.setStamina(player.getStamina());
-    }
 
-    /**
-     * Restores the player's core stats from the ProgressContext.
-     *
-     * @param player The player entity instance.
-     */
-    public static void restoreStats(final Player player) {
-        if (ProgressContext.instance == null || player == null) {
-            return;
-        }
-        player.setPlayerMaxHp(ProgressContext.instance.getMaxHp());
-        player.setPlayerHp(ProgressContext.instance.getHp());
-        player.setStamina(ProgressContext.instance.getStamina());
-    }
 }

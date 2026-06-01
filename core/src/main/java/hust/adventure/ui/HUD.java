@@ -12,21 +12,20 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.core.TimeProvider;
 
 /**
- * Upgraded HUD – modern bar design with gradient fills, icons, rounded feel,
- * and a low-HP pulse warning.
+ * Upgraded HUD – modern bar design with gradient fills, icons, rounded feel, and a low-HP pulse warning.
  */
 public class HUD {
     private final OrthographicCamera uiCam;
 
     // Layout constants
-    private static final float PANEL_X  = 14f;
-    private static final float PANEL_Y  = 498f;
-    private static final float PANEL_W  = 210f;
-    private static final float PANEL_H  = 98f;
+    private static final float PANEL_X = 14f;
+    private static final float PANEL_Y = 498f;
+    private static final float PANEL_W = 210f;
+    private static final float PANEL_H = 98f;
 
-    private static final float BAR_X    = 42f;
-    private static final float BAR_W    = 155f;
-    private static final float BAR_H    = 13f;
+    private static final float BAR_X = 42f;
+    private static final float BAR_W = 155f;
+    private static final float BAR_H = 13f;
     private static final float BAR_HP_Y = 575f;
     private static final float BAR_SP_Y = 556f;
     private static final float BAR_MR_Y = 537f;
@@ -77,8 +76,8 @@ public class HUD {
     /**
      * Draws a status bar with dark background and two-color gradient fill.
      */
-    private void drawBar(ShapeRenderer sr, float x, float y, float w, float h,
-                         float percent, Color colLeft, Color colRight, float bgAlpha) {
+    private void drawBar(ShapeRenderer sr, float x, float y, float w, float h, float percent, Color colLeft,
+            Color colRight, float bgAlpha) {
         // Background
         sr.setColor(0.1f, 0.1f, 0.12f, bgAlpha);
         sr.rect(x, y, w, h);
@@ -140,7 +139,7 @@ public class HUD {
         // Pulse timer for low HP warning
         pulseTimer += Gdx.graphics.getDeltaTime();
         boolean lowHp = hpPct < 0.25f;
-        float pulse = (float)(Math.sin(pulseTimer * 5.0) * 0.5 + 0.5); // 0 to 1
+        float pulse = (float) (Math.sin(pulseTimer * 5.0) * 0.5 + 0.5); // 0 to 1
 
         // ── ShapeRenderer pass ──────────────────────────────────────────────
         sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -148,30 +147,30 @@ public class HUD {
         // HP bar: green -> yellow -> red based on percentage
         Color hpLeft, hpRight;
         if (hpPct > 0.5f) {
-            hpLeft  = new Color(0.1f, 0.9f, 0.3f, 1f);
+            hpLeft = new Color(0.1f, 0.9f, 0.3f, 1f);
             hpRight = new Color(0.4f, 1.0f, 0.2f, 1f);
         } else if (hpPct > 0.25f) {
-            hpLeft  = new Color(1.0f, 0.65f, 0.0f, 1f);
+            hpLeft = new Color(1.0f, 0.65f, 0.0f, 1f);
             hpRight = new Color(1.0f, 0.85f, 0.1f, 1f);
         } else {
             // Pulse red when HP is critically low
             float pr = 0.8f + pulse * 0.2f;
-            hpLeft  = new Color(pr, 0.05f, 0.05f, 1f);
+            hpLeft = new Color(pr, 0.05f, 0.05f, 1f);
             hpRight = new Color(1.0f, 0.2f + pulse * 0.2f, 0.0f, 1f);
         }
         drawBar(sr, BAR_X, BAR_HP_Y, BAR_W, BAR_H, hpPct, hpLeft, hpRight, 0.55f);
 
         // SP bar: purple -> cyan
-        drawBar(sr, BAR_X, BAR_SP_Y, BAR_W, BAR_H, spPct,
-                new Color(0.5f, 0.1f, 0.9f, 1f), new Color(0.1f, 0.7f, 1.0f, 1f), 0.55f);
+        drawBar(sr, BAR_X, BAR_SP_Y, BAR_W, BAR_H, spPct, new Color(0.5f, 0.1f, 0.9f, 1f),
+                new Color(0.1f, 0.7f, 1.0f, 1f), 0.55f);
 
         // Morale bar: orange -> bright yellow
-        drawBar(sr, BAR_X, BAR_MR_Y, BAR_W, BAR_H, mrPct,
-                new Color(0.9f, 0.5f, 0.0f, 1f), new Color(1.0f, 0.9f, 0.2f, 1f), 0.55f);
+        drawBar(sr, BAR_X, BAR_MR_Y, BAR_W, BAR_H, mrPct, new Color(0.9f, 0.5f, 0.0f, 1f),
+                new Color(1.0f, 0.9f, 0.2f, 1f), 0.55f);
 
         // EXP bar: dark purple -> pink
-        drawBar(sr, BAR_X, BAR_EX_Y, BAR_W, BAR_H, exPct,
-                new Color(0.5f, 0.0f, 0.7f, 1f), new Color(1.0f, 0.3f, 0.9f, 1f), 0.55f);
+        drawBar(sr, BAR_X, BAR_EX_Y, BAR_W, BAR_H, exPct, new Color(0.5f, 0.0f, 0.7f, 1f),
+                new Color(1.0f, 0.3f, 0.9f, 1f), 0.55f);
 
         // Outer panel border pulses red on low HP
         if (lowHp) {
@@ -200,17 +199,12 @@ public class HUD {
 
         // Numeric values on the right
         font.setColor(Color.WHITE);
-        font.draw(batch,
-                (int)data.getHp() + "/" + (int)data.getMaxHp(),
-                BAR_X + BAR_W + 4, BAR_HP_Y + BAR_H - 1);
-        font.draw(batch,
-                (int)data.getStamina() + "/" + (int)data.getMaxStamina(),
-                BAR_X + BAR_W + 4, BAR_SP_Y + BAR_H - 1);
-        font.draw(batch, (int)data.getMorale() + "%",
-                BAR_X + BAR_W + 4, BAR_MR_Y + BAR_H - 1);
+        font.draw(batch, (int) data.getHp() + "/" + (int) data.getMaxHp(), BAR_X + BAR_W + 4, BAR_HP_Y + BAR_H - 1);
+        font.draw(batch, (int) data.getStamina() + "/" + (int) data.getMaxStamina(), BAR_X + BAR_W + 4,
+                BAR_SP_Y + BAR_H - 1);
+        font.draw(batch, (int) data.getMorale() + "%", BAR_X + BAR_W + 4, BAR_MR_Y + BAR_H - 1);
         font.setColor(0.8f, 0.6f, 1f, 1f);
-        font.draw(batch, "LV" + data.getLevel(),
-                BAR_X + BAR_W + 4, BAR_EX_Y + BAR_H - 1);
+        font.draw(batch, "LV" + data.getLevel(), BAR_X + BAR_W + 4, BAR_EX_Y + BAR_H - 1);
 
         // Timer display
         int totalSeconds = (int) data.getCurrentTime();

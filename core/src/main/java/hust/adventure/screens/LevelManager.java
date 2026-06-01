@@ -1,4 +1,4 @@
-package hust.adventure.stats;
+package hust.adventure.screens;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.events.EventDispatcher;

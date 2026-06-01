@@ -1,4 +1,4 @@
-package hust.adventure.weapons.impl;
+package hust.adventure.items.weapons.impl;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,8 +13,8 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
 import hust.adventure.graphics.ShapeDrawUtils;
-import hust.adventure.weapons.BaseWeapon;
-import hust.adventure.weapons.WeaponConfig;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponConfig;
 
 /**
  * A whip weapon that hits enemies in a rectangular area in front of the player. Supports area scaling and burst strikes

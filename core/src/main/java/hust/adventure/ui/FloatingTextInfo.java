@@ -1,4 +1,4 @@
-package hust.adventure.items.loot;
+package hust.adventure.ui;
 
 import com.badlogic.gdx.graphics.Color;
 

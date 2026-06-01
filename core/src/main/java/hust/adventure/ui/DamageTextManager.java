@@ -17,7 +17,6 @@ import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
 import hust.adventure.items.consumable.ConsumableItem;
-import hust.adventure.items.loot.FloatingTextInfo;
 
 public class DamageTextManager implements EventListener {
     private final Array<DamageText> activeTexts;

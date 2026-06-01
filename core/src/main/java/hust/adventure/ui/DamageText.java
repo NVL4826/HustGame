@@ -13,7 +13,8 @@ public class DamageText implements Pool.Poolable {
     private float duration;
     private float timeToLive;
 
-    public DamageText() {}
+    public DamageText() {
+    }
 
     public void init(float x, float y, float vx, float vy, String text, Color color, float duration) {
         this.position.set(x, y);
@@ -36,9 +37,17 @@ public class DamageText implements Pool.Poolable {
         return timeToLive <= 0;
     }
 
-    public Vector2 getPosition() { return position; }
-    public String getText() { return text; }
-    public Color getColor() { return color; }
+    public Vector2 getPosition() {
+        return position;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public Color getColor() {
+        return color;
+    }
 
     @Override
     public void reset() {

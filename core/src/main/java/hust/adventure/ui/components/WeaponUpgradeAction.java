@@ -1,8 +1,8 @@
 package hust.adventure.ui.components;
 
-import hust.adventure.weapons.WeaponFactory;
 import hust.adventure.entities.player.Player;
-import hust.adventure.weapons.BaseWeapon;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponFactory;
 
 /**
  * Action representing a choice to unlock a new weapon or upgrade an existing one.

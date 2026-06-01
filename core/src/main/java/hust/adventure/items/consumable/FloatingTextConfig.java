@@ -1,4 +1,4 @@
-package hust.adventure.items.loot;
+package hust.adventure.items.consumable;
 
 /**
  * Configuration data object representing floating text triggered by item consumption.

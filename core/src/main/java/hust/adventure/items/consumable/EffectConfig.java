@@ -1,4 +1,4 @@
-package hust.adventure.items.loot;
+package hust.adventure.items.consumable;
 
 /**
  * Configuration data object representing a single effect for a consumable item.

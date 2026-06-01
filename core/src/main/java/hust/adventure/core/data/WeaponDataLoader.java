@@ -4,8 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
-import hust.adventure.weapons.WeaponConfig;
-import hust.adventure.weapons.WeaponConfigCatalog;
+
+import hust.adventure.items.weapons.WeaponConfig;
+import hust.adventure.items.weapons.WeaponConfigCatalog;
 
 /**
  * Responsible for loading the JSON and storing configuration models for weapons.

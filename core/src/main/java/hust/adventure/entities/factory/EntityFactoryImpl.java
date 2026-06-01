@@ -21,6 +21,7 @@ import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.environment.FloatingBook;
 import hust.adventure.entities.environment.Candle;
 import hust.adventure.graphics.LightProvider;
@@ -71,7 +72,7 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public Player createPlayer(float x, float y, Inventory inventory, PlayerController controller) {
-        Player player = new Player(x, y, inventory, controller, collisionManager, assetManager);
+        Player player = new Player(x, y, inventory, controller, collisionManager, assetManager, ProgressContext.instance.getPlayerStats());
         player.setFactory(this);
         player.setCollider(new Collider(player, CollisionLayer.PLAYER, Collider.Shape.RECTANGLE));
         entityManager.addEntity(player);

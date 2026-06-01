@@ -14,8 +14,8 @@ public class HUDData {
     private final int level;
     private final float currentTime;
 
-    public HUDData(float hp, float maxHp, float stamina, float maxStamina, float morale,
-                   float exp, float expToNextLevel, int level, float currentTime) {
+    public HUDData(float hp, float maxHp, float stamina, float maxStamina, float morale, float exp,
+            float expToNextLevel, int level, float currentTime) {
         this.hp = hp;
         this.maxHp = maxHp;
         this.stamina = stamina;

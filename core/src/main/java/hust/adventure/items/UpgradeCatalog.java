@@ -1,4 +1,4 @@
-package hust.adventure.items.loot;
+package hust.adventure.items;
 
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;

@@ -16,8 +16,6 @@ import hust.adventure.events.GameEvent;
 public abstract class Character extends MapObject implements Damageable {
     private float maxHp;
     private float hp;
-    private float maxStamina;
-    private float stamina;
     private float speed;
     private float speedMultiplier;
     private Direction direction;
@@ -35,8 +33,6 @@ public abstract class Character extends MapObject implements Damageable {
         super(x, y, width, height);
         this.maxHp = maxHp;
         this.hp = maxHp;
-        this.maxStamina = 100f; // Default
-        this.stamina = 100f;
         this.speed = 80f; // Default speed
         this.speedMultiplier = 1.0f;
         this.direction = Direction.DOWN;
@@ -68,7 +64,7 @@ public abstract class Character extends MapObject implements Damageable {
 
         if (amount < 0)
             throw new IllegalArgumentException("Damage amount cannot be negative");
-        this.hp = Math.max(0, this.hp - amount);
+        setHp(getHp() - amount);
 
         EntityDamagedEvent eventData = new EntityDamagedEvent(this, amount, isCrit);
         GameEvent<EntityDamagedEvent> event = new GameEvent<>(EventType.ENTITY_DAMAGED, eventData);
@@ -82,48 +78,33 @@ public abstract class Character extends MapObject implements Damageable {
     }
 
     @Override
-    public final boolean isDead() {
-        return hp <= 0;
+    public boolean isDead() {
+        return getHp() <= 0;
     }
 
     @Override
-    public final float getHp() {
+    public float getHp() {
         return hp;
     }
 
     @Override
-    public final float getMaxHp() {
+    public float getMaxHp() {
         return maxHp;
     }
 
-    protected final void setHp(final float hp) {
-        this.hp = Math.max(0, Math.min(maxHp, hp));
+    protected void setHp(final float hp) {
+        this.hp = Math.max(0, Math.min(getMaxHp(), hp));
     }
 
-    protected final void setMaxHp(final float maxHp) {
+    protected void setMaxHp(final float maxHp) {
         this.maxHp = maxHp;
+        this.hp = Math.min(this.hp, this.maxHp);
     }
 
     public final void heal(final float amount) {
         if (amount < 0)
             throw new IllegalArgumentException("Heal amount cannot be negative");
-        setHp(this.hp + amount);
-    }
-
-    public final float getStamina() {
-        return stamina;
-    }
-
-    public final void setStamina(final float stamina) {
-        this.stamina = Math.max(0, Math.min(maxStamina, stamina));
-    }
-
-    public final float getMaxStamina() {
-        return maxStamina;
-    }
-
-    public final void restoreStamina(final float amount) {
-        setStamina(this.stamina + amount);
+        setHp(getHp() + amount);
     }
 
     public final float getSpeed() {

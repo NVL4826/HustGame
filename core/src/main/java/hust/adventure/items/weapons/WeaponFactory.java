@@ -1,13 +1,13 @@
-package hust.adventure.weapons;
+package hust.adventure.items.weapons;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
 import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.player.Player;
-import hust.adventure.weapons.impl.BunDauWeapon;
-import hust.adventure.weapons.impl.GarlicAuraWeapon;
-import hust.adventure.weapons.impl.MagicWandWeapon;
-import hust.adventure.weapons.impl.WhipWeapon;
+import hust.adventure.items.weapons.impl.BunDauWeapon;
+import hust.adventure.items.weapons.impl.GarlicAuraWeapon;
+import hust.adventure.items.weapons.impl.MagicWandWeapon;
+import hust.adventure.items.weapons.impl.WhipWeapon;
 
 /**
  * Factory for creating weapons using a data-driven approach and registry pattern.

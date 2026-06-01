@@ -2,7 +2,7 @@ package hust.adventure.items.consumable;
 
 import hust.adventure.entities.base.Character;
 import hust.adventure.items.base.Item;
-import hust.adventure.items.loot.FloatingTextInfo;
+import hust.adventure.ui.FloatingTextInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -14,17 +14,18 @@ import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.items.gear.GearManager;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponManager;
 import hust.adventure.behavior.SpellController;
 import hust.adventure.behavior.movement.PlayerMovementBehavior;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.PlayerStats;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.interactables.ExpGem;
-import hust.adventure.weapons.WeaponManager;
-import hust.adventure.weapons.BaseWeapon;
 
 /**
  * Main player character class.
@@ -36,6 +37,7 @@ public class Player extends Character implements Targetable {
     private final GearManager gearManager;
     private CollisionManager collisionManager;
     private EntityFactory entityFactory;
+    private final PlayerStats stats;
 
     private Texture[] allTextures;
     private Animation<TextureRegion> walkLeft, walkRight, walkDown, walkUp;
@@ -54,8 +56,9 @@ public class Player extends Character implements Targetable {
     private final PlayerEventHandler eventHandler;
 
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
-            final CollisionManager collisionManager, final GameAssetManager assetManager) {
+            final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
+        this.stats = stats;
         setId("player");
         setName("Player");
         setSpritePath("player_textures");
@@ -79,9 +82,6 @@ public class Player extends Character implements Targetable {
         // Initialize spell controller
         this.spellController = new SpellController();
         ProgressContext.instance.setPlayer(this);
-
-        // Sync initial stats from global context via persistence service
-        PlayerPersistenceService.restoreStats(this);
     }
 
     private void loadTextures(final GameAssetManager assetManager) {
@@ -139,9 +139,6 @@ public class Player extends Character implements Targetable {
         setSpeedMultiplier(wingsSpeedMultiplier);
 
         super.update(delta);
-
-        // Sync core stats to global context via persistence service
-        PlayerPersistenceService.saveStats(this);
 
         // Magnetic radius for ExpGem
         if (collisionManager != null) {
@@ -300,16 +297,60 @@ public class Player extends Character implements Targetable {
         final float newMaxHp = oldMaxHp + amount;
         setMaxHp(newMaxHp);
         heal(amount);
-        // Sync stats to context
-        PlayerPersistenceService.saveStats(this);
     }
 
-    public void setPlayerHp(final float hp) {
-        super.setHp(hp);
+    @Override
+    public float getHp() {
+        return stats != null ? stats.getHp() : super.getHp();
     }
 
-    public void setPlayerMaxHp(final float maxHp) {
-        super.setMaxHp(maxHp);
+    @Override
+    public float getMaxHp() {
+        return stats != null ? stats.getMaxHp() : super.getMaxHp();
+    }
+
+    @Override
+    public void setHp(final float hp) {
+        if (stats != null) {
+            stats.setHp(hp);
+        } else {
+            super.setHp(hp);
+        }
+    }
+
+    @Override
+    public void setMaxHp(final float maxHp) {
+        if (stats != null) {
+            stats.setMaxHp(maxHp);
+        } else {
+            super.setMaxHp(maxHp);
+        }
+    }
+
+    public float getStamina() {
+        return stats != null ? stats.getStamina() : 100f;
+    }
+
+    public void setStamina(final float stamina) {
+        if (stats != null) {
+            stats.setStamina(stamina);
+        }
+    }
+
+    public float getMaxStamina() {
+        return stats != null ? stats.getMaxStamina() : 100f;
+    }
+
+    public void setMaxStamina(final float maxStamina) {
+        if (stats != null) {
+            stats.setMaxStamina(maxStamina);
+        }
+    }
+
+    public void restoreStamina(final float amount) {
+        if (stats != null) {
+            stats.setStamina(stats.getStamina() + amount);
+        }
     }
 
     public void setFactory(final EntityFactory factory) {
@@ -341,8 +382,6 @@ public class Player extends Character implements Targetable {
         if (!ignoreIFrames) {
             iframeTimer = IFRAME_DURATION;
         }
-        // Sync stats to context
-        PlayerPersistenceService.saveStats(this);
     }
 
     public float getIframeTimer() {
