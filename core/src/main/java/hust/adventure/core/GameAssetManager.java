@@ -71,11 +71,42 @@ public class GameAssetManager {
         manager.load("audio/sfx/chest_open.wav", Sound.class);
         manager.load("audio/sfx/puzzle_solved.wav", Sound.class);
         manager.load("audio/sfx/puzzle_failed.wav", Sound.class);
+        
+        manager.load("audio/sfx/garlic_aura.wav", Sound.class);
+        manager.load("audio/sfx/drink.wav", Sound.class);
+        manager.load("audio/sfx/skill_q.wav", Sound.class);
+        manager.load("audio/sfx/skill_e.wav", Sound.class);
+        manager.load("audio/sfx/skill_f.wav", Sound.class);
+        manager.load("audio/sfx/enemy_spawn.wav", Sound.class);
+        manager.load("audio/sfx/time_alarm.wav", Sound.class);
+        manager.load("audio/sfx/pickup_gem.wav", Sound.class);
+        manager.load("audio/sfx/pickup_item.wav", Sound.class);
+        manager.load("audio/sfx/portal_enter.wav", Sound.class);
+        manager.load("audio/sfx/inventory_open.wav", Sound.class);
+        manager.load("audio/sfx/ui_hover.wav", Sound.class);
+        manager.load("audio/sfx/roulette_spin.wav", Sound.class);
+        manager.load("audio/sfx/roulette_result.wav", Sound.class);
+        manager.load("audio/sfx/book_drag.wav", Sound.class);
+        manager.load("audio/sfx/book_snap.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_wrong.wav", Sound.class);
+        manager.load("audio/sfx/dialogue_next.wav", Sound.class);
+        manager.load("audio/sfx/answer_correct.wav", Sound.class);
+        manager.load("audio/sfx/answer_wrong.wav", Sound.class);
+        manager.load("audio/sfx/paper_spawn.wav", Sound.class);
+        manager.load("audio/sfx/game_over.wav", Sound.class);
 
         // Music tracks
         manager.load("audio/music/menu_theme.wav", Music.class);
         manager.load("audio/music/level_theme.wav", Music.class);
         manager.load("audio/music/boss_theme.wav", Music.class);
+        
+        manager.load("audio/music/bg_menu.mp3", Music.class);
+        manager.load("audio/music/bg_outside.mp3", Music.class);
+        manager.load("audio/music/bg_library.mp3", Music.class);
+        manager.load("audio/music/bg_lab.mp3", Music.class);
+        manager.load("audio/music/bg_boss.mp3", Music.class);
+        manager.load("audio/music/bg_victory.mp3", Music.class);
+        manager.load("audio/music/bg_gameover.mp3", Music.class);
     }
 
     public boolean update() {
