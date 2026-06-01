@@ -9,7 +9,6 @@ import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.behavior.BehaviorRegistry;
 import hust.adventure.behavior.EnemyBehaviors;
-import hust.adventure.behavior.ai.AIBehavior;
 import hust.adventure.behavior.attack.AttackBehavior;
 import hust.adventure.behavior.death.DeathBehavior;
 import hust.adventure.collision.Collider;
@@ -33,27 +32,37 @@ public class Enemy extends Character {
     private Color color;
     private CollisionManager collisionManager;
     private EntityFactory factory;
-    private AIBehavior movementBehavior;
     private AttackBehavior attackBehavior;
     private float contactDamage;
     private boolean split;
     private boolean boss;
     private DeathBehavior deathBehavior;
 
+    private final Player player;
+    private final EntityManager entityManager;
+
     public Enemy() {
         super();
+        this.player = null;
+        this.entityManager = null;
     }
 
     public Enemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
-            final Color color, final CollisionManager collisionManager) {
+            final Color color, final CollisionManager collisionManager, final Player player,
+            final EntityManager entityManager) {
         super(x, y, w, h, maxHp);
+        this.player = player;
+        this.entityManager = entityManager;
         setId("enemy");
         init(x, y, w, h, maxHp, name, color, collisionManager, 0f);
     }
 
     public Enemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
-            final Color color, final CollisionManager collisionManager, final float contactDamage) {
+            final Color color, final CollisionManager collisionManager, final float contactDamage, final Player player,
+            final EntityManager entityManager) {
         super(x, y, w, h, maxHp);
+        this.player = player;
+        this.entityManager = entityManager;
         setId("enemy");
         init(x, y, w, h, maxHp, name, color, collisionManager, contactDamage);
     }
@@ -65,9 +74,14 @@ public class Enemy extends Character {
      * @param y                vertical spawn position
      * @param collisionManager standard collision manager
      * @param config           the loaded configuration parameters
+     * @param player           the player dependency
+     * @param entityManager    the entity manager dependency
      */
-    public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config) {
+    public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config,
+            final Player player, final EntityManager entityManager) {
         super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());
+        this.player = player;
+        this.entityManager = entityManager;
         setId(config.getType());
         init(x, y, config.getWidth(), config.getHeight(), config.getMaxHp(), config.getName(), config.getColor(),
                 collisionManager, config.getContactDamage());
@@ -125,24 +139,15 @@ public class Enemy extends Character {
 
     @Override
     public void update(final float delta) {
-        super.update(delta * ProgressContext.instance.getEnemyTimeScale());
+        final float virtualDelta = delta * ProgressContext.instance.getEnemyTimeScale();
+        super.update(virtualDelta);
         if (isDead()) {
             destroy();
-        }
-    }
-
-    /**
-     * Executes AI behavior logic.
-     */
-    public void handleUpdate(final float delta, final Player player, final EntityManager entityManager) {
-        if (isDead())
             return;
-
-        if (movementBehavior != null) {
-            movementBehavior.execute(this, delta, player, entityManager);
         }
+
         if (attackBehavior != null) {
-            attackBehavior.execute(this, delta, player, entityManager);
+            attackBehavior.execute(this, virtualDelta, player, entityManager);
         }
 
         // Clamp to map boundaries after movement updates
@@ -166,13 +171,12 @@ public class Enemy extends Character {
         }
     }
 
-    /**
-     * Sets the movement/AI behavior strategy.
-     *
-     * @param movementBehavior the movement behavior strategy
-     */
-    public final void setMovementBehavior(final AIBehavior movementBehavior) {
-        this.movementBehavior = movementBehavior;
+    public final Player getPlayer() {
+        return player;
+    }
+
+    public final EntityManager getEntityManager() {
+        return entityManager;
     }
 
     /**

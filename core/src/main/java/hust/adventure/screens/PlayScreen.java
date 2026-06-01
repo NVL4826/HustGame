@@ -265,13 +265,6 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (state == PlayMode.RUNNING && !game.getScreenTransition().isTransitioning()) {
             entityManager.update(delta, entityFactory);
 
-            for (var e : entityManager.getEntities()) {
-                if (e instanceof Enemy) {
-                    ((Enemy) e).handleUpdate(delta * ProgressContext.instance.getEnemyTimeScale(), player,
-                            entityManager);
-                }
-            }
-
             lightingManager.update();
             collisionManager.update(worldManager.getWalls());
             checkTriggers();

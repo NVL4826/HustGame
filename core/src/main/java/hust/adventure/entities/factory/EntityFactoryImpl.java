@@ -85,7 +85,7 @@ public class EntityFactoryImpl implements EntityFactory {
         if (config == null) {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
-        final Enemy enemy = new Enemy(x, y, collisionManager, config);
+        final Enemy enemy = new Enemy(x, y, collisionManager, config, ProgressContext.instance.getPlayer(), entityManager);
 
         if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
             try {
