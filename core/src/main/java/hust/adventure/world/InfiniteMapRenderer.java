@@ -3,11 +3,9 @@ package hust.adventure.world;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import hust.adventure.entities.base.BackgroundRenderable;
-import hust.adventure.entities.base.Updatable;
 import hust.adventure.graphics.CameraManager;
 
-public class InfiniteMapRenderer implements BackgroundRenderable, Updatable {
+public class InfiniteMapRenderer {
     private final CameraManager cameraManager;
     private final MapChunk baseChunk;
     private final float chunkWidth;
@@ -40,12 +38,10 @@ public class InfiniteMapRenderer implements BackgroundRenderable, Updatable {
         this.visibleChunksY = (int) Math.ceil(viewHeight / chunkHeight) + 2;
     }
 
-    @Override
     public void update(final float delta) {
         calculateVisibleChunks();
     }
 
-    @Override
     public void draw(final SpriteBatch batch) {
         if (batch == null) {
             throw new IllegalArgumentException("SpriteBatch cannot be null");

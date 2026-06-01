@@ -1,7 +1,6 @@
 package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
-import hust.adventure.entities.environment.StaticNPC;
 import hust.adventure.items.base.ItemManager;
 
 /**
@@ -20,8 +19,8 @@ public class Floor1Behavior implements LevelBehavior {
         context.getEntityFactory().createItemDrop(350f, 180f, im.getItem("coffee_sua"), Color.YELLOW);
 
         // Create NPCs
-        context.getEntityManager().addEntity(new StaticNPC(200f, 300f, "Guard", Color.BLUE));
-        context.getEntityManager().addEntity(new StaticNPC(600f, 300f, "Staff", Color.CYAN));
+        context.getEntityFactory().createStaticNPC(200f, 300f, "Guard", Color.BLUE);
+        context.getEntityFactory().createStaticNPC(600f, 300f, "Staff", Color.CYAN);
     }
 
     @Override

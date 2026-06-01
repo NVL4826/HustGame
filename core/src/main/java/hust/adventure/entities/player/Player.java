@@ -55,6 +55,13 @@ public class Player extends Character implements Targetable {
     private final SpellController spellController;
     private final PlayerEventHandler eventHandler;
 
+    // Multipliers for data-driven gears
+    private float powerMultiplier = 1.0f;
+    private float cooldownMultiplier = 1.0f;
+    private float areaMultiplier = 1.0f;
+    private float magnetMultiplier = 1.0f;
+    private float speedMultiplier = 1.0f;
+
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
@@ -129,14 +136,7 @@ public class Player extends Character implements Targetable {
             ProgressContext.instance.setPlayer(this);
         }
 
-        float wingsSpeedMultiplier = 1.0f;
-        if (gearManager != null) {
-            final Gear wings = gearManager.getGear("wings");
-            if (wings != null) {
-                wingsSpeedMultiplier += wings.getLevel() * 0.10f;
-            }
-        }
-        setSpeedMultiplier(wingsSpeedMultiplier);
+        setSpeedMultiplier(speedMultiplier);
 
         super.update(delta);
 
@@ -249,47 +249,39 @@ public class Player extends Character implements Targetable {
     }
 
     public float getPowerMultiplier() {
-        float mult = 1.0f;
-        if (gearManager != null) {
-            final Gear spinach = gearManager.getGear("spinach");
-            if (spinach != null) {
-                mult += spinach.getLevel() * 0.10f;
-            }
-        }
-        return mult;
+        return powerMultiplier;
     }
 
     public float getCooldownMultiplier() {
-        float mult = 1.0f;
-        if (gearManager != null) {
-            final Gear emptyTome = gearManager.getGear("empty_tome");
-            if (emptyTome != null) {
-                mult -= emptyTome.getLevel() * 0.08f;
-            }
-        }
-        return Math.max(0.2f, mult);
+        return cooldownMultiplier;
     }
 
     public float getAreaMultiplier() {
-        float mult = 1.0f;
-        if (gearManager != null) {
-            final Gear candelabrador = gearManager.getGear("candelabrador");
-            if (candelabrador != null) {
-                mult += candelabrador.getLevel() * 0.20f;
-            }
-        }
-        return mult;
+        return areaMultiplier;
     }
 
     public float getMagnetMultiplier() {
-        float mult = 1.0f;
-        if (gearManager != null) {
-            final Gear attractorb = gearManager.getGear("attractorb");
-            if (attractorb != null) {
-                mult += attractorb.getLevel() * 0.20f;
-            }
-        }
-        return mult;
+        return magnetMultiplier;
+    }
+
+    public void addPowerMultiplier(final float amount) {
+        this.powerMultiplier += amount;
+    }
+
+    public void addCooldownMultiplier(final float amount) {
+        this.cooldownMultiplier = Math.max(0.2f, this.cooldownMultiplier + amount);
+    }
+
+    public void addAreaMultiplier(final float amount) {
+        this.areaMultiplier += amount;
+    }
+
+    public void addMagnetMultiplier(final float amount) {
+        this.magnetMultiplier += amount;
+    }
+
+    public void addSpeedMultiplier(final float amount) {
+        this.speedMultiplier += amount;
     }
 
     public void increaseMaxHp(final float amount) {

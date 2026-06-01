@@ -101,6 +101,13 @@ public class PlayerPersistenceService {
                     gear.upgrade();
                 }
                 player.getGearManager().addGear(gear);
+
+                // Re-apply cumulative equip effects for restored level
+                if (gearFactory != null) {
+                    for (int i = 0; i < targetLevel; i++) {
+                        gearFactory.applyEquipEffect(gearId, player);
+                    }
+                }
             }
         }
     }

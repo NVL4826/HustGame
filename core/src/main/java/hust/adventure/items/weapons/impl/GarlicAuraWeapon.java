@@ -30,7 +30,7 @@ public class GarlicAuraWeapon extends BaseWeapon {
 
         for (final MapObject target : targets) {
             if (target instanceof Damageable) {
-                ((Damageable) target).takeDamage(getBaseDamage());
+                ((Damageable) target).takeDamage(getEffectiveDamage());
             }
         }
     }

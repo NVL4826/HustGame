@@ -29,6 +29,11 @@ public class GearFactory {
 
     private void registerDefaultAppliers() {
         effectAppliers.put("increase_max_hp", (config, player) -> player.increaseMaxHp(config.getOnEquipValue()));
+        effectAppliers.put("add_power", (config, player) -> player.addPowerMultiplier(config.getOnEquipValue()));
+        effectAppliers.put("reduce_cooldown", (config, player) -> player.addCooldownMultiplier(-config.getOnEquipValue()));
+        effectAppliers.put("add_speed", (config, player) -> player.addSpeedMultiplier(config.getOnEquipValue()));
+        effectAppliers.put("add_area", (config, player) -> player.addAreaMultiplier(config.getOnEquipValue()));
+        effectAppliers.put("add_magnet", (config, player) -> player.addMagnetMultiplier(config.getOnEquipValue()));
     }
 
     /**

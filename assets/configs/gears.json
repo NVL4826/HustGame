@@ -11,7 +11,9 @@
         "Tăng 10% sát thương cho tất cả vũ khí (Cấp 4).",
         "Tăng 10% sát thương cho tất cả vũ khí (Cấp 5)."
       ],
-      "maxLevel": 5
+      "maxLevel": 5,
+      "onEquipEffect": "add_power",
+      "onEquipValue": 0.10
     },
     {
       "id": "empty_tome",
@@ -24,7 +26,9 @@
         "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 4).",
         "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 5)."
       ],
-      "maxLevel": 5
+      "maxLevel": 5,
+      "onEquipEffect": "reduce_cooldown",
+      "onEquipValue": 0.08
     },
     {
       "id": "wings",
@@ -37,7 +41,9 @@
         "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 4).",
         "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 5)."
       ],
-      "maxLevel": 5
+      "maxLevel": 5,
+      "onEquipEffect": "add_speed",
+      "onEquipValue": 0.10
     },
     {
       "id": "hollow_heart",
@@ -65,7 +71,9 @@
         "Tăng 20% phạm vi tấn công của vũ khí (Cấp 4).",
         "Tăng 20% phạm vi tấn công của vũ khí (Cấp 5)."
       ],
-      "maxLevel": 5
+      "maxLevel": 5,
+      "onEquipEffect": "add_area",
+      "onEquipValue": 0.20
     },
     {
       "id": "attractorb",
@@ -78,7 +86,9 @@
         "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 4).",
         "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 5)."
       ],
-      "maxLevel": 5
+      "maxLevel": 5,
+      "onEquipEffect": "add_magnet",
+      "onEquipValue": 0.20
     }
   ]
 }

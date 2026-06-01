@@ -10,6 +10,7 @@ import hust.adventure.items.base.Item;
 import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.player.Player;
 import hust.adventure.graphics.LightProvider;
+import hust.adventure.entities.environment.StaticNPC;
 
 /**
  * Abstract Factory interface for entity creation.
@@ -28,6 +29,8 @@ public interface EntityFactory {
     MapObject createFloatingBook(float x, float y, LightProvider lightProvider);
 
     MapObject createCandle(float x, float y, LightProvider lightProvider);
+
+    StaticNPC createStaticNPC(float x, float y, String name, Color color);
 
     void freeEntity(MapObject entity);
 }

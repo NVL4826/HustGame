@@ -24,6 +24,7 @@ import hust.adventure.items.base.Item;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.environment.FloatingBook;
 import hust.adventure.entities.environment.Candle;
+import hust.adventure.entities.environment.StaticNPC;
 import hust.adventure.graphics.LightProvider;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.utils.GamePools;
@@ -72,7 +73,8 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public Player createPlayer(float x, float y, Inventory inventory, PlayerController controller) {
-        Player player = new Player(x, y, inventory, controller, collisionManager, assetManager, ProgressContext.instance.getPlayerStats());
+        Player player = new Player(x, y, inventory, controller, collisionManager, assetManager,
+                ProgressContext.instance.getPlayerStats());
         player.setFactory(this);
         player.setCollider(new Collider(player, CollisionLayer.PLAYER, Collider.Shape.RECTANGLE));
         entityManager.addEntity(player);
@@ -85,7 +87,8 @@ public class EntityFactoryImpl implements EntityFactory {
         if (config == null) {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
-        final Enemy enemy = new Enemy(x, y, collisionManager, config, ProgressContext.instance.getPlayer(), entityManager);
+        final Enemy enemy = new Enemy(x, y, collisionManager, config, ProgressContext.instance.getPlayer(),
+                entityManager);
 
         if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
             try {
@@ -157,10 +160,13 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public ExpGem createExpGem(float x, float y, float amount) {
-        // ExpGems still use pooling
         ExpGem gem = GamePools.obtain(ExpGem.class);
         gem.init(x, y, amount);
-        gem.setCollider(new Collider(gem, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
+        if (gem.getCollider() == null) {
+            gem.setCollider(new Collider(gem, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
+        } else {
+            gem.setCollider(gem.getCollider());
+        }
         entityManager.addEntity(gem);
         return gem;
     }
@@ -181,5 +187,12 @@ public class EntityFactoryImpl implements EntityFactory {
         Candle candle = new Candle(x, y, texture, lightProvider);
         entityManager.addEntity(candle);
         return candle;
+    }
+
+    @Override
+    public StaticNPC createStaticNPC(float x, float y, String name, Color color) {
+        StaticNPC npc = new StaticNPC(x, y, name, color);
+        entityManager.addEntity(npc);
+        return npc;
     }
 }

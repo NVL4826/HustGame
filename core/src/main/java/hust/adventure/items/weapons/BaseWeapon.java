@@ -123,11 +123,22 @@ public abstract class BaseWeapon extends EquipmentItem {
     }
 
     public final float getBaseDamage() {
+        if (owner == null) {
+            return baseDamage;
+        }
         return baseDamage * owner.getPowerMultiplier();
     }
 
     public final float getEffectiveDamage() {
-        return baseDamage * ProgressContext.instance.getDamageMultiplier();
+        float ownerMultiplier = 1.0f;
+        if (owner != null) {
+            ownerMultiplier = owner.getPowerMultiplier();
+        }
+        float globalMultiplier = 1.0f;
+        if (ProgressContext.instance != null && ProgressContext.instance.getPlayerStats() != null) {
+            globalMultiplier = ProgressContext.instance.getPlayerStats().getDamageMultiplier();
+        }
+        return baseDamage * ownerMultiplier * globalMultiplier;
     }
 
     public final void setBaseDamage(final float baseDamage) {
