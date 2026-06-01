@@ -180,6 +180,7 @@ public class BossFightBehavior implements LevelBehavior {
 
     private void updateCutscene(final LevelContext context) {
         if (context.getInputReader().isEnterJustPressed()) {
+            hust.adventure.events.EventDispatcher.getInstance().dispatch(new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/dialogue_next.mp3"));
             dialogueIndex++;
             if (dialogueIndex >= dialogue.length) {
                 phase = PHASE_QA;
@@ -197,6 +198,7 @@ public class BossFightBehavior implements LevelBehavior {
             if (answerTimer <= 0) {
                 context.getPlayer().takeDamage(TIME_OUT_DAMAGE);
                 shakeTimer = SHAKE_DURATION;
+                hust.adventure.events.EventDispatcher.getInstance().dispatch(new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/time_alarm.mp3"));
                 nextQuestion();
             } else if (context.getInputReader().isSpaceJustPressed()) {
                 handleAnswerInput(context);
@@ -210,6 +212,7 @@ public class BossFightBehavior implements LevelBehavior {
             final float startX = MathUtils.random(100f, 700f);
             final String text = PAPER_TEXTS[MathUtils.random(PAPER_TEXTS.length - 1)];
             fallingPapers.add(new FallingPaper(new Rectangle(startX, 600f, 80f, 30f), text));
+            hust.adventure.events.EventDispatcher.getInstance().dispatch(new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/paper_spawn.mp3"));
         }
 
         // Check collision with player
@@ -234,9 +237,11 @@ public class BossFightBehavior implements LevelBehavior {
                 if (i == questions.get(currentQuestionIndex).correctIndex) {
                     context.getPlayer().heal(ANSWER_HEAL);
                     finalBoss.takeDamage(ANSWER_DAMAGE_DEALT);
+                    hust.adventure.events.EventDispatcher.getInstance().dispatch(new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/answer_correct.mp3"));
                 } else {
                     context.getPlayer().takeDamage(WRONG_ANSWER_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
+                    hust.adventure.events.EventDispatcher.getInstance().dispatch(new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/answer_wrong.mp3"));
                 }
                 nextQuestion();
                 break;
@@ -266,10 +271,14 @@ public class BossFightBehavior implements LevelBehavior {
                     phase = PHASE_VICTORY;
                     textField.setVisible(false);
                     Gdx.input.setInputProcessor(context.getInputReader());
+                    if (context.getGame().getAudioManager() != null) {
+                        context.getGame().getAudioManager().playMusic("audio/music/bg_victory.mp3", false);
+                    }
                 } else {
                     context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
                     textField.setText("");
+                    hust.adventure.events.EventDispatcher.getInstance().dispatch(new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/answer_wrong.mp3"));
                 }
             }
         }
@@ -550,32 +559,35 @@ public class BossFightBehavior implements LevelBehavior {
         // White screen victory fade-in
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
+        context.getShapeRenderer().setProjectionMatrix(stage.getCamera().combined);
         context.getShapeRenderer().begin(ShapeType.Filled);
         context.getShapeRenderer().setColor(new Color(1f, 1f, 1f, Math.min(1f, victoryTimer / 2f)));
-        context.getShapeRenderer().rect(0f, 0f, 800f, 600f);
+        context.getShapeRenderer().rect(0f, 0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         context.getShapeRenderer().end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        context.getGame().getSpriteBatch().setProjectionMatrix(context.getCamera().combined);
+        context.getGame().getSpriteBatch().setProjectionMatrix(stage.getCamera().combined);
         context.getGame().getSpriteBatch().begin();
+
+        float sw = Gdx.graphics.getWidth();
+        float sh = Gdx.graphics.getHeight();
 
         if (victoryTimer > 3f) {
             context.getGame().getFont().setColor(Color.BLACK);
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "✅ ASSIGNMENT SUBMITTED SUCCESSFULLY",
-                    250f, 400f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "ASSIGNMENT SUBMITTED SUCCESSFULLY",
+                    sw / 2f - 150f, sh / 2f + 50f);
             if (victoryTimer > 5f) {
                 context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "Chuc mung em da qua mon - THT",
-                        280f, 200f + (victoryTimer - 5f) * 50f);
+                        sw / 2f - 120f, sh / 2f - 50f + (victoryTimer - 5f) * 20f);
             }
-            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "[Nhấn Esc để về Menu]", 300f, 100f);
+            context.getGame().getFont().draw(context.getGame().getSpriteBatch(), "[Nhan Esc de ve Menu]", sw / 2f - 80f, 100f);
         } else {
             // Classic Vietnamese victory message during fade-in
             context.getGame().getFont().setColor(Color.YELLOW);
             context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    "CHIẾN THẮNG!!! CHÚC MỪNG BẠN ĐÃ TỐT NGHIỆP!", 100f, 300f);
+                    "CHIEN THANG!!! CHUC MUNG BAN DA TOT NGHIEP!", sw / 2f - 200f, sh / 2f);
             context.getGame().getFont().draw(context.getGame().getSpriteBatch(),
-                    "Thời gian kết thúc: " + (int) victoryTimer + "s", 100f, 250f);
+                    "Thoi gian ket thuc: " + (int) victoryTimer + "s", sw / 2f - 100f, sh / 2f - 50f);
         }
         context.getGame().getSpriteBatch().end();
     }

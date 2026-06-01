@@ -58,47 +58,38 @@ public class GameAssetManager {
         manager.load("Phong_doc/1.png", Texture.class);
 
         // Sound effects
-        manager.load("audio/sfx/shoot.wav", Sound.class);
-        manager.load("audio/sfx/whip.wav", Sound.class);
-        manager.load("audio/sfx/magic.wav", Sound.class);
-        manager.load("audio/sfx/player_hit.wav", Sound.class);
-        manager.load("audio/sfx/enemy_hit.wav", Sound.class);
-        manager.load("audio/sfx/enemy_die.wav", Sound.class);
-        manager.load("audio/sfx/level_up.wav", Sound.class);
-        manager.load("audio/sfx/pickup.wav", Sound.class);
-        manager.load("audio/sfx/item_use.wav", Sound.class);
-        manager.load("audio/sfx/ui_click.wav", Sound.class);
-        manager.load("audio/sfx/chest_open.wav", Sound.class);
-        manager.load("audio/sfx/puzzle_solved.wav", Sound.class);
-        manager.load("audio/sfx/puzzle_failed.wav", Sound.class);
+        manager.load("audio/sfx/player_hit.mp3", Sound.class);
+        manager.load("audio/sfx/enemy_hit.mp3", Sound.class);
+        manager.load("audio/sfx/enemy_die.mp3", Sound.class);
+        manager.load("audio/sfx/level_up.mp3", Sound.class);
+        manager.load("audio/sfx/item_consume.mp3", Sound.class);
+        manager.load("audio/sfx/item_eat.mp3", Sound.class);
+        manager.load("audio/sfx/ui_click.mp3", Sound.class);
+        manager.load("audio/sfx/chest_open.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_solved.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_failed.mp3", Sound.class);
         
-        manager.load("audio/sfx/garlic_aura.wav", Sound.class);
-        manager.load("audio/sfx/drink.wav", Sound.class);
-        manager.load("audio/sfx/skill_q.wav", Sound.class);
-        manager.load("audio/sfx/skill_e.wav", Sound.class);
+        manager.load("audio/sfx/garlic_aura.mp3", Sound.class);
+        manager.load("audio/sfx/skill_q.mp3", Sound.class);
+        manager.load("audio/sfx/skill_e.mp3", Sound.class);
         manager.load("audio/sfx/skill_f.wav", Sound.class);
-        manager.load("audio/sfx/enemy_spawn.wav", Sound.class);
-        manager.load("audio/sfx/time_alarm.wav", Sound.class);
-        manager.load("audio/sfx/pickup_gem.wav", Sound.class);
-        manager.load("audio/sfx/pickup_item.wav", Sound.class);
-        manager.load("audio/sfx/portal_enter.wav", Sound.class);
-        manager.load("audio/sfx/inventory_open.wav", Sound.class);
-        manager.load("audio/sfx/ui_hover.wav", Sound.class);
-        manager.load("audio/sfx/roulette_spin.wav", Sound.class);
-        manager.load("audio/sfx/roulette_result.wav", Sound.class);
-        manager.load("audio/sfx/book_drag.wav", Sound.class);
-        manager.load("audio/sfx/book_snap.wav", Sound.class);
-        manager.load("audio/sfx/puzzle_wrong.wav", Sound.class);
-        manager.load("audio/sfx/dialogue_next.wav", Sound.class);
-        manager.load("audio/sfx/answer_correct.wav", Sound.class);
-        manager.load("audio/sfx/answer_wrong.wav", Sound.class);
-        manager.load("audio/sfx/paper_spawn.wav", Sound.class);
-        manager.load("audio/sfx/game_over.wav", Sound.class);
+        manager.load("audio/sfx/time_alarm.mp3", Sound.class);
+        manager.load("audio/sfx/pickup_gem.mp3", Sound.class);
+        manager.load("audio/sfx/pickup_item.mp3", Sound.class);
+        manager.load("audio/sfx/portal_enter.mp3", Sound.class);
+        manager.load("audio/sfx/inventory_open.mp3", Sound.class);
+        manager.load("audio/sfx/ui_hover.mp3", Sound.class);
+        manager.load("audio/sfx/roulette_spin.mp3", Sound.class);
+        manager.load("audio/sfx/roulette_result.mp3", Sound.class);
+        manager.load("audio/sfx/book_drag.mp3", Sound.class);
+        manager.load("audio/sfx/book_snap.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_wrong.mp3", Sound.class);
+        manager.load("audio/sfx/dialogue_next.mp3", Sound.class);
+        manager.load("audio/sfx/answer_correct.mp3", Sound.class);
+        manager.load("audio/sfx/answer_wrong.mp3", Sound.class);
+        manager.load("audio/sfx/paper_spawn.mp3", Sound.class);
 
         // Music tracks
-        manager.load("audio/music/menu_theme.wav", Music.class);
-        manager.load("audio/music/level_theme.wav", Music.class);
-        manager.load("audio/music/boss_theme.wav", Music.class);
         
         manager.load("audio/music/bg_menu.mp3", Music.class);
         manager.load("audio/music/bg_outside.mp3", Music.class);

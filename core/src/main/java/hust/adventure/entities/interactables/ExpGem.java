@@ -52,6 +52,7 @@ public class ExpGem extends BaseEntity implements Pool.Poolable {
                 GameEvent<ExpGainedEvent> event = new GameEvent<>(EventType.EXP_GAINED, payload);
  
                 EventDispatcher.getInstance().dispatch(event);
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/pickup_gem.mp3"));
                 destroy();
             });
         }

@@ -79,7 +79,7 @@ public class GameOverScreen extends BaseScreen {
         fadeTimer = 0f;
         Gdx.input.setInputProcessor(null);
         if (game.getAudioManager() != null) {
-            game.getAudioManager().playMusic("audio/music/menu_theme.wav", true);
+            game.getAudioManager().playMusic("audio/music/bg_gameover.mp3", true);
         }
     }
 
@@ -93,16 +93,32 @@ public class GameOverScreen extends BaseScreen {
         // Mouse hover detection (flip Y: libGDX screen Y is top-down)
         float mx = Gdx.input.getX();
         float my = UI_H - Gdx.input.getY();
+        
+        boolean oldRestartHover = restartHover;
+        boolean oldQuitHover = quitHover;
+        
         restartHover = inButton(mx, my, BTN_RESTART_X, BTN_RESTART_Y);
         quitHover    = inButton(mx, my, BTN_QUIT_X,    BTN_QUIT_Y);
+
+        if ((restartHover && !oldRestartHover) || (quitHover && !oldQuitHover)) {
+            hust.adventure.events.EventDispatcher.getInstance().dispatch(
+                new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/ui_hover.mp3")
+            );
+        }
 
         // Input
         if (fadeTimer > FADE_DURATION) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.R) || (Gdx.input.justTouched() && restartHover)) {
+                hust.adventure.events.EventDispatcher.getInstance().dispatch(
+                    new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/ui_click.mp3")
+                );
                 doRestart();
                 return;
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || (Gdx.input.justTouched() && quitHover)) {
+                hust.adventure.events.EventDispatcher.getInstance().dispatch(
+                    new hust.adventure.events.GameEvent<>(hust.adventure.events.EventType.PLAY_SFX, "audio/sfx/ui_click.mp3")
+                );
                 Gdx.app.exit();
                 return;
             }

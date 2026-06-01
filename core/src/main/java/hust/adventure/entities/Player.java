@@ -147,16 +147,19 @@ public class Player extends BaseActor implements Targetable, EventListener {
         // Skill key checks
         if (ProgressContext.instance.isHasNao() && controller.isSkillQJustPressed()) {
             slowMotionTimer = SLOW_MOTION_DURATION;
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/skill_q.mp3"));
         }
 
         if (controller.isSkillEJustPressed() && getStamina() >= STUN_STAMINA_COST) {
             setStamina(getStamina() - STUN_STAMINA_COST);
             stunTimer = STUN_DURATION;
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/skill_e.mp3"));
         }
 
         if (controller.isSkillFJustPressed() && getStamina() >= RADAR_STAMINA_COST) {
             setStamina(getStamina() - RADAR_STAMINA_COST);
             showEnemiesTimer = RADAR_DURATION;
+            // EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/skill_f.wav"));
         }
 
         // Timer updates
@@ -390,6 +393,9 @@ public class Player extends BaseActor implements Targetable, EventListener {
         if (!ignoreIFrames) {
             iframeTimer = IFRAME_DURATION;
         }
+        
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/player_hit.mp3"));
+        
         // Sync to global context
         ProgressContext.instance.setHp(getHp());
     }
@@ -466,6 +472,11 @@ public class Player extends BaseActor implements Targetable, EventListener {
             if (item instanceof Consumable) {
                 if (inventory.removeItem(item, 1)) {
                     ((Consumable) item).consume(this);
+                    if (itemId != null && itemId.contains("kho_ga")) {
+                        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/item_eat.mp3"));
+                    } else {
+                        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/item_consume.mp3"));
+                    }
                 }
             }
         } else if (event.getType() == EventType.ITEM_PICKED_UP) {

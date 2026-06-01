@@ -61,6 +61,7 @@ public class WaveManager implements TimeProvider {
                 TimeLimitReachedEvent data = new TimeLimitReachedEvent();
                 GameEvent<TimeLimitReachedEvent> event = new GameEvent<>(EventType.TIME_LIMIT_REACHED, data);
                 EventDispatcher.getInstance().dispatch(event);
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/time_alarm.mp3"));
             }
         }
  
@@ -141,6 +142,9 @@ public class WaveManager implements TimeProvider {
             Array<Vector2> positions = strategy.calculatePositions(camera, config.spawnCount);
             for (Vector2 pos : positions) {
                 entityFactory.createEnemy(config.enemyType, pos.x, pos.y);
+            }
+            if (positions.size > 0) {
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/pickup_item.mp3"));
             }
         }
     }

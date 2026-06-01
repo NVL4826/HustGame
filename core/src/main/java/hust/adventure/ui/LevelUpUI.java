@@ -104,7 +104,7 @@ public class LevelUpUI {
             UpgradeAction action = currentChoices.get(keyPressed - 1);
             action.execute(player);
             EventDispatcher.getInstance().dispatch(
-                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
+                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.mp3")
             );
             if (onResume != null) {
                 onResume.run();

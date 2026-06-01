@@ -46,6 +46,7 @@ public class TreasureChest extends BaseEntity implements Interactable {
             TreasureOpenedEvent data = new TreasureOpenedEvent();
             GameEvent<TreasureOpenedEvent> event = new GameEvent<>(EventType.TREASURE_OPENED, data);
             EventDispatcher.getInstance().dispatch(event);
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/chest_open.mp3"));
             
             destroy();
         }

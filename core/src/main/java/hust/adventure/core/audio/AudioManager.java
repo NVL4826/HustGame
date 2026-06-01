@@ -22,9 +22,9 @@ public class AudioManager implements EventListener, Disposable {
     private final GameAssetManager assetManager;
 
     private float masterVolume = 1.0f;
-    private float musicVolume = 0.4f; // Mix Hierarchy: background music is softer
-    private float sfxVolume = 0.8f;   // SFX is prominent
-    private float uiVolume = 0.9f;    // UI is distinct
+    private float musicVolume = 1.0f; // Maximized background music volume as requested
+    private float sfxVolume = 0.2f;   // Further lowered to make music stand out and player SFX quieter
+    private float uiVolume = 0.5f;    // Lowered to make music stand out
 
     // Music State & Crossfading
     private Music currentMusic;
@@ -62,7 +62,7 @@ public class AudioManager implements EventListener, Disposable {
             fadeTimer += delta;
             float progress = Math.min(1f, fadeTimer / FADE_DURATION);
             if (currentMusic != null) {
-                currentMusic.setVolume((1f - progress) * musicVolume * masterVolume);
+                currentMusic.setVolume((1f - progress) * getMusicTargetVolume(currentMusicPath));
             }
             if (progress >= 1f) {
                 if (currentMusic != null) {
@@ -87,7 +87,7 @@ public class AudioManager implements EventListener, Disposable {
             fadeTimer += delta;
             float progress = Math.min(1f, fadeTimer / FADE_DURATION);
             if (currentMusic != null) {
-                currentMusic.setVolume(progress * musicVolume * masterVolume);
+                currentMusic.setVolume(progress * getMusicTargetVolume(currentMusicPath));
             }
             if (progress >= 1f) {
                 fadeState = FadeState.NONE;
@@ -105,7 +105,8 @@ public class AudioManager implements EventListener, Disposable {
         // Sound Throttling: limit spamming of the same SFX
         long now = System.currentTimeMillis();
         Long lastPlay = lastPlayTimes.get(path);
-        if (lastPlay != null && now - lastPlay < SFX_COOLDOWN_MS) {
+        long cooldown = path.contains("garlic_aura") ? 2000 : SFX_COOLDOWN_MS;
+        if (lastPlay != null && now - lastPlay < cooldown) {
             return; // Skip to avoid sonic spam
         }
         lastPlayTimes.put(path, now);
@@ -113,6 +114,7 @@ public class AudioManager implements EventListener, Disposable {
         try {
             Sound sound = assetManager.getSound(path);
             if (sound != null) {
+                Gdx.app.log("AudioManager", "Successfully played SFX: " + path);
                 float volume = (isUi ? uiVolume : sfxVolume) * masterVolume;
                 
                 // Pitch Randomization to prevent fatigue, except for UI sounds
@@ -124,7 +126,7 @@ public class AudioManager implements EventListener, Disposable {
                 sound.play(volume, pitch, 0f);
             }
         } catch (Exception e) {
-            Gdx.app.error("AudioManager", "Failed to play sound: " + path, e);
+            Gdx.app.error("AudioManager", "Failed to play SFX: " + path + " - " + e.getMessage(), e);
         }
     }
 
@@ -132,6 +134,14 @@ public class AudioManager implements EventListener, Disposable {
         return path.contains("shoot") || path.contains("whip") || 
                path.contains("magic") || path.contains("hit") || 
                path.contains("pickup") || path.contains("die");
+    }
+
+    private float getMusicTargetVolume(String path) {
+        float vol = musicVolume * masterVolume;
+        if (path != null && (path.contains("boss") || path.contains("victory"))) {
+            return vol * 0.4f; // Lower boss music specifically
+        }
+        return vol;
     }
 
     public void playMusic(final String path, boolean loop) {
@@ -146,14 +156,19 @@ public class AudioManager implements EventListener, Disposable {
 
         try {
             Music loadedMusic = assetManager.getMusic(path);
-            if (loadedMusic == null) return;
+            if (loadedMusic == null) {
+                Gdx.app.error("AudioManager", "Music asset not loaded: " + path);
+                return;
+            }
+            
+            Gdx.app.log("AudioManager", "Successfully playing BGM: " + path);
 
             // If no music is currently playing, start immediately
             if (currentMusic == null) {
                 currentMusic = loadedMusic;
                 currentMusicPath = path;
                 currentMusic.setLooping(loop);
-                currentMusic.setVolume(musicVolume * masterVolume);
+                currentMusic.setVolume(getMusicTargetVolume(currentMusicPath));
                 currentMusic.play();
                 fadeState = FadeState.NONE;
             } else {
@@ -164,7 +179,7 @@ public class AudioManager implements EventListener, Disposable {
                 fadeTimer = 0f;
             }
         } catch (Exception e) {
-            Gdx.app.error("AudioManager", "Failed to play music: " + path, e);
+            Gdx.app.error("AudioManager", "Failed to play BGM: " + path + " - " + e.getMessage(), e);
         }
     }
 
@@ -194,7 +209,7 @@ public class AudioManager implements EventListener, Disposable {
     public void setMusicVolume(float volume) {
         this.musicVolume = MathUtils.clamp(volume, 0f, 1f);
         if (currentMusic != null && fadeState == FadeState.NONE) {
-            currentMusic.setVolume(musicVolume * masterVolume);
+            currentMusic.setVolume(getMusicTargetVolume(currentMusicPath));
         }
     }
 
@@ -209,7 +224,7 @@ public class AudioManager implements EventListener, Disposable {
     public void setMasterVolume(float volume) {
         this.masterVolume = MathUtils.clamp(volume, 0f, 1f);
         if (currentMusic != null && fadeState == FadeState.NONE) {
-            currentMusic.setVolume(musicVolume * masterVolume);
+            currentMusic.setVolume(getMusicTargetVolume(currentMusicPath));
         }
     }
 
@@ -228,38 +243,38 @@ public class AudioManager implements EventListener, Disposable {
                 }
                 break;
             case LEVEL_UP:
-                playSound("audio/sfx/level_up.wav", false);
+                playSound("audio/sfx/level_up.mp3", false);
                 break;
             case ITEM_PICKED_UP:
-                playSound("audio/sfx/pickup.wav", false);
+                playSound("audio/sfx/pickup_item.mp3", false);
                 break;
             case ITEM_USED:
-                playSound("audio/sfx/item_use.wav", false);
+                playSound("audio/sfx/item_consume.mp3", false);
                 break;
             case TREASURE_OPENED:
-                playSound("audio/sfx/chest_open.wav", false);
+                playSound("audio/sfx/chest_open.mp3", false);
                 break;
             case PUZZLE_SOLVED:
-                playSound("audio/sfx/puzzle_solved.wav", false);
+                playSound("audio/sfx/puzzle_solved.mp3", false);
                 break;
             case PUZZLE_FAILED:
-                playSound("audio/sfx/puzzle_failed.wav", false);
+                playSound("audio/sfx/puzzle_failed.mp3", false);
                 break;
             case ENTITY_DAMAGED:
                 if (event.getData() instanceof EntityDamagedEvent) {
                     EntityDamagedEvent edEvent = (EntityDamagedEvent) event.getData();
                     if (edEvent.getEntity() instanceof Player) {
-                        playSound("audio/sfx/player_hit.wav", false);
+                        playSound("audio/sfx/player_hit.mp3", false);
                     } else if (edEvent.getEntity() instanceof BaseEnemy) {
-                        playSound("audio/sfx/enemy_hit.wav", false);
+                        playSound("audio/sfx/enemy_hit.mp3", false);
                     }
                 }
                 break;
             case ENTITY_DIED:
                 if (event.getData() instanceof Player) {
-                    playSound("audio/sfx/game_over.wav", false);
+                    // Game over music is handled in GameOverScreen
                 } else if (event.getData() instanceof BaseEnemy) {
-                    playSound("audio/sfx/enemy_die.wav", false);
+                    playSound("audio/sfx/enemy_die.mp3", false);
                 }
                 break;
             default:

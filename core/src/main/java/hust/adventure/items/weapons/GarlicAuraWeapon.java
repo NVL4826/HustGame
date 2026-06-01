@@ -29,11 +29,16 @@ public class GarlicAuraWeapon extends BaseWeapon {
         final Array<GameEntity> targets = getOwner().getCollisionManager().getEntitiesInRadius(getOwner().getX(), getOwner().getY(),
                 radius, CollisionLayer.ENEMY);
 
+        boolean hitSomething = false;
         for (final GameEntity target : targets) {
             if (target instanceof Damageable) {
                 ((Damageable) target).takeDamage(getBaseDamage());
+                hitSomething = true;
             }
         }
+        
+        // Removed sound effect for Garlic Aura completely as requested
+        // if (hitSomething) { ... }
     }
 
     @Override

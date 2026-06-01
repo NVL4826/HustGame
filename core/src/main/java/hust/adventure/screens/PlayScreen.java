@@ -224,15 +224,18 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         setupLayerIndices();
 
         if (game.getAudioManager() != null) {
+            if (config.getLevelId() == LevelID.BOSS_ROOM) {
+                game.getAudioManager().stopMusic(); // Skip fade out
+            }
             game.getAudioManager().playMusic(getBgmForLevel(config.getLevelId()), true);
         }
     }
 
     private String getBgmForLevel(final LevelID id) {
-        if (id == LevelID.BOSS_ROOM) {
-            return "audio/music/boss_theme.wav";
-        }
-        return "audio/music/level_theme.wav";
+        if (id == LevelID.BOSS_ROOM) return "audio/music/bg_boss.mp3";
+        if (id == LevelID.LIBRARY) return "audio/music/bg_library.mp3";
+        if (id == LevelID.LAB) return "audio/music/bg_lab.mp3";
+        return "audio/music/bg_outside.mp3";
     }
 
     private void setupLayerIndices() {
@@ -325,7 +328,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (inputReader.isInventoryJustPressed()) {
             ProgressContext.instance.setInventoryOpen(!ProgressContext.instance.isInventoryOpen());
             EventDispatcher.getInstance().dispatch(
-                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav")
+                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/inventory_open.mp3")
             );
         }
         if (inputReader.isDebugJustPressed()) {
@@ -423,6 +426,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
                 GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
 
                 EventDispatcher.getInstance().dispatch(event);
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/portal_enter.mp3"));
                 break;
             }
         }

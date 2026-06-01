@@ -96,6 +96,7 @@ public class ItemDrop extends BaseEntity {
                 ItemPickedUpEvent payload = new ItemPickedUpEvent(item, other);
                 GameEvent<ItemPickedUpEvent> event = new GameEvent<>(EventType.ITEM_PICKED_UP, payload);
                 EventDispatcher.getInstance().dispatch(event);
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/pickup_item.mp3"));
                 destroy();
             });
         }

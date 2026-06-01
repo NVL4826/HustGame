@@ -45,7 +45,7 @@ public class MagicWandWeapon extends BaseWeapon {
             if (projectile != null) {
                 projectile.setPierce(getPierce());
             }
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/magic.wav"));
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/skill_e.mp3"));
         }
     }
 

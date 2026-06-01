@@ -74,7 +74,14 @@ public abstract class BaseActor extends BaseEntity implements Damageable {
         GameEvent<EntityDamagedEvent> event = new GameEvent<>(EventType.ENTITY_DAMAGED, eventData);
         EventDispatcher.getInstance().dispatch(event);
 
+        if (!(this instanceof hust.adventure.entities.Player)) {
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/enemy_hit.mp3"));
+        }
+
         if (isDead()) {
+            if (!(this instanceof hust.adventure.entities.Player)) {
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/enemy_die.mp3"));
+            }
             GameEvent<GameEntity> deathEvent = new GameEvent<>(EventType.ENTITY_DIED, this);
             EventDispatcher.getInstance().dispatch(deathEvent);
             destroy();

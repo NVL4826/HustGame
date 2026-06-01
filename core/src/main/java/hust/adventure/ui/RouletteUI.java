@@ -26,14 +26,22 @@ public class RouletteUI implements EventListener {
         }
     }
     
+    private float tickTimer = 0f;
+
     public void update(float delta) {
         if (active) {
             timer -= delta; // Even when game is paused, we need delta. BaseLevelScreen uses real delta for UI.
+            tickTimer -= delta;
+            if (tickTimer <= 0) {
+                tickTimer = 0.1f;
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/roulette_spin.mp3"));
+            }
             if (timer <= 0) {
                 active = false;
                 RewardSelectedEvent data = new RewardSelectedEvent("whip_upgrade");
                 GameEvent<RewardSelectedEvent> rewardEvent = new GameEvent<>(EventType.REWARD_SELECTED, data);
                 EventDispatcher.getInstance().dispatch(rewardEvent);
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/roulette_result.mp3"));
             }
         }
     }
