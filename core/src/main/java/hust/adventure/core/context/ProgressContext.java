@@ -3,7 +3,7 @@ package hust.adventure.core.context;
 import hust.adventure.gamestate.GameState;
 import hust.adventure.gamestate.PlayingGameState;
 import hust.adventure.inventory.Inventory;
-import hust.adventure.core.config.LevelConfig;
+import hust.adventure.screens.LevelConfig;
 import hust.adventure.entities.player.Player;
 
 import java.util.Map;

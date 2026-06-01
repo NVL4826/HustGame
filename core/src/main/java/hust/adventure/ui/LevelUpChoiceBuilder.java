@@ -3,8 +3,8 @@ package hust.adventure.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 
-import hust.adventure.core.data.GearDataManager;
-import hust.adventure.core.data.WeaponDataManager;
+import hust.adventure.core.data.GearDataLoader;
+import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.items.loot.UpgradeCatalog;
@@ -20,8 +20,8 @@ import hust.adventure.ui.components.WeaponUpgradeAction;
  * weapons and gears to determine possible upgrades.
  */
 public final class LevelUpChoiceBuilder {
-    private static GearDataManager gearDataManager;
-    private static WeaponDataManager weaponDataManager;
+    private static GearDataLoader gearDataManager;
+    private static WeaponDataLoader weaponDataManager;
 
     private LevelUpChoiceBuilder() {
         // Prevent instantiation
@@ -32,7 +32,7 @@ public final class LevelUpChoiceBuilder {
      *
      * @param manager the GearDataManager instance
      */
-    public static void setGearDataManager(final GearDataManager manager) {
+    public static void setGearDataManager(final GearDataLoader manager) {
         gearDataManager = manager;
     }
 
@@ -41,7 +41,7 @@ public final class LevelUpChoiceBuilder {
      *
      * @param manager the WeaponDataManager instance
      */
-    public static void setWeaponDataManager(final WeaponDataManager manager) {
+    public static void setWeaponDataManager(final WeaponDataLoader manager) {
         weaponDataManager = manager;
     }
 

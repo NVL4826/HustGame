@@ -2,7 +2,7 @@ package hust.adventure.weapons;
 
 import com.badlogic.gdx.utils.ObjectMap;
 
-import hust.adventure.core.data.WeaponDataManager;
+import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.player.Player;
 import hust.adventure.weapons.impl.BunDauWeapon;
 import hust.adventure.weapons.impl.GarlicAuraWeapon;
@@ -13,7 +13,7 @@ import hust.adventure.weapons.impl.WhipWeapon;
  * Factory for creating weapons using a data-driven approach and registry pattern.
  */
 public class WeaponFactory {
-    private final WeaponDataManager weaponDataManager;
+    private final WeaponDataLoader weaponDataManager;
     private final ObjectMap<String, WeaponProvider> providers;
 
     /**
@@ -23,7 +23,7 @@ public class WeaponFactory {
         BaseWeapon create(Player player, WeaponConfig config);
     }
 
-    public WeaponFactory(final WeaponDataManager weaponDataManager) {
+    public WeaponFactory(final WeaponDataLoader weaponDataManager) {
         if (weaponDataManager == null) {
             throw new IllegalArgumentException("WeaponDataManager cannot be null");
         }

@@ -19,9 +19,8 @@ import com.badlogic.gdx.math.Vector2;
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.LootDropService;
-import hust.adventure.core.config.LevelConfig;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.core.data.EnemyDataManager;
+import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
@@ -97,7 +96,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.entityManager = new EntityManager();
         this.collisionManager = new CollisionManager(entityManager, 64f);
 
-        final EnemyDataManager enemyDataManager = new EnemyDataManager("configs/enemies.json");
+        final EnemyDataLoader enemyDataManager = new EnemyDataLoader("configs/enemies.json");
         DebugOptionRegistry.setEnemyDataManager(enemyDataManager);
         this.entityFactory = new EntityFactoryImpl(game.getAssetManager(), entityManager, collisionManager,
                 enemyDataManager);
@@ -156,7 +155,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (cameraManager == null) {
             cameraManager = new CameraManager(VIEW_WIDTH, VIEW_HEIGHT);
         }
-        boolean infinite = config.getLevelId().isInfinite();
+        boolean infinite = config.isInfinite();
         collisionManager.setInfinite(infinite);
         cameraManager.setInfinite(infinite);
 

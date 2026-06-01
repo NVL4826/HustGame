@@ -10,7 +10,7 @@ import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.assets.GameAssetManager;
-import hust.adventure.core.data.EnemyDataManager;
+import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.enemies.Enemy;
@@ -35,7 +35,7 @@ public class EntityFactoryImpl implements EntityFactory {
     private final GameAssetManager assetManager;
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
-    private final EnemyDataManager enemyDataManager;
+    private final EnemyDataLoader enemyDataManager;
     private final Array<Texture> bookTextures = new Array<>();
 
     /**
@@ -47,7 +47,7 @@ public class EntityFactoryImpl implements EntityFactory {
      * @param enemyDataManager the configuration loader for enemies
      */
     public EntityFactoryImpl(final GameAssetManager assetManager, final EntityManager entityManager,
-            final CollisionManager collisionManager, final EnemyDataManager enemyDataManager) {
+            final CollisionManager collisionManager, final EnemyDataLoader enemyDataManager) {
         if (assetManager == null)
             throw new NullPointerException("assetManager cannot be null");
         if (entityManager == null)

@@ -1,15 +1,15 @@
 package hust.adventure.items.loot;
 
-import hust.adventure.core.data.GearDataManager;
-import hust.adventure.core.data.WeaponDataManager;
+import hust.adventure.core.data.GearDataLoader;
+import hust.adventure.core.data.WeaponDataLoader;
 
 /**
  * Catalog for weapon names, upgrade descriptions, and gear properties. Provides unified access to upgrade descriptions
  * for level up screens.
  */
 public final class UpgradeCatalog {
-    private static GearDataManager gearDataManager;
-    private static WeaponDataManager weaponDataManager;
+    private static GearDataLoader gearDataManager;
+    private static WeaponDataLoader weaponDataManager;
 
     private UpgradeCatalog() {
         // Prevent instantiation
@@ -20,7 +20,7 @@ public final class UpgradeCatalog {
      *
      * @param manager the GearDataManager instance
      */
-    public static void setGearDataManager(final GearDataManager manager) {
+    public static void setGearDataManager(final GearDataLoader manager) {
         gearDataManager = manager;
     }
 
@@ -29,7 +29,7 @@ public final class UpgradeCatalog {
      *
      * @param manager the WeaponDataManager instance
      */
-    public static void setWeaponDataManager(final WeaponDataManager manager) {
+    public static void setWeaponDataManager(final WeaponDataLoader manager) {
         weaponDataManager = manager;
     }
 

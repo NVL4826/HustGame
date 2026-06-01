@@ -12,7 +12,7 @@ import hust.adventure.items.gear.GearConfig;
 /**
  * Data manager for loading and retrieving gear configurations from JSON.
  */
-public class GearDataManager {
+public class GearDataLoader {
     private final ObjectMap<String, GearConfig> gearConfigs = new ObjectMap<>();
     private final Array<String> gearIds = new Array<>();
 
@@ -21,7 +21,7 @@ public class GearDataManager {
      *
      * @param configsJsonPath the relative path to the configuration file
      */
-    public GearDataManager(final String configsJsonPath) {
+    public GearDataLoader(final String configsJsonPath) {
         loadConfigs(configsJsonPath);
     }
 

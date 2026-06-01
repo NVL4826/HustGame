@@ -12,7 +12,7 @@ import hust.adventure.entities.enemies.EnemyConfigCatalog;
  * Manages the loading and retrieval of game data configurations (e.g. enemy definitions). Decouples JSON parsing and
  * data management from entity and factory classes (SRP).
  */
-public class EnemyDataManager {
+public class EnemyDataLoader {
     private final ObjectMap<String, EnemyConfig> enemyConfigs = new ObjectMap<>();
 
     /**
@@ -20,7 +20,7 @@ public class EnemyDataManager {
      *
      * @param configsJsonPath the relative path to the configuration file
      */
-    public EnemyDataManager(final String configsJsonPath) {
+    public EnemyDataLoader(final String configsJsonPath) {
         loadConfigs(configsJsonPath);
     }
 

@@ -3,7 +3,7 @@ package hust.adventure.items.gear;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import hust.adventure.core.data.GearDataManager;
+import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.entities.player.Player;
 
 /**
@@ -11,7 +11,7 @@ import hust.adventure.entities.player.Player;
  * registry-based provider pattern for mapping equip effects.
  */
 public class GearFactory {
-    private final GearDataManager dataManager;
+    private final GearDataLoader dataManager;
     private final ObjectMap<String, GearEffectApplier> effectAppliers = new ObjectMap<>();
 
     /**
@@ -19,7 +19,7 @@ public class GearFactory {
      *
      * @param dataManager the GearDataManager to retrieve gear configurations from
      */
-    public GearFactory(final GearDataManager dataManager) {
+    public GearFactory(final GearDataLoader dataManager) {
         if (dataManager == null) {
             throw new IllegalArgumentException("GearDataManager cannot be null");
         }

@@ -12,7 +12,7 @@ import hust.adventure.items.consumable.ConsumableItemConfig;
 /**
  * Data manager for loading and retrieving item configurations. Handles polymorphic JSON deserialization of items.
  */
-public class ItemDataManager {
+public class ItemDataLoader {
     private final ObjectMap<String, ItemConfig> itemConfigs = new ObjectMap<>();
 
     /**
@@ -20,7 +20,7 @@ public class ItemDataManager {
      *
      * @param configsJsonPath the relative path to the configuration file
      */
-    public ItemDataManager(final String configsJsonPath) {
+    public ItemDataLoader(final String configsJsonPath) {
         loadConfigs(configsJsonPath);
     }
 

@@ -12,8 +12,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.HustGame;
-import hust.adventure.core.config.LevelConfig;
-import hust.adventure.core.config.LevelID;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.screens.levels.LevelFactory;
 
@@ -221,8 +219,10 @@ public class GameOverScreen extends BaseScreen {
         LevelConfig savedConfig = ProgressContext.instance.getCurrentLevelConfig();
         if (savedConfig == null) {
             // Fallback nếu chưa lưu được (ví dụ: chết ngay màn đầu)
-            savedConfig = new LevelConfig(LevelID.MAP_1, "Final Outside.tmx", 400f, 400f, 1.0f,
-                    LevelID.MAP_1.getBgmPath(), LevelID.MAP_1.getAmbientColor());
+            LevelConfig template = game.getLevelDataManager().getLevelConfig("MAP_1");
+            savedConfig = new LevelConfig("MAP_1", template.getName(), template.getMapPath(),
+                    template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
+                    template.getAmbientColor(), template.isInfinite());
         }
         ProgressContext.instance.reset();
         Screen next = LevelFactory.createLevel(game, savedConfig);

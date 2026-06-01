@@ -10,10 +10,10 @@ import hust.adventure.weapons.WeaponConfigCatalog;
 /**
  * Responsible for loading the JSON and storing configuration models for weapons.
  */
-public class WeaponDataManager {
+public class WeaponDataLoader {
     private final ObjectMap<String, WeaponConfig> configs;
 
-    public WeaponDataManager(final String configFilePath) {
+    public WeaponDataLoader(final String configFilePath) {
         configs = new ObjectMap<>();
         loadConfigs(configFilePath);
     }

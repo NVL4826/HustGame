@@ -12,17 +12,17 @@ import hust.adventure.entities.combat.Projectile;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.screens.LoadingScreen;
 import hust.adventure.screens.ScreenTransition;
-import hust.adventure.core.config.LevelConfig;
-import hust.adventure.core.config.LevelID;
-import hust.adventure.core.data.GearDataManager;
-import hust.adventure.core.data.ItemDataManager;
-import hust.adventure.core.data.WeaponDataManager;
+import hust.adventure.core.data.GearDataLoader;
+import hust.adventure.core.data.ItemDataLoader;
+import hust.adventure.core.data.LevelDataLoader;
+import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.screens.levels.LevelFactory;
 import hust.adventure.screens.GameOverScreen;
+import hust.adventure.screens.LevelConfig;
 import hust.adventure.ui.HUD;
 import hust.adventure.ui.InventoryUI;
 import hust.adventure.entities.interactables.ItemDrop;
@@ -55,6 +55,7 @@ public class HustGame extends Game implements EventListener {
     private EventDispatcher eventDispatcher;
     public ScreenTransition screenTransition;
     private AudioManager audioManager;
+    private LevelDataLoader levelDataManager;
 
     @Override
     public void create() {
@@ -87,7 +88,7 @@ public class HustGame extends Game implements EventListener {
         generator.dispose();
 
         // Nạp và đăng ký các vật phẩm từ cấu hình JSON
-        final ItemDataManager itemDataManager = new ItemDataManager("configs/items.json");
+        final ItemDataLoader itemDataManager = new ItemDataLoader("configs/items.json");
         DebugOptionRegistry.setItemDataManager(itemDataManager);
         final ItemFactory itemFactory = new ItemFactory();
         for (final ItemConfig config : itemDataManager.getAllConfigs()) {
@@ -95,7 +96,7 @@ public class HustGame extends Game implements EventListener {
         }
 
         // Nạp và đăng ký cấu hình Gears từ JSON
-        final GearDataManager gearDataManager = new GearDataManager("configs/gears.json");
+        final GearDataLoader gearDataManager = new GearDataLoader("configs/gears.json");
         DebugOptionRegistry.setGearDataManager(gearDataManager);
         final GearFactory gearFactory = new GearFactory(gearDataManager);
         UpgradeCatalog.setGearDataManager(gearDataManager);
@@ -104,13 +105,17 @@ public class HustGame extends Game implements EventListener {
         PlayerPersistenceService.setGearFactory(gearFactory);
 
         // Nạp và đăng ký cấu hình Weapons từ JSON
-        final WeaponDataManager weaponDataManager = new WeaponDataManager("configs/weapons.json");
+        final WeaponDataLoader weaponDataManager = new WeaponDataLoader("configs/weapons.json");
         DebugOptionRegistry.setWeaponDataManager(weaponDataManager);
         final WeaponFactory weaponFactory = new WeaponFactory(weaponDataManager);
         UpgradeCatalog.setWeaponDataManager(weaponDataManager);
         LevelUpChoiceBuilder.setWeaponDataManager(weaponDataManager);
         WeaponUpgradeAction.setWeaponFactory(weaponFactory);
         PlayerPersistenceService.setWeaponFactory(weaponFactory);
+
+        // Nạp và đăng ký cấu hình Levels từ JSON
+        levelDataManager = new LevelDataLoader("configs/levels.json");
+        DebugOptionRegistry.setLevelDataManager(levelDataManager);
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));
@@ -127,12 +132,14 @@ public class HustGame extends Game implements EventListener {
         if (screenTransition.isTransitioning())
             return;
 
-        final LevelID nextId = LevelID.fromMapPath(data.getTargetMap());
-        if (nextId == null)
+        final LevelConfig template = levelDataManager.getLevelConfigByMapPath(data.getTargetMap());
+        if (template == null)
             return;
 
-        final LevelConfig config = new LevelConfig(nextId, data.getTargetMap(), data.getSpawnX(), data.getSpawnY(),
-                1.0f, nextId.getBgmPath(), nextId.getAmbientColor());
+        final String nextId = template.getLevelId();
+        final LevelConfig config = new LevelConfig(nextId, template.getName(), data.getTargetMap(), data.getSpawnX(),
+                data.getSpawnY(), template.getZoom(), template.getBgmPath(), template.getAmbientColor(),
+                template.isInfinite());
         final Screen nextScreen = LevelFactory.createLevel(this, config);
 
         if (nextScreen != null) {
@@ -226,5 +233,9 @@ public class HustGame extends Game implements EventListener {
 
     public AudioManager getAudioManager() {
         return audioManager;
+    }
+
+    public LevelDataLoader getLevelDataManager() {
+        return levelDataManager;
     }
 }

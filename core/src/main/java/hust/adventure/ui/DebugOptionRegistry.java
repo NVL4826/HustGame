@@ -1,12 +1,13 @@
 package hust.adventure.ui;
 
-import hust.adventure.core.config.LevelID;
-import hust.adventure.core.data.EnemyDataManager;
-import hust.adventure.core.data.GearDataManager;
-import hust.adventure.core.data.ItemDataManager;
-import hust.adventure.core.data.WeaponDataManager;
+import hust.adventure.core.data.EnemyDataLoader;
+import hust.adventure.core.data.GearDataLoader;
+import hust.adventure.core.data.ItemDataLoader;
+import hust.adventure.core.data.LevelDataLoader;
+import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.items.base.ItemConfig;
+import hust.adventure.screens.LevelConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,64 +16,37 @@ import java.util.List;
  * Registry containing dynamic lists of debug options for maps, items, and monsters.
  */
 public class DebugOptionRegistry {
-    private static EnemyDataManager enemyDataManager;
-    private static ItemDataManager itemDataManager;
-    private static WeaponDataManager weaponDataManager;
-    private static GearDataManager gearDataManager;
+    private static EnemyDataLoader enemyDataManager;
+    private static ItemDataLoader itemDataManager;
+    private static WeaponDataLoader weaponDataManager;
+    private static GearDataLoader gearDataManager;
+    private static LevelDataLoader levelDataManager;
 
-    public static void setEnemyDataManager(final EnemyDataManager manager) {
+    public static void setEnemyDataManager(final EnemyDataLoader manager) {
         enemyDataManager = manager;
     }
 
-    public static void setItemDataManager(final ItemDataManager manager) {
+    public static void setItemDataManager(final ItemDataLoader manager) {
         itemDataManager = manager;
     }
 
-    public static void setWeaponDataManager(final WeaponDataManager manager) {
+    public static void setWeaponDataManager(final WeaponDataLoader manager) {
         weaponDataManager = manager;
     }
 
-    public static void setGearDataManager(final GearDataManager manager) {
+    public static void setGearDataManager(final GearDataLoader manager) {
         gearDataManager = manager;
+    }
+
+    public static void setLevelDataManager(final LevelDataLoader manager) {
+        levelDataManager = manager;
     }
 
     private static DebugOption[] getMapOptions() {
         final List<DebugOption> list = new ArrayList<>();
-        for (final LevelID level : LevelID.values()) {
-            String path = null;
-            String name = null;
-            switch (level) {
-            case TANG_1:
-                path = "tang1.tmx";
-                name = "Floor 1 (tang1)";
-                break;
-            case LIBRARY:
-                path = "library.tmx";
-                name = "Library";
-                break;
-            case LAB:
-                path = "lab.tmx";
-                name = "Lab";
-                break;
-            case BOSS_ROOM:
-                path = "boss_room.tmx";
-                name = "Boss Room";
-                break;
-            case FINAL_OUTSIDE:
-                path = "Final Outside.tmx";
-                name = "Final Outside";
-                break;
-            case TEST_LEVEL:
-                path = "test.tmx";
-                name = "Test Map";
-                break;
-            case MAP_1:
-                path = "tsx/map_1.tmx";
-                name = "Map 1";
-                break;
-            }
-            if (path != null) {
-                list.add(new DebugOption(path, name));
+        if (levelDataManager != null) {
+            for (final LevelConfig config : levelDataManager.getAllConfigs()) {
+                list.add(new DebugOption(config.getMapPath(), config.getName()));
             }
         }
         return list.toArray(new DebugOption[0]);
