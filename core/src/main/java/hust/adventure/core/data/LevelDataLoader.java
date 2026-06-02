@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SerializationException;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import hust.adventure.screens.LevelConfig;
 import hust.adventure.screens.LevelConfigCatalog;
@@ -35,8 +37,9 @@ public class LevelDataLoader {
                     allConfigs.add(config);
                 }
             }
-        } catch (final Exception e) {
+        } catch (final SerializationException | GdxRuntimeException e) {
             Gdx.app.error("LevelDataManager", "Failed to load level configurations from: " + path, e);
+            throw new GdxRuntimeException("Failed to load level configurations from: " + path, e);
         }
     }
 

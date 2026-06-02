@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
@@ -126,7 +127,7 @@ public class AudioManager implements EventListener, Disposable {
 
                 sound.play(volume, pitch, 0f);
             }
-        } catch (Exception e) {
+        } catch (GdxRuntimeException e) {
             Gdx.app.error("AudioManager", "Failed to play sound: " + path, e);
         }
     }
@@ -167,7 +168,7 @@ public class AudioManager implements EventListener, Disposable {
                 fadeState = FadeState.FADING_OUT;
                 fadeTimer = 0f;
             }
-        } catch (Exception e) {
+        } catch (GdxRuntimeException e) {
             Gdx.app.error("AudioManager", "Failed to play music: " + path, e);
         }
     }

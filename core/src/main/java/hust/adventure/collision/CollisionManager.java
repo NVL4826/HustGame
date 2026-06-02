@@ -362,13 +362,9 @@ public class CollisionManager {
 
                     if (canCollide(c1, c2)) {
                         if (c1.intersects(c2)) {
-                            try {
-                                c1.handleCollision(c2.getOwner());
-                                if (!c1.getOwner().isDestroyed() && !c2.getOwner().isDestroyed()) {
-                                    c2.handleCollision(c1.getOwner());
-                                }
-                            } catch (Exception e) {
-                                Gdx.app.error("CollisionManager", "Error handling collision", e);
+                            c1.handleCollision(c2.getOwner());
+                            if (!c1.getOwner().isDestroyed() && !c2.getOwner().isDestroyed()) {
+                                c2.handleCollision(c1.getOwner());
                             }
                         }
                     }
@@ -398,13 +394,9 @@ public class CollisionManager {
 
                     if (canCollide(c1, c2)) {
                         if (c1.intersects(c2)) {
-                            try {
-                                c1.handleCollision(c2.getOwner());
-                                if (!c1.getOwner().isDestroyed() && !c2.getOwner().isDestroyed()) {
-                                    c2.handleCollision(c1.getOwner());
-                                }
-                            } catch (Exception e) {
-                                Gdx.app.error("CollisionManager", "Error handling collision", e);
+                            c1.handleCollision(c2.getOwner());
+                            if (!c1.getOwner().isDestroyed() && !c2.getOwner().isDestroyed()) {
+                                c2.handleCollision(c1.getOwner());
                             }
                         }
                     }

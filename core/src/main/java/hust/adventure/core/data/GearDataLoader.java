@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.SerializationException;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import hust.adventure.items.gear.GearConfig;
 
@@ -42,8 +44,9 @@ public class GearDataLoader {
                     }
                 }
             }
-        } catch (final Exception e) {
+        } catch (final SerializationException | GdxRuntimeException e) {
             Gdx.app.error("GearDataManager", "Failed to load gear configurations from: " + path, e);
+            throw new GdxRuntimeException("Failed to load gear configurations from: " + path, e);
         }
     }
 

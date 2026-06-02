@@ -4,6 +4,7 @@ import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.Equipable;
+import java.util.Objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -25,14 +26,8 @@ public abstract class BaseWeapon extends Item implements Equipable {
     private float shotTimer;
 
     public BaseWeapon(final Player owner, final WeaponConfig config) {
-        super(config.getId(), config.getName(), config.getDescription(), null);
-        if (owner == null) {
-            throw new IllegalArgumentException("Owner cannot be null");
-        }
-        if (config == null) {
-            throw new IllegalArgumentException("Config cannot be null");
-        }
-        this.owner = owner;
+        super(Objects.requireNonNull(config, "Config cannot be null").getId(), config.getName(), config.getDescription(), null);
+        this.owner = Objects.requireNonNull(owner, "Owner cannot be null");
         this.config = config;
         this.level = 1;
         this.baseDamage = config.getBaseDamage();

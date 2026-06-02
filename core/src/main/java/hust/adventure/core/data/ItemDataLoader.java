@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.SerializationException;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import hust.adventure.items.base.ItemConfig;
 import hust.adventure.items.consumable.ConsumableItemConfig;
@@ -47,8 +49,9 @@ public class ItemDataLoader {
                     }
                 }
             }
-        } catch (final Exception e) {
+        } catch (final SerializationException | GdxRuntimeException e) {
             Gdx.app.error("ItemDataManager", "Failed to load item configurations from: " + path, e);
+            throw new GdxRuntimeException("Failed to load item configurations from: " + path, e);
         }
     }
 

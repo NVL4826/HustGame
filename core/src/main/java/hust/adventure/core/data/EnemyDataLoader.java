@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SerializationException;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.entities.enemies.EnemyConfigCatalog;
@@ -33,8 +35,9 @@ public class EnemyDataLoader {
                     enemyConfigs.put(config.getType().toLowerCase(), config);
                 }
             }
-        } catch (final Exception e) {
+        } catch (final SerializationException | GdxRuntimeException e) {
             Gdx.app.error("EnemyDataManager", "Failed to load enemy configurations from: " + path, e);
+            throw new GdxRuntimeException("Failed to load enemy configurations from: " + path, e);
         }
     }
 
