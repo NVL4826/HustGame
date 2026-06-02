@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.HustGame;
 
 public class ScreenTransition extends BaseScreen {
-    private ShapeRenderer transitionShapeRenderer;
     private Screen nextScreen;
     private float duration;
     private float time;
@@ -17,7 +16,6 @@ public class ScreenTransition extends BaseScreen {
 
     public ScreenTransition(HustGame game) {
         super(game);
-        this.transitionShapeRenderer = new ShapeRenderer();
     }
 
     public void fadeOut(Screen next, float durationSec) {
@@ -61,10 +59,10 @@ public class ScreenTransition extends BaseScreen {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        transitionShapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        transitionShapeRenderer.setColor(new Color(0, 0, 0, alpha));
-        transitionShapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        transitionShapeRenderer.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0, 0, 0, alpha));
+        shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        shapeRenderer.end();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
@@ -82,8 +80,5 @@ public class ScreenTransition extends BaseScreen {
 
     @Override
     public void dispose() {
-        if (transitionShapeRenderer != null) {
-            transitionShapeRenderer.dispose();
-        }
     }
 }

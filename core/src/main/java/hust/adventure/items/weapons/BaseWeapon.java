@@ -2,14 +2,15 @@ package hust.adventure.items.weapons;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
-import hust.adventure.items.base.EquipmentItem;
+import hust.adventure.items.base.Item;
+import hust.adventure.items.Equipable;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * Abstract base class for all weapons. Handles common functionality like cooldown management and level tracking.
  */
-public abstract class BaseWeapon extends EquipmentItem {
+public abstract class BaseWeapon extends Item implements Equipable {
     private final Player owner;
     private final WeaponConfig config;
     private float baseDamage;
@@ -218,6 +219,20 @@ public abstract class BaseWeapon extends EquipmentItem {
     @Override
     public final String getDescription() {
         return config.getDescription();
+    }
+
+    @Override
+    public void equip(final Player player) {
+        if (player != null && player.getWeaponManager() != null) {
+            player.getWeaponManager().addWeapon(this);
+        }
+    }
+
+    @Override
+    public void unequip(final Player player) {
+        if (player != null && player.getWeaponManager() != null) {
+            player.getWeaponManager().getWeapons().removeValue(this, true);
+        }
     }
 
     @Override

@@ -28,6 +28,7 @@ public class DebugInputHandler {
     private final UIManager uiManager;
     private final EntityFactory entityFactory;
     private final GameAssetManager assetManager;
+    private final InputReader inputReader;
 
     // States for debug selection
     private SelectionMode activeMode = SelectionMode.NONE;
@@ -40,12 +41,17 @@ public class DebugInputHandler {
      * @param uiManager     the UI manager
      * @param entityFactory the entity factory
      * @param assetManager  the game asset manager
+     * @param inputReader   the input reader
      */
     public DebugInputHandler(final UIManager uiManager, final EntityFactory entityFactory,
-            final GameAssetManager assetManager) {
+            final GameAssetManager assetManager, final InputReader inputReader) {
+        if (inputReader == null) {
+            throw new IllegalArgumentException("inputReader cannot be null");
+        }
         this.uiManager = uiManager;
         this.entityFactory = entityFactory;
         this.assetManager = assetManager;
+        this.inputReader = inputReader;
     }
 
     /**
@@ -68,21 +74,21 @@ public class DebugInputHandler {
             return null; // Suppress other actions while selection is active
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F4)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.F4)) {
             ProgressContext.instance.setGodMode(!ProgressContext.instance.isGodMode());
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.F5)) {
             ProgressContext.instance.setFastRun(!ProgressContext.instance.isFastRun());
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F6)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.F6)) {
             startSelection(SelectionMode.MAP);
             return PlayMode.IN_UI;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F7)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.F7)) {
             startSelection(SelectionMode.ITEM);
             return PlayMode.IN_UI;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F8)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.F8)) {
             startSelection(SelectionMode.MONSTER);
             return PlayMode.IN_UI;
         }
@@ -126,17 +132,17 @@ public class DebugInputHandler {
             return null;
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.UP)) {
             selectedIndex = (selectedIndex - 1 + currentOptions.length) % currentOptions.length;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.DOWN)) {
             selectedIndex = (selectedIndex + 1) % currentOptions.length;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.ESCAPE)) {
             cancelSelection();
             return null;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+        if (inputReader.isKeyJustPressed(Input.Keys.ENTER)) {
             final DebugOption selection = currentOptions[selectedIndex];
             cancelSelection();
             return selection;

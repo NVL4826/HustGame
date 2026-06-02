@@ -3,6 +3,7 @@ package hust.adventure.collision;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.LongArray;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,15 +14,21 @@ import hust.adventure.entities.environment.WallEntity;
 import java.util.List;
 
 /**
- * High-performance collision system using Spatial Hashing and a Bitmask Collision Matrix. This class combines the
- * functionality of the former CollisionManager and CollisionSystem.
+ * High-performance collision system using Spatial Hashing and a Bitmask Collision Matrix.
+ * Decouples static environment walls from dynamic entities to minimize CPU overhead.
  */
 public class CollisionManager {
     private final float cellSize;
-    private final ObjectMap<Long, Array<Collider>> grid;
+    private final ObjectMap<Long, Array<Collider>> dynamicGrid;
+    private final ObjectMap<Long, Array<Collider>> staticGrid;
+    
+    // Zero-allocation cell array pooling structures
+    private final Array<Array<Collider>> cellArrayPool;
+    private final Array<Array<Collider>> activeDynamicCells;
+    private final LongArray activeDynamicKeys;
+
     private final int[] collisionMatrix;
     private final EntityManager entityManager;
-    private final Array<MapObject> allCollidables;
     private final Array<WallEntity> staticWalls;
     private final Rectangle tempRect;
     private float mapWidth, mapHeight;
@@ -33,16 +40,21 @@ public class CollisionManager {
         }
         this.entityManager = entityManager;
         this.cellSize = cellSize;
-        this.grid = new ObjectMap<>();
-        this.allCollidables = new Array<>();
+        this.dynamicGrid = new ObjectMap<>();
+        this.staticGrid = new ObjectMap<>();
         this.staticWalls = new Array<>();
         this.tempRect = new Rectangle();
         this.collisionMatrix = new int[32];
+
+        this.cellArrayPool = new Array<>(false, 256);
+        this.activeDynamicCells = new Array<>(false, 256);
+        this.activeDynamicKeys = new LongArray(false, 256);
+
         initCollisionMatrix();
     }
 
     /**
-     * Sets the current map and its static walls.
+     * Sets the current map and its static walls. Rebuilds the static spatial hash grid.
      * 
      * @param map   The current TiledMap.
      * @param walls The list of static walls in the map.
@@ -93,6 +105,8 @@ public class CollisionManager {
 
             Gdx.app.log("CollisionManager", "Map bounds set to: " + mapWidth + "x" + mapHeight);
         }
+
+        rebuildStaticGrid();
     }
 
     public void setInfinite(boolean infinite) {
@@ -112,7 +126,8 @@ public class CollisionManager {
     }
 
     /**
-     * Checks if an entity can move to a specific position without colliding with the map or static walls.
+     * Checks if an entity can move to a specific position without colliding with the map boundaries or static walls.
+     * Utilizes the static spatial hash grid for highly optimized O(1) collision detection.
      * 
      * @param entity The entity attempting to move.
      * @param nextX  The target X coordinate.
@@ -129,9 +144,22 @@ public class CollisionManager {
         // 2. Wall collision check
         final Rectangle collisionBox = entity.getMovementBounds(nextX, nextY, tempRect);
 
-        for (int i = 0; i < staticWalls.size; i++) {
-            if (collisionBox.overlaps(staticWalls.get(i).getBounds())) {
-                return false;
+        final int startX = (int) (collisionBox.x / cellSize);
+        final int startY = (int) (collisionBox.y / cellSize);
+        final int endX = (int) ((collisionBox.x + collisionBox.width) / cellSize);
+        final int endY = (int) ((collisionBox.y + collisionBox.height) / cellSize);
+
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                final Array<Collider> cell = staticGrid.get(hash(x, y));
+                if (cell != null) {
+                    for (int i = 0; i < cell.size; i++) {
+                        final Collider wallCollider = cell.get(i);
+                        if (collisionBox.overlaps(wallCollider.getOwner().getBounds())) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
@@ -169,32 +197,93 @@ public class CollisionManager {
 
     /**
      * Main update method for the collision system.
-     * 
-     * @param walls List of static walls to include in collision checks.
+     * Clears and rebuilds the dynamic grid, then resolves collisions.
      */
-    public void update(final List<WallEntity> walls) {
-        allCollidables.clear();
-
-        // Add dynamic entities
-        final Array<MapObject> entities = entityManager.getEntities();
-        for (int i = 0; i < entities.size; i++) {
-            allCollidables.add(entities.get(i));
-        }
-
-        // Add static walls
-        if (walls != null) {
-            for (final WallEntity wall : walls) {
-                allCollidables.add(wall);
-            }
-        }
-
-        rebuildGrid(allCollidables);
+    public void update() {
+        rebuildDynamicGrid();
         checkCollisions();
     }
 
-    private void rebuildGrid(final Array<MapObject> entities) {
-        grid.clear();
+    private Array<Collider> obtainCellArray() {
+        if (cellArrayPool.size > 0) {
+            return cellArrayPool.pop();
+        }
+        return new Array<>();
+    }
 
+    private void releaseCellArray(final Array<Collider> array) {
+        array.clear();
+        cellArrayPool.add(array);
+    }
+
+    private void rebuildStaticGrid() {
+        staticGrid.clear();
+
+        for (int i = 0; i < staticWalls.size; i++) {
+            final WallEntity wall = staticWalls.get(i);
+            if (wall.isDestroyed()) {
+                continue;
+            }
+
+            final Collider collider = wall.getCollider();
+            if (collider == null) {
+                continue;
+            }
+
+            final int cellX = (int) (wall.getX() / cellSize);
+            final int cellY = (int) (wall.getY() / cellSize);
+
+            addColliderToStaticCell(cellX, cellY, collider);
+
+            float minX, maxX, minY, maxY;
+            if (collider.getShape() == Collider.Shape.RECTANGLE) {
+                minX = wall.getBounds().x;
+                maxX = wall.getBounds().x + wall.getBounds().width;
+                minY = wall.getBounds().y;
+                maxY = wall.getBounds().y + wall.getBounds().height;
+            } else {
+                float radius = collider.getRadius();
+                minX = wall.getX() - radius;
+                maxX = wall.getX() + radius;
+                minY = wall.getY() - radius;
+                maxY = wall.getY() + radius;
+            }
+
+            final int cellX1 = (int) (minX / cellSize);
+            final int cellY1 = (int) (minY / cellSize);
+            final int cellX2 = (int) (maxX / cellSize);
+            final int cellY2 = (int) (maxY / cellSize);
+
+            for (int x = cellX1; x <= cellX2; x++) {
+                for (int y = cellY1; y <= cellY2; y++) {
+                    if (x != cellX || y != cellY) {
+                        addColliderToStaticCell(x, y, collider);
+                    }
+                }
+            }
+        }
+    }
+
+    private void addColliderToStaticCell(final int x, final int y, final Collider collider) {
+        final long key = hash(x, y);
+        Array<Collider> cell = staticGrid.get(key);
+        if (cell == null) {
+            cell = new Array<>();
+            staticGrid.put(key, cell);
+        }
+        cell.add(collider);
+    }
+
+    private void rebuildDynamicGrid() {
+        // Recycle the active cell arrays back to the pool
+        for (int i = 0; i < activeDynamicCells.size; i++) {
+            releaseCellArray(activeDynamicCells.get(i));
+        }
+        activeDynamicCells.clear();
+        activeDynamicKeys.clear();
+        dynamicGrid.clear();
+
+        final Array<MapObject> entities = entityManager.getEntities();
         for (int i = 0; i < entities.size; i++) {
             final MapObject entity = entities.get(i);
             if (entity.isDestroyed()) {
@@ -209,19 +298,15 @@ public class CollisionManager {
             final int cellX = (int) (entity.getX() / cellSize);
             final int cellY = (int) (entity.getY() / cellSize);
 
-            addColliderToCell(cellX, cellY, collider);
+            addColliderToDynamicCell(cellX, cellY, collider);
 
-            // Handle objects overlapping multiple cells using their bounding box
             float minX, maxX, minY, maxY;
             if (collider.getShape() == Collider.Shape.RECTANGLE) {
-                // For rectangles, bounds are (x - width/2, y - height/2) to (x + width/2, y + height/2) based on
-                // BaseEntity getBounds()
                 minX = entity.getBounds().x;
                 maxX = entity.getBounds().x + entity.getBounds().width;
                 minY = entity.getBounds().y;
                 maxY = entity.getBounds().y + entity.getBounds().height;
             } else {
-                // For circles
                 float radius = collider.getRadius();
                 minX = entity.getX() - radius;
                 maxX = entity.getX() + radius;
@@ -237,19 +322,21 @@ public class CollisionManager {
             for (int x = cellX1; x <= cellX2; x++) {
                 for (int y = cellY1; y <= cellY2; y++) {
                     if (x != cellX || y != cellY) {
-                        addColliderToCell(x, y, collider);
+                        addColliderToDynamicCell(x, y, collider);
                     }
                 }
             }
         }
     }
 
-    private void addColliderToCell(final int x, final int y, final Collider collider) {
+    private void addColliderToDynamicCell(final int x, final int y, final Collider collider) {
         final long key = hash(x, y);
-        Array<Collider> cell = grid.get(key);
+        Array<Collider> cell = dynamicGrid.get(key);
         if (cell == null) {
-            cell = new Array<>();
-            grid.put(key, cell);
+            cell = obtainCellArray();
+            dynamicGrid.put(key, cell);
+            activeDynamicCells.add(cell);
+            activeDynamicKeys.add(key);
         }
         cell.add(collider);
     }
@@ -259,7 +346,9 @@ public class CollisionManager {
     }
 
     private void checkCollisions() {
-        for (final Array<Collider> cellContent : grid.values()) {
+        // 1. Dynamic vs Dynamic collisions
+        for (int k = 0; k < activeDynamicCells.size; k++) {
+            final Array<Collider> cellContent = activeDynamicCells.get(k);
             for (int i = 0; i < cellContent.size; i++) {
                 final Collider c1 = cellContent.get(i);
                 if (c1.getOwner().isDestroyed()) {
@@ -267,6 +356,42 @@ public class CollisionManager {
                 }
                 for (int j = i + 1; j < cellContent.size; j++) {
                     final Collider c2 = cellContent.get(j);
+                    if (c2.getOwner().isDestroyed()) {
+                        continue;
+                    }
+
+                    if (canCollide(c1, c2)) {
+                        if (c1.intersects(c2)) {
+                            try {
+                                c1.handleCollision(c2.getOwner());
+                                if (!c1.getOwner().isDestroyed() && !c2.getOwner().isDestroyed()) {
+                                    c2.handleCollision(c1.getOwner());
+                                }
+                            } catch (Exception e) {
+                                Gdx.app.error("CollisionManager", "Error handling collision", e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Dynamic vs Static collisions
+        for (int k = 0; k < activeDynamicKeys.size; k++) {
+            final long key = activeDynamicKeys.get(k);
+            final Array<Collider> dynamicCell = dynamicGrid.get(key);
+            final Array<Collider> staticCell = staticGrid.get(key);
+            if (dynamicCell == null || staticCell == null) {
+                continue;
+            }
+
+            for (int i = 0; i < dynamicCell.size; i++) {
+                final Collider c1 = dynamicCell.get(i);
+                if (c1.getOwner().isDestroyed()) {
+                    continue;
+                }
+                for (int j = 0; j < staticCell.size; j++) {
+                    final Collider c2 = staticCell.get(j);
                     if (c2.getOwner().isDestroyed()) {
                         continue;
                     }
@@ -311,12 +436,28 @@ public class CollisionManager {
 
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                final Array<Collider> cell = grid.get(hash(x, y));
+                final long key = hash(x, y);
+                final Array<Collider> cell = dynamicGrid.get(key);
                 if (cell != null) {
-                    for (final Collider c : cell) {
+                    for (int i = 0; i < cell.size; i++) {
+                        final Collider c = cell.get(i);
                         if ((c.getLayer() & layerMask) != 0 && c.getOwner().getBounds().overlaps(area)) {
                             if (!result.contains(c.getOwner(), true)) {
                                 result.add(c.getOwner());
+                            }
+                        }
+                    }
+                }
+
+                if ((layerMask & CollisionLayer.WALL) != 0) {
+                    final Array<Collider> staticCell = staticGrid.get(key);
+                    if (staticCell != null) {
+                        for (int i = 0; i < staticCell.size; i++) {
+                            final Collider c = staticCell.get(i);
+                            if ((c.getLayer() & layerMask) != 0 && c.getOwner().getBounds().overlaps(area)) {
+                                if (!result.contains(c.getOwner(), true)) {
+                                    result.add(c.getOwner());
+                                }
                             }
                         }
                     }
@@ -341,15 +482,35 @@ public class CollisionManager {
 
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                final Array<Collider> cell = grid.get(hash(x, y));
+                final long key = hash(x, y);
+                final Array<Collider> cell = dynamicGrid.get(key);
                 if (cell != null) {
-                    for (final Collider c : cell) {
+                    for (int i = 0; i < cell.size; i++) {
+                        final Collider c = cell.get(i);
                         if ((c.getLayer() & layerMask) != 0) {
                             final float dx = c.getOwner().getX() - cx;
                             final float dy = c.getOwner().getY() - cy;
                             if (dx * dx + dy * dy <= radiusSq) {
                                 if (!result.contains(c.getOwner(), true)) {
                                     result.add(c.getOwner());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ((layerMask & CollisionLayer.WALL) != 0) {
+                    final Array<Collider> staticCell = staticGrid.get(key);
+                    if (staticCell != null) {
+                        for (int i = 0; i < staticCell.size; i++) {
+                            final Collider c = staticCell.get(i);
+                            if ((c.getLayer() & layerMask) != 0) {
+                                final float dx = c.getOwner().getX() - cx;
+                                final float dy = c.getOwner().getY() - cy;
+                                if (dx * dx + dy * dy <= radiusSq) {
+                                    if (!result.contains(c.getOwner(), true)) {
+                                        result.add(c.getOwner());
+                                    }
                                 }
                             }
                         }
@@ -379,9 +540,11 @@ public class CollisionManager {
                 for (int y = centerY - r; y <= centerY + r; y++) {
                     // Only check the perimeter of the current "ring" (r)
                     if (Math.abs(x - centerX) == r || Math.abs(y - centerY) == r) {
-                        final Array<Collider> cell = grid.get(hash(x, y));
+                        final long key = hash(x, y);
+                        final Array<Collider> cell = dynamicGrid.get(key);
                         if (cell != null) {
-                            for (final Collider c : cell) {
+                            for (int i = 0; i < cell.size; i++) {
+                                final Collider c = cell.get(i);
                                 if ((c.getLayer() & layerMask) != 0) {
                                     final float dx = c.getOwner().getX() - cx;
                                     final float dy = c.getOwner().getY() - cy;
@@ -390,6 +553,25 @@ public class CollisionManager {
                                         minDistanceSq = distSq;
                                         nearest = c.getOwner();
                                         foundInRange = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((layerMask & CollisionLayer.WALL) != 0) {
+                            final Array<Collider> staticCell = staticGrid.get(key);
+                            if (staticCell != null) {
+                                for (int i = 0; i < staticCell.size; i++) {
+                                    final Collider c = staticCell.get(i);
+                                    if ((c.getLayer() & layerMask) != 0) {
+                                        final float dx = c.getOwner().getX() - cx;
+                                        final float dy = c.getOwner().getY() - cy;
+                                        final float distSq = dx * dx + dy * dy;
+                                        if (distSq < minDistanceSq) {
+                                            minDistanceSq = distSq;
+                                            nearest = c.getOwner();
+                                            foundInRange = true;
+                                        }
                                     }
                                 }
                             }

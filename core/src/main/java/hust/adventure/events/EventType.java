@@ -13,7 +13,6 @@ public enum EventType {
     ITEM_USED,
     ITEM_PICKED_UP,
     PUZZLE_SOLVED,
-    STAT_CHANGED,
     EXP_GAINED,
     LEVEL_UP,
     ENTITY_DAMAGED,

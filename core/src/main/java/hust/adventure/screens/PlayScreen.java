@@ -102,7 +102,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.uiManager = new UIManager();
         this.inputReader = new InputReader();
         this.lightingManager = new LightingManager();
-        this.debugInputHandler = new DebugInputHandler(uiManager, entityFactory, game.getAssetManager());
+        this.debugInputHandler = new DebugInputHandler(uiManager, entityFactory, game.getAssetManager(), inputReader);
         this.uiManager.getDebugUI().setInputHandler(debugInputHandler);
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
@@ -266,7 +266,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             entityManager.update(delta, entityFactory);
 
             lightingManager.update();
-            collisionManager.update(worldManager.getWalls());
+            collisionManager.update();
             checkTriggers();
             updateLevel(delta);
         }

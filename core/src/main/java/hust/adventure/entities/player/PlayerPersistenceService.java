@@ -44,8 +44,8 @@ public class PlayerPersistenceService {
         }
 
         ProgressContext.instance.getWeaponLevels().clear();
-        for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
-            ProgressContext.instance.getWeaponLevels().put(w.getId().toLowerCase(), w.getLevel());
+        for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
+            ProgressContext.instance.getWeaponLevels().put(weapon.getId().toLowerCase(), weapon.getLevel());
         }
 
         ProgressContext.instance.getGearLevels().clear();
@@ -74,7 +74,7 @@ public class PlayerPersistenceService {
             // Initialize with default weapon for a new game
             if (weaponFactory != null) {
                 final BaseWeapon defaultWeapon = weaponFactory.createWeapon("bun_dau", player);
-                player.getWeaponManager().addWeapon(defaultWeapon);
+                defaultWeapon.equip(player);
             }
             savedWeapons.put("bun_dau", 1);
         } else {
@@ -86,7 +86,7 @@ public class PlayerPersistenceService {
                     for (int i = 1; i < targetLevel; i++) {
                         weapon.upgrade(0f, 0f);
                     }
-                    player.getWeaponManager().addWeapon(weapon);
+                    weapon.equip(player);
                 }
             }
         }
@@ -100,17 +100,16 @@ public class PlayerPersistenceService {
                 for (int i = 1; i < targetLevel; i++) {
                     gear.upgrade();
                 }
-                player.getGearManager().addGear(gear);
+                gear.equip(player);
 
-                // Re-apply cumulative equip effects for restored level
+                // Re-apply cumulative equip effects for restored levels > 1
                 if (gearFactory != null) {
-                    for (int i = 0; i < targetLevel; i++) {
+                    for (int i = 1; i < targetLevel; i++) {
                         gearFactory.applyEquipEffect(gearId, player);
                     }
                 }
             }
         }
     }
-
 
 }

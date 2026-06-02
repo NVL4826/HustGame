@@ -1,25 +1,28 @@
 package hust.adventure.input;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.utils.IntSet;
 
 /**
  * System for handling player input and mapping it to game actions.
+ * Consolidates dynamic key state tracking using an internal IntSet to respect memory constraints.
  */
 public class InputReader implements PlayerController {
     private boolean up, down, left, right, running;
-    private boolean spaceJP, qJP, eJP, fJP, iJP, enterJP, debugJP, hitboxJP;
-    private int numJP = -1;
+    private final IntSet justPressedKeys = new IntSet();
+
+    /**
+     * Checks if a key was just pressed in the current frame.
+     *
+     * @param keycode the keycode to check
+     * @return true if the key was just pressed, false otherwise
+     */
+    public boolean isKeyJustPressed(final int keycode) {
+        return justPressedKeys.contains(keycode);
+    }
 
     public void update() {
-        spaceJP = false;
-        qJP = false;
-        eJP = false;
-        fJP = false;
-        iJP = false;
-        enterJP = false;
-        debugJP = false;
-        hitboxJP = false;
-        numJP = -1;
+        justPressedKeys.clear();
     }
 
     @Override
@@ -49,51 +52,57 @@ public class InputReader implements PlayerController {
 
     @Override
     public boolean isSpaceJustPressed() {
-        return spaceJP;
+        return isKeyJustPressed(Input.Keys.SPACE);
     }
 
     @Override
     public boolean isQJustPressed() {
-        return qJP;
+        return isKeyJustPressed(Input.Keys.Q);
     }
 
     @Override
     public boolean isEJustPressed() {
-        return eJP;
+        return isKeyJustPressed(Input.Keys.E);
     }
 
     @Override
     public boolean isFJustPressed() {
-        return fJP;
+        return isKeyJustPressed(Input.Keys.F);
     }
 
     @Override
     public boolean isInventoryJustPressed() {
-        return iJP;
+        return isKeyJustPressed(Input.Keys.I);
     }
 
     @Override
     public boolean isEnterJustPressed() {
-        return enterJP;
+        return isKeyJustPressed(Input.Keys.ENTER);
     }
 
     @Override
     public boolean isDebugJustPressed() {
-        return debugJP;
+        return isKeyJustPressed(Input.Keys.F2);
     }
 
     @Override
     public boolean isHitboxJustPressed() {
-        return hitboxJP;
+        return isKeyJustPressed(Input.Keys.F3);
     }
 
     @Override
     public int getJustPressedNum() {
-        return numJP;
+        for (int i = 1; i <= 5; i++) {
+            if (isKeyJustPressed(Input.Keys.NUM_1 + i - 1)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public boolean keyDown(int keycode) {
+        justPressedKeys.add(keycode);
         if (keycode == Input.Keys.W || keycode == Input.Keys.UP)
             up = true;
         if (keycode == Input.Keys.S || keycode == Input.Keys.DOWN)
@@ -104,24 +113,6 @@ public class InputReader implements PlayerController {
             right = true;
         if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT)
             running = true;
-        if (keycode == Input.Keys.SPACE)
-            spaceJP = true;
-        if (keycode == Input.Keys.Q)
-            qJP = true;
-        if (keycode == Input.Keys.E)
-            eJP = true;
-        if (keycode == Input.Keys.F)
-            fJP = true;
-        if (keycode == Input.Keys.I)
-            iJP = true;
-        if (keycode == Input.Keys.ENTER)
-            enterJP = true;
-        if (keycode == Input.Keys.F2)
-            debugJP = true;
-        if (keycode == Input.Keys.F3)
-            hitboxJP = true;
-        if (keycode >= Input.Keys.NUM_1 && keycode <= Input.Keys.NUM_5)
-            numJP = keycode - Input.Keys.NUM_1 + 1;
         return true;
     }
 

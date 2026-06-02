@@ -25,6 +25,11 @@ public class GearFactory {
         }
         this.dataManager = dataManager;
         registerDefaultAppliers();
+        Gear.setGearFactory(this);
+    }
+
+    public GearDataLoader getDataManager() {
+        return dataManager;
     }
 
     private void registerDefaultAppliers() {

@@ -56,17 +56,14 @@ public class GearUpgradeAction implements UpgradeAction {
             return;
         }
         if (isUnlock) {
-            player.getGearManager().addGear(new Gear(gearId, name, description));
+            final Gear gear = new Gear(gearId, name, description);
+            gear.equip(player);
         } else {
             final Gear gear = player.getGearManager().getGear(gearId);
             if (gear != null) {
                 gear.upgrade();
+                gear.equip(player);
             }
-        }
-
-        // Trigger immediate side-effects
-        if (gearFactory != null) {
-            gearFactory.applyEquipEffect(gearId, player);
         }
     }
 }
