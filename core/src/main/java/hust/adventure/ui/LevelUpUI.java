@@ -3,7 +3,6 @@ package hust.adventure.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -20,14 +19,10 @@ import java.util.List;
  * Fully decoupled from Player and UpgradeAction models.
  */
 public class LevelUpUI {
-    private final OrthographicCamera uiCam;
     private final List<LevelUpChoiceData> currentChoices = new ArrayList<>();
     private Runnable onResume;
 
     public LevelUpUI() {
-        uiCam = new OrthographicCamera();
-        uiCam.setToOrtho(false, 800, 600);
-        uiCam.update();
     }
 
     public void setOnResume(final Runnable onResume) {
@@ -44,9 +39,6 @@ public class LevelUpUI {
     public void render(final SpriteBatch batch, final ShapeRenderer shapeRenderer, final BitmapFont font) {
         if (currentChoices.isEmpty())
             return;
-
-        shapeRenderer.setProjectionMatrix(uiCam.combined);
-        batch.setProjectionMatrix(uiCam.combined);
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

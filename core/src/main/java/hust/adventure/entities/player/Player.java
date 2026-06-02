@@ -62,6 +62,7 @@ public class Player extends Character implements Targetable {
     private float magnetMultiplier = 1.0f;
     private float speedMultiplier = 1.0f;
 
+    @lombok.Builder
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);

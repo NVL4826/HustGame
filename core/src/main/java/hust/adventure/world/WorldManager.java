@@ -230,16 +230,32 @@ public class WorldManager implements Disposable {
     }
 
     public static class Portal {
-        public final Rectangle bounds;
-        public final String targetMap;
-        public final float spawnX;
-        public final float spawnY;
+        private final Rectangle bounds;
+        private final String targetMap;
+        private final float spawnX;
+        private final float spawnY;
 
         public Portal(final Rectangle bounds, final String targetMap, final float spawnX, final float spawnY) {
             this.bounds = bounds;
             this.targetMap = targetMap;
             this.spawnX = spawnX;
             this.spawnY = spawnY;
+        }
+
+        public Rectangle getBounds() {
+            return bounds;
+        }
+
+        public String getTargetMap() {
+            return targetMap;
+        }
+
+        public float getSpawnX() {
+            return spawnX;
+        }
+
+        public float getSpawnY() {
+            return spawnY;
         }
     }
 }

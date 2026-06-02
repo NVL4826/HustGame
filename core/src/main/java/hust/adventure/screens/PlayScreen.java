@@ -204,9 +204,20 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             lootDropService = new LootDropService(entityFactory, game.getAssetManager());
         }
 
-        gameRenderer = new GameRenderer(cameraManager, entityManager, game.getSpriteBatch(), silhouetteShader,
-                discardShader, uiManager.getHud(), uiManager.getStatusEffectsHUD(), uiManager.getInventoryUI(),
-                uiManager.getLevelUpUI(), uiManager.getDamageTextManager(), uiManager.getDebugUI(), worldManager);
+        gameRenderer = GameRenderer.builder()
+                .cameraManager(cameraManager)
+                .entityManager(entityManager)
+                .batch(game.getSpriteBatch())
+                .silhouetteShader(silhouetteShader)
+                .discardShader(discardShader)
+                .hud(uiManager.getHud())
+                .statusEffectsHUD(uiManager.getStatusEffectsHUD())
+                .inventoryUI(uiManager.getInventoryUI())
+                .levelUpUI(uiManager.getLevelUpUI())
+                .damageTextManager(uiManager.getDamageTextManager())
+                .debugUI(uiManager.getDebugUI())
+                .worldManager(worldManager)
+                .build();
 
         setupLayerIndices();
 
@@ -332,8 +343,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         for (final WorldManager.Portal portal : worldManager.getPortals()) {
-            if (portal.bounds.contains(player.getX(), player.getY())) {
-                MapTransitionData data = new MapTransitionData(portal.targetMap, portal.spawnX, portal.spawnY);
+            if (portal.getBounds().contains(player.getX(), player.getY())) {
+                MapTransitionData data = new MapTransitionData(portal.getTargetMap(), portal.getSpawnX(), portal.getSpawnY());
                 GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
 
                 EventDispatcher.getInstance().dispatch(event);

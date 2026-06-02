@@ -3,6 +3,7 @@ package hust.adventure.graphics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -35,6 +36,7 @@ import hust.adventure.world.WorldManager;
 public class GameRenderer {
     private final CameraManager cameraManager;
     private final EntityManager entityManager;
+    private final OrthographicCamera uiCam;
     private final SpriteBatch batch;
     private final ShaderProgram silhouetteShader;
     private final ShaderProgram discardShader;
@@ -45,11 +47,14 @@ public class GameRenderer {
     private final DamageTextManager damageTextManager;
     private final DebugUI debugUI;
     private final WorldManager worldManager;
+    private final HUDData hudData;
+    private final StatusEffectsData statusData;
     private static final Matrix4 uiMatrix = new Matrix4();
     private final GlyphLayout layout = new GlyphLayout();
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
     private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
 
+    @lombok.Builder
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
             final StatusEffectsHUD statusEffectsHUD, final InventoryUI inventoryUI, final LevelUpUI levelUpUI,
@@ -66,6 +71,11 @@ public class GameRenderer {
         this.damageTextManager = damageTextManager;
         this.debugUI = debugUI;
         this.worldManager = worldManager;
+        this.hudData = new HUDData(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0, 0f);
+        this.statusData = new StatusEffectsData(false, false, 1f, 0f, false, false, false);
+        this.uiCam = new OrthographicCamera();
+        this.uiCam.setToOrtho(false, 800, 600);
+        this.uiCam.update();
     }
 
     /**
@@ -183,6 +193,8 @@ public class GameRenderer {
         }
 
         // 6. Render UI
+        shapeRenderer.setProjectionMatrix(uiCam.combined);
+        batch.setProjectionMatrix(uiCam.combined);
         renderUI(batch, shapeRenderer, font, player);
     }
 
@@ -190,7 +202,7 @@ public class GameRenderer {
             final Player player) {
         if (hud != null) {
             final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
-            final HUDData hudData = new HUDData(ProgressContext.instance.getHp(), ProgressContext.instance.getMaxHp(),
+            hudData.set(ProgressContext.instance.getHp(), ProgressContext.instance.getMaxHp(),
                     ProgressContext.instance.getStamina(), ProgressContext.instance.getMaxStamina(),
                     ProgressContext.instance.getMorale(), ProgressContext.instance.getExp(),
                     ProgressContext.instance.getExpToNextLevel(), ProgressContext.instance.getLevel(), currentTime);
@@ -205,7 +217,7 @@ public class GameRenderer {
                 isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
                 isConfused = player.hasStatus(StatusFlag.CONFUSED);
             }
-            final StatusEffectsData statusData = new StatusEffectsData(ProgressContext.instance.isHasNao(),
+            statusData.set(ProgressContext.instance.isHasNao(),
                     ProgressContext.instance.isHasUsb(), ProgressContext.instance.getEnemyTimeScale(),
                     ProgressContext.instance.getShowEnemiesTimer(), isSpeedBoosted, isHpRegen, isConfused);
             statusEffectsHUD.render(batch, font, statusData);

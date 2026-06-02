@@ -1,7 +1,6 @@
 package hust.adventure.ui;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -9,12 +8,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * HUD component responsible for rendering active status effects, spells, and collected artifacts.
  */
 public class StatusEffectsHUD {
-    private final OrthographicCamera uiCam;
 
     public StatusEffectsHUD() {
-        uiCam = new OrthographicCamera();
-        uiCam.setToOrtho(false, 800, 600);
-        uiCam.update();
     }
 
     /**
@@ -28,7 +23,6 @@ public class StatusEffectsHUD {
         if (data == null) {
             return;
         }
-        batch.setProjectionMatrix(uiCam.combined);
         batch.begin();
 
         // ── Artifacts ────────────────────────────────────────────────────────

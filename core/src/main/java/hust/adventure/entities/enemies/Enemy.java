@@ -77,6 +77,7 @@ public class Enemy extends Character {
      * @param player           the player dependency
      * @param entityManager    the entity manager dependency
      */
+    @lombok.Builder
     public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config,
             final Player player, final EntityManager entityManager) {
         super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());

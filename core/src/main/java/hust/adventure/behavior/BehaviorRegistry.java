@@ -126,6 +126,7 @@ public final class BehaviorRegistry {
     /**
      * Functional interface supplying AIBehavior based on config.
      */
+    @FunctionalInterface
     public interface AIBehaviorProvider {
         /**
          * Creates an AIBehavior instance.
@@ -139,6 +140,7 @@ public final class BehaviorRegistry {
     /**
      * Functional interface supplying AttackBehavior based on config.
      */
+    @FunctionalInterface
     public interface AttackBehaviorProvider {
         /**
          * Creates an AttackBehavior instance.
@@ -152,6 +154,7 @@ public final class BehaviorRegistry {
     /**
      * Functional interface supplying DeathBehavior based on config.
      */
+    @FunctionalInterface
     public interface DeathBehaviorProvider {
         /**
          * Creates a DeathBehavior instance.

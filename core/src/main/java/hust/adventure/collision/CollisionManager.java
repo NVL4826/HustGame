@@ -2,7 +2,7 @@ package hust.adventure.collision;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.LongArray;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -19,8 +19,8 @@ import java.util.List;
  */
 public class CollisionManager {
     private final float cellSize;
-    private final ObjectMap<Long, Array<Collider>> dynamicGrid;
-    private final ObjectMap<Long, Array<Collider>> staticGrid;
+    private final LongMap<Array<Collider>> dynamicGrid;
+    private final LongMap<Array<Collider>> staticGrid;
     
     // Zero-allocation cell array pooling structures
     private final Array<Array<Collider>> cellArrayPool;
@@ -40,8 +40,8 @@ public class CollisionManager {
         }
         this.entityManager = entityManager;
         this.cellSize = cellSize;
-        this.dynamicGrid = new ObjectMap<>();
-        this.staticGrid = new ObjectMap<>();
+        this.dynamicGrid = new LongMap<>();
+        this.staticGrid = new LongMap<>();
         this.staticWalls = new Array<>();
         this.tempRect = new Rectangle();
         this.collisionMatrix = new int[32];

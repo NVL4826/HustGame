@@ -3,7 +3,6 @@ package hust.adventure.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -16,7 +15,6 @@ import hust.adventure.input.DebugInputHandler;
  * selection menus.
  */
 public class DebugUI {
-    private final OrthographicCamera uiCam;
     private DebugInputHandler inputHandler;
 
     // UI Layout Constants to avoid magic numbers
@@ -30,9 +28,6 @@ public class DebugUI {
     private static final float SELECT_WIDTH = 260f;
     private static final float SELECT_HEIGHT = 350f;
 
-    private static final float CAM_VIEW_WIDTH = 800f;
-    private static final float CAM_VIEW_HEIGHT = 600f;
-
     // Stylized color theme constants
     private static final Color BG_COLOR = new Color(0.08f, 0.09f, 0.13f, 0.85f);
     private static final Color BORDER_COLOR = new Color(0.18f, 0.50f, 0.93f, 0.9f);
@@ -43,9 +38,6 @@ public class DebugUI {
      * Constructs a new DebugUI.
      */
     public DebugUI() {
-        this.uiCam = new OrthographicCamera();
-        this.uiCam.setToOrtho(false, CAM_VIEW_WIDTH, CAM_VIEW_HEIGHT);
-        this.uiCam.update();
     }
 
     /**
@@ -68,10 +60,6 @@ public class DebugUI {
         if (!ProgressContext.instance.isShowDebug()) {
             return;
         }
-
-        // Set projection matrix for UI rendering
-        shapeRenderer.setProjectionMatrix(uiCam.combined);
-        batch.setProjectionMatrix(uiCam.combined);
 
         // Render panels backgrounds and borders
         Gdx.gl.glEnable(GL20.GL_BLEND);

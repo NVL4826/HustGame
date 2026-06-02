@@ -3,7 +3,6 @@ package hust.adventure.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -25,7 +24,6 @@ import java.util.Map;
  * Fully decoupled from Player and Item models.
  */
 public class InventoryUI {
-    private final OrthographicCamera uiCam;
     private final List<InventoryItemData> itemList = new ArrayList<>();
 
     // Panel geometry
@@ -67,17 +65,11 @@ public class InventoryUI {
     private int hoveredIndex = -1;
 
     public InventoryUI() {
-        uiCam = new OrthographicCamera();
-        uiCam.setToOrtho(false, 800, 600);
-        uiCam.update();
     }
 
     public void render(final SpriteBatch batch, final ShapeRenderer sr, final BitmapFont font, final InventoryUIData data) {
         if (!ProgressContext.instance.isInventoryOpen())
             return;
-
-        sr.setProjectionMatrix(uiCam.combined);
-        batch.setProjectionMatrix(uiCam.combined);
 
         // Mouse (flip Y)
         final float mx = Gdx.input.getX();

@@ -18,6 +18,7 @@ import hust.adventure.events.EventType;
 public class MagicWandWeapon extends BaseWeapon {
     private static final float PROJECTILE_SPEED = 200f;
     private static final float MAX_RANGE = 400f;
+    private final Vector2 tmpDirection = new Vector2();
 
     public MagicWandWeapon(final Player owner, final WeaponConfig config) {
         super(owner, config);
@@ -37,9 +38,9 @@ public class MagicWandWeapon extends BaseWeapon {
         final float startX = getOwner().getX();
         final float startY = getOwner().getY();
 
-        final Vector2 direction = new Vector2(target.getX() - startX, target.getY() - startY).nor();
-        final float vx = direction.x * PROJECTILE_SPEED;
-        final float vy = direction.y * PROJECTILE_SPEED;
+        tmpDirection.set(target.getX() - startX, target.getY() - startY).nor();
+        final float vx = tmpDirection.x * PROJECTILE_SPEED;
+        final float vy = tmpDirection.y * PROJECTILE_SPEED;
 
         if (getOwner().getFactory() != null) {
             final Projectile projectile = getOwner().getFactory().createProjectile(startX, startY, vx, vy,

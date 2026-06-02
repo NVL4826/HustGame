@@ -2,7 +2,6 @@ package hust.adventure.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -15,7 +14,6 @@ import hust.adventure.core.TimeProvider;
  * Upgraded HUD – modern bar design with gradient fills, icons, rounded feel, and a low-HP pulse warning.
  */
 public class HUD {
-    private final OrthographicCamera uiCam;
 
     // Layout constants
     private static final float PANEL_X = 14f;
@@ -40,9 +38,6 @@ public class HUD {
     private TimeProvider timeProvider;
 
     public HUD() {
-        uiCam = new OrthographicCamera();
-        uiCam.setToOrtho(false, 800, 600);
-        uiCam.update();
     }
 
     private static Texture getWhitePixel() {
@@ -128,8 +123,6 @@ public class HUD {
         if (data == null) {
             return;
         }
-        sr.setProjectionMatrix(uiCam.combined);
-        batch.setProjectionMatrix(uiCam.combined);
 
         float hpPct = Math.max(0, Math.min(1, data.getHp() / data.getMaxHp()));
         float spPct = Math.max(0, Math.min(1, data.getStamina() / data.getMaxStamina()));

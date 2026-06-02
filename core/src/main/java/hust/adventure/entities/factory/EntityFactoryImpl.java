@@ -73,8 +73,15 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public Player createPlayer(float x, float y, Inventory inventory, PlayerController controller) {
-        Player player = new Player(x, y, inventory, controller, collisionManager, assetManager,
-                ProgressContext.instance.getPlayerStats());
+        Player player = Player.builder()
+                .startX(x)
+                .startY(y)
+                .inventory(inventory)
+                .controller(controller)
+                .collisionManager(collisionManager)
+                .assetManager(assetManager)
+                .stats(ProgressContext.instance.getPlayerStats())
+                .build();
         player.setFactory(this);
         player.setCollider(new Collider(player, CollisionLayer.PLAYER, Collider.Shape.RECTANGLE));
         entityManager.addEntity(player);
@@ -87,8 +94,14 @@ public class EntityFactoryImpl implements EntityFactory {
         if (config == null) {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
-        final Enemy enemy = new Enemy(x, y, collisionManager, config, ProgressContext.instance.getPlayer(),
-                entityManager);
+        final Enemy enemy = Enemy.builder()
+                .x(x)
+                .y(y)
+                .collisionManager(collisionManager)
+                .config(config)
+                .player(ProgressContext.instance.getPlayer())
+                .entityManager(entityManager)
+                .build();
 
         if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
             try {
