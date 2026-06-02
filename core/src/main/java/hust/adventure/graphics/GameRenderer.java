@@ -22,6 +22,8 @@ import hust.adventure.ui.HUDData;
 import hust.adventure.ui.StatusEffectsData;
 import hust.adventure.ui.StatusEffectsHUD;
 import hust.adventure.ui.InventoryUI;
+import hust.adventure.ui.InventoryItemData;
+import hust.adventure.ui.InventoryUIData;
 import hust.adventure.ui.LevelUpUI;
 import hust.adventure.ui.DamageTextManager;
 import hust.adventure.ui.DebugUI;
@@ -209,10 +211,18 @@ public class GameRenderer {
             statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
-            inventoryUI.render(player, batch, shapeRenderer, font);
+            final java.util.List<InventoryItemData> itemDataList = new java.util.ArrayList<>();
+            if (player.getInventory() != null) {
+                for (final java.util.Map.Entry<hust.adventure.items.base.Item, Integer> entry : player.getInventory().getReadOnlyItems().entrySet()) {
+                    final hust.adventure.items.base.Item item = entry.getKey();
+                    itemDataList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(), item.getSpritePath(), entry.getValue()));
+                }
+            }
+            final InventoryUIData invData = new InventoryUIData(itemDataList);
+            inventoryUI.render(batch, shapeRenderer, font, invData);
         }
-        if (levelUpUI != null && player != null) {
-            levelUpUI.render(player, batch, shapeRenderer, font);
+        if (levelUpUI != null) {
+            levelUpUI.render(batch, shapeRenderer, font);
         }
 
         if (debugUI != null) {

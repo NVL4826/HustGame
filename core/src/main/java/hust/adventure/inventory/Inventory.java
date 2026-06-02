@@ -6,6 +6,9 @@ import java.util.Map;
 
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
 
 /**
  * Lớp quản lý túi đồ của người chơi. Lưu trữ danh sách các vật phẩm và số lượng tương ứng. Tuân thủ Flyweight pattern:
@@ -30,6 +33,7 @@ public class Inventory {
         if (item == null || amount <= 0)
             return;
         items.put(item, items.getOrDefault(item, 0) + amount);
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_CHANGED, this));
     }
 
     /**
@@ -64,6 +68,7 @@ public class Inventory {
             } else {
                 items.put(item, newAmount);
             }
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_CHANGED, this));
             return true;
         }
         return false;
@@ -102,6 +107,9 @@ public class Inventory {
      * Làm trống túi đồ.
      */
     public void clear() {
-        items.clear();
+        if (!items.isEmpty()) {
+            items.clear();
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_CHANGED, this));
+        }
     }
 }

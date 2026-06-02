@@ -7,36 +7,41 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.Array;
 
-import hust.adventure.ui.components.UpgradeAction;
-import hust.adventure.entities.player.Player;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Modern Level Up UI rendering and key input delegation.
+ * Fully decoupled from Player and UpgradeAction models.
+ */
 public class LevelUpUI {
-    private OrthographicCamera uiCam;
-    private Array<UpgradeAction> currentChoices;
+    private final OrthographicCamera uiCam;
+    private final List<LevelUpChoiceData> currentChoices = new ArrayList<>();
     private Runnable onResume;
 
     public LevelUpUI() {
         uiCam = new OrthographicCamera();
         uiCam.setToOrtho(false, 800, 600);
         uiCam.update();
-        currentChoices = new Array<>();
     }
 
-    public void setOnResume(Runnable onResume) {
+    public void setOnResume(final Runnable onResume) {
         this.onResume = onResume;
     }
 
-    public void setChoices(Array<UpgradeAction> choices) {
+    public void setChoices(final LevelUpUIData data) {
         this.currentChoices.clear();
-        this.currentChoices.addAll(choices);
+        if (data != null && data.getChoices() != null) {
+            this.currentChoices.addAll(data.getChoices());
+        }
     }
 
-    public void render(Player player, SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font) {
+    public void render(final SpriteBatch batch, final ShapeRenderer shapeRenderer, final BitmapFont font) {
         if (currentChoices.isEmpty())
             return;
 
@@ -53,10 +58,10 @@ public class LevelUpUI {
         shapeRenderer.rect(0, 0, 800, 600);
 
         // Khung Level Up
-        float panelW = 500;
-        float panelH = 400;
-        float panelX = (800 - panelW) / 2;
-        float panelY = (600 - panelH) / 2;
+        final float panelW = 500;
+        final float panelH = 400;
+        final float panelX = (800 - panelW) / 2;
+        final float panelY = (600 - panelH) / 2;
 
         shapeRenderer.setColor(new Color(0.1f, 0.2f, 0.4f, 1f));
         shapeRenderer.rect(panelX, panelY, panelW, panelH);
@@ -79,9 +84,9 @@ public class LevelUpUI {
 
         int offsetY = 130;
 
-        for (int i = 0; i < currentChoices.size; i++) {
-            UpgradeAction action = currentChoices.get(i);
-            int choiceNum = i + 1;
+        for (int i = 0; i < currentChoices.size(); i++) {
+            final LevelUpChoiceData action = currentChoices.get(i);
+            final int choiceNum = i + 1;
 
             font.setColor(Color.CYAN);
             font.draw(batch, "[" + choiceNum + "] " + action.getName(), panelX + 70, panelY + panelH - offsetY);
@@ -94,15 +99,15 @@ public class LevelUpUI {
         batch.end();
     }
 
-    public void update(Player player) {
-        if (currentChoices.isEmpty() || player == null) {
+    public void update(final int keyPressed, final java.util.function.Consumer<Integer> choiceCallback) {
+        if (currentChoices.isEmpty()) {
             return;
         }
 
-        int keyPressed = player.getController().getJustPressedNum();
-        if (keyPressed > 0 && keyPressed <= currentChoices.size) {
-            UpgradeAction action = currentChoices.get(keyPressed - 1);
-            action.execute(player);
+        if (keyPressed > 0 && keyPressed <= currentChoices.size()) {
+            if (choiceCallback != null) {
+                choiceCallback.accept(keyPressed - 1);
+            }
             EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
             if (onResume != null) {
                 onResume.run();

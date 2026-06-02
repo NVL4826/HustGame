@@ -73,6 +73,7 @@ public class ItemDrop extends MapObject {
         this.color = color;
         this.bobTimer = (float) (Math.random() * Math.PI * 2); // random phase
         setDestroyed(false);
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ITEM_DROPPED, this));
     }
 
     @Override

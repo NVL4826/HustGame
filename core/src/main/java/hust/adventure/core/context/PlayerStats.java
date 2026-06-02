@@ -1,5 +1,9 @@
 package hust.adventure.core.context;
 
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
+
 /**
  * Encapsulates the core progression and combat statistics of the Player. Part of the SRP refactoring of
  * ProgressContext.
@@ -30,7 +34,11 @@ public class PlayerStats {
      * @param hp new HP.
      */
     public void setHp(float hp) {
+        float oldHp = this.hp;
         this.hp = Math.max(0, Math.min(this.maxHp, hp));
+        if (oldHp > 0 && this.hp <= 0) {
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAYER_DIED, null));
+        }
     }
 
     /**
@@ -49,7 +57,11 @@ public class PlayerStats {
      */
     public void setMaxHp(float maxHp) {
         this.maxHp = maxHp;
+        float oldHp = this.hp;
         this.hp = Math.min(this.hp, this.maxHp);
+        if (oldHp > 0 && this.hp <= 0) {
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAYER_DIED, null));
+        }
     }
 
     /**

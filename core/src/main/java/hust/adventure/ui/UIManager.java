@@ -24,10 +24,22 @@ public class UIManager implements UIProvider, Disposable {
         this.debugUI = new DebugUI();
     }
 
-    public void update(final float delta, final Player player) {
+    public void update(final float delta, final Player player, final java.util.function.Consumer<Integer> choiceCallback) {
         damageTextManager.update(delta);
-        inventoryUI.update(player);
-        levelUpUI.update(player);
+
+        final int keyPressed = (player != null && player.getController() != null) ? player.getController().getJustPressedNum() : 0;
+
+        final java.util.List<InventoryItemData> itemDataList = new java.util.ArrayList<>();
+        if (player != null && player.getInventory() != null) {
+            for (final java.util.Map.Entry<hust.adventure.items.base.Item, Integer> entry : player.getInventory().getReadOnlyItems().entrySet()) {
+                final hust.adventure.items.base.Item item = entry.getKey();
+                itemDataList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(), item.getSpritePath(), entry.getValue()));
+            }
+        }
+        final InventoryUIData invData = new InventoryUIData(itemDataList);
+        inventoryUI.update(keyPressed, invData);
+
+        levelUpUI.update(keyPressed, choiceCallback);
     }
 
     public HUD getHud() {

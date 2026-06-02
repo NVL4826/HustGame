@@ -22,7 +22,6 @@ import hust.adventure.core.LootDropService;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.entities.EntityManager;
-import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
 import hust.adventure.entities.player.Player;
@@ -38,6 +37,8 @@ import hust.adventure.screens.levels.LevelBehavior;
 import hust.adventure.screens.levels.LevelContext;
 import hust.adventure.ui.UIManager;
 import hust.adventure.ui.LevelUpChoiceBuilder;
+import hust.adventure.ui.LevelUpChoiceData;
+import hust.adventure.ui.LevelUpUIData;
 import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.world.InfiniteMapRenderer;
@@ -60,6 +61,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private final EntityFactory entityFactory;
     private final CollisionManager collisionManager;
     private final DebugInputHandler debugInputHandler;
+    private final Array<UpgradeAction> currentLevelUpActions = new Array<>();
 
     private CameraManager cameraManager;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -106,6 +108,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.uiManager.getDebugUI().setInputHandler(debugInputHandler);
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
+        EventDispatcher.getInstance().addListener(EventType.PLAYER_DIED, this);
 
         initShaders();
     }
@@ -256,12 +259,6 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     @Override
     public void render(float delta) {
-        // ── Check player death ──────────────────────────────────────────────
-        if (player != null && ProgressContext.instance.getHp() <= 0 && !game.getScreenTransition().isTransitioning()) {
-            game.getScreenTransition().fadeOut(new GameOverScreen(game), 0.8f);
-            return;
-        }
-
         if (state == PlayMode.RUNNING && !game.getScreenTransition().isTransitioning()) {
             entityManager.update(delta, entityFactory);
 
@@ -272,7 +269,14 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         // uiManager.update chạy MỌI lúc (kể cả IN_UI) để nhận input từ LevelUpUI, InventoryUI
-        uiManager.update(delta, player);
+        uiManager.update(delta, player, index -> {
+            if (index >= 0 && index < currentLevelUpActions.size) {
+                final UpgradeAction action = currentLevelUpActions.get(index);
+                if (action != null) {
+                    action.execute(player);
+                }
+            }
+        });
 
         if (gameRenderer != null) {
             gameRenderer.render(delta, mapRenderer, backgroundLayers, foregroundLayers, player, shapeRenderer, font,
@@ -286,7 +290,15 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     private void handleInput() {
         if (inputReader.isInventoryJustPressed()) {
-            ProgressContext.instance.setInventoryOpen(!ProgressContext.instance.isInventoryOpen());
+            boolean nextState = !ProgressContext.instance.isInventoryOpen();
+            ProgressContext.instance.setInventoryOpen(nextState);
+            if (nextState) {
+                this.state = PlayMode.IN_UI;
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_OPENED, null));
+            } else {
+                this.state = PlayMode.RUNNING;
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_CLOSED, null));
+            }
             EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
         }
         if (inputReader.isDebugJustPressed()) {
@@ -335,10 +347,24 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (event.getType() == EventType.LEVEL_UP) {
             this.state = PlayMode.IN_UI;
             final Array<UpgradeAction> choices = LevelUpChoiceBuilder.getLevelUpChoices(player);
-            uiManager.getLevelUpUI().setChoices(choices);
+            this.currentLevelUpActions.clear();
+            this.currentLevelUpActions.addAll(choices);
+
+            final java.util.List<LevelUpChoiceData> choiceDTOs = new java.util.ArrayList<>();
+            for (int i = 0; i < choices.size; i++) {
+                final UpgradeAction action = choices.get(i);
+                choiceDTOs.add(new LevelUpChoiceData(action.getName(), action.getDescription()));
+            }
+            final LevelUpUIData levelUpUIData = new LevelUpUIData(choiceDTOs);
+
+            uiManager.getLevelUpUI().setChoices(levelUpUIData);
             uiManager.getLevelUpUI().setOnResume(() -> {
                 this.state = PlayMode.RUNNING;
             });
+        } else if (event.getType() == EventType.PLAYER_DIED) {
+            if (!game.getScreenTransition().isTransitioning()) {
+                game.getScreenTransition().fadeOut(new GameOverScreen(game), 0.8f);
+            }
         }
 
         // Delegate to behavior if it listens to events
@@ -435,6 +461,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     @Override
     public void dispose() {
         EventDispatcher.getInstance().removeListener(EventType.LEVEL_UP, this);
+        EventDispatcher.getInstance().removeListener(EventType.PLAYER_DIED, this);
 
         if (behavior != null) {
             behavior.dispose(this);
