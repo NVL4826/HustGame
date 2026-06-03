@@ -1,6 +1,5 @@
-package hust.adventure.screens;
+package hust.adventure.core.context;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;

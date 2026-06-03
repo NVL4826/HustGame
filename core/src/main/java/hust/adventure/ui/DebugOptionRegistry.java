@@ -3,11 +3,11 @@ package hust.adventure.ui;
 import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.ItemDataLoader;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.core.data.LevelDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.items.base.ItemConfig;
-import hust.adventure.screens.LevelConfig;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.weapons.BaseWeapon;
@@ -20,33 +20,26 @@ import java.util.List;
  * Registry containing dynamic lists of debug options for maps, items, and monsters.
  */
 public class DebugOptionRegistry {
-    private static EnemyDataLoader enemyDataManager;
-    private static ItemDataLoader itemDataManager;
-    private static WeaponDataLoader weaponDataManager;
-    private static GearDataLoader gearDataManager;
-    private static LevelDataLoader levelDataManager;
+    private final EnemyDataLoader enemyDataManager;
+    private final ItemDataLoader itemDataManager;
+    private final WeaponDataLoader weaponDataManager;
+    private final GearDataLoader gearDataManager;
+    private final LevelDataLoader levelDataManager;
 
-    public static void setEnemyDataManager(final EnemyDataLoader manager) {
-        enemyDataManager = manager;
+    /**
+     * Constructs a new DebugOptionRegistry with dependencies.
+     */
+    public DebugOptionRegistry(final EnemyDataLoader enemyDataManager, final ItemDataLoader itemDataManager,
+            final WeaponDataLoader weaponDataManager, final GearDataLoader gearDataManager,
+            final LevelDataLoader levelDataManager) {
+        this.enemyDataManager = enemyDataManager;
+        this.itemDataManager = itemDataManager;
+        this.weaponDataManager = weaponDataManager;
+        this.gearDataManager = gearDataManager;
+        this.levelDataManager = levelDataManager;
     }
 
-    public static void setItemDataManager(final ItemDataLoader manager) {
-        itemDataManager = manager;
-    }
-
-    public static void setWeaponDataManager(final WeaponDataLoader manager) {
-        weaponDataManager = manager;
-    }
-
-    public static void setGearDataManager(final GearDataLoader manager) {
-        gearDataManager = manager;
-    }
-
-    public static void setLevelDataManager(final LevelDataLoader manager) {
-        levelDataManager = manager;
-    }
-
-    private static DebugOption[] getMapOptions() {
+    private DebugOption[] getMapOptions() {
         final List<DebugOption> list = new ArrayList<>();
         if (levelDataManager != null) {
             for (final LevelConfig config : levelDataManager.getAllConfigs()) {
@@ -56,7 +49,7 @@ public class DebugOptionRegistry {
         return list.toArray(new DebugOption[0]);
     }
 
-    private static DebugOption[] getItemOptions() {
+    private DebugOption[] getItemOptions() {
         final List<DebugOption> list = new ArrayList<>();
         if (itemDataManager != null) {
             for (final ItemConfig config : itemDataManager.getAllConfigs()) {
@@ -73,7 +66,7 @@ public class DebugOptionRegistry {
         return list.toArray(new DebugOption[0]);
     }
 
-    private static DebugOption[] getEquipOptions(final Player player) {
+    private DebugOption[] getEquipOptions(final Player player) {
         final List<DebugOption> list = new ArrayList<>();
 
         if (weaponDataManager != null) {
@@ -108,7 +101,7 @@ public class DebugOptionRegistry {
         return list.toArray(new DebugOption[0]);
     }
 
-    private static DebugOption[] getMonsterOptions() {
+    private DebugOption[] getMonsterOptions() {
         final List<DebugOption> list = new ArrayList<>();
         if (enemyDataManager != null) {
             for (final String type : enemyDataManager.getAllEnemyTypes()) {
@@ -127,7 +120,7 @@ public class DebugOptionRegistry {
      * @param player the player instance
      * @return an array of DebugOption, or null if the mode is NONE or invalid
      */
-    public static DebugOption[] getOptions(final SelectionMode mode, final Player player) {
+    public DebugOption[] getOptions(final SelectionMode mode, final Player player) {
         if (mode == null) {
             return null;
         }

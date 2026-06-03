@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import hust.adventure.HustGame;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.screens.BaseScreen;
-import hust.adventure.screens.LevelConfig;
 import hust.adventure.screens.PlayScreen;
 
 /**

@@ -11,7 +11,6 @@ import hust.adventure.entities.ExpGem;
 import hust.adventure.entities.base.Character;
 import hust.adventure.entities.base.Targetable;
 import hust.adventure.entities.state.MovingState;
-import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.gear.GearManager;
 import hust.adventure.items.weapons.BaseWeapon;
@@ -24,6 +23,7 @@ import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.core.context.PlayerStats;
 import hust.adventure.entities.factory.EntityFactory;
+import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.entities.base.MapObject;
 
 /**
@@ -218,7 +218,6 @@ public class Player extends Character implements Targetable {
             Color color = batch.getColor();
             batch.setColor(color.r, color.g, color.b, oldAlpha);
         }
-        weaponManager.draw(batch);
     }
 
     public void setCollisionManager(final CollisionManager newManager) {

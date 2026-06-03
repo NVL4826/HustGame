@@ -1,19 +1,19 @@
 package hust.adventure.entities;
 
-import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.graphics.LightProvider;
+import hust.adventure.entities.base.LightProvider;
+import hust.adventure.entities.base.GameLight;
 
 /**
  * Environmental entity: A static candle that emits a flickering light.
  */
 public class Candle extends MapObject {
     private final Texture texture;
-    private final PointLight light;
+    private final GameLight light;
 
     public Candle(float x, float y, Texture texture, LightProvider lightProvider) {
         super(x, y, texture.getWidth(), texture.getHeight());

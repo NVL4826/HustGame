@@ -1,11 +1,11 @@
 package hust.adventure.gamestate;
 
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 
 public interface GameState {
-    void enter(ProgressContext context);
+    void enter(GameProgressContext context);
 
-    void update(ProgressContext context, float delta);
+    void update(GameProgressContext context, float delta);
 
-    void exit(ProgressContext context);
+    void exit(GameProgressContext context);
 }

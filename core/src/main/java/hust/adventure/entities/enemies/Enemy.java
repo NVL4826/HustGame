@@ -18,7 +18,6 @@ import hust.adventure.entities.base.Character;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.Damageable;
-import hust.adventure.graphics.ShapeDrawUtils;
 
 /**
  * Base class for all enemy types. Inherits core living entity logic from BaseActor.
@@ -230,9 +229,6 @@ public class Enemy extends Character {
             if (frame != null) {
                 batch.draw(frame, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight());
             }
-        } else {
-            ShapeDrawUtils.drawRect(batch, getX() - getWidth() / 2f, getY() - getHeight() / 2f, getWidth(), getHeight(),
-                    Color.ORANGE);
         }
     }
 

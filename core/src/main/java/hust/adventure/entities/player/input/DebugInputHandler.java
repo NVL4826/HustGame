@@ -1,5 +1,6 @@
-package hust.adventure.input;
+package hust.adventure.entities.player.input;
 
+import hust.adventure.input.InputReader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -36,6 +37,7 @@ public class DebugInputHandler {
     private final InputReader inputReader;
     private final WeaponFactory weaponFactory;
     private final GearFactory gearFactory;
+    private final DebugOptionRegistry debugOptionRegistry;
 
     // States for debug selection
     private SelectionMode activeMode = SelectionMode.NONE;
@@ -54,7 +56,7 @@ public class DebugInputHandler {
      */
     public DebugInputHandler(final UIManager uiManager, final EntityFactory entityFactory,
             final GameAssetManager assetManager, final InputReader inputReader, final WeaponFactory weaponFactory,
-            final GearFactory gearFactory) {
+            final GearFactory gearFactory, final DebugOptionRegistry debugOptionRegistry) {
         if (inputReader == null) {
             throw new IllegalArgumentException("inputReader cannot be null");
         }
@@ -64,6 +66,7 @@ public class DebugInputHandler {
         this.inputReader = inputReader;
         this.weaponFactory = weaponFactory;
         this.gearFactory = gearFactory;
+        this.debugOptionRegistry = debugOptionRegistry;
     }
 
     /**
@@ -218,7 +221,7 @@ public class DebugInputHandler {
      * @return an array of DebugOption
      */
     public DebugOption[] getCurrentOptions(final Player player) {
-        return DebugOptionRegistry.getOptions(activeMode, player);
+        return debugOptionRegistry.getOptions(activeMode, player);
     }
 
     private void executeDebugAction(final SelectionMode mode, final DebugOption option, final Player player) {

@@ -5,13 +5,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import hust.adventure.HustGame;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.player.Player;
+import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.gamestate.PlayMode;
-import hust.adventure.graphics.LightProvider;
-import hust.adventure.input.PlayerController;
-import hust.adventure.screens.LevelConfig;
+import hust.adventure.entities.base.LightProvider;
 import hust.adventure.ui.UIProvider;
 
 /**

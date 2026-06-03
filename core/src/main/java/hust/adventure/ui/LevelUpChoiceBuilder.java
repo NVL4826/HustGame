@@ -19,30 +19,19 @@ import hust.adventure.ui.components.WeaponUpgradeAction;
  * Builder class that generates random upgrade choices for a player when leveling up. Evaluates the player's current
  * weapons and gears to determine possible upgrades.
  */
-public final class LevelUpChoiceBuilder {
-    private static GearDataLoader gearDataManager;
-    private static WeaponDataLoader weaponDataManager;
-
-    private LevelUpChoiceBuilder() {
-        // Prevent instantiation
-    }
+public class LevelUpChoiceBuilder {
+    private final GearDataLoader gearDataManager;
+    private final WeaponDataLoader weaponDataManager;
+    private final UpgradeCatalog upgradeCatalog;
 
     /**
-     * Sets the GearDataManager instance used for retrieving available gears.
-     *
-     * @param manager the GearDataManager instance
+     * Constructs a new LevelUpChoiceBuilder with dependencies.
      */
-    public static void setGearDataManager(final GearDataLoader manager) {
-        gearDataManager = manager;
-    }
-
-    /**
-     * Sets the WeaponDataManager instance used for retrieving available weapons.
-     *
-     * @param manager the WeaponDataManager instance
-     */
-    public static void setWeaponDataManager(final WeaponDataLoader manager) {
-        weaponDataManager = manager;
+    public LevelUpChoiceBuilder(final GearDataLoader gearDataManager, final WeaponDataLoader weaponDataManager,
+            final UpgradeCatalog upgradeCatalog) {
+        this.gearDataManager = gearDataManager;
+        this.weaponDataManager = weaponDataManager;
+        this.upgradeCatalog = upgradeCatalog;
     }
 
     /**
@@ -52,7 +41,7 @@ public final class LevelUpChoiceBuilder {
      * @param player The player who leveled up and is choosing an upgrade.
      * @return An Array of UpgradeAction choices.
      */
-    public static Array<UpgradeAction> getLevelUpChoices(final Player player) {
+    public Array<UpgradeAction> getLevelUpChoices(final Player player) {
         if (player == null) {
             return new Array<>();
         }
@@ -73,13 +62,13 @@ public final class LevelUpChoiceBuilder {
             }
 
             if (weapon == null) {
-                possibleChoices.add(new WeaponUpgradeAction(id, UpgradeCatalog.getWeaponName(id),
-                        UpgradeCatalog.getWeaponLevelDescription(id, 1), true));
+                possibleChoices.add(new WeaponUpgradeAction(id, upgradeCatalog.getWeaponName(id),
+                        upgradeCatalog.getWeaponLevelDescription(id, 1), true));
             } else if (weapon.getLevel() < 5) {
                 final int nextLevel = weapon.getLevel() + 1;
                 possibleChoices
-                        .add(new WeaponUpgradeAction(id, UpgradeCatalog.getWeaponName(id) + " (Cấp " + nextLevel + ")",
-                                UpgradeCatalog.getWeaponLevelDescription(id, nextLevel), false));
+                        .add(new WeaponUpgradeAction(id, upgradeCatalog.getWeaponName(id) + " (Cấp " + nextLevel + ")",
+                                upgradeCatalog.getWeaponLevelDescription(id, nextLevel), false));
             }
         }
 
@@ -91,13 +80,13 @@ public final class LevelUpChoiceBuilder {
         for (final String id : gearIds) {
             final Gear gear = player.getGearManager().getGear(id);
             if (gear == null) {
-                possibleChoices.add(new GearUpgradeAction(id, UpgradeCatalog.getGearName(id),
-                        UpgradeCatalog.getGearLevelDescription(id, 1), true));
+                possibleChoices.add(new GearUpgradeAction(id, upgradeCatalog.getGearName(id),
+                        upgradeCatalog.getGearLevelDescription(id, 1), true));
             } else if (gear.getLevel() < 5) {
                 final int nextLevel = gear.getLevel() + 1;
                 possibleChoices
-                        .add(new GearUpgradeAction(id, UpgradeCatalog.getGearName(id) + " (Cấp " + nextLevel + ")",
-                                UpgradeCatalog.getGearLevelDescription(id, nextLevel), false));
+                        .add(new GearUpgradeAction(id, upgradeCatalog.getGearName(id) + " (Cấp " + nextLevel + ")",
+                                upgradeCatalog.getGearLevelDescription(id, nextLevel), false));
             }
         }
 

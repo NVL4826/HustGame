@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.player.Player;
@@ -29,10 +30,12 @@ import hust.adventure.ui.LevelUpUI;
 import hust.adventure.ui.DamageTextManager;
 import hust.adventure.ui.DebugUI;
 import hust.adventure.ui.DebugInfoUIData;
-import hust.adventure.screens.LevelConfig;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.world.WorldManager;
+import hust.adventure.entities.ExpGem;
+import hust.adventure.items.weapons.impl.GarlicAuraWeapon;
+import hust.adventure.items.weapons.impl.WhipWeapon;
 
 /**
  * Centralized renderer for the game, responsible for map, entities, and UI.
@@ -60,6 +63,7 @@ public class GameRenderer {
     private final GlyphLayout layout = new GlyphLayout();
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
     private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
+    private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
 
     @lombok.Builder
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
@@ -121,7 +125,7 @@ public class GameRenderer {
         // 2. Vẽ Nhân vật và thực thể (Y-sorting)
         batch.setProjectionMatrix(cameraManager.getCamera().combined);
         batch.begin();
-        entityManager.draw(batch);
+        drawEntities(batch);
 
         // Vẽ tên của quái vật
         for (final MapObject entity : entityManager.getEntities()) {
@@ -153,6 +157,32 @@ public class GameRenderer {
         }
         font.setColor(Color.WHITE); // Reset font color
 
+        // Draw weapon effects in presentation layer
+        if (player != null && player.getWeaponManager() != null) {
+            for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
+                if (weapon instanceof GarlicAuraWeapon) {
+                    final GarlicAuraWeapon garlic = (GarlicAuraWeapon) weapon;
+                    final float px = player.getX();
+                    final float py = player.getY();
+                    final float baseRadius = garlic.getArea();
+                    final float rotationAngle = garlic.getRotationAngle();
+                    ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.6f, rotationAngle,
+                            new Color(0.85f, 0.95f, 0.75f, 0.3f));
+                    ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.8f, -rotationAngle * 0.7f,
+                            new Color(0.85f, 0.95f, 0.75f, 0.25f));
+                    ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 1.0f, rotationAngle * 0.4f,
+                            new Color(0.85f, 0.95f, 0.75f, 0.15f));
+                } else if (weapon instanceof WhipWeapon) {
+                    final WhipWeapon whip = (WhipWeapon) weapon;
+                    if (whip.getFlashTimer() > 0) {
+                        final com.badlogic.gdx.math.Rectangle hitArea = whip.getHitArea();
+                        ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height,
+                                new Color(1, 1, 1, 0.5f));
+                    }
+                }
+            }
+        }
+
         batch.end();
 
         // 3. Stencil Buffer cho Foreground
@@ -173,7 +203,7 @@ public class GameRenderer {
 
         batch.setShader(silhouetteShader);
         batch.begin();
-        entityManager.draw(batch);
+        drawEntities(batch);
         batch.end();
         batch.setShader(null);
 
@@ -225,17 +255,19 @@ public class GameRenderer {
                 isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
                 isConfused = player.hasStatus(StatusFlag.CONFUSED);
             }
-            statusData.set(ProgressContext.instance.isHasNao(),
-                    ProgressContext.instance.isHasUsb(), ProgressContext.instance.getEnemyTimeScale(),
-                    ProgressContext.instance.getShowEnemiesTimer(), isSpeedBoosted, isHpRegen, isConfused);
+            statusData.set(ProgressContext.instance.isHasNao(), ProgressContext.instance.isHasUsb(),
+                    ProgressContext.instance.getEnemyTimeScale(), ProgressContext.instance.getShowEnemiesTimer(),
+                    isSpeedBoosted, isHpRegen, isConfused);
             statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
             final java.util.List<InventoryItemData> itemDataList = new java.util.ArrayList<>();
             if (player.getInventory() != null) {
-                for (final java.util.Map.Entry<hust.adventure.items.base.Item, Integer> entry : player.getInventory().getReadOnlyItems().entrySet()) {
+                for (final java.util.Map.Entry<hust.adventure.items.base.Item, Integer> entry : player.getInventory()
+                        .getReadOnlyItems().entrySet()) {
                     final hust.adventure.items.base.Item item = entry.getKey();
-                    itemDataList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(), item.getSpritePath(), entry.getValue()));
+                    itemDataList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(),
+                            item.getSpritePath(), entry.getValue()));
                 }
             }
             final InventoryUIData invData = new InventoryUIData(itemDataList);
@@ -270,8 +302,8 @@ public class GameRenderer {
 
                     if (player.getWeaponManager() != null && player.getWeaponManager().getWeapons() != null) {
                         for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
-                            tempWeaponsList.add(String.format("%s (Lv.%d, Dmg:%.1f, CD:%.2fs)",
-                                    weapon.getName(), weapon.getLevel(), weapon.getEffectiveDamage(), weapon.getCooldown()));
+                            tempWeaponsList.add(String.format("%s (Lv.%d, Dmg:%.1f, CD:%.2fs)", weapon.getName(),
+                                    weapon.getLevel(), weapon.getEffectiveDamage(), weapon.getCooldown()));
                         }
                     }
 
@@ -289,7 +321,9 @@ public class GameRenderer {
                 }
 
                 final int fps = Gdx.graphics.getFramesPerSecond();
-                final int activeEntitiesCount = entityManager != null && entityManager.getEntities() != null ? entityManager.getEntities().size : 0;
+                final int activeEntitiesCount = entityManager != null && entityManager.getEntities() != null
+                        ? entityManager.getEntities().size
+                        : 0;
 
                 final Runtime runtime = Runtime.getRuntime();
                 final long totalMem = runtime.totalMemory();
@@ -298,8 +332,8 @@ public class GameRenderer {
                 final long totalMemoryMB = totalMem / (1024L * 1024L);
 
                 debugInfoData.set(px, py, speed, powerMultiplier, cooldownMultiplier, areaMultiplier, magnetMultiplier,
-                        stateName, mapName, fps, activeEntitiesCount, usedMemoryMB, totalMemoryMB,
-                        tempWeaponsList, tempGearsList);
+                        stateName, mapName, fps, activeEntitiesCount, usedMemoryMB, totalMemoryMB, tempWeaponsList,
+                        tempGearsList);
 
                 debugUI.render(batch, shapeRenderer, font, debugInfoData, player);
             } else {
@@ -339,5 +373,20 @@ public class GameRenderer {
 
     public CameraManager getcameraManager() {
         return cameraManager;
+    }
+
+    private void drawEntities(final SpriteBatch batch) {
+        final com.badlogic.gdx.utils.Array<MapObject> entities = entityManager.getEntities();
+        entities.sort(yComparator);
+
+        for (final MapObject entity : entities) {
+            if (entity instanceof ExpGem) {
+                ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f, entity.getY() - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight(), Color.GREEN);
+            } else if (entity instanceof Enemy && !entity.hasSprite()) {
+                ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f, entity.getY() - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight(), Color.ORANGE);
+            } else {
+                entity.draw(batch);
+            }
+        }
     }
 }

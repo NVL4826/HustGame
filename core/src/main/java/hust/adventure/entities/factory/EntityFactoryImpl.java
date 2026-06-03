@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
@@ -15,11 +16,11 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.entities.player.Player;
-import hust.adventure.input.PlayerController;
+import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.graphics.LightProvider;
+import hust.adventure.entities.base.LightProvider;
 import hust.adventure.entities.Candle;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.ExpGem;
@@ -97,7 +98,7 @@ public class EntityFactoryImpl implements EntityFactory {
                 if (texture != null) {
                     enemy.setStaticSprite(new TextureRegion(texture));
                 }
-            } catch (final Exception e) {
+            } catch (final GdxRuntimeException e) {
                 com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl",
                         "Failed to load static sprite: " + config.getSpritePath(), e);
             }
@@ -116,7 +117,7 @@ public class EntityFactoryImpl implements EntityFactory {
                     final float dur = config.getFrameDuration() > 0 ? config.getFrameDuration() : 0.1f;
                     enemy.setAnimation(new Animation<>(dur, frames));
                 }
-            } catch (final Exception e) {
+            } catch (final GdxRuntimeException e) {
                 com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl", "Failed to load animation frames", e);
             }
         }
@@ -158,7 +159,7 @@ public class EntityFactoryImpl implements EntityFactory {
         if (item != null && item.getSpritePath() != null && !item.getSpritePath().isEmpty()) {
             try {
                 itemTexture = assetManager.getTexture(item.getSpritePath());
-            } catch (Exception e) {
+            } catch (final GdxRuntimeException e) {
                 com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl",
                         "Failed to load item texture: " + item.getSpritePath(), e);
             }

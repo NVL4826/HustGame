@@ -1,10 +1,10 @@
-package hust.adventure.screens;
+package hust.adventure.core.data;
 
 import com.badlogic.gdx.utils.Array;
 
 /**
- * Data mapping helper representing the list of level configurations.
- * Used by libGDX Json deserialization to parse the configs/levels.json file.
+ * Data mapping helper representing the list of level configurations. Used by libGDX Json deserialization to parse the
+ * configs/levels.json file.
  */
 public class LevelConfigCatalog {
     private Array<LevelConfig> levels;

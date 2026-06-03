@@ -5,13 +5,13 @@ import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
+import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.base.StatusFlag;
 import hust.adventure.entities.base.Direction;
 import hust.adventure.entities.state.EntityState;
 import hust.adventure.entities.state.IdleState;
 import hust.adventure.entities.state.MovingState;
-import hust.adventure.input.PlayerController;
 
 public class PlayerMovementBehavior implements MovementBehavior {
     private PlayerController controller;

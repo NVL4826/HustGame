@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
-import hust.adventure.input.DebugInputHandler;
+import hust.adventure.entities.player.input.DebugInputHandler;
 
 /**
  * Renders the debug mode overlay panel when debug mode is enabled. Queries state from DebugInputHandler to render
@@ -57,8 +57,8 @@ public class DebugUI {
     }
 
     /**
-     * Renders the debug panel overlay and any active selection menus. Also renders the detailed
-     * F3 debug overlay if active.
+     * Renders the debug panel overlay and any active selection menus. Also renders the detailed F3 debug overlay if
+     * active.
      *
      * @param batch         the sprite batch
      * @param shapeRenderer the shape renderer
@@ -217,14 +217,12 @@ public class DebugUI {
                         font.setColor(Color.WHITE);
                         sb.setLength(0);
                         sb.append("> ").append(currentOptions[i].getDisplayName());
-                        font.draw(batch, sb, SELECT_X + 20f,
-                                SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
+                        font.draw(batch, sb, SELECT_X + 20f, SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
                     } else {
                         font.setColor(Color.LIGHT_GRAY);
                         sb.setLength(0);
                         sb.append("  ").append(currentOptions[i].getDisplayName());
-                        font.draw(batch, sb, SELECT_X + 20f,
-                                SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
+                        font.draw(batch, sb, SELECT_X + 20f, SELECT_Y + SELECT_HEIGHT - 75f - (i * 30f));
                     }
                 }
             }

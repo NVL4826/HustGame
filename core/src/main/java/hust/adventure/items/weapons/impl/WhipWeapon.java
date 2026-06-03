@@ -1,7 +1,5 @@
 package hust.adventure.items.weapons.impl;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import hust.adventure.collision.CollisionLayer;
@@ -12,7 +10,6 @@ import hust.adventure.entities.base.Damageable;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
-import hust.adventure.graphics.ShapeDrawUtils;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponConfig;
 
@@ -56,13 +53,12 @@ public class WhipWeapon extends BaseWeapon {
         }
     }
 
-    @Override
-    public void draw(final SpriteBatch batch) {
-        if (flashTimer > 0) {
-            // Draw a semi-transparent rectangle for the whip effect
-            ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height,
-                    new Color(1, 1, 1, 0.5f));
-        }
+    public float getFlashTimer() {
+        return flashTimer;
+    }
+
+    public Rectangle getHitArea() {
+        return hitArea;
     }
 
     private Direction getOppositeDirection(final Direction dir) {

@@ -262,7 +262,7 @@ public class BossFightBehavior implements LevelBehavior {
                     victory = true;
                     phase = PHASE_VICTORY;
                     textField.setVisible(false);
-                    Gdx.input.setInputProcessor(context.getInputReader());
+                    Gdx.input.setInputProcessor((com.badlogic.gdx.InputProcessor) context.getInputReader());
                 } else {
                     context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
                     shakeTimer = SHAKE_DURATION;

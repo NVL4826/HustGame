@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.HustGame;
 import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.screens.levels.LevelFactory;
 
 /**

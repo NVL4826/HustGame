@@ -7,9 +7,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SerializationException;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-import hust.adventure.screens.LevelConfig;
-import hust.adventure.screens.LevelConfigCatalog;
-
 /**
  * Manages the loading and retrieval of game level configurations. Decouples level configurations from hardcoded Java
  * files to assets/configs/levels.json.

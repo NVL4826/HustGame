@@ -1,4 +1,4 @@
-package hust.adventure.input;
+package hust.adventure.entities.player.input;
 
 /**
  * Interface for checking debug inputs.

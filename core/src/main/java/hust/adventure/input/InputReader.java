@@ -1,13 +1,15 @@
 package hust.adventure.input;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.IntSet;
+import hust.adventure.entities.player.input.PlayerController;
 
 /**
- * System for handling player input and mapping it to game actions.
- * Consolidates dynamic key state tracking using an internal IntSet to respect memory constraints.
+ * System for handling player input and mapping it to game actions. Consolidates dynamic key state tracking using an
+ * internal IntSet to respect memory constraints.
  */
-public class InputReader implements PlayerController {
+public class InputReader implements PlayerController, InputProcessor {
     private boolean up, down, left, right, running;
     private final IntSet justPressedKeys = new IntSet();
 

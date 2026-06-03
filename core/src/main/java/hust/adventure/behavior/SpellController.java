@@ -2,7 +2,7 @@ package hust.adventure.behavior;
 
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
-import hust.adventure.input.PlayerController;
+import hust.adventure.entities.player.input.PlayerController;
 
 /**
  * Controller class to encapsulate the logic of Player spells (Q/E/F).

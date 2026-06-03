@@ -11,11 +11,11 @@ import hust.adventure.effects.types.RegenEffect;
 import hust.adventure.effects.types.SpeedBoostEffect;
 import hust.adventure.entities.base.Character;
 import hust.adventure.entities.player.Player;
+import hust.adventure.items.FloatingTextInfo;
 import hust.adventure.items.consumable.ConsumableItem;
 import hust.adventure.items.consumable.ConsumableItemConfig;
 import hust.adventure.items.consumable.EffectConfig;
 import hust.adventure.items.consumable.FloatingTextConfig;
-import hust.adventure.ui.FloatingTextInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +112,7 @@ public class ItemFactory {
                 Color color;
                 try {
                     color = Color.valueOf(config.getColorHex());
-                } catch (final Exception e) {
+                } catch (final IllegalArgumentException e) {
                     color = Color.WHITE;
                 }
                 list.add(new FloatingTextInfo(config.getText(), color, config.getDuration(), config.getOffsetX(),

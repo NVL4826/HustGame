@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
+import hust.adventure.entities.base.LightProvider;
+import hust.adventure.entities.base.GameLight;
 
 /**
  * Manages the game's lighting system using Box2DLights. Decoupled from specific entities.
@@ -37,10 +39,10 @@ public class LightingManager implements LightProvider, Disposable {
     }
 
     @Override
-    public PointLight createPointLight(int rays, Color color, float distance, float x, float y) {
+    public GameLight createPointLight(int rays, Color color, float distance, float x, float y) {
         PointLight light = new PointLight(rayHandler, rays, color, distance, x, y);
         light.setSoft(true);
-        return light;
+        return new PointLightWrapper(light);
     }
 
     public void update() {
@@ -59,5 +61,28 @@ public class LightingManager implements LightProvider, Disposable {
     public void dispose() {
         rayHandler.dispose();
         world.dispose();
+    }
+
+    private static class PointLightWrapper implements GameLight {
+        private final PointLight pointLight;
+
+        public PointLightWrapper(final PointLight pointLight) {
+            this.pointLight = pointLight;
+        }
+
+        @Override
+        public void setDistance(final float distance) {
+            pointLight.setDistance(distance);
+        }
+
+        @Override
+        public void setPosition(final float x, final float y) {
+            pointLight.setPosition(x, y);
+        }
+
+        @Override
+        public void remove() {
+            pointLight.remove();
+        }
     }
 }

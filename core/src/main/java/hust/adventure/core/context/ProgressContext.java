@@ -3,17 +3,27 @@ package hust.adventure.core.context;
 import hust.adventure.gamestate.GameState;
 import hust.adventure.gamestate.PlayingGameState;
 import hust.adventure.inventory.Inventory;
-import hust.adventure.screens.LevelConfig;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.player.Player;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * Manages the global game data and current game flow state. Refactored to delegate domain-specific states to
  * PlayerStats, DebugContext, and SpellState.
  */
-public class ProgressContext {
+public class ProgressContext implements GameProgressContext {
+    private static Supplier<GameState> initialStateSupplier;
+
+    public static void setInitialStateSupplier(final java.util.function.Supplier<GameState> supplier) {
+        initialStateSupplier = supplier;
+        if (instance != null && instance.currentState == null && supplier != null) {
+            instance.currentState = supplier.get();
+        }
+    }
+
     public static ProgressContext instance = new ProgressContext();
 
     // Domain sub-contexts (SRP Separation)

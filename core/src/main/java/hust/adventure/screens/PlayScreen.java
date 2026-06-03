@@ -19,27 +19,27 @@ import com.badlogic.gdx.math.Vector2;
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.LootDropService;
+import hust.adventure.core.context.LevelManager;
 import hust.adventure.core.context.ProgressContext;
 import hust.adventure.core.data.EnemyDataLoader;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.player.PlayerPersistenceService;
+import hust.adventure.entities.player.input.DebugInputHandler;
+import hust.adventure.input.InputReader;
 import hust.adventure.events.*;
 import hust.adventure.gamestate.PlayMode;
 import hust.adventure.graphics.CameraManager;
 import hust.adventure.graphics.GameRenderer;
 import hust.adventure.graphics.LightingManager;
-import hust.adventure.input.DebugInputHandler;
-import hust.adventure.input.InputReader;
 import hust.adventure.screens.levels.LevelBehavior;
 import hust.adventure.screens.levels.LevelContext;
 import hust.adventure.ui.UIManager;
-import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.LevelUpChoiceData;
 import hust.adventure.ui.LevelUpUIData;
-import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
@@ -97,15 +97,14 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.entityManager = new EntityManager();
         this.collisionManager = new CollisionManager(entityManager, 64f);
 
-        final EnemyDataLoader enemyDataManager = new EnemyDataLoader("configs/enemies.json");
-        DebugOptionRegistry.setEnemyDataManager(enemyDataManager);
+        final EnemyDataLoader enemyDataManager = game.getEnemyDataManager();
         this.entityFactory = new EntityFactoryImpl(game.getAssetManager(), entityManager, collisionManager,
                 enemyDataManager);
         this.uiManager = new UIManager();
         this.inputReader = new InputReader();
         this.lightingManager = new LightingManager();
         this.debugInputHandler = new DebugInputHandler(uiManager, entityFactory, game.getAssetManager(), inputReader,
-                game.getWeaponFactory(), game.getGearFactory());
+                game.getWeaponFactory(), game.getGearFactory(), game.getDebugOptionRegistry());
         this.uiManager.getDebugUI().setInputHandler(debugInputHandler);
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
@@ -205,20 +204,12 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             lootDropService = new LootDropService(entityFactory, game.getAssetManager());
         }
 
-        gameRenderer = GameRenderer.builder()
-                .cameraManager(cameraManager)
-                .entityManager(entityManager)
-                .batch(game.getSpriteBatch())
-                .silhouetteShader(silhouetteShader)
-                .discardShader(discardShader)
-                .hud(uiManager.getHud())
-                .statusEffectsHUD(uiManager.getStatusEffectsHUD())
-                .inventoryUI(uiManager.getInventoryUI())
-                .levelUpUI(uiManager.getLevelUpUI())
-                .damageTextManager(uiManager.getDamageTextManager())
-                .debugUI(uiManager.getDebugUI())
-                .worldManager(worldManager)
-                .build();
+        gameRenderer = GameRenderer.builder().cameraManager(cameraManager).entityManager(entityManager)
+                .batch(game.getSpriteBatch()).silhouetteShader(silhouetteShader).discardShader(discardShader)
+                .hud(uiManager.getHud()).statusEffectsHUD(uiManager.getStatusEffectsHUD())
+                .inventoryUI(uiManager.getInventoryUI()).levelUpUI(uiManager.getLevelUpUI())
+                .damageTextManager(uiManager.getDamageTextManager()).debugUI(uiManager.getDebugUI())
+                .worldManager(worldManager).build();
 
         setupLayerIndices();
 
@@ -345,7 +336,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
         for (final WorldManager.Portal portal : worldManager.getPortals()) {
             if (portal.getBounds().contains(player.getX(), player.getY())) {
-                MapTransitionData data = new MapTransitionData(portal.getTargetMap(), portal.getSpawnX(), portal.getSpawnY());
+                MapTransitionData data = new MapTransitionData(portal.getTargetMap(), portal.getSpawnX(),
+                        portal.getSpawnY());
                 GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
 
                 EventDispatcher.getInstance().dispatch(event);
@@ -358,7 +350,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     public void onEvent(GameEvent<?> event) {
         if (event.getType() == EventType.LEVEL_UP) {
             this.state = PlayMode.IN_UI;
-            final Array<UpgradeAction> choices = LevelUpChoiceBuilder.getLevelUpChoices(player);
+            final Array<UpgradeAction> choices = game.getLevelUpChoiceBuilder().getLevelUpChoices(player);
             this.currentLevelUpActions.clear();
             this.currentLevelUpActions.addAll(choices);
 

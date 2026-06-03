@@ -11,8 +11,10 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.screens.LoadingScreen;
 import hust.adventure.screens.ScreenTransition;
+import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.ItemDataLoader;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.core.data.LevelDataLoader;
 import hust.adventure.core.data.WaveDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
@@ -22,13 +24,16 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.screens.levels.LevelFactory;
 import hust.adventure.screens.GameOverScreen;
-import hust.adventure.screens.LevelConfig;
 import hust.adventure.ui.HUD;
 import hust.adventure.ui.InventoryUI;
 import hust.adventure.entities.player.PlayerPersistenceService;
 import hust.adventure.graphics.ShapeDrawUtils;
 import hust.adventure.core.assets.AudioManager;
 import hust.adventure.core.assets.GameAssetManager;
+import hust.adventure.ui.DamageText;
+import hust.adventure.utils.GamePools;
+import hust.adventure.core.context.ProgressContext;
+import hust.adventure.gamestate.PlayingGameState;
 
 import com.badlogic.gdx.Screen;
 
@@ -59,8 +64,20 @@ public class HustGame extends Game implements EventListener {
     private WeaponFactory weaponFactory;
     private GearFactory gearFactory;
 
+    private ItemDataLoader itemDataManager;
+    private GearDataLoader gearDataManager;
+    private WeaponDataLoader weaponDataManager;
+    private EnemyDataLoader enemyDataManager;
+
+    private UpgradeCatalog upgradeCatalog;
+    private LevelUpChoiceBuilder levelUpChoiceBuilder;
+    private DebugOptionRegistry debugOptionRegistry;
+
     @Override
     public void create() {
+        ProgressContext.setInitialStateSupplier(PlayingGameState::new);
+        GamePools.registerPool(DamageText::new);
+
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         assetManager = new GameAssetManager();
@@ -90,37 +107,37 @@ public class HustGame extends Game implements EventListener {
         generator.dispose();
 
         // Nạp và đăng ký các vật phẩm từ cấu hình JSON
-        final ItemDataLoader itemDataManager = new ItemDataLoader("configs/items.json");
-        DebugOptionRegistry.setItemDataManager(itemDataManager);
+        itemDataManager = new ItemDataLoader("configs/items.json");
         final ItemFactory itemFactory = new ItemFactory();
         for (final ItemConfig config : itemDataManager.getAllConfigs()) {
             ItemManager.instance.register(itemFactory.createItem(config));
         }
 
         // Nạp và đăng ký cấu hình Gears từ JSON
-        final GearDataLoader gearDataManager = new GearDataLoader("configs/gears.json");
-        DebugOptionRegistry.setGearDataManager(gearDataManager);
+        gearDataManager = new GearDataLoader("configs/gears.json");
         this.gearFactory = new GearFactory(gearDataManager);
-        UpgradeCatalog.setGearDataManager(gearDataManager);
-        LevelUpChoiceBuilder.setGearDataManager(gearDataManager);
         GearUpgradeAction.setGearFactory(gearFactory);
         PlayerPersistenceService.setGearFactory(gearFactory);
 
         // Nạp và đăng ký cấu hình Weapons từ JSON
-        final WeaponDataLoader weaponDataManager = new WeaponDataLoader("configs/weapons.json");
-        DebugOptionRegistry.setWeaponDataManager(weaponDataManager);
+        weaponDataManager = new WeaponDataLoader("configs/weapons.json");
         this.weaponFactory = new WeaponFactory(weaponDataManager);
-        UpgradeCatalog.setWeaponDataManager(weaponDataManager);
-        LevelUpChoiceBuilder.setWeaponDataManager(weaponDataManager);
         WeaponUpgradeAction.setWeaponFactory(weaponFactory);
         PlayerPersistenceService.setWeaponFactory(weaponFactory);
 
         // Nạp và đăng ký cấu hình Levels từ JSON
         levelDataManager = new LevelDataLoader("configs/levels.json");
-        DebugOptionRegistry.setLevelDataManager(levelDataManager);
 
         // Nạp và đăng ký cấu hình Waves từ JSON
         waveDataManager = new WaveDataLoader("configs/waves.json");
+
+        // Nạp cấu hình Enemies từ JSON
+        enemyDataManager = new EnemyDataLoader("configs/enemies.json");
+
+        // Khởi tạo các catalog và builder thông qua constructor DI
+        upgradeCatalog = new UpgradeCatalog(gearDataManager, weaponDataManager);
+        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager, upgradeCatalog);
+        debugOptionRegistry = new DebugOptionRegistry(enemyDataManager, itemDataManager, weaponDataManager, gearDataManager, levelDataManager);
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));
@@ -252,5 +269,33 @@ public class HustGame extends Game implements EventListener {
 
     public GearFactory getGearFactory() {
         return gearFactory;
+    }
+
+    public ItemDataLoader getItemDataManager() {
+        return itemDataManager;
+    }
+
+    public GearDataLoader getGearDataManager() {
+        return gearDataManager;
+    }
+
+    public WeaponDataLoader getWeaponDataManager() {
+        return weaponDataManager;
+    }
+
+    public EnemyDataLoader getEnemyDataManager() {
+        return enemyDataManager;
+    }
+
+    public UpgradeCatalog getUpgradeCatalog() {
+        return upgradeCatalog;
+    }
+
+    public LevelUpChoiceBuilder getLevelUpChoiceBuilder() {
+        return levelUpChoiceBuilder;
+    }
+
+    public DebugOptionRegistry getDebugOptionRegistry() {
+        return debugOptionRegistry;
     }
 }

@@ -1,6 +1,5 @@
-package hust.adventure.graphics;
+package hust.adventure.entities.base;
 
-import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 
 /**
@@ -15,9 +14,9 @@ public interface LightProvider {
      * @param distance distance of the light
      * @param x x position
      * @param y y position
-     * @return the created PointLight
+     * @return the created GameLight
      */
-    PointLight createPointLight(int rays, Color color, float distance, float x, float y);
+    GameLight createPointLight(int rays, Color color, float distance, float x, float y);
 
     /**
      * Sets the ambient light for the current environment.

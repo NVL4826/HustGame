@@ -7,30 +7,16 @@ import hust.adventure.core.data.WeaponDataLoader;
  * Catalog for weapon names, upgrade descriptions, and gear properties. Provides unified access to upgrade descriptions
  * for level up screens.
  */
-public final class UpgradeCatalog {
-    private static GearDataLoader gearDataManager;
-    private static WeaponDataLoader weaponDataManager;
-
-    private UpgradeCatalog() {
-        // Prevent instantiation
-    }
+public class UpgradeCatalog {
+    private final GearDataLoader gearDataManager;
+    private final WeaponDataLoader weaponDataManager;
 
     /**
-     * Sets the GearDataManager instance used for retrieving gear details.
-     *
-     * @param manager the GearDataManager instance
+     * Constructs a new UpgradeCatalog with dependencies.
      */
-    public static void setGearDataManager(final GearDataLoader manager) {
-        gearDataManager = manager;
-    }
-
-    /**
-     * Sets the WeaponDataManager instance used for retrieving weapon details.
-     *
-     * @param manager the WeaponDataManager instance
-     */
-    public static void setWeaponDataManager(final WeaponDataLoader manager) {
-        weaponDataManager = manager;
+    public UpgradeCatalog(final GearDataLoader gearDataManager, final WeaponDataLoader weaponDataManager) {
+        this.gearDataManager = gearDataManager;
+        this.weaponDataManager = weaponDataManager;
     }
 
     /**
@@ -39,7 +25,7 @@ public final class UpgradeCatalog {
      * @param id The unique weapon identifier (e.g. "whip", "magic_wand").
      * @return The localized display name of the weapon.
      */
-    public static String getWeaponName(final String id) {
+    public String getWeaponName(final String id) {
         if (weaponDataManager == null) {
             return id;
         }
@@ -53,7 +39,7 @@ public final class UpgradeCatalog {
      * @param level The level of the weapon (1 to 5).
      * @return The description of the upgrade/unlock effect for that level.
      */
-    public static String getWeaponLevelDescription(final String id, final int level) {
+    public String getWeaponLevelDescription(final String id, final int level) {
         if (weaponDataManager == null) {
             return "";
         }
@@ -66,7 +52,7 @@ public final class UpgradeCatalog {
      * @param id The unique gear identifier.
      * @return The localized display name of the gear.
      */
-    public static String getGearName(final String id) {
+    public String getGearName(final String id) {
         if (gearDataManager == null) {
             return id;
         }
@@ -80,7 +66,7 @@ public final class UpgradeCatalog {
      * @param level The level of the gear (1 to 5).
      * @return The description of the upgrade/unlock effect for that level.
      */
-    public static String getGearLevelDescription(final String id, final int level) {
+    public String getGearLevelDescription(final String id, final int level) {
         if (gearDataManager == null) {
             return "";
         }

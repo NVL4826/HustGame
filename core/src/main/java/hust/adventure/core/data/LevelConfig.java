@@ -1,4 +1,4 @@
-package hust.adventure.screens;
+package hust.adventure.core.data;
 
 import com.badlogic.gdx.graphics.Color;
 

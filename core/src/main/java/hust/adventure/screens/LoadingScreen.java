@@ -1,6 +1,7 @@
 package hust.adventure.screens;
 
 import hust.adventure.HustGame;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.screens.levels.LevelFactory;
 
 public class LoadingScreen extends BaseScreen {

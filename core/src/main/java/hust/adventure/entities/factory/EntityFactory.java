@@ -7,11 +7,11 @@ import hust.adventure.entities.ItemDrop;
 import hust.adventure.entities.Projectile;
 import hust.adventure.entities.StaticNPC;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
 import hust.adventure.entities.player.Player;
-import hust.adventure.graphics.LightProvider;
+import hust.adventure.entities.player.input.PlayerController;
+import hust.adventure.entities.base.LightProvider;
 
 /**
  * Abstract Factory interface for entity creation.
