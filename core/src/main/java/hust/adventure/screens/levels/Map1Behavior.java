@@ -1,6 +1,7 @@
 package hust.adventure.screens.levels;
 
-import hust.adventure.wave.WaveConfig;
+import com.badlogic.gdx.utils.Array;
+import hust.adventure.wave.WaveEntry;
 import hust.adventure.wave.WaveManager;
 
 /**
@@ -15,8 +16,9 @@ public class Map1Behavior implements LevelBehavior {
             throw new IllegalArgumentException("LevelContext cannot be null");
         }
 
-        final WaveConfig waveConfig = context.getGame().getAssetManager().loadWaveConfig("configs/waves.json");
-        this.waveManager = new WaveManager(waveConfig, context.getEntityFactory());
+        final String levelId = context.getConfig().getLevelId();
+        final Array<WaveEntry> waves = context.getGame().getWaveDataManager().getWaves(levelId);
+        this.waveManager = new WaveManager(waves, context.getEntityFactory());
         context.getUIManager().getHud().setTimeProvider(this.waveManager);
     }
 

@@ -28,6 +28,10 @@ import hust.adventure.ui.InventoryUIData;
 import hust.adventure.ui.LevelUpUI;
 import hust.adventure.ui.DamageTextManager;
 import hust.adventure.ui.DebugUI;
+import hust.adventure.ui.DebugInfoUIData;
+import hust.adventure.screens.LevelConfig;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.gear.Gear;
 import hust.adventure.world.WorldManager;
 
 /**
@@ -49,6 +53,9 @@ public class GameRenderer {
     private final WorldManager worldManager;
     private final HUDData hudData;
     private final StatusEffectsData statusData;
+    private final DebugInfoUIData debugInfoData;
+    private final java.util.List<String> tempWeaponsList = new java.util.ArrayList<>();
+    private final java.util.List<String> tempGearsList = new java.util.ArrayList<>();
     private static final Matrix4 uiMatrix = new Matrix4();
     private final GlyphLayout layout = new GlyphLayout();
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
@@ -73,6 +80,7 @@ public class GameRenderer {
         this.worldManager = worldManager;
         this.hudData = new HUDData(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0, 0f);
         this.statusData = new StatusEffectsData(false, false, 1f, 0f, false, false, false);
+        this.debugInfoData = new DebugInfoUIData(0f, 0f, 0f, 1f, 1f, 1f, 1f, "None", "None", 0, 0, 0L, 0L, null, null);
         this.uiCam = new OrthographicCamera();
         this.uiCam.setToOrtho(false, 800, 600);
         this.uiCam.update();
@@ -238,7 +246,65 @@ public class GameRenderer {
         }
 
         if (debugUI != null) {
-            debugUI.render(batch, shapeRenderer, font);
+            if (ProgressContext.instance.isShowHitbox()) {
+                float px = 0f, py = 0f;
+                float speed = 0f;
+                float powerMultiplier = 1f;
+                float cooldownMultiplier = 1f;
+                float areaMultiplier = 1f;
+                float magnetMultiplier = 1f;
+                String stateName = "None";
+
+                tempWeaponsList.clear();
+                tempGearsList.clear();
+
+                if (player != null) {
+                    px = player.getX();
+                    py = player.getY();
+                    speed = player.getSpeed();
+                    powerMultiplier = player.getPowerMultiplier();
+                    cooldownMultiplier = player.getCooldownMultiplier();
+                    areaMultiplier = player.getAreaMultiplier();
+                    magnetMultiplier = player.getMagnetMultiplier();
+                    stateName = player.getState() != null ? player.getState().getStateName() : "None";
+
+                    if (player.getWeaponManager() != null && player.getWeaponManager().getWeapons() != null) {
+                        for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
+                            tempWeaponsList.add(String.format("%s (Lv.%d, Dmg:%.1f, CD:%.2fs)",
+                                    weapon.getName(), weapon.getLevel(), weapon.getEffectiveDamage(), weapon.getCooldown()));
+                        }
+                    }
+
+                    if (player.getGearManager() != null && player.getGearManager().getGears() != null) {
+                        for (final Gear gear : player.getGearManager().getGears()) {
+                            tempGearsList.add(String.format("%s (Lv.%d)", gear.getName(), gear.getLevel()));
+                        }
+                    }
+                }
+
+                String mapName = "Unknown";
+                final LevelConfig currentLevelConfig = ProgressContext.instance.getCurrentLevelConfig();
+                if (currentLevelConfig != null) {
+                    mapName = currentLevelConfig.getName();
+                }
+
+                final int fps = Gdx.graphics.getFramesPerSecond();
+                final int activeEntitiesCount = entityManager != null && entityManager.getEntities() != null ? entityManager.getEntities().size : 0;
+
+                final Runtime runtime = Runtime.getRuntime();
+                final long totalMem = runtime.totalMemory();
+                final long freeMem = runtime.freeMemory();
+                final long usedMemoryMB = (totalMem - freeMem) / (1024L * 1024L);
+                final long totalMemoryMB = totalMem / (1024L * 1024L);
+
+                debugInfoData.set(px, py, speed, powerMultiplier, cooldownMultiplier, areaMultiplier, magnetMultiplier,
+                        stateName, mapName, fps, activeEntitiesCount, usedMemoryMB, totalMemoryMB,
+                        tempWeaponsList, tempGearsList);
+
+                debugUI.render(batch, shapeRenderer, font, debugInfoData, player);
+            } else {
+                debugUI.render(batch, shapeRenderer, font, null, player);
+            }
         }
 
         if (player != null && player.hasStatus(StatusFlag.CONFUSED)) {

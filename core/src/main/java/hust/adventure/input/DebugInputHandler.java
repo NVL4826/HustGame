@@ -19,6 +19,11 @@ import hust.adventure.ui.DebugOption;
 import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.SelectionMode;
 import hust.adventure.ui.UIManager;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.weapons.WeaponFactory;
+import hust.adventure.items.gear.Gear;
+import hust.adventure.items.gear.GearFactory;
+import hust.adventure.events.ExpGainedEvent;
 
 /**
  * Handles debug shortcut keys (F4-F8), manages selection states for debug options, and executes corresponding debug
@@ -29,6 +34,8 @@ public class DebugInputHandler {
     private final EntityFactory entityFactory;
     private final GameAssetManager assetManager;
     private final InputReader inputReader;
+    private final WeaponFactory weaponFactory;
+    private final GearFactory gearFactory;
 
     // States for debug selection
     private SelectionMode activeMode = SelectionMode.NONE;
@@ -42,9 +49,12 @@ public class DebugInputHandler {
      * @param entityFactory the entity factory
      * @param assetManager  the game asset manager
      * @param inputReader   the input reader
+     * @param weaponFactory the weapon factory for equipping weapons
+     * @param gearFactory   the gear factory for equipping gears
      */
     public DebugInputHandler(final UIManager uiManager, final EntityFactory entityFactory,
-            final GameAssetManager assetManager, final InputReader inputReader) {
+            final GameAssetManager assetManager, final InputReader inputReader, final WeaponFactory weaponFactory,
+            final GearFactory gearFactory) {
         if (inputReader == null) {
             throw new IllegalArgumentException("inputReader cannot be null");
         }
@@ -52,6 +62,8 @@ public class DebugInputHandler {
         this.entityFactory = entityFactory;
         this.assetManager = assetManager;
         this.inputReader = inputReader;
+        this.weaponFactory = weaponFactory;
+        this.gearFactory = gearFactory;
     }
 
     /**
@@ -63,7 +75,7 @@ public class DebugInputHandler {
      */
     public PlayMode handleDebugInput(final Player player, final PlayMode currentState) {
         if (isActive()) {
-            final DebugOption selected = handleSelectionInput();
+            final DebugOption selected = handleSelectionInput(player);
             if (selected != null) {
                 executeDebugAction(previousMode, selected, player);
                 return PlayMode.RUNNING;
@@ -90,6 +102,17 @@ public class DebugInputHandler {
         }
         if (inputReader.isKeyJustPressed(Input.Keys.F8)) {
             startSelection(SelectionMode.MONSTER);
+            return PlayMode.IN_UI;
+        }
+        if (inputReader.isKeyJustPressed(Input.Keys.F9)) {
+            startSelection(SelectionMode.EQUIP);
+            return PlayMode.IN_UI;
+        }
+        if (inputReader.isKeyJustPressed(Input.Keys.F10)) {
+            final float needed = ProgressContext.instance.getExpToNextLevel() - ProgressContext.instance.getExp();
+            final ExpGainedEvent payload = new ExpGainedEvent(needed);
+            final GameEvent<ExpGainedEvent> event = new GameEvent<>(EventType.EXP_GAINED, payload);
+            EventDispatcher.getInstance().dispatch(event);
             return PlayMode.IN_UI;
         }
 
@@ -124,11 +147,12 @@ public class DebugInputHandler {
     /**
      * Updates selection menu input.
      *
+     * @param player the player instance to get dynamic options
      * @return selected DebugOption if confirmed, null otherwise.
      */
-    private DebugOption handleSelectionInput() {
-        final DebugOption[] currentOptions = getCurrentOptions();
-        if (!isActive() || currentOptions == null) {
+    private DebugOption handleSelectionInput(final Player player) {
+        final DebugOption[] currentOptions = getCurrentOptions(player);
+        if (!isActive() || currentOptions == null || currentOptions.length == 0) {
             return null;
         }
 
@@ -190,32 +214,99 @@ public class DebugInputHandler {
     /**
      * Gets the array of debug options for the current active selection mode.
      *
+     * @param player the player instance
      * @return an array of DebugOption
      */
-    public DebugOption[] getCurrentOptions() {
-        return DebugOptionRegistry.getOptions(activeMode);
+    public DebugOption[] getCurrentOptions(final Player player) {
+        return DebugOptionRegistry.getOptions(activeMode, player);
     }
 
     private void executeDebugAction(final SelectionMode mode, final DebugOption option, final Player player) {
-        if (mode == SelectionMode.MAP) {
-            final String targetMap = option.id;
-            final MapTransitionData data = new MapTransitionData(targetMap, 400f, 400f);
-            final GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
-            EventDispatcher.getInstance().dispatch(event);
-        } else if (mode == SelectionMode.ITEM) {
-            final String itemId = option.id;
-            final Item item = ItemManager.instance.getItem(itemId);
-            if (item != null && player != null) {
-                entityFactory.createItemDrop(player.getX() + 32f, player.getY(), item, Color.WHITE);
+        if (mode == null || option == null) {
+            return;
+        }
+        switch (mode) {
+        case MAP:
+            executeMapAction(option);
+            break;
+        case ITEM:
+            executeItemAction(option, player);
+            break;
+        case MONSTER:
+            executeMonsterAction(option, player);
+            break;
+        case EQUIP:
+            executeEquipAction(option, player);
+            break;
+        default:
+            break;
+        }
+    }
+
+    private void executeMapAction(final DebugOption option) {
+        final String targetMap = option.getId();
+        final MapTransitionData data = new MapTransitionData(targetMap, 400f, 400f);
+        final GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
+        EventDispatcher.getInstance().dispatch(event);
+    }
+
+    private void executeItemAction(final DebugOption option, final Player player) {
+        final String itemId = option.getId();
+        final Item item = ItemManager.instance.getItem(itemId);
+        if (item != null && player != null) {
+            entityFactory.createItemDrop(player.getX() + 32f, player.getY(), item, Color.WHITE);
+        }
+    }
+
+    private void executeMonsterAction(final DebugOption option, final Player player) {
+        final String enemyId = option.getId();
+        try {
+            if (player != null) {
+                entityFactory.createEnemy(enemyId, player.getX() + 64f, player.getY());
             }
-        } else if (mode == SelectionMode.MONSTER) {
-            final String enemyId = option.id;
-            try {
-                if (player != null) {
-                    entityFactory.createEnemy(enemyId, player.getX() + 64f, player.getY());
+        } catch (final Exception e) {
+            Gdx.app.log("DebugMode", "Failed to spawn enemy: " + enemyId, e);
+        }
+    }
+
+    private void executeEquipAction(final DebugOption option, final Player player) {
+        if (player == null) {
+            return;
+        }
+        final String optionId = option.getId();
+        if (optionId.startsWith("weapon_")) {
+            final String weaponId = optionId.substring("weapon_".length());
+            BaseWeapon equipped = null;
+            if (player.getWeaponManager() != null) {
+                for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
+                    if (w.getId().equalsIgnoreCase(weaponId)) {
+                        equipped = w;
+                        break;
+                    }
                 }
-            } catch (final Exception e) {
-                Gdx.app.log("DebugMode", "Failed to spawn enemy: " + enemyId, e);
+            }
+            if (equipped != null) {
+                equipped.unequip(player);
+            } else {
+                if (weaponFactory != null) {
+                    final BaseWeapon weapon = weaponFactory.createWeapon(weaponId, player);
+                    if (weapon != null) {
+                        weapon.equip(player);
+                    }
+                }
+            }
+        } else if (optionId.startsWith("gear_")) {
+            final String gearId = optionId.substring("gear_".length());
+            final Gear equipped = player.getGearManager() != null ? player.getGearManager().getGear(gearId) : null;
+            if (equipped != null) {
+                equipped.unequip(player);
+            } else {
+                if (gearFactory != null) {
+                    final Gear gear = gearFactory.createGear(gearId);
+                    if (gear != null) {
+                        gear.equip(player);
+                    }
+                }
             }
         }
     }

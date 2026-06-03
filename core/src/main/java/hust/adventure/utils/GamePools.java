@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.PoolManager;
 import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.ui.DamageText;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Central registry for object pools using PoolManager. Only high-frequency objects are pooled to balance performance
@@ -17,6 +18,7 @@ public class GamePools {
         manager.addPool(DamageText::new);
         manager.addPool(Projectile::new);
         manager.addPool(ExpGem::new);
+        manager.addPool(Vector2::new);
     }
 
     /**

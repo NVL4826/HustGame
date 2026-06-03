@@ -8,6 +8,10 @@ import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.items.base.ItemConfig;
 import hust.adventure.screens.LevelConfig;
+import hust.adventure.core.context.ProgressContext;
+import hust.adventure.entities.player.Player;
+import hust.adventure.items.weapons.BaseWeapon;
+import hust.adventure.items.gear.Gear;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,19 +64,47 @@ public class DebugOptionRegistry {
                 if (weaponDataManager != null && weaponDataManager.getAllWeaponIds().contains(id, false)) {
                     continue; // Skip weapon dummy items from items.json
                 }
+                if (gearDataManager != null && gearDataManager.getAllGearIds().contains(id, false)) {
+                    continue; // Skip gear dummy items from items.json
+                }
                 list.add(new DebugOption(id, config.getName()));
             }
         }
+        return list.toArray(new DebugOption[0]);
+    }
+
+    private static DebugOption[] getEquipOptions(final Player player) {
+        final List<DebugOption> list = new ArrayList<>();
+
         if (weaponDataManager != null) {
             for (final String id : weaponDataManager.getAllWeaponIds()) {
-                list.add(new DebugOption(id, weaponDataManager.getWeaponName(id) + " (Weapon)"));
+                final String name = weaponDataManager.getWeaponName(id);
+                boolean isEquipped = false;
+                if (player != null && player.getWeaponManager() != null) {
+                    for (final BaseWeapon w : player.getWeaponManager().getWeapons()) {
+                        if (w.getId().equalsIgnoreCase(id)) {
+                            isEquipped = true;
+                            break;
+                        }
+                    }
+                }
+                final String displayName = isEquipped ? "[Equipped] " + name + " (Weapon)" : name + " (Weapon)";
+                list.add(new DebugOption("weapon_" + id, displayName));
             }
         }
+
         if (gearDataManager != null) {
             for (final String id : gearDataManager.getAllGearIds()) {
-                list.add(new DebugOption(id, gearDataManager.getGearName(id) + " (Gear)"));
+                final String name = gearDataManager.getGearName(id);
+                boolean isEquipped = false;
+                if (player != null && player.getGearManager() != null) {
+                    isEquipped = (player.getGearManager().getGear(id) != null);
+                }
+                final String displayName = isEquipped ? "[Equipped] " + name + " (Gear)" : name + " (Gear)";
+                list.add(new DebugOption("gear_" + id, displayName));
             }
         }
+
         return list.toArray(new DebugOption[0]);
     }
 
@@ -91,10 +123,11 @@ public class DebugOptionRegistry {
     /**
      * Gets the corresponding array of debug options for the given SelectionMode.
      *
-     * @param mode the selection mode
+     * @param mode   the selection mode
+     * @param player the player instance
      * @return an array of DebugOption, or null if the mode is NONE or invalid
      */
-    public static DebugOption[] getOptions(final SelectionMode mode) {
+    public static DebugOption[] getOptions(final SelectionMode mode, final Player player) {
         if (mode == null) {
             return null;
         }
@@ -103,6 +136,8 @@ public class DebugOptionRegistry {
             return getMapOptions();
         case ITEM:
             return getItemOptions();
+        case EQUIP:
+            return getEquipOptions(player);
         case MONSTER:
             return getMonsterOptions();
         default:

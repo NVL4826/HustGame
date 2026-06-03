@@ -10,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
-import hust.adventure.wave.WaveConfig;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
 
@@ -23,10 +22,6 @@ public class GameAssetManager {
         this.manager = new AssetManager();
         this.json = new Json();
         manager.setLoader(TiledMap.class, new TmxMapLoader());
-    }
-
-    public WaveConfig loadWaveConfig(String path) {
-        return json.fromJson(WaveConfig.class, Gdx.files.internal(path));
     }
 
 

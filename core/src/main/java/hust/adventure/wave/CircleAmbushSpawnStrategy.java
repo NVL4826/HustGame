@@ -5,16 +5,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import hust.adventure.utils.GamePools;
  
 /**
  * Strategy that spawns enemies in a circle around the camera.
  */
 public class CircleAmbushSpawnStrategy implements SpawnStrategy {
     private static final float RADIUS_OFFSET = 150f;
+    private final Array<Vector2> positions = new Array<>();
  
     @Override
     public Array<Vector2> calculatePositions(Camera camera, int spawnCount) {
-        Array<Vector2> positions = new Array<>();
+        positions.clear();
         if (spawnCount <= 0) return positions;
  
         float zoom = (camera instanceof OrthographicCamera) ? ((OrthographicCamera) camera).zoom : 1.0f;
@@ -30,7 +32,7 @@ public class CircleAmbushSpawnStrategy implements SpawnStrategy {
  
         for (int i = 0; i < spawnCount; i++) {
             float angle = startAngle + i * angleStep;
-            Vector2 pos = new Vector2();
+            Vector2 pos = GamePools.obtain(Vector2.class);
             pos.set(cx + radius * MathUtils.cosDeg(angle), cy + radius * MathUtils.sinDeg(angle));
             positions.add(pos);
         }

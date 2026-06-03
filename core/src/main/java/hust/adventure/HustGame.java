@@ -15,6 +15,7 @@ import hust.adventure.screens.ScreenTransition;
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.ItemDataLoader;
 import hust.adventure.core.data.LevelDataLoader;
+import hust.adventure.core.data.WaveDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
@@ -56,6 +57,9 @@ public class HustGame extends Game implements EventListener {
     public ScreenTransition screenTransition;
     private AudioManager audioManager;
     private LevelDataLoader levelDataManager;
+    private WaveDataLoader waveDataManager;
+    private WeaponFactory weaponFactory;
+    private GearFactory gearFactory;
 
     @Override
     public void create() {
@@ -98,7 +102,7 @@ public class HustGame extends Game implements EventListener {
         // Nạp và đăng ký cấu hình Gears từ JSON
         final GearDataLoader gearDataManager = new GearDataLoader("configs/gears.json");
         DebugOptionRegistry.setGearDataManager(gearDataManager);
-        final GearFactory gearFactory = new GearFactory(gearDataManager);
+        this.gearFactory = new GearFactory(gearDataManager);
         UpgradeCatalog.setGearDataManager(gearDataManager);
         LevelUpChoiceBuilder.setGearDataManager(gearDataManager);
         GearUpgradeAction.setGearFactory(gearFactory);
@@ -107,7 +111,7 @@ public class HustGame extends Game implements EventListener {
         // Nạp và đăng ký cấu hình Weapons từ JSON
         final WeaponDataLoader weaponDataManager = new WeaponDataLoader("configs/weapons.json");
         DebugOptionRegistry.setWeaponDataManager(weaponDataManager);
-        final WeaponFactory weaponFactory = new WeaponFactory(weaponDataManager);
+        this.weaponFactory = new WeaponFactory(weaponDataManager);
         UpgradeCatalog.setWeaponDataManager(weaponDataManager);
         LevelUpChoiceBuilder.setWeaponDataManager(weaponDataManager);
         WeaponUpgradeAction.setWeaponFactory(weaponFactory);
@@ -116,6 +120,9 @@ public class HustGame extends Game implements EventListener {
         // Nạp và đăng ký cấu hình Levels từ JSON
         levelDataManager = new LevelDataLoader("configs/levels.json");
         DebugOptionRegistry.setLevelDataManager(levelDataManager);
+
+        // Nạp và đăng ký cấu hình Waves từ JSON
+        waveDataManager = new WaveDataLoader("configs/waves.json");
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));
@@ -237,5 +244,17 @@ public class HustGame extends Game implements EventListener {
 
     public LevelDataLoader getLevelDataManager() {
         return levelDataManager;
+    }
+
+    public WaveDataLoader getWaveDataManager() {
+        return waveDataManager;
+    }
+
+    public WeaponFactory getWeaponFactory() {
+        return weaponFactory;
+    }
+
+    public GearFactory getGearFactory() {
+        return gearFactory;
     }
 }

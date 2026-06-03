@@ -33,6 +33,14 @@ public class PlayerPersistenceService {
         weaponFactory = factory;
     }
 
+    public static GearFactory getGearFactory() {
+        return gearFactory;
+    }
+
+    public static WeaponFactory getWeaponFactory() {
+        return weaponFactory;
+    }
+
     /**
      * Saves the player's active weapons and gears levels to the ProgressContext.
      *
