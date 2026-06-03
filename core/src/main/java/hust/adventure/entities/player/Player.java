@@ -37,6 +37,8 @@ public class Player extends Character implements Targetable {
     private CollisionManager collisionManager;
     private EntityFactory entityFactory;
     private final PlayerStats stats;
+    private final ProgressContext progressContext;
+    private final PlayerPersistenceService persistenceService;
 
     private Texture[] allTextures;
     private Animation<TextureRegion> walkLeft, walkRight, walkDown, walkUp;
@@ -63,9 +65,12 @@ public class Player extends Character implements Targetable {
 
     @lombok.Builder
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
-            final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats) {
+            final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats,
+            final ProgressContext progressContext, final PlayerPersistenceService persistenceService) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
         this.stats = stats;
+        this.progressContext = progressContext;
+        this.persistenceService = persistenceService;
         setId("player");
         setName("Player");
         setSpritePath("player_textures");
@@ -77,7 +82,9 @@ public class Player extends Character implements Targetable {
         this.iframeTimer = 0f;
 
         // Restore weapons and gears from global context via persistence service
-        PlayerPersistenceService.restoreWeaponsAndGears(this);
+        if (persistenceService != null) {
+            persistenceService.restore(this);
+        }
 
         // Composition: Movement behavior
         this.setMovementBehavior(new PlayerMovementBehavior(controller, collisionManager));
@@ -87,8 +94,9 @@ public class Player extends Character implements Targetable {
         this.eventHandler = new PlayerEventHandler(this);
 
         // Initialize spell controller
-        this.spellController = new SpellController();
-        ProgressContext.instance.setPlayer(this);
+        this.spellController = new SpellController(progressContext);
+
+        progressContext.setPlayer(this);
     }
 
     private void loadTextures(final GameAssetManager assetManager) {
@@ -122,7 +130,7 @@ public class Player extends Character implements Targetable {
 
     @Override
     public void update(final float delta) {
-        if (ProgressContext.instance.isGodMode()) {
+        if (progressContext.isGodMode()) {
             setHp(getMaxHp());
         }
         if (iframeTimer > 0) {
@@ -132,8 +140,8 @@ public class Player extends Character implements Targetable {
         // Update spells through the delegated controller
         spellController.update(this, controller, delta);
 
-        if (ProgressContext.instance.getPlayer() != this) {
-            ProgressContext.instance.setPlayer(this);
+        if (progressContext.getPlayer() != this) {
+            progressContext.setPlayer(this);
         }
 
         setSpeedMultiplier(speedMultiplier);
@@ -363,7 +371,7 @@ public class Player extends Character implements Targetable {
     }
 
     public void takeDamage(final float amount, final boolean isCrit, final boolean ignoreIFrames) {
-        if (ProgressContext.instance.isGodMode()) {
+        if (progressContext.isGodMode()) {
             return;
         }
         if (!ignoreIFrames && iframeTimer > 0) {
@@ -387,9 +395,13 @@ public class Player extends Character implements Targetable {
         return spellController;
     }
 
+    public ProgressContext getProgressContext() {
+        return progressContext;
+    }
+
     @Override
     public void dispose() {
-        ProgressContext.instance.setPlayer(null);
+        progressContext.setPlayer(null);
         if (eventHandler != null) {
             eventHandler.dispose();
         }

@@ -21,8 +21,10 @@ import hust.adventure.items.consumable.ConsumableItem;
 
 public class DamageTextManager implements EventListener {
     private final Array<DamageText> activeTexts;
+    private final ProgressContext progressContext;
 
-    public DamageTextManager() {
+    public DamageTextManager(final ProgressContext progressContext) {
+        this.progressContext = progressContext;
         activeTexts = new Array<>();
         EventDispatcher.getInstance().addListener(EventType.ENTITY_DAMAGED, this);
         EventDispatcher.getInstance().addListener(EventType.ITEM_USED, this);
@@ -66,7 +68,7 @@ public class DamageTextManager implements EventListener {
             final String itemId = (String) event.getData();
             final Item item = ItemManager.instance.getItem(itemId);
             if (item != null) {
-                final Player player = ProgressContext.instance.getPlayer();
+                final Player player = progressContext != null ? progressContext.getPlayer() : null;
                 if (player != null) {
                     showFloatingText(player, "Used: " + item.getName(), Color.WHITE, 1.2f, 0f, 60f);
 

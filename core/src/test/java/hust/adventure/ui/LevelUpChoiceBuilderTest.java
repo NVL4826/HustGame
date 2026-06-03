@@ -7,11 +7,10 @@ import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.UpgradeCatalog;
-import hust.adventure.items.gear.Gear;
 import hust.adventure.items.gear.GearManager;
-import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponManager;
 import hust.adventure.ui.components.UpgradeAction;
+import hust.adventure.core.context.ProgressContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,8 @@ public class LevelUpChoiceBuilderTest {
         mockGearLoader = mock(GearDataLoader.class);
         mockWeaponLoader = mock(WeaponDataLoader.class);
         upgradeCatalog = new UpgradeCatalog(mockGearLoader, mockWeaponLoader);
-        choiceBuilder = new LevelUpChoiceBuilder(mockGearLoader, mockWeaponLoader, upgradeCatalog);
+        ProgressContext mockProgressContext = mock(ProgressContext.class);
+        choiceBuilder = new LevelUpChoiceBuilder(mockGearLoader, mockWeaponLoader, upgradeCatalog, mockProgressContext);
 
         mockPlayer = mock(Player.class);
         mockWeaponManager = mock(WeaponManager.class);
@@ -74,8 +74,10 @@ public class LevelUpChoiceBuilderTest {
         boolean hasWhip = false;
         boolean hasClover = false;
         for (UpgradeAction action : choices) {
-            if (action.getName().contains("Whip")) hasWhip = true;
-            if (action.getName().contains("Clover")) hasClover = true;
+            if (action.getName().contains("Whip"))
+                hasWhip = true;
+            if (action.getName().contains("Clover"))
+                hasClover = true;
         }
         assertTrue(hasWhip || hasClover);
     }

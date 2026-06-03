@@ -2,8 +2,6 @@ package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
@@ -64,7 +62,7 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
         bookConfigs.put("AI", 7);
         bookConfigs.put("Do an", 8);
 
-        puzzle = new BookPuzzle(bookConfigs);
+        puzzle = new BookPuzzle(bookConfigs, ctx.getProgressContext());
 
         EventDispatcher.getInstance().addListener(EventType.PUZZLE_FAILED, this);
         EventDispatcher.getInstance().addListener(EventType.PUZZLE_SOLVED, this);
@@ -141,8 +139,6 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
         case ITEM_PICKED_UP:
             final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
             if ("brain".equals(data.getItem().getId())) {
-                ProgressContext.instance.setHasNao(true);
-                ProgressContext.instance.setLibraryCleared(true);
                 libraryCleared = true;
 
                 // Chuyển sang màn Lab

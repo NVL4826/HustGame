@@ -52,6 +52,7 @@ import hust.adventure.ui.components.WeaponUpgradeAction;
  * Lớp gốc quản lý vòng đời ứng dụng và lưu trữ các phân hệ trung tâm.
  */
 public class HustGame extends Game implements EventListener {
+    private final ProgressContext progressContext = new ProgressContext();
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
@@ -63,6 +64,7 @@ public class HustGame extends Game implements EventListener {
     private WaveDataLoader waveDataManager;
     private WeaponFactory weaponFactory;
     private GearFactory gearFactory;
+    private PlayerPersistenceService playerPersistenceService;
 
     private ItemDataLoader itemDataManager;
     private GearDataLoader gearDataManager;
@@ -75,7 +77,7 @@ public class HustGame extends Game implements EventListener {
 
     @Override
     public void create() {
-        ProgressContext.setInitialStateSupplier(PlayingGameState::new);
+
         GamePools.registerPool(DamageText::new);
 
         spriteBatch = new SpriteBatch();
@@ -83,6 +85,8 @@ public class HustGame extends Game implements EventListener {
         assetManager = new GameAssetManager();
         eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.addListener(EventType.MAP_TRANSITION, this);
+        eventDispatcher.addListener(EventType.ITEM_PICKED_UP, progressContext);
+        eventDispatcher.addListener(EventType.ITEM_USED, progressContext);
 
         audioManager = new AudioManager(assetManager);
         eventDispatcher.addListener(EventType.PLAY_SFX, audioManager);
@@ -117,13 +121,13 @@ public class HustGame extends Game implements EventListener {
         gearDataManager = new GearDataLoader("configs/gears.json");
         this.gearFactory = new GearFactory(gearDataManager);
         GearUpgradeAction.setGearFactory(gearFactory);
-        PlayerPersistenceService.setGearFactory(gearFactory);
 
         // Nạp và đăng ký cấu hình Weapons từ JSON
         weaponDataManager = new WeaponDataLoader("configs/weapons.json");
         this.weaponFactory = new WeaponFactory(weaponDataManager);
         WeaponUpgradeAction.setWeaponFactory(weaponFactory);
-        PlayerPersistenceService.setWeaponFactory(weaponFactory);
+
+        this.playerPersistenceService = new PlayerPersistenceService(progressContext, gearFactory, weaponFactory);
 
         // Nạp và đăng ký cấu hình Levels từ JSON
         levelDataManager = new LevelDataLoader("configs/levels.json");
@@ -136,7 +140,7 @@ public class HustGame extends Game implements EventListener {
 
         // Khởi tạo các catalog và builder thông qua constructor DI
         upgradeCatalog = new UpgradeCatalog(gearDataManager, weaponDataManager);
-        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager, upgradeCatalog);
+        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager, upgradeCatalog, progressContext);
         debugOptionRegistry = new DebugOptionRegistry(enemyDataManager, itemDataManager, weaponDataManager, gearDataManager, levelDataManager);
 
         // Khởi đầu bằng màn hình tải tài nguyên
@@ -196,6 +200,10 @@ public class HustGame extends Game implements EventListener {
     @Override
     public void dispose() {
         eventDispatcher.removeListener(EventType.MAP_TRANSITION, this);
+        if (progressContext != null) {
+            eventDispatcher.removeListener(EventType.ITEM_PICKED_UP, progressContext);
+            eventDispatcher.removeListener(EventType.ITEM_USED, progressContext);
+        }
         if (audioManager != null) {
             eventDispatcher.removeListener(EventType.PLAY_SFX, audioManager);
             eventDispatcher.removeListener(EventType.PLAY_BGM, audioManager);
@@ -297,5 +305,13 @@ public class HustGame extends Game implements EventListener {
 
     public DebugOptionRegistry getDebugOptionRegistry() {
         return debugOptionRegistry;
+    }
+
+    public ProgressContext getProgressContext() {
+        return progressContext;
+    }
+
+    public PlayerPersistenceService getPlayerPersistenceService() {
+        return playerPersistenceService;
     }
 }

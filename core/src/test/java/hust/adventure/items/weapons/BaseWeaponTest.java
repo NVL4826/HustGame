@@ -75,21 +75,15 @@ public class BaseWeaponTest {
 
     @Test
     public void testGetEffectiveDamageWithGlobalMultiplier() {
-        // Setup ProgressContext mock stats
-        ProgressContext originalContext = ProgressContext.instance;
-        try {
-            ProgressContext mockContext = mock(ProgressContext.class);
-            PlayerStats mockStats = mock(PlayerStats.class);
-            when(mockStats.getDamageMultiplier()).thenReturn(1.2f);
-            when(mockContext.getPlayerStats()).thenReturn(mockStats);
-            ProgressContext.instance = mockContext;
+        ProgressContext mockContext = mock(ProgressContext.class);
+        PlayerStats mockStats = mock(PlayerStats.class);
+        when(mockStats.getDamageMultiplier()).thenReturn(1.2f);
+        when(mockContext.getPlayerStats()).thenReturn(mockStats);
+        when(mockPlayer.getProgressContext()).thenReturn(mockContext);
 
-            when(mockPlayer.getPowerMultiplier()).thenReturn(1.5f);
-            // 20 * 1.5 (player) * 1.2 (global) = 36
-            assertEquals(36f, weapon.getEffectiveDamage(), 0.01f);
-        } finally {
-            ProgressContext.instance = originalContext;
-        }
+        when(mockPlayer.getPowerMultiplier()).thenReturn(1.5f);
+        // 20 * 1.5 (player) * 1.2 (global) = 36
+        assertEquals(36f, weapon.getEffectiveDamage(), 0.01f);
     }
 
     @Test

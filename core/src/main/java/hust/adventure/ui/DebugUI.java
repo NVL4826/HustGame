@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.player.input.DebugInputHandler;
 
@@ -67,9 +66,8 @@ public class DebugUI {
      * @param player        the current player instance
      */
     public void render(final SpriteBatch batch, final ShapeRenderer shapeRenderer, final BitmapFont font,
-            final DebugInfoUIData debugInfo, final Player player) {
-        final boolean showDebugMenu = ProgressContext.instance.isShowDebug();
-        final boolean showDebugInfo = ProgressContext.instance.isShowHitbox() && debugInfo != null;
+            final DebugInfoUIData debugInfo, final Player player, final boolean showDebugMenu,
+            final boolean showDebugInfo, final boolean isGodMode, final boolean isFastRun) {
 
         if (!showDebugMenu && !showDebugInfo) {
             return;
@@ -156,7 +154,7 @@ public class DebugUI {
             // F3: Hitboxes indicator
             font.setColor(Color.WHITE);
             font.draw(batch, "[F3] Hitboxes: ", PANEL_X + 15f, PANEL_Y + PANEL_HEIGHT - 135f);
-            if (ProgressContext.instance.isShowHitbox()) {
+            if (showDebugInfo) {
                 font.setColor(Color.GREEN);
                 font.draw(batch, "VISIBLE", PANEL_X + 150f, PANEL_Y + PANEL_HEIGHT - 135f);
             } else {
@@ -167,7 +165,7 @@ public class DebugUI {
             // F4: God Mode
             font.setColor(Color.WHITE);
             font.draw(batch, "[F4] God Mode: ", PANEL_X + 15f, PANEL_Y + PANEL_HEIGHT - 170f);
-            if (ProgressContext.instance.isGodMode()) {
+            if (isGodMode) {
                 font.setColor(Color.GREEN);
                 font.draw(batch, "ON", PANEL_X + 150f, PANEL_Y + PANEL_HEIGHT - 170f);
             } else {
@@ -178,7 +176,7 @@ public class DebugUI {
             // F5: Speed Run
             font.setColor(Color.WHITE);
             font.draw(batch, "[F5] Speed Hack: ", PANEL_X + 15f, PANEL_Y + PANEL_HEIGHT - 205f);
-            if (ProgressContext.instance.isFastRun()) {
+            if (isFastRun) {
                 font.setColor(Color.GREEN);
                 font.draw(batch, "ON", PANEL_X + 150f, PANEL_Y + PANEL_HEIGHT - 205f);
             } else {

@@ -9,15 +9,20 @@ import hust.adventure.events.LevelUpEvent;
 import com.badlogic.gdx.utils.Disposable;
 
 public class LevelManager implements EventListener, Disposable {
+    private final ProgressContext progressContext;
     private int currentLevel = 1;
     private float currentExp = 0;
     private float expToNextLevel = 100f;
 
-    public LevelManager() {
+    public LevelManager(final ProgressContext progressContext) {
+        if (progressContext == null) {
+            throw new IllegalArgumentException("progressContext cannot be null");
+        }
+        this.progressContext = progressContext;
         EventDispatcher.getInstance().addListener(EventType.EXP_GAINED, this);
-        this.currentLevel = ProgressContext.instance.getLevel();
-        this.currentExp = ProgressContext.instance.getExp();
-        this.expToNextLevel = ProgressContext.instance.getExpToNextLevel();
+        this.currentLevel = progressContext.getLevel();
+        this.currentExp = progressContext.getExp();
+        this.expToNextLevel = progressContext.getExpToNextLevel();
     }
 
     @Override
@@ -44,9 +49,9 @@ public class LevelManager implements EventListener, Disposable {
     }
 
     private void syncProgressContext() {
-        ProgressContext.instance.setLevel(currentLevel);
-        ProgressContext.instance.setExp(currentExp);
-        ProgressContext.instance.setExpToNextLevel(expToNextLevel);
+        progressContext.setLevel(currentLevel);
+        progressContext.setExp(currentExp);
+        progressContext.setExpToNextLevel(expToNextLevel);
     }
 
     public int getCurrentLevel() {

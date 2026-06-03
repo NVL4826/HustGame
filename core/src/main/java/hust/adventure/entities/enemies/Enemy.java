@@ -39,32 +39,7 @@ public class Enemy extends Character {
 
     private final Player player;
     private final EntityManager entityManager;
-
-    public Enemy() {
-        super();
-        this.player = null;
-        this.entityManager = null;
-    }
-
-    public Enemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
-            final Color color, final CollisionManager collisionManager, final Player player,
-            final EntityManager entityManager) {
-        super(x, y, w, h, maxHp);
-        this.player = player;
-        this.entityManager = entityManager;
-        setId("enemy");
-        init(x, y, w, h, maxHp, name, color, collisionManager, 0f);
-    }
-
-    public Enemy(final float x, final float y, final float w, final float h, final float maxHp, final String name,
-            final Color color, final CollisionManager collisionManager, final float contactDamage, final Player player,
-            final EntityManager entityManager) {
-        super(x, y, w, h, maxHp);
-        this.player = player;
-        this.entityManager = entityManager;
-        setId("enemy");
-        init(x, y, w, h, maxHp, name, color, collisionManager, contactDamage);
-    }
+    private final ProgressContext progressContext;
 
     /**
      * Constructs a BaseEnemy from its configuration data.
@@ -78,10 +53,11 @@ public class Enemy extends Character {
      */
     @lombok.Builder
     public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config,
-            final Player player, final EntityManager entityManager) {
+            final Player player, final EntityManager entityManager, final ProgressContext progressContext) {
         super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());
         this.player = player;
         this.entityManager = entityManager;
+        this.progressContext = progressContext;
         setId(config.getType());
         init(x, y, config.getWidth(), config.getHeight(), config.getMaxHp(), config.getName(), config.getColor(),
                 collisionManager, config.getContactDamage());
@@ -139,7 +115,8 @@ public class Enemy extends Character {
 
     @Override
     public void update(final float delta) {
-        final float virtualDelta = delta * ProgressContext.instance.getEnemyTimeScale();
+        final float enemyTimeScale = (progressContext != null) ? progressContext.getEnemyTimeScale() : 1.0f;
+        final float virtualDelta = delta * enemyTimeScale;
         super.update(virtualDelta);
         if (isDead()) {
             destroy();
@@ -194,7 +171,9 @@ public class Enemy extends Character {
             return;
 
         // Flashlight culling in lights out mode (if showEnemiesTimer / radar is not active)
-        if (ProgressContext.instance.isLightsOut() && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
+        final boolean lightsOut = (progressContext != null) ? progressContext.isLightsOut() : false;
+        final float showEnemiesTimer = (progressContext != null) ? progressContext.getShowEnemiesTimer() : 0f;
+        if (lightsOut && showEnemiesTimer <= 0f) {
             final Player p = player;
             if (p != null) {
                 final float dx = getX() - p.getX();
@@ -206,7 +185,8 @@ public class Enemy extends Character {
         }
 
         // Blink effect: skip render khi enemyBlinkVisible == false
-        if (!ProgressContext.instance.isEnemyBlinkVisible())
+        final boolean blinkVisible = (progressContext == null) || progressContext.isEnemyBlinkVisible();
+        if (!blinkVisible)
             return;
 
         renderSpecific(batch);

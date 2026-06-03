@@ -5,27 +5,19 @@ import hust.adventure.gamestate.PlayingGameState;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.player.Player;
+import hust.adventure.events.EventListener;
+import hust.adventure.events.GameEvent;
+import hust.adventure.events.EventType;
+import hust.adventure.events.ItemPickedUpEvent;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.Supplier;
 
 /**
  * Manages the global game data and current game flow state. Refactored to delegate domain-specific states to
  * PlayerStats, DebugContext, and SpellState.
  */
-public class ProgressContext implements GameProgressContext {
-    private static Supplier<GameState> initialStateSupplier;
-
-    public static void setInitialStateSupplier(final java.util.function.Supplier<GameState> supplier) {
-        initialStateSupplier = supplier;
-        if (instance != null && instance.currentState == null && supplier != null) {
-            instance.currentState = supplier.get();
-        }
-    }
-
-    public static ProgressContext instance = new ProgressContext();
-
+public class ProgressContext implements GameProgressContext, EventListener {
     // Domain sub-contexts (SRP Separation)
     private final PlayerStats playerStats = new PlayerStats();
     private final DebugContext debugContext = new DebugContext();
@@ -54,7 +46,7 @@ public class ProgressContext implements GameProgressContext {
     // State Pattern
     private GameState currentState;
 
-    private ProgressContext() {
+    public ProgressContext() {
         this.currentState = new PlayingGameState();
     }
 
@@ -338,5 +330,27 @@ public class ProgressContext implements GameProgressContext {
         weaponLevels.clear();
         gearLevels.clear();
         setGameState(new PlayingGameState());
+    }
+
+    @Override
+    public void onEvent(final GameEvent<?> event) {
+        if (event.getType() == EventType.ITEM_PICKED_UP) {
+            final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
+            if (data != null && data.getItem() != null) {
+                final String itemId = data.getItem().getId();
+                if ("brain".equals(itemId)) {
+                    hasNao = true;
+                    libraryCleared = true;
+                } else if ("usb".equals(itemId)) {
+                    hasUsb = true;
+                    labCleared = true;
+                }
+            }
+        } else if (event.getType() == EventType.ITEM_USED) {
+            final String itemId = (String) event.getData();
+            if ("coffee".equals(itemId)) {
+                coffeeCount++;
+            }
+        }
     }
 }

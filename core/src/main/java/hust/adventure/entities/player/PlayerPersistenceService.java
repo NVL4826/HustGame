@@ -12,33 +12,15 @@ import java.util.Map;
  * Service to handle saving and restoring Player stats, weapons, and gears to/from the global ProgressContext.
  */
 public class PlayerPersistenceService {
-    private static GearFactory gearFactory;
-    private static WeaponFactory weaponFactory;
+    private final ProgressContext progressContext;
+    private final GearFactory gearFactory;
+    private final WeaponFactory weaponFactory;
 
-    /**
-     * Sets the GearFactory instance used for restoring gear instances.
-     *
-     * @param factory the GearFactory instance
-     */
-    public static void setGearFactory(final GearFactory factory) {
-        gearFactory = factory;
-    }
-
-    /**
-     * Sets the WeaponFactory instance used for restoring weapon instances.
-     *
-     * @param factory the WeaponFactory instance
-     */
-    public static void setWeaponFactory(final WeaponFactory factory) {
-        weaponFactory = factory;
-    }
-
-    public static GearFactory getGearFactory() {
-        return gearFactory;
-    }
-
-    public static WeaponFactory getWeaponFactory() {
-        return weaponFactory;
+    public PlayerPersistenceService(final ProgressContext progressContext, final GearFactory gearFactory,
+            final WeaponFactory weaponFactory) {
+        this.progressContext = progressContext;
+        this.gearFactory = gearFactory;
+        this.weaponFactory = weaponFactory;
     }
 
     /**
@@ -46,20 +28,20 @@ public class PlayerPersistenceService {
      *
      * @param player The player entity instance.
      */
-    public static void saveWeaponsAndGears(final Player player) {
-        if (ProgressContext.instance == null || player == null) {
+    public void save(final Player player) {
+        if (progressContext == null || player == null) {
             return;
         }
 
-        ProgressContext.instance.getWeaponLevels().clear();
+        progressContext.getWeaponLevels().clear();
         for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
-            ProgressContext.instance.getWeaponLevels().put(weapon.getId().toLowerCase(), weapon.getLevel());
+            progressContext.getWeaponLevels().put(weapon.getId().toLowerCase(), weapon.getLevel());
         }
 
-        ProgressContext.instance.getGearLevels().clear();
+        progressContext.getGearLevels().clear();
         if (player.getGearManager() != null) {
             for (final Gear gear : player.getGearManager().getGears()) {
-                ProgressContext.instance.getGearLevels().put(gear.getId().toLowerCase(), gear.getLevel());
+                progressContext.getGearLevels().put(gear.getId().toLowerCase(), gear.getLevel());
             }
         }
     }
@@ -69,13 +51,13 @@ public class PlayerPersistenceService {
      *
      * @param player The player entity instance.
      */
-    public static void restoreWeaponsAndGears(final Player player) {
-        if (ProgressContext.instance == null || player == null) {
+    public void restore(final Player player) {
+        if (progressContext == null || player == null) {
             return;
         }
 
-        final Map<String, Integer> savedWeapons = ProgressContext.instance.getWeaponLevels();
-        final Map<String, Integer> savedGears = ProgressContext.instance.getGearLevels();
+        final Map<String, Integer> savedWeapons = progressContext.getWeaponLevels();
+        final Map<String, Integer> savedGears = progressContext.getGearLevels();
 
         // Restore weapons
         if (savedWeapons.isEmpty()) {
@@ -119,5 +101,4 @@ public class PlayerPersistenceService {
             }
         }
     }
-
 }

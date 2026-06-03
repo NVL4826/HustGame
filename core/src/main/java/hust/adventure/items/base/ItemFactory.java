@@ -5,12 +5,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.effects.types.ConfusionEffect;
 import hust.adventure.effects.types.RegenEffect;
 import hust.adventure.effects.types.SpeedBoostEffect;
 import hust.adventure.entities.base.Character;
 import hust.adventure.entities.player.Player;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
 import hust.adventure.items.FloatingTextInfo;
 import hust.adventure.items.consumable.ConsumableItem;
 import hust.adventure.items.consumable.ConsumableItemConfig;
@@ -41,8 +43,8 @@ public class ItemFactory {
                 .addEffect(new RegenEffect(config.getDuration(), config.getValue())));
         effectProviders.put("confusion", config -> consumer -> consumer.getStatusEffectManager()
                 .addEffect(new ConfusionEffect(config.getDuration())));
-        effectProviders.put("coffee", config -> consumer -> ProgressContext.instance
-                .setCoffeeCount(ProgressContext.instance.getCoffeeCount() + 1));
+        effectProviders.put("coffee", config -> consumer -> EventDispatcher.getInstance()
+                .dispatch(new GameEvent<>(EventType.ITEM_USED, "coffee")));
     }
 
     /**

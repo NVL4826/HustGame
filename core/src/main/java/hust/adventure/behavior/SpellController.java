@@ -16,10 +16,17 @@ public class SpellController {
     private static final float RADAR_DURATION = 5f;
     private static final float RADAR_STAMINA_COST = 10f;
 
-    // Spells Timers
     private float slowMotionTimer = 0f;
     private float stunTimer = 0f;
     private float showEnemiesTimer = 0f;
+    private final ProgressContext progressContext;
+
+    /**
+     * Constructs a SpellController with ProgressContext.
+     */
+    public SpellController(final ProgressContext progressContext) {
+        this.progressContext = progressContext;
+    }
 
     /**
      * Updates spell timers and checks input keys to trigger spells.
@@ -30,7 +37,7 @@ public class SpellController {
      */
     public void update(final Player player, final PlayerController controller, final float delta) {
         // Skill key checks
-        if (ProgressContext.instance.isHasNao() && controller.isSkillQJustPressed()) {
+        if (progressContext.isHasNao() && controller.isSkillQJustPressed()) {
             slowMotionTimer = SLOW_MOTION_DURATION;
         }
 
@@ -62,8 +69,8 @@ public class SpellController {
         } else if (slowMotionTimer > 0) {
             enemyTimeScale = SLOW_MOTION_TIME_SCALE;
         }
-        ProgressContext.instance.setEnemyTimeScale(enemyTimeScale);
-        ProgressContext.instance.setShowEnemiesTimer(showEnemiesTimer);
+        progressContext.setEnemyTimeScale(enemyTimeScale);
+        progressContext.setShowEnemiesTimer(showEnemiesTimer);
     }
 
     /**

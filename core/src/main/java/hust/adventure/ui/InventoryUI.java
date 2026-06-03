@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
@@ -67,8 +66,8 @@ public class InventoryUI {
     public InventoryUI() {
     }
 
-    public void render(final SpriteBatch batch, final ShapeRenderer sr, final BitmapFont font, final InventoryUIData data) {
-        if (!ProgressContext.instance.isInventoryOpen())
+    public void render(final SpriteBatch batch, final ShapeRenderer sr, final BitmapFont font, final InventoryUIData data, final boolean isInventoryOpen) {
+        if (!isInventoryOpen)
             return;
 
         // Mouse (flip Y)
@@ -219,8 +218,8 @@ public class InventoryUI {
         return new float[] { x, y };
     }
 
-    public void update(final int keyPressed, final InventoryUIData data) {
-        if (!ProgressContext.instance.isInventoryOpen())
+    public void update(final int keyPressed, final InventoryUIData data, final boolean isInventoryOpen) {
+        if (!isInventoryOpen)
             return;
 
         if (keyPressed > 0 && data != null && data.getItems() != null) {

@@ -152,7 +152,7 @@ public class BossFightBehavior implements LevelBehavior {
         }
 
         float dt = delta;
-        if (ProgressContext.instance.isHasNao() && context.getInputReader().isQJustPressed()) {
+        if (context.getProgressContext().isHasNao() && context.getInputReader().isQJustPressed()) {
             dt *= 0.3f;
         }
 

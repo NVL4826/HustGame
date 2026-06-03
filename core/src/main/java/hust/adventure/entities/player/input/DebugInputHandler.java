@@ -38,6 +38,7 @@ public class DebugInputHandler {
     private final WeaponFactory weaponFactory;
     private final GearFactory gearFactory;
     private final DebugOptionRegistry debugOptionRegistry;
+    private final ProgressContext progressContext;
 
     // States for debug selection
     private SelectionMode activeMode = SelectionMode.NONE;
@@ -56,9 +57,13 @@ public class DebugInputHandler {
      */
     public DebugInputHandler(final UIManager uiManager, final EntityFactory entityFactory,
             final GameAssetManager assetManager, final InputReader inputReader, final WeaponFactory weaponFactory,
-            final GearFactory gearFactory, final DebugOptionRegistry debugOptionRegistry) {
+            final GearFactory gearFactory, final DebugOptionRegistry debugOptionRegistry,
+            final ProgressContext progressContext) {
         if (inputReader == null) {
             throw new IllegalArgumentException("inputReader cannot be null");
+        }
+        if (progressContext == null) {
+            throw new IllegalArgumentException("progressContext cannot be null");
         }
         this.uiManager = uiManager;
         this.entityFactory = entityFactory;
@@ -67,6 +72,7 @@ public class DebugInputHandler {
         this.weaponFactory = weaponFactory;
         this.gearFactory = gearFactory;
         this.debugOptionRegistry = debugOptionRegistry;
+        this.progressContext = progressContext;
     }
 
     /**
@@ -90,10 +96,10 @@ public class DebugInputHandler {
         }
 
         if (inputReader.isKeyJustPressed(Input.Keys.F4)) {
-            ProgressContext.instance.setGodMode(!ProgressContext.instance.isGodMode());
+            progressContext.setGodMode(!progressContext.isGodMode());
         }
         if (inputReader.isKeyJustPressed(Input.Keys.F5)) {
-            ProgressContext.instance.setFastRun(!ProgressContext.instance.isFastRun());
+            progressContext.setFastRun(!progressContext.isFastRun());
         }
         if (inputReader.isKeyJustPressed(Input.Keys.F6)) {
             startSelection(SelectionMode.MAP);
@@ -112,7 +118,7 @@ public class DebugInputHandler {
             return PlayMode.IN_UI;
         }
         if (inputReader.isKeyJustPressed(Input.Keys.F10)) {
-            final float needed = ProgressContext.instance.getExpToNextLevel() - ProgressContext.instance.getExp();
+            final float needed = progressContext.getExpToNextLevel() - progressContext.getExp();
             final ExpGainedEvent payload = new ExpGainedEvent(needed);
             final GameEvent<ExpGainedEvent> event = new GameEvent<>(EventType.EXP_GAINED, payload);
             EventDispatcher.getInstance().dispatch(event);

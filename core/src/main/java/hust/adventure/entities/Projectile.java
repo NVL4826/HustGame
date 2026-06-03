@@ -28,19 +28,14 @@ public class Projectile extends MapObject implements Pool.Poolable {
     private int pierce = 1;
     private final Array<MapObject> hitEntities = new Array<>();
     private Texture texture;
+    private ProgressContext progressContext;
 
     public Projectile() {
         super(0, 0, 30, 30);
     }
 
-    public Projectile(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer) {
-        super(x, y, 30, 30);
-        // Note: constructor is kept for reference, but should call init with texture or get from factory.
-        init(x, y, vx, vy, damage, color, isPlayer, null);
-    }
-
-    public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer,
-            Texture texture) {
+    public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer, Texture texture,
+            final ProgressContext progressContext) {
         setX(x);
         setY(y);
         this.vx = vx;
@@ -54,6 +49,7 @@ public class Projectile extends MapObject implements Pool.Poolable {
         this.pierce = 1;
         this.hitEntities.clear();
         this.texture = texture;
+        this.progressContext = progressContext;
     }
 
     @Override
@@ -67,6 +63,7 @@ public class Projectile extends MapObject implements Pool.Poolable {
         pierce = 1;
         hitEntities.clear();
         texture = null;
+        progressContext = null;
         if (getCollider() != null) {
             getCollider().setListener(null);
         }
@@ -125,7 +122,8 @@ public class Projectile extends MapObject implements Pool.Poolable {
     public void update(float delta) {
         float localDelta = delta;
         if (!isPlayerProjectile) {
-            localDelta *= ProgressContext.instance.getEnemyTimeScale();
+            final float enemyTimeScale = (progressContext != null) ? progressContext.getEnemyTimeScale() : 1.0f;
+            localDelta *= enemyTimeScale;
         }
         setX(getX() + vx * localDelta);
         setY(getY() + vy * localDelta);

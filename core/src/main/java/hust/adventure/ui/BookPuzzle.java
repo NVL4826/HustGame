@@ -38,12 +38,14 @@ public class BookPuzzle implements Disposable {
     private final List<PuzzleSlot> slots;
     private final BitmapFont font;
     private boolean isSolved = false;
+    private final ProgressContext progressContext;
 
-    public BookPuzzle(final Map<String, Integer> bookConfigs) {
+    public BookPuzzle(final Map<String, Integer> bookConfigs, final ProgressContext progressContext) {
         if (bookConfigs == null || bookConfigs.isEmpty()) {
             throw new IllegalArgumentException("Book configurations cannot be null or empty");
         }
 
+        this.progressContext = progressContext;
         this.font = new BitmapFont();
         this.font.setColor(Color.WHITE);
         this.books = new ArrayList<>();
@@ -156,7 +158,7 @@ public class BookPuzzle implements Disposable {
         for (final PuzzleBook b : books) {
             if (b.isPlacedCorrectly()) {
                 shapeRenderer.setColor(COLOR_BOOK_CORRECT);
-            } else if (ProgressContext.instance.isHasNao() && b.isDragging()) {
+            } else if (progressContext != null && progressContext.isHasNao() && b.isDragging()) {
                 shapeRenderer.setColor(COLOR_BOOK_DRAGGING);
             } else {
                 shapeRenderer.setColor(COLOR_BOOK_DEFAULT);

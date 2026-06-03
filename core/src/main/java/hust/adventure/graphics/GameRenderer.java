@@ -59,6 +59,7 @@ public class GameRenderer {
     private final DebugInfoUIData debugInfoData;
     private final java.util.List<String> tempWeaponsList = new java.util.ArrayList<>();
     private final java.util.List<String> tempGearsList = new java.util.ArrayList<>();
+    private final ProgressContext progressContext;
     private static final Matrix4 uiMatrix = new Matrix4();
     private final GlyphLayout layout = new GlyphLayout();
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
@@ -69,7 +70,8 @@ public class GameRenderer {
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
             final StatusEffectsHUD statusEffectsHUD, final InventoryUI inventoryUI, final LevelUpUI levelUpUI,
-            final DamageTextManager damageTextManager, final DebugUI debugUI, final WorldManager worldManager) {
+            final DamageTextManager damageTextManager, final DebugUI debugUI, final WorldManager worldManager,
+            final ProgressContext progressContext) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
         this.batch = batch;
@@ -78,6 +80,7 @@ public class GameRenderer {
         this.hud = hud;
         this.statusEffectsHUD = statusEffectsHUD;
         this.inventoryUI = inventoryUI;
+        this.progressContext = progressContext;
         this.levelUpUI = levelUpUI;
         this.damageTextManager = damageTextManager;
         this.debugUI = debugUI;
@@ -133,9 +136,9 @@ public class GameRenderer {
                 final Enemy enemy = (Enemy) entity;
                 if (!enemy.isDead()) {
                     // Flashlight culling check in lights out mode
-                    if (ProgressContext.instance.isLightsOut()
-                            && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
-                        final Player p = ProgressContext.instance.getPlayer();
+                    if (progressContext != null && progressContext.isLightsOut()
+                            && progressContext.getShowEnemiesTimer() <= 0f) {
+                        final Player p = progressContext.getPlayer();
                         if (p != null) {
                             final float dx = enemy.getX() - p.getX();
                             final float dy = enemy.getY() - p.getY();
@@ -226,7 +229,7 @@ public class GameRenderer {
         }
 
         // 5.5. Render Debug Hitboxes
-        if (ProgressContext.instance.isShowHitbox()) {
+        if (progressContext != null && progressContext.isShowHitbox()) {
             renderDebugHitboxes(shapeRenderer);
         }
 
@@ -240,10 +243,12 @@ public class GameRenderer {
             final Player player) {
         if (hud != null) {
             final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
-            hudData.set(ProgressContext.instance.getHp(), ProgressContext.instance.getMaxHp(),
-                    ProgressContext.instance.getStamina(), ProgressContext.instance.getMaxStamina(),
-                    ProgressContext.instance.getMorale(), ProgressContext.instance.getExp(),
-                    ProgressContext.instance.getExpToNextLevel(), ProgressContext.instance.getLevel(), currentTime);
+            if (progressContext != null) {
+                hudData.set(progressContext.getHp(), progressContext.getMaxHp(),
+                        progressContext.getStamina(), progressContext.getMaxStamina(),
+                        progressContext.getMorale(), progressContext.getExp(),
+                        progressContext.getExpToNextLevel(), progressContext.getLevel(), currentTime);
+            }
             hud.render(batch, shapeRenderer, font, hudData);
         }
         if (statusEffectsHUD != null) {
@@ -255,9 +260,11 @@ public class GameRenderer {
                 isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
                 isConfused = player.hasStatus(StatusFlag.CONFUSED);
             }
-            statusData.set(ProgressContext.instance.isHasNao(), ProgressContext.instance.isHasUsb(),
-                    ProgressContext.instance.getEnemyTimeScale(), ProgressContext.instance.getShowEnemiesTimer(),
-                    isSpeedBoosted, isHpRegen, isConfused);
+            if (progressContext != null) {
+                statusData.set(progressContext.isHasNao(), progressContext.isHasUsb(),
+                        progressContext.getEnemyTimeScale(), progressContext.getShowEnemiesTimer(),
+                        isSpeedBoosted, isHpRegen, isConfused);
+            }
             statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
@@ -271,14 +278,14 @@ public class GameRenderer {
                 }
             }
             final InventoryUIData invData = new InventoryUIData(itemDataList);
-            inventoryUI.render(batch, shapeRenderer, font, invData);
+            inventoryUI.render(batch, shapeRenderer, font, invData, progressContext != null && progressContext.isInventoryOpen());
         }
         if (levelUpUI != null) {
             levelUpUI.render(batch, shapeRenderer, font);
         }
 
         if (debugUI != null) {
-            if (ProgressContext.instance.isShowHitbox()) {
+            if (progressContext != null && progressContext.isShowHitbox()) {
                 float px = 0f, py = 0f;
                 float speed = 0f;
                 float powerMultiplier = 1f;
@@ -315,7 +322,7 @@ public class GameRenderer {
                 }
 
                 String mapName = "Unknown";
-                final LevelConfig currentLevelConfig = ProgressContext.instance.getCurrentLevelConfig();
+                final LevelConfig currentLevelConfig = progressContext != null ? progressContext.getCurrentLevelConfig() : null;
                 if (currentLevelConfig != null) {
                     mapName = currentLevelConfig.getName();
                 }
@@ -335,9 +342,17 @@ public class GameRenderer {
                         stateName, mapName, fps, activeEntitiesCount, usedMemoryMB, totalMemoryMB, tempWeaponsList,
                         tempGearsList);
 
-                debugUI.render(batch, shapeRenderer, font, debugInfoData, player);
+                debugUI.render(batch, shapeRenderer, font, debugInfoData, player,
+                        progressContext != null && progressContext.isShowDebug(),
+                        progressContext != null && progressContext.isShowHitbox(),
+                        progressContext != null && progressContext.isGodMode(),
+                        progressContext != null && progressContext.isFastRun());
             } else {
-                debugUI.render(batch, shapeRenderer, font, null, player);
+                debugUI.render(batch, shapeRenderer, font, null, player,
+                        progressContext != null && progressContext.isShowDebug(),
+                        false,
+                        progressContext != null && progressContext.isGodMode(),
+                        progressContext != null && progressContext.isFastRun());
             }
         }
 

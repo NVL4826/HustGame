@@ -4,6 +4,12 @@ import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 
 public class DamageIncreaseAction implements UpgradeAction {
+    private final ProgressContext progressContext;
+
+    public DamageIncreaseAction(final ProgressContext progressContext) {
+        this.progressContext = progressContext;
+    }
+
     @Override
     public String getName() {
         return "Tăng sát thương";
@@ -17,7 +23,7 @@ public class DamageIncreaseAction implements UpgradeAction {
     @Override
     public void execute(Player player) {
         // Nhân đôi damageMultiplier trong ProgressContext → persist qua map transition
-        float current = ProgressContext.instance.getDamageMultiplier();
-        ProgressContext.instance.setDamageMultiplier(current * 2f);
+        float current = progressContext.getDamageMultiplier();
+        progressContext.setDamageMultiplier(current * 2f);
     }
 }

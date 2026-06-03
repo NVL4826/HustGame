@@ -41,9 +41,11 @@ public class LabBehavior implements LevelBehavior, EventListener {
     private static final float BLINK_INTERVAL = 1.0f; // 1 giây hiện, 1 giây ẩn
     private float blinkTimer = 0f;
     private boolean blinkPhase = true; // true = hiện, false = ẩn
+    private LevelContext context;
 
     @Override
     public void init(final LevelContext context) {
+        this.context = context;
         uiCam = new OrthographicCamera();
         uiCam.setToOrtho(false, 800, 600);
         uiCam.update();
@@ -63,7 +65,7 @@ public class LabBehavior implements LevelBehavior, EventListener {
             if (blinkTimer >= BLINK_INTERVAL) {
                 blinkTimer = 0f;
                 blinkPhase = !blinkPhase;
-                ProgressContext.instance.setEnemyBlinkVisible(blinkPhase);
+                context.getProgressContext().setEnemyBlinkVisible(blinkPhase);
             }
         }
 
@@ -106,8 +108,8 @@ public class LabBehavior implements LevelBehavior, EventListener {
         // Reset blink khi vào wave mới (chỉ wave 3 mới blink)
         blinkTimer = 0f;
         blinkPhase = true;
-        ProgressContext.instance.setEnemyBlinkVisible(true);
-        ProgressContext.instance.setLightsOut(wave == LIGHTS_OUT_WAVE);
+        context.getProgressContext().setEnemyBlinkVisible(true);
+        context.getProgressContext().setLightsOut(wave == LIGHTS_OUT_WAVE);
 
         if (wave == LIGHTS_OUT_WAVE) {
             context.getLightingManager()
@@ -161,9 +163,6 @@ public class LabBehavior implements LevelBehavior, EventListener {
         if (event.getType() == EventType.ITEM_PICKED_UP) {
             final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
             if (data.getItem().getId().equals("usb")) {
-                ProgressContext.instance.setHasUsb(true);
-                ProgressContext.instance.setLabCleared(true);
-
                 final MapTransitionData transData = new MapTransitionData(BOSS_MAP, BOSS_SPAWN_X, BOSS_SPAWN_Y);
                 final GameEvent<MapTransitionData> transEvent = new GameEvent<>(EventType.MAP_TRANSITION, transData);
                 EventDispatcher.getInstance().dispatch(transEvent);
@@ -179,11 +178,11 @@ public class LabBehavior implements LevelBehavior, EventListener {
     @Override
     public void dispose(final LevelContext context) {
         EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
-        ProgressContext.instance.setLightsOut(false);
-        ProgressContext.instance.setEnemyBlinkVisible(true); // reset blink khi rời màn lab
+        context.getProgressContext().setLightsOut(false);
+        context.getProgressContext().setEnemyBlinkVisible(true); // reset blink khi rời màn lab
     }
 
     public boolean isLightsOut() {
-        return ProgressContext.instance.isLightsOut();
+        return context != null ? context.getProgressContext().isLightsOut() : false;
     }
 }

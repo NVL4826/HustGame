@@ -39,6 +39,8 @@ public class EntityFactoryImpl implements EntityFactory {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final EnemyDataLoader enemyDataManager;
+    private final ProgressContext progressContext;
+    private final hust.adventure.entities.player.PlayerPersistenceService persistenceService;
     private final Array<Texture> bookTextures = new Array<>();
 
     /**
@@ -50,7 +52,8 @@ public class EntityFactoryImpl implements EntityFactory {
      * @param enemyDataManager the configuration loader for enemies
      */
     public EntityFactoryImpl(final GameAssetManager assetManager, final EntityManager entityManager,
-            final CollisionManager collisionManager, final EnemyDataLoader enemyDataManager) {
+            final CollisionManager collisionManager, final EnemyDataLoader enemyDataManager,
+            final ProgressContext progressContext, final hust.adventure.entities.player.PlayerPersistenceService persistenceService) {
         if (assetManager == null)
             throw new NullPointerException("assetManager cannot be null");
         if (entityManager == null)
@@ -59,11 +62,17 @@ public class EntityFactoryImpl implements EntityFactory {
             throw new NullPointerException("collisionManager cannot be null");
         if (enemyDataManager == null)
             throw new NullPointerException("enemyDataManager cannot be null");
+        if (progressContext == null)
+            throw new NullPointerException("progressContext cannot be null");
+        if (persistenceService == null)
+            throw new NullPointerException("persistenceService cannot be null");
 
         this.assetManager = assetManager;
         this.entityManager = entityManager;
         this.collisionManager = collisionManager;
         this.enemyDataManager = enemyDataManager;
+        this.progressContext = progressContext;
+        this.persistenceService = persistenceService;
 
         // Pre-cache book textures for easy random access
         for (int i = 19; i <= 29; i++)
@@ -75,8 +84,9 @@ public class EntityFactoryImpl implements EntityFactory {
     @Override
     public Player createPlayer(float x, float y, Inventory inventory, PlayerController controller) {
         Player player = Player.builder().startX(x).startY(y).inventory(inventory).controller(controller)
-                .collisionManager(collisionManager).assetManager(assetManager)
-                .stats(ProgressContext.instance.getPlayerStats()).build();
+            .collisionManager(collisionManager).assetManager(assetManager)
+            .stats(progressContext.getPlayerStats()).progressContext(progressContext)
+            .persistenceService(persistenceService).build();
         player.setFactory(this);
         player.setCollider(new Collider(player, CollisionLayer.PLAYER, Collider.Shape.RECTANGLE));
         entityManager.addEntity(player);
@@ -90,7 +100,7 @@ public class EntityFactoryImpl implements EntityFactory {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
         final Enemy enemy = Enemy.builder().x(x).y(y).collisionManager(collisionManager).config(config)
-                .player(ProgressContext.instance.getPlayer()).entityManager(entityManager).build();
+                .player(progressContext.getPlayer()).entityManager(entityManager).progressContext(progressContext).build();
 
         if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
             try {
@@ -134,7 +144,7 @@ public class EntityFactoryImpl implements EntityFactory {
         // Projectiles still use pooling
         Projectile p = GamePools.obtain(Projectile.class);
         Texture bulletTexture = assetManager.getTexture("bullet.png");
-        p.init(x, y, vx, vy, damage, color, isPlayer, bulletTexture);
+        p.init(x, y, vx, vy, damage, color, isPlayer, bulletTexture, progressContext);
         int layer = isPlayer ? CollisionLayer.PLAYER_BULLET : CollisionLayer.ENEMY_BULLET;
 
         if (p.getCollider() == null) {

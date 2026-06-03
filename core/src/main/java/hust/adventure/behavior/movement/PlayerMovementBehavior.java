@@ -3,15 +3,12 @@ package hust.adventure.behavior.movement;
 import com.badlogic.gdx.math.MathUtils;
 
 import hust.adventure.collision.CollisionManager;
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.base.StatusFlag;
 import hust.adventure.entities.base.Direction;
 import hust.adventure.entities.state.EntityState;
-import hust.adventure.entities.state.IdleState;
-import hust.adventure.entities.state.MovingState;
 
 public class PlayerMovementBehavior implements MovementBehavior {
     private PlayerController controller;
@@ -40,7 +37,7 @@ public class PlayerMovementBehavior implements MovementBehavior {
         float currentSpeed = player.getSpeed();
         boolean isSprinting = controller.isRunning() && player.getStamina() > 0;
 
-        if (ProgressContext.instance.isFastRun()) {
+        if (player.getProgressContext() != null && player.getProgressContext().isFastRun()) {
             currentSpeed *= 3.0f;
             player.restoreStamina(100f * delta);
         } else if (player.getStamina() <= 0) {

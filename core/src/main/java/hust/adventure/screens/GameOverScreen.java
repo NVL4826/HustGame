@@ -20,6 +20,7 @@ import hust.adventure.screens.levels.LevelFactory;
  * Game Over screen – hiện ra khi player chết. Nhấn R → restart từ MAP_1 + reset ProgressContext. Nhấn ESC → thoát game.
  */
 public class GameOverScreen extends BaseScreen {
+    private final ProgressContext progressContext;
 
     private static final float UI_W = 800f;
     private static final float UI_H = 600f;
@@ -46,8 +47,9 @@ public class GameOverScreen extends BaseScreen {
     private boolean restartHover = false;
     private boolean quitHover = false;
 
-    public GameOverScreen(HustGame game) {
+    public GameOverScreen(final HustGame game) {
         super(game);
+        this.progressContext = game.getProgressContext();
         uiCam = new OrthographicCamera();
         uiCam.setToOrtho(false, UI_W, UI_H);
         uiCam.update();
@@ -190,8 +192,8 @@ public class GameOverScreen extends BaseScreen {
 
         // Stats
         font.setColor(0.7f, 0.7f, 0.7f, 1f);
-        layout.setText(font, "Cap do: " + ProgressContext.instance.getLevel() + "   EXP: "
-                + (int) ProgressContext.instance.getExp());
+        layout.setText(font, "Cap do: " + progressContext.getLevel() + "   EXP: "
+                + (int) progressContext.getExp());
         font.draw(batch, layout, (UI_W - layout.width) / 2f, UI_H / 2f + 20f);
 
         // Nút text
@@ -217,7 +219,7 @@ public class GameOverScreen extends BaseScreen {
 
     private void doRestart() {
         // Lấy config màn hiện tại TRƯỚC khi reset (reset sẽ không xóa config)
-        LevelConfig savedConfig = ProgressContext.instance.getCurrentLevelConfig();
+        LevelConfig savedConfig = progressContext.getCurrentLevelConfig();
         if (savedConfig == null) {
             // Fallback nếu chưa lưu được (ví dụ: chết ngay màn đầu)
             LevelConfig template = game.getLevelDataManager().getLevelConfig("FINAL_OUTSIDE");
@@ -225,7 +227,7 @@ public class GameOverScreen extends BaseScreen {
                     template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
                     template.getAmbientColor(), template.isInfinite());
         }
-        ProgressContext.instance.reset();
+        progressContext.reset();
         Screen next = LevelFactory.createLevel(game, savedConfig);
         if (next != null) {
             game.getScreenTransition().fadeOut(next, 0.5f);

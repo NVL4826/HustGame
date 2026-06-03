@@ -51,6 +51,7 @@ import hust.adventure.world.WorldManager;
 public class PlayScreen extends BaseScreen implements LevelContext, EventListener {
     private final LevelConfig config;
     private final LevelBehavior behavior;
+    private final ProgressContext progressContext;
     private PlayMode state;
 
     private final WorldManager worldManager;
@@ -90,21 +91,22 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
         this.config = config;
         this.behavior = behavior;
+        this.progressContext = game.getProgressContext();
         this.state = PlayMode.RUNNING;
 
         this.worldManager = new WorldManager();
-        this.levelManager = new LevelManager();
+        this.levelManager = new LevelManager(progressContext);
         this.entityManager = new EntityManager();
         this.collisionManager = new CollisionManager(entityManager, 64f);
 
         final EnemyDataLoader enemyDataManager = game.getEnemyDataManager();
         this.entityFactory = new EntityFactoryImpl(game.getAssetManager(), entityManager, collisionManager,
-                enemyDataManager);
-        this.uiManager = new UIManager();
+                enemyDataManager, progressContext, game.getPlayerPersistenceService());
+        this.uiManager = new UIManager(progressContext);
         this.inputReader = new InputReader();
         this.lightingManager = new LightingManager();
         this.debugInputHandler = new DebugInputHandler(uiManager, entityFactory, game.getAssetManager(), inputReader,
-                game.getWeaponFactory(), game.getGearFactory(), game.getDebugOptionRegistry());
+                game.getWeaponFactory(), game.getGearFactory(), game.getDebugOptionRegistry(), progressContext);
         this.uiManager.getDebugUI().setInputHandler(debugInputHandler);
 
         EventDispatcher.getInstance().addListener(EventType.LEVEL_UP, this);
@@ -140,7 +142,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             mapRenderer.dispose();
         }
         // Ghi lại màn hiện tại để GameOverScreen biết restart vào đâu
-        ProgressContext.instance.setCurrentLevelConfig(config);
+        progressContext.setCurrentLevelConfig(config);
 
         lightingManager.setAmbientLight(config.getAmbientColor());
         worldManager.loadMap(game.getAssetManager().getTiledMap(config.getMapPath()));
@@ -191,7 +193,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         float spawnY = (tmxSpawn != null) ? tmxSpawn.y : config.getSpawnY();
 
         if (player == null) {
-            player = entityFactory.createPlayer(spawnX, spawnY, ProgressContext.instance.getGlobalInventory(),
+            player = entityFactory.createPlayer(spawnX, spawnY, progressContext.getGlobalInventory(),
                     inputReader);
             cameraManager.setTarget(player);
         } else {
@@ -209,7 +211,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
                 .hud(uiManager.getHud()).statusEffectsHUD(uiManager.getStatusEffectsHUD())
                 .inventoryUI(uiManager.getInventoryUI()).levelUpUI(uiManager.getLevelUpUI())
                 .damageTextManager(uiManager.getDamageTextManager()).debugUI(uiManager.getDebugUI())
-                .worldManager(worldManager).build();
+                .worldManager(worldManager).progressContext(progressContext).build();
 
         setupLayerIndices();
 
@@ -293,8 +295,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     private void handleInput() {
         if (inputReader.isInventoryJustPressed()) {
-            boolean nextState = !ProgressContext.instance.isInventoryOpen();
-            ProgressContext.instance.setInventoryOpen(nextState);
+            boolean nextState = !progressContext.isInventoryOpen();
+            progressContext.setInventoryOpen(nextState);
             if (nextState) {
                 this.state = PlayMode.IN_UI;
                 EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_OPENED, null));
@@ -305,8 +307,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
         }
         if (inputReader.isDebugJustPressed()) {
-            ProgressContext.instance.setShowDebug(!ProgressContext.instance.isShowDebug());
-            if (!ProgressContext.instance.isShowDebug()) {
+            progressContext.setShowDebug(!progressContext.isShowDebug());
+            if (!progressContext.isShowDebug()) {
                 debugInputHandler.cancelDebug();
                 if (state == PlayMode.IN_UI) {
                     state = PlayMode.RUNNING;
@@ -314,10 +316,10 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             }
         }
         if (inputReader.isHitboxJustPressed()) {
-            ProgressContext.instance.setShowHitbox(!ProgressContext.instance.isShowHitbox());
+            progressContext.setShowHitbox(!progressContext.isShowHitbox());
         }
 
-        if (ProgressContext.instance.isShowDebug()) {
+        if (progressContext.isShowDebug()) {
             final PlayMode newState = debugInputHandler.handleDebugInput(player, state);
             if (newState != null) {
                 state = newState;
@@ -375,6 +377,11 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (behavior instanceof EventListener) {
             ((EventListener) behavior).onEvent(event);
         }
+    }
+
+    @Override
+    public ProgressContext getProgressContext() {
+        return progressContext;
     }
 
     @Override
@@ -458,7 +465,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     @Override
     public void hide() {
         if (player != null) {
-            PlayerPersistenceService.saveWeaponsAndGears(player);
+            game.getPlayerPersistenceService().save(player);
         }
     }
 

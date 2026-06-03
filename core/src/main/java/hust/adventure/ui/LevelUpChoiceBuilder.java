@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
+import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.items.UpgradeCatalog;
@@ -23,15 +24,17 @@ public class LevelUpChoiceBuilder {
     private final GearDataLoader gearDataManager;
     private final WeaponDataLoader weaponDataManager;
     private final UpgradeCatalog upgradeCatalog;
+    private final ProgressContext progressContext;
 
     /**
      * Constructs a new LevelUpChoiceBuilder with dependencies.
      */
     public LevelUpChoiceBuilder(final GearDataLoader gearDataManager, final WeaponDataLoader weaponDataManager,
-            final UpgradeCatalog upgradeCatalog) {
+            final UpgradeCatalog upgradeCatalog, final ProgressContext progressContext) {
         this.gearDataManager = gearDataManager;
         this.weaponDataManager = weaponDataManager;
         this.upgradeCatalog = upgradeCatalog;
+        this.progressContext = progressContext;
     }
 
     /**
@@ -93,7 +96,7 @@ public class LevelUpChoiceBuilder {
         // Fallbacks if nothing is available
         if (possibleChoices.size == 0) {
             possibleChoices.add(new HealAction());
-            possibleChoices.add(new DamageIncreaseAction());
+            possibleChoices.add(new DamageIncreaseAction(progressContext));
         }
 
         possibleChoices.shuffle();

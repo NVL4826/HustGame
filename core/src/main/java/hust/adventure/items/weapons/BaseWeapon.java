@@ -1,6 +1,5 @@
 package hust.adventure.items.weapons;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.Equipable;
@@ -26,7 +25,8 @@ public abstract class BaseWeapon extends Item implements Equipable {
     private float shotTimer;
 
     public BaseWeapon(final Player owner, final WeaponConfig config) {
-        super(Objects.requireNonNull(config, "Config cannot be null").getId(), config.getName(), config.getDescription(), null);
+        super(Objects.requireNonNull(config, "Config cannot be null").getId(), config.getName(),
+                config.getDescription(), null);
         this.owner = Objects.requireNonNull(owner, "Owner cannot be null");
         this.config = config;
         this.level = 1;
@@ -131,8 +131,9 @@ public abstract class BaseWeapon extends Item implements Equipable {
             ownerMultiplier = owner.getPowerMultiplier();
         }
         float globalMultiplier = 1.0f;
-        if (ProgressContext.instance != null && ProgressContext.instance.getPlayerStats() != null) {
-            globalMultiplier = ProgressContext.instance.getPlayerStats().getDamageMultiplier();
+        if (owner != null && owner.getProgressContext() != null
+                && owner.getProgressContext().getPlayerStats() != null) {
+            globalMultiplier = owner.getProgressContext().getPlayerStats().getDamageMultiplier();
         }
         return baseDamage * ownerMultiplier * globalMultiplier;
     }
