@@ -12,21 +12,21 @@ import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.entities.combat.Projectile;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.enemies.EnemyConfig;
-import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.player.Player;
-import hust.adventure.entities.interactables.ExpGem;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.entities.environment.FloatingBook;
-import hust.adventure.entities.environment.Candle;
-import hust.adventure.entities.environment.StaticNPC;
 import hust.adventure.graphics.LightProvider;
+import hust.adventure.entities.Candle;
 import hust.adventure.entities.EntityManager;
+import hust.adventure.entities.ExpGem;
+import hust.adventure.entities.FloatingBook;
+import hust.adventure.entities.ItemDrop;
+import hust.adventure.entities.Projectile;
+import hust.adventure.entities.StaticNPC;
 import hust.adventure.utils.GamePools;
 
 /**
@@ -73,15 +73,9 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public Player createPlayer(float x, float y, Inventory inventory, PlayerController controller) {
-        Player player = Player.builder()
-                .startX(x)
-                .startY(y)
-                .inventory(inventory)
-                .controller(controller)
-                .collisionManager(collisionManager)
-                .assetManager(assetManager)
-                .stats(ProgressContext.instance.getPlayerStats())
-                .build();
+        Player player = Player.builder().startX(x).startY(y).inventory(inventory).controller(controller)
+                .collisionManager(collisionManager).assetManager(assetManager)
+                .stats(ProgressContext.instance.getPlayerStats()).build();
         player.setFactory(this);
         player.setCollider(new Collider(player, CollisionLayer.PLAYER, Collider.Shape.RECTANGLE));
         entityManager.addEntity(player);
@@ -94,14 +88,8 @@ public class EntityFactoryImpl implements EntityFactory {
         if (config == null) {
             throw new IllegalArgumentException("Unknown enemy type: " + type);
         }
-        final Enemy enemy = Enemy.builder()
-                .x(x)
-                .y(y)
-                .collisionManager(collisionManager)
-                .config(config)
-                .player(ProgressContext.instance.getPlayer())
-                .entityManager(entityManager)
-                .build();
+        final Enemy enemy = Enemy.builder().x(x).y(y).collisionManager(collisionManager).config(config)
+                .player(ProgressContext.instance.getPlayer()).entityManager(entityManager).build();
 
         if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
             try {
@@ -144,11 +132,12 @@ public class EntityFactoryImpl implements EntityFactory {
             boolean isPlayer) {
         // Projectiles still use pooling
         Projectile p = GamePools.obtain(Projectile.class);
-        p.init(x, y, vx, vy, damage, color, isPlayer);
+        Texture bulletTexture = assetManager.getTexture("bullet.png");
+        p.init(x, y, vx, vy, damage, color, isPlayer, bulletTexture);
         int layer = isPlayer ? CollisionLayer.PLAYER_BULLET : CollisionLayer.ENEMY_BULLET;
 
         if (p.getCollider() == null) {
-            p.setCollider(new Collider(p, layer, Collider.Shape.RECTANGLE, 5f));
+            p.setCollider(new Collider(p, layer, Collider.Shape.RECTANGLE, 3f));
         } else {
             p.getCollider().setLayer(layer);
             p.setCollider(p.getCollider());
@@ -165,7 +154,16 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public ItemDrop createItemDrop(float x, float y, Item item, Color color) {
-        ItemDrop itemDrop = new ItemDrop(x, y, item, color);
+        Texture itemTexture = null;
+        if (item != null && item.getSpritePath() != null && !item.getSpritePath().isEmpty()) {
+            try {
+                itemTexture = assetManager.getTexture(item.getSpritePath());
+            } catch (Exception e) {
+                com.badlogic.gdx.Gdx.app.error("EntityFactoryImpl",
+                        "Failed to load item texture: " + item.getSpritePath(), e);
+            }
+        }
+        ItemDrop itemDrop = new ItemDrop(x, y, item, color, itemTexture);
         itemDrop.setCollider(new Collider(itemDrop, CollisionLayer.ITEM, Collider.Shape.RECTANGLE));
         entityManager.addEntity(itemDrop);
         return itemDrop;

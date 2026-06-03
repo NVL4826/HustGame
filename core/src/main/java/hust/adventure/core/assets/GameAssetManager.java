@@ -8,22 +8,17 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
 
 public class GameAssetManager {
     private final AssetManager manager;
     private Texture whitePixel;
-    private final Json json;
 
     public GameAssetManager() {
         this.manager = new AssetManager();
-        this.json = new Json();
         manager.setLoader(TiledMap.class, new TmxMapLoader());
     }
-
 
     public void loadAllAssets() {
         // Textures
@@ -34,6 +29,12 @@ public class GameAssetManager {
         for (int i = 4; i <= 25; i++) {
             manager.load(i + ".png", Texture.class);
         }
+        manager.load("bullet.png", Texture.class);
+        manager.load("items/brain.png", Texture.class);
+        manager.load("items/coffee.png", Texture.class);
+        manager.load("items/energy_drink.png", Texture.class);
+        manager.load("items/kho_ga.png", Texture.class);
+        manager.load("items/usb.png", Texture.class);
 
         // Maps
         manager.load("Final Outside.tmx", TiledMap.class);

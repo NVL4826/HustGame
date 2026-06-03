@@ -1,8 +1,9 @@
 package hust.adventure.utils;
 
 import com.badlogic.gdx.utils.PoolManager;
-import hust.adventure.entities.combat.Projectile;
-import hust.adventure.entities.interactables.ExpGem;
+
+import hust.adventure.entities.ExpGem;
+import hust.adventure.entities.Projectile;
 import hust.adventure.ui.DamageText;
 import com.badlogic.gdx.math.Vector2;
 

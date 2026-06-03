@@ -9,7 +9,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntArray;
-import hust.adventure.entities.environment.WallEntity;
+
+import hust.adventure.entities.WallEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,8 @@ import java.util.Set;
  * Manages the game world state, including the map, collisions, and portals.
  */
 public class WorldManager implements Disposable {
-    private static final Set<String> KNOWN_BACKGROUND_LAYERS = Set.of(
-        "Via He", "Duong", "Grass", "Nha1", "Background", "Floor", "Tile Layer 1"
-    );
+    private static final Set<String> KNOWN_BACKGROUND_LAYERS = Set.of("Via He", "Duong", "Grass", "Nha1", "Background",
+            "Floor", "Tile Layer 1");
 
     private TiledMap currentMap;
     private final List<WallEntity> walls;
@@ -49,7 +49,7 @@ public class WorldManager implements Disposable {
 
     private void setupWalls() {
         walls.clear();
-        
+
         // Find collision layers using map properties, layer properties, or fallbacks
         final List<MapLayer> collisionLayers = findCollisionLayers();
         for (final MapLayer layer : collisionLayers) {
@@ -86,7 +86,8 @@ public class WorldManager implements Disposable {
             }
             if (collProp instanceof Boolean && (Boolean) collProp) {
                 foundLayers.add(layer);
-            } else if (collProp instanceof String && ("true".equalsIgnoreCase((String) collProp) || "1".equals(collProp))) {
+            } else if (collProp instanceof String
+                    && ("true".equalsIgnoreCase((String) collProp) || "1".equals(collProp))) {
                 foundLayers.add(layer);
             }
         }
@@ -95,7 +96,7 @@ public class WorldManager implements Disposable {
         }
 
         // 3. Fallback to default known collision layer names
-        final String[] defaultLayerNames = {"collision", "Border", "Object Layer 1"};
+        final String[] defaultLayerNames = { "collision", "Border", "Object Layer 1" };
         for (final String name : defaultLayerNames) {
             final MapLayer layer = currentMap.getLayers().get(name);
             if (layer != null) {
@@ -149,14 +150,15 @@ public class WorldManager implements Disposable {
     }
 
     /**
-     * Reads the spawn point of the player from the "Spawn" objectgroup in TMX.
-     * Supports custom properties for flexible configuration.
+     * Reads the spawn point of the player from the "Spawn" objectgroup in TMX. Supports custom properties for flexible
+     * configuration.
      *
      * @return the spawn point coordinates as a Vector2, or null if not found
      */
     public Vector2 getSpawnPoint() {
-        if (currentMap == null) return null;
-        
+        if (currentMap == null)
+            return null;
+
         // Check for custom spawn layer name in map properties, fallback to "Spawn"
         final String spawnLayerName = currentMap.getProperties().get("spawnLayer", "Spawn", String.class);
         MapLayer spawnLayer = currentMap.getLayers().get(spawnLayerName);
@@ -164,14 +166,15 @@ public class WorldManager implements Disposable {
             // Also try scanning for any layer with a property "isSpawn" or similar
             for (final MapLayer layer : currentMap.getLayers()) {
                 if ("true".equalsIgnoreCase(layer.getProperties().get("isSpawn", String.class))
-                 || Boolean.TRUE.equals(layer.getProperties().get("isSpawn", Boolean.class))) {
+                        || Boolean.TRUE.equals(layer.getProperties().get("isSpawn", Boolean.class))) {
                     spawnLayer = layer;
                     break;
                 }
             }
         }
 
-        if (spawnLayer == null) return null;
+        if (spawnLayer == null)
+            return null;
         for (final MapObject obj : spawnLayer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 final Rectangle rect = ((RectangleMapObject) obj).getRectangle();
@@ -184,8 +187,8 @@ public class WorldManager implements Disposable {
     }
 
     /**
-     * Analyzes map layers and classifies them into background/foreground.
-     * Prioritizes the "isBackground" property on each layer, falling back to a known name list.
+     * Analyzes map layers and classifies them into background/foreground. Prioritizes the "isBackground" property on
+     * each layer, falling back to a known name list.
      *
      * @return a 2D array where index [0] contains background layers and index [1] contains foreground layers.
      */

@@ -1,6 +1,5 @@
-package hust.adventure.entities.interactables;
+package hust.adventure.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,9 +13,6 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.Item;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Represents a physical item dropped in the world. Renders using a per-item sprite from assets/items/ when available,
  * falling back to a colored rectangle.
@@ -24,33 +20,7 @@ import java.util.Map;
 public class ItemDrop extends MapObject {
     private Item item;
     private Color color;
-
-    /** Shared sprite cache – loaded lazily, disposed with disposeStaticResources(). */
-    private static final Map<String, Texture> spriteCache = new HashMap<>();
-
-    private static Texture getSprite(Item item) {
-        if (item == null)
-            return null;
-        String path = item.getSpritePath();
-        if (path == null || path.isEmpty())
-            return null;
-        if (!spriteCache.containsKey(path)) {
-            if (Gdx.files.internal(path).exists()) {
-                spriteCache.put(path, new Texture(Gdx.files.internal(path)));
-            } else {
-                spriteCache.put(path, null); // mark missing so we don't retry every frame
-            }
-        }
-        return spriteCache.get(path);
-    }
-
-    public static void disposeStaticResources() {
-        for (Texture t : spriteCache.values()) {
-            if (t != null)
-                t.dispose();
-        }
-        spriteCache.clear();
-    }
+    private Texture sprite;
 
     // ── Bob animation ────────────────────────────────────────────────────────
     private float bobTimer = 0f;
@@ -61,16 +31,17 @@ public class ItemDrop extends MapObject {
         super(0, 0, 60, 60);
     }
 
-    public ItemDrop(float x, float y, Item item, Color color) {
+    public ItemDrop(float x, float y, Item item, Color color, Texture sprite) {
         super(x, y, 60, 60);
-        init(x, y, item, color);
+        init(x, y, item, color, sprite);
     }
 
-    public void init(float x, float y, Item item, Color color) {
+    public void init(float x, float y, Item item, Color color, Texture sprite) {
         setX(x);
         setY(y);
         this.item = item;
         this.color = color;
+        this.sprite = sprite;
         this.bobTimer = (float) (Math.random() * Math.PI * 2); // random phase
         setDestroyed(false);
         EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ITEM_DROPPED, this));
@@ -81,7 +52,7 @@ public class ItemDrop extends MapObject {
         super.setCollider(collider);
         if (collider != null) {
             collider.setListener(other -> {
-                ItemPickedUpEvent payload = new ItemPickedUpEvent(item, other);
+                ItemPickedUpEvent payload = new ItemPickedUpEvent(item, (MapObject) other);
                 GameEvent<ItemPickedUpEvent> event = new GameEvent<>(EventType.ITEM_PICKED_UP, payload);
                 EventDispatcher.getInstance().dispatch(event);
                 destroy();
@@ -96,19 +67,15 @@ public class ItemDrop extends MapObject {
 
     @Override
     public void draw(SpriteBatch batch) {
-        if (item == null)
+        if (item == null || sprite == null)
             return;
 
         float bob = (float) Math.sin(bobTimer * BOB_SPEED) * BOB_AMOUNT;
         float drawX = getX() - getWidth() / 2f;
         float drawY = getY() - getHeight() / 2f + bob;
 
-        Texture sprite = getSprite(item);
-        if (sprite != null) {
-            batch.setColor(Color.WHITE);
-            batch.draw(sprite, drawX, drawY, getWidth(), getHeight());
-        }
-        // Items without a dedicated sprite are not drawn (no fallback colored rect)
+        batch.setColor(Color.WHITE);
+        batch.draw(sprite, drawX, drawY, getWidth(), getHeight());
     }
 
     public void drawDebug(ShapeRenderer sr) {

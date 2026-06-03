@@ -24,5 +24,31 @@
       "spawnCount": 15,
       "pattern": "CIRCLE_AMBUSH"
     }
+  ],
+  "FINAL_OUTSIDE": [
+    {
+      "timeStart": 0,
+      "timeEnd": 60,
+      "enemyType": "null_pointer",
+      "spawnInterval": 1.5,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 60,
+      "timeEnd": 120,
+      "enemyType": "null_pointer",
+      "spawnInterval": 2.0,
+      "spawnCount": 2,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 120,
+      "timeEnd": 120,
+      "enemyType": "null_pointer",
+      "spawnInterval": 0,
+      "spawnCount": 15,
+      "pattern": "CIRCLE_AMBUSH"
+    }
   ]
 }

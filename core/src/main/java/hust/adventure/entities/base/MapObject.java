@@ -33,7 +33,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         super();
         this.bounds = new Rectangle();
         this.isDestroyed = false;
-        this.state = new IdleState();
+        this.state = EntityState.IDLE;
     }
 
     public MapObject(final float x, final float y, final float width, final float height) {
@@ -44,7 +44,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         this.height = height;
         this.bounds = new Rectangle(x - width / 2f, y - height / 2f, width, height);
         this.isDestroyed = false;
-        this.state = new IdleState();
+        this.state = EntityState.IDLE;
     }
 
     public void update(float delta) {
@@ -122,6 +122,9 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     public void setState(final EntityState newState) {
         if (newState == null)
             throw new IllegalArgumentException("State cannot be null");
+        if (this.state == newState) {
+            return;
+        }
 
         if (this.state != null) {
             this.state.exit(this);

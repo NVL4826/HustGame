@@ -8,6 +8,7 @@ import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.base.StatusFlag;
 import hust.adventure.entities.base.Direction;
+import hust.adventure.entities.state.EntityState;
 import hust.adventure.entities.state.IdleState;
 import hust.adventure.entities.state.MovingState;
 import hust.adventure.input.PlayerController;
@@ -89,13 +90,13 @@ public class PlayerMovementBehavior implements MovementBehavior {
         player.setDirection(newDirection);
 
         if (moving) {
-            player.setState(new MovingState());
+            player.setState(EntityState.MOVING);
             if (collisionManager.canMove(player, newX, newY)) {
                 player.setX(newX);
                 player.setY(newY);
             }
         } else {
-            player.setState(new IdleState());
+            player.setState(EntityState.IDLE);
         }
     }
 }

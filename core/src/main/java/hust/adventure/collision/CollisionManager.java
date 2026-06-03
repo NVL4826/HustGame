@@ -8,20 +8,20 @@ import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.entities.EntityManager;
+import hust.adventure.entities.WallEntity;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.entities.environment.WallEntity;
 
 import java.util.List;
 
 /**
- * High-performance collision system using Spatial Hashing and a Bitmask Collision Matrix.
- * Decouples static environment walls from dynamic entities to minimize CPU overhead.
+ * High-performance collision system using Spatial Hashing and a Bitmask Collision Matrix. Decouples static environment
+ * walls from dynamic entities to minimize CPU overhead.
  */
 public class CollisionManager {
     private final float cellSize;
     private final LongMap<Array<Collider>> dynamicGrid;
     private final LongMap<Array<Collider>> staticGrid;
-    
+
     // Zero-allocation cell array pooling structures
     private final Array<Array<Collider>> cellArrayPool;
     private final Array<Array<Collider>> activeDynamicCells;
@@ -196,8 +196,7 @@ public class CollisionManager {
     }
 
     /**
-     * Main update method for the collision system.
-     * Clears and rebuilds the dynamic grid, then resolves collisions.
+     * Main update method for the collision system. Clears and rebuilds the dynamic grid, then resolves collisions.
      */
     public void update() {
         rebuildDynamicGrid();
@@ -434,8 +433,11 @@ public class CollisionManager {
                     for (int i = 0; i < cell.size; i++) {
                         final Collider c = cell.get(i);
                         if ((c.getLayer() & layerMask) != 0 && c.getOwner().getBounds().overlaps(area)) {
-                            if (!result.contains(c.getOwner(), true)) {
-                                result.add(c.getOwner());
+                            if (c.getOwner() instanceof MapObject) {
+                                final MapObject mapObj = (MapObject) c.getOwner();
+                                if (!result.contains(mapObj, true)) {
+                                    result.add(mapObj);
+                                }
                             }
                         }
                     }
@@ -447,8 +449,11 @@ public class CollisionManager {
                         for (int i = 0; i < staticCell.size; i++) {
                             final Collider c = staticCell.get(i);
                             if ((c.getLayer() & layerMask) != 0 && c.getOwner().getBounds().overlaps(area)) {
-                                if (!result.contains(c.getOwner(), true)) {
-                                    result.add(c.getOwner());
+                                if (c.getOwner() instanceof MapObject) {
+                                    final MapObject mapObj = (MapObject) c.getOwner();
+                                    if (!result.contains(mapObj, true)) {
+                                        result.add(mapObj);
+                                    }
                                 }
                             }
                         }
@@ -483,8 +488,11 @@ public class CollisionManager {
                             final float dx = c.getOwner().getX() - cx;
                             final float dy = c.getOwner().getY() - cy;
                             if (dx * dx + dy * dy <= radiusSq) {
-                                if (!result.contains(c.getOwner(), true)) {
-                                    result.add(c.getOwner());
+                                if (c.getOwner() instanceof MapObject) {
+                                    final MapObject mapObj = (MapObject) c.getOwner();
+                                    if (!result.contains(mapObj, true)) {
+                                        result.add(mapObj);
+                                    }
                                 }
                             }
                         }
@@ -500,8 +508,11 @@ public class CollisionManager {
                                 final float dx = c.getOwner().getX() - cx;
                                 final float dy = c.getOwner().getY() - cy;
                                 if (dx * dx + dy * dy <= radiusSq) {
-                                    if (!result.contains(c.getOwner(), true)) {
-                                        result.add(c.getOwner());
+                                    if (c.getOwner() instanceof MapObject) {
+                                        final MapObject mapObj = (MapObject) c.getOwner();
+                                        if (!result.contains(mapObj, true)) {
+                                            result.add(mapObj);
+                                        }
                                     }
                                 }
                             }
@@ -542,9 +553,11 @@ public class CollisionManager {
                                     final float dy = c.getOwner().getY() - cy;
                                     final float distSq = dx * dx + dy * dy;
                                     if (distSq < minDistanceSq) {
-                                        minDistanceSq = distSq;
-                                        nearest = c.getOwner();
-                                        foundInRange = true;
+                                        if (c.getOwner() instanceof MapObject) {
+                                            minDistanceSq = distSq;
+                                            nearest = (MapObject) c.getOwner();
+                                            foundInRange = true;
+                                        }
                                     }
                                 }
                             }
@@ -560,9 +573,11 @@ public class CollisionManager {
                                         final float dy = c.getOwner().getY() - cy;
                                         final float distSq = dx * dx + dy * dy;
                                         if (distSq < minDistanceSq) {
-                                            minDistanceSq = distSq;
-                                            nearest = c.getOwner();
-                                            foundInRange = true;
+                                            if (c.getOwner() instanceof MapObject) {
+                                                minDistanceSq = distSq;
+                                                nearest = (MapObject) c.getOwner();
+                                                foundInRange = true;
+                                            }
                                         }
                                     }
                                 }

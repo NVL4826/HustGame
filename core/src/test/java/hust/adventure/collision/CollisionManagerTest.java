@@ -6,8 +6,9 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.entities.EntityManager;
+import hust.adventure.entities.WallEntity;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.entities.environment.WallEntity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,7 +33,8 @@ public class CollisionManagerTest {
         }
 
         @Override
-        public void draw(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {}
+        public void draw(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {
+        }
     }
 
     @BeforeEach

@@ -1,16 +1,17 @@
 package hust.adventure.entities.factory;
 
 import com.badlogic.gdx.graphics.Color;
-import hust.adventure.entities.interactables.ExpGem;
+
+import hust.adventure.entities.ExpGem;
+import hust.adventure.entities.ItemDrop;
+import hust.adventure.entities.Projectile;
+import hust.adventure.entities.StaticNPC;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.entities.combat.Projectile;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
-import hust.adventure.entities.interactables.ItemDrop;
 import hust.adventure.entities.player.Player;
 import hust.adventure.graphics.LightProvider;
-import hust.adventure.entities.environment.StaticNPC;
 
 /**
  * Abstract Factory interface for entity creation.

@@ -1,4 +1,4 @@
-package hust.adventure.entities.environment;
+package hust.adventure.entities;
 
 import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
@@ -15,7 +15,6 @@ public class FloatingBook extends MapObject {
     private final Texture texture;
     private final PointLight light;
     private final float baseY;
-    private float stateTime;
 
     public FloatingBook(float x, float y, Texture texture, LightProvider lightProvider) {
         super(x, y, texture.getWidth(), texture.getHeight());
@@ -29,7 +28,7 @@ public class FloatingBook extends MapObject {
 
     @Override
     public void update(float delta) {
-        stateTime += delta;
+        super.update(delta);
         // Floating movement
         y = baseY + MathUtils.sin(stateTime * 2f) * 10f;
         updateBounds();

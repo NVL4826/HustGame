@@ -1,6 +1,5 @@
-package hust.adventure.entities.combat;
+package hust.adventure.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,7 +27,7 @@ public class Projectile extends MapObject implements Pool.Poolable {
     private static final float MAX_RANGE = 2000f;
     private int pierce = 1;
     private final Array<MapObject> hitEntities = new Array<>();
-    private static Texture bulletTexture;
+    private Texture texture;
 
     public Projectile() {
         super(0, 0, 30, 30);
@@ -36,10 +35,12 @@ public class Projectile extends MapObject implements Pool.Poolable {
 
     public Projectile(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer) {
         super(x, y, 30, 30);
-        init(x, y, vx, vy, damage, color, isPlayer);
+        // Note: constructor is kept for reference, but should call init with texture or get from factory.
+        init(x, y, vx, vy, damage, color, isPlayer, null);
     }
 
-    public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer) {
+    public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer,
+            Texture texture) {
         setX(x);
         setY(y);
         this.vx = vx;
@@ -52,22 +53,7 @@ public class Projectile extends MapObject implements Pool.Poolable {
         setDestroyed(false);
         this.pierce = 1;
         this.hitEntities.clear();
-    }
-
-    /** Lazily load the bullet texture the first time it is needed. */
-    private static Texture getBulletTexture() {
-        if (bulletTexture == null) {
-            bulletTexture = new Texture(Gdx.files.internal("bullet.png"));
-        }
-        return bulletTexture;
-    }
-
-    /** Call this when the game shuts down to free the texture from GPU memory. */
-    public static void disposeStaticResources() {
-        if (bulletTexture != null) {
-            bulletTexture.dispose();
-            bulletTexture = null;
-        }
+        this.texture = texture;
     }
 
     @Override
@@ -80,6 +66,7 @@ public class Projectile extends MapObject implements Pool.Poolable {
         isPlayerProjectile = false;
         pierce = 1;
         hitEntities.clear();
+        texture = null;
         if (getCollider() != null) {
             getCollider().setListener(null);
         }
@@ -151,7 +138,9 @@ public class Projectile extends MapObject implements Pool.Poolable {
 
     @Override
     public void draw(SpriteBatch batch) {
-        Texture tex = getBulletTexture();
+        if (texture == null) {
+            return;
+        }
 
         float w = getWidth();
         float h = getHeight();
@@ -166,13 +155,13 @@ public class Projectile extends MapObject implements Pool.Poolable {
         }
 
         batch.setColor(Color.WHITE); // draw without tint so the sprite's own colours show
-        batch.draw(tex, getX() - originX, getY() - originY, // position (bottom-left)
+        batch.draw(texture, getX() - originX, getY() - originY, // position (bottom-left)
                 originX, originY, // origin for rotation
                 w, h, // size
                 1f, 1f, // scale
                 angle, // rotation in degrees
                 0, 0, // source rect start
-                tex.getWidth(), tex.getHeight(), // source rect size
+                texture.getWidth(), texture.getHeight(), // source rect size
                 false, false // flip
         );
     }

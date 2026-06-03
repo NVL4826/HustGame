@@ -196,7 +196,7 @@ public class Enemy extends Character {
 
         // Flashlight culling in lights out mode (if showEnemiesTimer / radar is not active)
         if (ProgressContext.instance.isLightsOut() && ProgressContext.instance.getShowEnemiesTimer() <= 0f) {
-            final Player p = ProgressContext.instance.getPlayer();
+            final Player p = player;
             if (p != null) {
                 final float dx = getX() - p.getX();
                 final float dy = getY() - p.getY();

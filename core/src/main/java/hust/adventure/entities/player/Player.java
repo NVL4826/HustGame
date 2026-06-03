@@ -7,12 +7,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+import hust.adventure.entities.ExpGem;
 import hust.adventure.entities.base.Character;
 import hust.adventure.entities.base.Targetable;
 import hust.adventure.entities.state.MovingState;
 import hust.adventure.input.PlayerController;
 import hust.adventure.inventory.Inventory;
-import hust.adventure.items.gear.Gear;
 import hust.adventure.items.gear.GearManager;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponManager;
@@ -25,7 +25,6 @@ import hust.adventure.core.context.ProgressContext;
 import hust.adventure.core.context.PlayerStats;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.base.MapObject;
-import hust.adventure.entities.interactables.ExpGem;
 
 /**
  * Main player character class.

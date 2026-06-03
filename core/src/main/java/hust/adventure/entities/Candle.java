@@ -1,4 +1,4 @@
-package hust.adventure.entities.environment;
+package hust.adventure.entities;
 
 import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
@@ -14,7 +14,6 @@ import hust.adventure.graphics.LightProvider;
 public class Candle extends MapObject {
     private final Texture texture;
     private final PointLight light;
-    private float stateTime;
 
     public Candle(float x, float y, Texture texture, LightProvider lightProvider) {
         super(x, y, texture.getWidth(), texture.getHeight());
@@ -28,7 +27,7 @@ public class Candle extends MapObject {
 
     @Override
     public void update(float delta) {
-        stateTime += delta;
+        super.update(delta);
         // Flickering effect
         if (light != null) {
             float flicker = MathUtils.random(-3f, 3f) + (MathUtils.sin(stateTime * 15f) * 4f);

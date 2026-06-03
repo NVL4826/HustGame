@@ -1,4 +1,4 @@
-package hust.adventure.entities.environment;
+package hust.adventure.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,12 +8,11 @@ import hust.adventure.entities.base.MapObject;
  * A non-playable character that stays in one place.
  */
 public class StaticNPC extends MapObject {
-    private final String name;
     private final Color color;
 
     public StaticNPC(final float x, final float y, final String name, final Color color) {
         super(x, y, 32, 32);
-        this.name = name;
+        setName(name);
         this.color = color;
     }
 
@@ -25,9 +24,5 @@ public class StaticNPC extends MapObject {
     @Override
     public void draw(SpriteBatch batch) {
         // No visual – NPC sprite is rendered via the tilemap layer
-    }
-
-    public String getName() {
-        return name;
     }
 }
