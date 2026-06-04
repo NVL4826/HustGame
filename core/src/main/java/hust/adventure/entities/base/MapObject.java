@@ -19,6 +19,8 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     protected float y;
     protected float width;
     protected float height;
+    protected float hitboxWidth;
+    protected float hitboxHeight;
     protected Rectangle bounds;
     private boolean isDestroyed;
     private EntityState state;
@@ -33,15 +35,23 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         this.bounds = new Rectangle();
         this.isDestroyed = false;
         this.state = EntityState.IDLE;
+        this.hitboxWidth = 0f;
+        this.hitboxHeight = 0f;
     }
 
     public MapObject(final float x, final float y, final float width, final float height) {
+        this(x, y, width, height, width, height);
+    }
+
+    public MapObject(final float x, final float y, final float width, final float height, final float hitboxWidth, final float hitboxHeight) {
         super();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.bounds = new Rectangle(x - width / 2f, y - height / 2f, width, height);
+        this.hitboxWidth = hitboxWidth;
+        this.hitboxHeight = hitboxHeight;
+        this.bounds = new Rectangle(x - hitboxWidth / 2f, y - hitboxHeight / 2f, hitboxWidth, hitboxHeight);
         this.isDestroyed = false;
         this.state = EntityState.IDLE;
     }
@@ -107,11 +117,31 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         return bounds;
     }
 
+    @Override
+    public final float getHitboxWidth() {
+        return hitboxWidth;
+    }
+
+    public final void setHitboxWidth(final float hitboxWidth) {
+        this.hitboxWidth = hitboxWidth;
+        updateBounds();
+    }
+
+    @Override
+    public final float getHitboxHeight() {
+        return hitboxHeight;
+    }
+
+    public final void setHitboxHeight(final float hitboxHeight) {
+        this.hitboxHeight = hitboxHeight;
+        updateBounds();
+    }
+
     /**
      * Synchronize collision bounds with current position.
      */
     protected final void updateBounds() {
-        this.bounds.set(x - width / 2f, y - height / 2f, width, height);
+        this.bounds.set(x - hitboxWidth / 2f, y - hitboxHeight / 2f, hitboxWidth, hitboxHeight);
     }
 
     public final EntityState getState() {
@@ -145,7 +175,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     }
 
     public Rectangle getMovementBounds(float x, float y, Rectangle out) {
-        return out.set(x - width / 2f, y - height / 2f, width, height);
+        return out.set(x - hitboxWidth / 2f, y - hitboxHeight / 2f, hitboxWidth, hitboxHeight);
     }
 
     public void setAnimation(final Animation<TextureRegion> animation) {

@@ -13,6 +13,8 @@ public interface Collidable {
     float getY();
     float getWidth();
     float getHeight();
+    float getHitboxWidth();
+    float getHitboxHeight();
     Collider getCollider();
     boolean isDestroyed();
 }

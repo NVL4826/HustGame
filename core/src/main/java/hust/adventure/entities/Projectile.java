@@ -31,7 +31,7 @@ public class Projectile extends MapObject implements Pool.Poolable {
     private GameProgressContext progressContext;
 
     public Projectile() {
-        super(0, 0, 30, 30);
+        super(0, 0, 30, 30, 10, 10);
     }
 
     public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer, Texture texture,

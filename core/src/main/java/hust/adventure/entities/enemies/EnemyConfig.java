@@ -11,6 +11,8 @@ public class EnemyConfig {
     private String name;
     private float width;
     private float height;
+    private float hitboxWidth;
+    private float hitboxHeight;
     private float maxHp;
     private float speed;
     private float contactDamage;
@@ -112,6 +114,42 @@ public class EnemyConfig {
      */
     public void setHeight(final float height) {
         this.height = height;
+    }
+
+    /**
+     * Gets the hitbox width of the enemy. Falls back to width if not specified.
+     *
+     * @return the hitbox width
+     */
+    public float getHitboxWidth() {
+        return hitboxWidth > 0f ? hitboxWidth : width;
+    }
+
+    /**
+     * Sets the hitbox width of the enemy.
+     *
+     * @param hitboxWidth the hitbox width
+     */
+    public void setHitboxWidth(final float hitboxWidth) {
+        this.hitboxWidth = hitboxWidth;
+    }
+
+    /**
+     * Gets the hitbox height of the enemy. Falls back to height if not specified.
+     *
+     * @return the hitbox height
+     */
+    public float getHitboxHeight() {
+        return hitboxHeight > 0f ? hitboxHeight : height;
+    }
+
+    /**
+     * Sets the hitbox height of the enemy.
+     *
+     * @param hitboxHeight the hitbox height
+     */
+    public void setHitboxHeight(final float hitboxHeight) {
+        this.hitboxHeight = hitboxHeight;
     }
 
     /**

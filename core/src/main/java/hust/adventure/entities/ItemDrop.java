@@ -28,11 +28,11 @@ public class ItemDrop extends MapObject {
     private static final float BOB_AMOUNT = 3f;
 
     public ItemDrop() {
-        super(0, 0, 60, 60);
+        super(0, 0, 60, 60, 24, 24);
     }
 
     public ItemDrop(float x, float y, Item item, Color color, Texture sprite) {
-        super(x, y, 60, 60);
+        super(x, y, 60, 60, 24, 24);
         init(x, y, item, color, sprite);
     }
 

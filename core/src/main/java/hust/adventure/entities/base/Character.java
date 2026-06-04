@@ -30,7 +30,11 @@ public abstract class Character extends MapObject implements Damageable {
     }
 
     public Character(final float x, final float y, final float width, final float height, final float maxHp) {
-        super(x, y, width, height);
+        this(x, y, width, height, width, height, maxHp);
+    }
+
+    public Character(final float x, final float y, final float width, final float height, final float hitboxWidth, final float hitboxHeight, final float maxHp) {
+        super(x, y, width, height, hitboxWidth, hitboxHeight);
         this.maxHp = maxHp;
         this.hp = maxHp;
         this.speed = 80f; // Default speed
@@ -154,9 +158,9 @@ public abstract class Character extends MapObject implements Damageable {
 
     @Override
     public Rectangle getMovementBounds(float x, float y, Rectangle out) {
-        final float feetWidth = getWidth() * FEET_WIDTH_RATIO;
-        final float feetHeight = getHeight() * FEET_HEIGHT_RATIO;
-        return out.set(x - feetWidth / 2f, y - getHeight() / 2f, feetWidth, feetHeight);
+        final float feetWidth = getHitboxWidth() * FEET_WIDTH_RATIO;
+        final float feetHeight = getHitboxHeight() * FEET_HEIGHT_RATIO;
+        return out.set(x - feetWidth / 2f, y - getHitboxHeight() / 2f, feetWidth, feetHeight);
     }
 
     @Override

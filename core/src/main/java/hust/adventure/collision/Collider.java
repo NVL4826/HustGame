@@ -29,7 +29,7 @@ public class Collider {
         this.layer = layer;
         this.shape = shape;
         if (shape == Shape.CIRCLE) {
-            this.radius = Math.max(owner.getWidth(), owner.getHeight()) / 2f;
+            this.radius = Math.max(owner.getHitboxWidth(), owner.getHitboxHeight()) / 2f;
             this.circle = new Circle(owner.getX(), owner.getY(), radius);
         }
     }

@@ -47,6 +47,16 @@ public class WallEntity implements Collidable {
     }
 
     @Override
+    public float getHitboxWidth() {
+        return bounds.width;
+    }
+
+    @Override
+    public float getHitboxHeight() {
+        return bounds.height;
+    }
+
+    @Override
     public Collider getCollider() {
         return collider;
     }

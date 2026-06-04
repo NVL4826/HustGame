@@ -50,6 +50,7 @@ public class Player extends Character implements Targetable {
     private static final float IFRAME_DURATION = 0.5f;
 
     private static final float DRAW_SIZE = 50f;
+    private static final float HITBOX_SIZE = 32f;
     private static final float MAX_HP = 100f;
 
     // Delegated controllers and handlers
@@ -67,7 +68,7 @@ public class Player extends Character implements Targetable {
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats,
             final GameProgressContext progressContext, final PlayerPersistenceService persistenceService) {
-        super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
+        super(startX, startY, DRAW_SIZE, DRAW_SIZE, HITBOX_SIZE, HITBOX_SIZE, MAX_HP);
         this.stats = stats;
         this.progressContext = progressContext;
         this.persistenceService = persistenceService;

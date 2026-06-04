@@ -136,8 +136,8 @@ public class CollisionManager {
      */
     public boolean canMove(final MapObject entity, final float nextX, final float nextY) {
         // 1. Boundary check
-        if (!isInfinite && (nextX < entity.getWidth() / 2f || nextX > mapWidth - entity.getWidth() / 2f
-                || nextY < entity.getHeight() / 2f || nextY > mapHeight - entity.getHeight() / 2f)) {
+        if (!isInfinite && (nextX < entity.getHitboxWidth() / 2f || nextX > mapWidth - entity.getHitboxWidth() / 2f
+                || nextY < entity.getHitboxHeight() / 2f || nextY > mapHeight - entity.getHitboxHeight() / 2f)) {
             return false;
         }
 
