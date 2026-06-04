@@ -54,12 +54,12 @@ public class Enemy extends Character {
     @lombok.Builder
     public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config,
             final Player player, final EntityManager entityManager, final GameProgressContext progressContext) {
-        super(x, y, config.getWidth(), config.getHeight(), config.getHitboxWidth(), config.getHitboxHeight(), config.getMaxHp());
+        super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());
         this.player = player;
         this.entityManager = entityManager;
         this.progressContext = progressContext;
         setId(config.getType());
-        init(x, y, config.getWidth(), config.getHeight(), config.getHitboxWidth(), config.getHitboxHeight(), config.getMaxHp(), config.getName(), config.getColor(),
+        init(x, y, config.getWidth(), config.getHeight(), config.getMaxHp(), config.getName(), config.getColor(),
                 collisionManager, config.getContactDamage());
         setSpeed(config.getSpeed());
         this.boss = config.isBoss();
@@ -73,21 +73,19 @@ public class Enemy extends Character {
     /**
      * Sets state for the enemy.
      */
-    public void init(final float x, final float y, final float w, final float h, final float hitboxW, final float hitboxH, final float maxHp, final String name,
+    public void init(final float x, final float y, final float w, final float h, final float maxHp, final String name,
             final Color color, final CollisionManager collisionManager, final float contactDamage) {
         this.width = w;
         this.height = h;
-        this.hitboxWidth = hitboxW;
-        this.hitboxHeight = hitboxH;
         this.collisionManager = collisionManager;
 
         float clampedX = x;
         float clampedY = y;
         if (collisionManager != null && collisionManager.getMapWidth() > 0 && !collisionManager.isInfinite()) {
-            final float minX = hitboxW / 2f;
-            final float maxX = collisionManager.getMapWidth() - hitboxW / 2f;
-            final float minY = hitboxH / 2f;
-            final float maxY = collisionManager.getMapHeight() - hitboxH / 2f;
+            final float minX = w / 2f;
+            final float maxX = collisionManager.getMapWidth() - w / 2f;
+            final float minY = h / 2f;
+            final float maxY = collisionManager.getMapHeight() - h / 2f;
 
             clampedX = Math.max(minX, Math.min(maxX, clampedX));
             clampedY = Math.max(minY, Math.min(maxY, clampedY));
@@ -131,10 +129,10 @@ public class Enemy extends Character {
 
         // Clamp to map boundaries after movement updates
         if (collisionManager != null && collisionManager.getMapWidth() > 0 && !collisionManager.isInfinite()) {
-            final float minX = getHitboxWidth() / 2f;
-            final float maxX = collisionManager.getMapWidth() - getHitboxWidth() / 2f;
-            final float minY = getHitboxHeight() / 2f;
-            final float maxY = collisionManager.getMapHeight() - getHitboxHeight() / 2f;
+            final float minX = getWidth() / 2f;
+            final float maxX = collisionManager.getMapWidth() - getWidth() / 2f;
+            final float minY = getHeight() / 2f;
+            final float maxY = collisionManager.getMapHeight() - getHeight() / 2f;
 
             if (getX() < minX) {
                 setX(minX);
@@ -171,6 +169,11 @@ public class Enemy extends Character {
     public final void draw(final SpriteBatch batch) {
         if (isDead())
             return;
+
+        // Draw telegraph warning line if active
+        if (telegraphedCharging && telegraphTimer > 0f) {
+            hust.adventure.graphics.ShapeDrawUtils.drawLine(batch, getX(), getY(), telegraphTargetX, telegraphTargetY, 4f, new Color(1f, 0.1f, 0.1f, 0.6f));
+        }
 
         // Flashlight culling in lights out mode (if showEnemiesTimer / radar is not active)
         final boolean lightsOut = (progressContext != null) ? progressContext.isLightsOut() : false;
@@ -229,14 +232,6 @@ public class Enemy extends Character {
 
     public final Color getColor() {
         return color;
-    }
-
-    @Override
-    public Color getShapeFallbackColor() {
-        if (!hasSprite()) {
-            return color;
-        }
-        return null;
     }
 
     public final CollisionManager getCollisionManager() {
@@ -306,5 +301,20 @@ public class Enemy extends Character {
             deathBehavior.onDestroy(this);
         }
     }
+
+    // Fields for telegraphed charge behavior
+    private boolean telegraphedCharging = false;
+    private float telegraphTimer = 0f;
+    private float telegraphTargetX = 0f;
+    private float telegraphTargetY = 0f;
+
+    public boolean isTelegraphedCharging() { return telegraphedCharging; }
+    public void setTelegraphedCharging(boolean active) { this.telegraphedCharging = active; }
+    public float getTelegraphTimer() { return telegraphTimer; }
+    public void setTelegraphTimer(float val) { this.telegraphTimer = val; }
+    public float getTelegraphTargetX() { return telegraphTargetX; }
+    public void setTelegraphTargetX(float val) { this.telegraphTargetX = val; }
+    public float getTelegraphTargetY() { return telegraphTargetY; }
+    public void setTelegraphTargetY(float val) { this.telegraphTargetY = val; }
 
 }

@@ -7,6 +7,7 @@ import hust.adventure.behavior.ai.BouncingBehavior;
 import hust.adventure.behavior.ai.ChaseBehavior;
 import hust.adventure.behavior.ai.FleeBehavior;
 import hust.adventure.behavior.ai.SimpleSwarmBehavior;
+import hust.adventure.behavior.ai.TelegraphedChargeBehavior;
 import hust.adventure.behavior.ai.WanderAIBehavior;
 import hust.adventure.behavior.attack.AttackBehavior;
 import hust.adventure.behavior.attack.RadialRotatingShootingBehavior;
@@ -32,6 +33,7 @@ public final class BehaviorRegistry {
                 config.getWorldWidth(), config.getWorldHeight()));
         movementProviders.put("simple_swarm", config -> new SimpleSwarmBehavior());
         movementProviders.put("wander", config -> new WanderAIBehavior());
+        movementProviders.put("telegraphed_charge", config -> new TelegraphedChargeBehavior(config.getSpeed()));
 
         // Combat/attack behaviors mapping
         attackProviders.put("shooting", config -> new ShootingBehavior(config.getFireInterval(),

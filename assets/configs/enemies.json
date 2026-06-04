@@ -31,10 +31,9 @@
       "width": 32.0,
       "height": 32.0,
       "maxHp": 200.0,
-      "speed": 80.0,
+      "speed": 65.0,
       "contactDamage": 15.0,
-      "movementBehavior": "flee",
-      "safeDistance": 150.0
+      "movementBehavior": "chase"
     },
     {
       "type": "stack_overflow",
@@ -68,6 +67,31 @@
       "projectileSpeed": 150.0,
       "projectileDamage": 15.0,
       "boss": true
+    },
+    {
+      "type": "segmentation_fault",
+      "name": "SegFault",
+      "width": 28.0,
+      "height": 28.0,
+      "maxHp": 8.0,
+      "speed": 60.0,
+      "contactDamage": 15.0,
+      "movementBehavior": "telegraphed_charge"
+    },
+    {
+      "type": "compilation_error",
+      "name": "CompileErr",
+      "width": 36.0,
+      "height": 36.0,
+      "maxHp": 40.0,
+      "speed": 35.0,
+      "contactDamage": 2.0,
+      "movementBehavior": "flee",
+      "attackBehavior": "radial_rotating_shooting",
+      "safeDistance": 180.0,
+      "fireInterval": 1.2,
+      "projectileSpeed": 130.0,
+      "projectileDamage": 12.0
     },
     {
       "type": "final_boss",
