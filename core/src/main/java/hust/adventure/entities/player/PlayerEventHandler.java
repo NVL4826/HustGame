@@ -6,7 +6,6 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.Item;
-import hust.adventure.items.base.ItemManager;
 import hust.adventure.items.consumable.Consumable;
 
 /**
@@ -42,7 +41,10 @@ public class PlayerEventHandler implements EventListener {
             player.takeDamage(damage);
         } else if (event.getType() == EventType.ITEM_USED) {
             final String itemId = (String) event.getData();
-            final Item item = ItemManager.instance.getItem(itemId);
+            final Item item = player.getProgressContext() != null
+                    && player.getProgressContext().getItemManager() != null
+                            ? player.getProgressContext().getItemManager().getItem(itemId)
+                            : null;
             if (item instanceof Consumable) {
                 if (player.getInventory().removeItem(item, 1)) {
                     ((Consumable) item).consume(player);

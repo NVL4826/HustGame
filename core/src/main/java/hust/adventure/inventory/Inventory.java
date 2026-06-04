@@ -18,9 +18,11 @@ public class Inventory {
 
     // Lưu trữ đối tượng Item (Logical) làm key
     private final Map<Item, Integer> items;
+    private final ItemManager itemManager;
 
-    public Inventory() {
-        items = new HashMap<>();
+    public Inventory(final ItemManager itemManager) {
+        this.items = new HashMap<>();
+        this.itemManager = itemManager;
     }
 
     /**
@@ -43,7 +45,7 @@ public class Inventory {
      * @param amount Số lượng muốn thêm
      */
     public void addItem(String itemId, int amount) {
-        Item item = ItemManager.instance.getItem(itemId);
+        Item item = itemManager != null ? itemManager.getItem(itemId) : null;
         if (item != null) {
             addItem(item, amount);
         }
@@ -78,7 +80,7 @@ public class Inventory {
      * Xóa vật phẩm khỏi túi đồ qua ID.
      */
     public boolean removeItem(String itemId, int amount) {
-        Item item = ItemManager.instance.getItem(itemId);
+        Item item = itemManager != null ? itemManager.getItem(itemId) : null;
         return item != null && removeItem(item, amount);
     }
 

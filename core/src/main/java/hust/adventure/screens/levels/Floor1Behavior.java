@@ -12,7 +12,7 @@ public class Floor1Behavior implements LevelBehavior {
 
     @Override
     public void init(final LevelContext context) {
-        final ItemManager im = ItemManager.instance;
+        final ItemManager im = context.getProgressContext().getItemManager();
 
         // Create Coffee Items
         context.getEntityFactory().createItemDrop(300f, 150f, im.getItem("coffee_den"), Color.BROWN);

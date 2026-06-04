@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.collision.CollisionManager;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.behavior.BehaviorRegistry;
 import hust.adventure.behavior.EnemyBehaviors;
 import hust.adventure.behavior.attack.AttackBehavior;
@@ -39,7 +39,7 @@ public class Enemy extends Character {
 
     private final Player player;
     private final EntityManager entityManager;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
     /**
      * Constructs a BaseEnemy from its configuration data.
@@ -53,7 +53,7 @@ public class Enemy extends Character {
      */
     @lombok.Builder
     public Enemy(final float x, final float y, final CollisionManager collisionManager, final EnemyConfig config,
-            final Player player, final EntityManager entityManager, final ProgressContext progressContext) {
+            final Player player, final EntityManager entityManager, final GameProgressContext progressContext) {
         super(x, y, config.getWidth(), config.getHeight(), config.getMaxHp());
         this.player = player;
         this.entityManager = entityManager;

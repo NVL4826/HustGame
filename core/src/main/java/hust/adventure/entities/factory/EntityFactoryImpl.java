@@ -19,7 +19,7 @@ import hust.adventure.entities.player.Player;
 import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.base.LightProvider;
 import hust.adventure.entities.Candle;
 import hust.adventure.entities.EntityManager;
@@ -39,7 +39,7 @@ public class EntityFactoryImpl implements EntityFactory {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final EnemyDataLoader enemyDataManager;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
     private final hust.adventure.entities.player.PlayerPersistenceService persistenceService;
     private final Array<Texture> bookTextures = new Array<>();
 
@@ -53,7 +53,7 @@ public class EntityFactoryImpl implements EntityFactory {
      */
     public EntityFactoryImpl(final GameAssetManager assetManager, final EntityManager entityManager,
             final CollisionManager collisionManager, final EnemyDataLoader enemyDataManager,
-            final ProgressContext progressContext, final hust.adventure.entities.player.PlayerPersistenceService persistenceService) {
+            final GameProgressContext progressContext, final hust.adventure.entities.player.PlayerPersistenceService persistenceService) {
         if (assetManager == null)
             throw new NullPointerException("assetManager cannot be null");
         if (entityManager == null)

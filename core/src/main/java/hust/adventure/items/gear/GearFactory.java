@@ -25,7 +25,6 @@ public class GearFactory {
         }
         this.dataManager = dataManager;
         registerDefaultAppliers();
-        Gear.setGearFactory(this);
     }
 
     public GearDataLoader getDataManager() {
@@ -54,9 +53,9 @@ public class GearFactory {
         final GearConfig config = dataManager.getConfig(gearId);
         if (config == null) {
             Gdx.app.error("GearFactory", "Failed to create gear: configuration not found for ID " + gearId);
-            return new Gear(gearId, gearId, "");
+            return new Gear(gearId, gearId, "", this);
         }
-        return new Gear(config.getId(), config.getName(), config.getDescription());
+        return new Gear(config.getId(), config.getName(), config.getDescription(), this);
     }
 
     /**

@@ -23,10 +23,12 @@ public class LootDropService implements EventListener, Disposable {
 
     private final EntityFactory entityFactory;
     private final GameAssetManager assetManager;
+    private final ItemManager itemManager;
 
-    public LootDropService(EntityFactory entityFactory, GameAssetManager assetManager) {
+    public LootDropService(EntityFactory entityFactory, GameAssetManager assetManager, ItemManager itemManager) {
         this.entityFactory = entityFactory;
         this.assetManager = assetManager;
+        this.itemManager = itemManager;
         EventDispatcher.getInstance().addListener(EventType.ENTITY_DIED, this);
     }
 
@@ -45,7 +47,7 @@ public class LootDropService implements EventListener, Disposable {
                     // 30% chance to drop a random consumable
                     if (MathUtils.random() < 0.3f) {
                         final Array<Item> consumables = new Array<>();
-                        for (final Item item : ItemManager.instance.getAllItems()) {
+                        for (final Item item : itemManager.getAllItems()) {
                             if (item instanceof Consumable) {
                                 consumables.add(item);
                             }

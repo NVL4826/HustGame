@@ -20,7 +20,7 @@ import hust.adventure.behavior.movement.PlayerMovementBehavior;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.assets.GameAssetManager;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.context.PlayerStats;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.player.input.PlayerController;
@@ -37,7 +37,7 @@ public class Player extends Character implements Targetable {
     private CollisionManager collisionManager;
     private EntityFactory entityFactory;
     private final PlayerStats stats;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
     private final PlayerPersistenceService persistenceService;
 
     private Texture[] allTextures;
@@ -66,7 +66,7 @@ public class Player extends Character implements Targetable {
     @lombok.Builder
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats,
-            final ProgressContext progressContext, final PlayerPersistenceService persistenceService) {
+            final GameProgressContext progressContext, final PlayerPersistenceService persistenceService) {
         super(startX, startY, DRAW_SIZE, DRAW_SIZE, MAX_HP);
         this.stats = stats;
         this.progressContext = progressContext;
@@ -395,7 +395,7 @@ public class Player extends Character implements Targetable {
         return spellController;
     }
 
-    public ProgressContext getProgressContext() {
+    public GameProgressContext getProgressContext() {
         return progressContext;
     }
 

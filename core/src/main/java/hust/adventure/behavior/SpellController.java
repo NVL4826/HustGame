@@ -1,6 +1,6 @@
 package hust.adventure.behavior;
 
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.player.input.PlayerController;
 
@@ -19,12 +19,12 @@ public class SpellController {
     private float slowMotionTimer = 0f;
     private float stunTimer = 0f;
     private float showEnemiesTimer = 0f;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
     /**
      * Constructs a SpellController with ProgressContext.
      */
-    public SpellController(final ProgressContext progressContext) {
+    public SpellController(final GameProgressContext progressContext) {
         this.progressContext = progressContext;
     }
 

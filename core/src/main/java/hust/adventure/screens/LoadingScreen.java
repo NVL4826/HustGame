@@ -2,7 +2,6 @@ package hust.adventure.screens;
 
 import hust.adventure.HustGame;
 import hust.adventure.core.data.LevelConfig;
-import hust.adventure.screens.levels.LevelFactory;
 
 public class LoadingScreen extends BaseScreen {
 
@@ -20,7 +19,7 @@ public class LoadingScreen extends BaseScreen {
             LevelConfig config = new LevelConfig("FINAL_OUTSIDE", template.getName(), template.getMapPath(),
                     template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
                     template.getAmbientColor(), template.isInfinite());
-            game.setScreen(LevelFactory.createLevel(game, config));
+            game.setScreen(game.getLevelFactory().createLevel(game, config));
         }
     }
 

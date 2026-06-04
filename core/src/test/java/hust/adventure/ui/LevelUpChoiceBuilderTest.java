@@ -10,7 +10,9 @@ import hust.adventure.items.UpgradeCatalog;
 import hust.adventure.items.gear.GearManager;
 import hust.adventure.items.weapons.WeaponManager;
 import hust.adventure.ui.components.UpgradeAction;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
+import hust.adventure.items.weapons.WeaponFactory;
+import hust.adventure.items.gear.GearFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +35,10 @@ public class LevelUpChoiceBuilderTest {
         mockGearLoader = mock(GearDataLoader.class);
         mockWeaponLoader = mock(WeaponDataLoader.class);
         upgradeCatalog = new UpgradeCatalog(mockGearLoader, mockWeaponLoader);
-        ProgressContext mockProgressContext = mock(ProgressContext.class);
-        choiceBuilder = new LevelUpChoiceBuilder(mockGearLoader, mockWeaponLoader, upgradeCatalog, mockProgressContext);
+        GameProgressContext mockProgressContext = mock(GameProgressContext.class);
+        WeaponFactory mockWeaponFactory = mock(WeaponFactory.class);
+        GearFactory mockGearFactory = mock(GearFactory.class);
+        choiceBuilder = new LevelUpChoiceBuilder(mockGearLoader, mockWeaponLoader, upgradeCatalog, mockProgressContext, mockWeaponFactory, mockGearFactory);
 
         mockPlayer = mock(Player.class);
         mockWeaponManager = mock(WeaponManager.class);

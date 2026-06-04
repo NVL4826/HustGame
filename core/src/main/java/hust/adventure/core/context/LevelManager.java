@@ -9,12 +9,12 @@ import hust.adventure.events.LevelUpEvent;
 import com.badlogic.gdx.utils.Disposable;
 
 public class LevelManager implements EventListener, Disposable {
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
     private int currentLevel = 1;
     private float currentExp = 0;
     private float expToNextLevel = 100f;
 
-    public LevelManager(final ProgressContext progressContext) {
+    public LevelManager(final GameProgressContext progressContext) {
         if (progressContext == null) {
             throw new IllegalArgumentException("progressContext cannot be null");
         }

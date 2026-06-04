@@ -5,7 +5,9 @@ import com.badlogic.gdx.utils.Array;
 
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
+import hust.adventure.items.weapons.WeaponFactory;
+import hust.adventure.items.gear.GearFactory;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.items.UpgradeCatalog;
@@ -24,17 +26,22 @@ public class LevelUpChoiceBuilder {
     private final GearDataLoader gearDataManager;
     private final WeaponDataLoader weaponDataManager;
     private final UpgradeCatalog upgradeCatalog;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
+    private final WeaponFactory weaponFactory;
+    private final GearFactory gearFactory;
 
     /**
      * Constructs a new LevelUpChoiceBuilder with dependencies.
      */
     public LevelUpChoiceBuilder(final GearDataLoader gearDataManager, final WeaponDataLoader weaponDataManager,
-            final UpgradeCatalog upgradeCatalog, final ProgressContext progressContext) {
+            final UpgradeCatalog upgradeCatalog, final GameProgressContext progressContext,
+            final WeaponFactory weaponFactory, final GearFactory gearFactory) {
         this.gearDataManager = gearDataManager;
         this.weaponDataManager = weaponDataManager;
         this.upgradeCatalog = upgradeCatalog;
         this.progressContext = progressContext;
+        this.weaponFactory = weaponFactory;
+        this.gearFactory = gearFactory;
     }
 
     /**
@@ -66,12 +73,12 @@ public class LevelUpChoiceBuilder {
 
             if (weapon == null) {
                 possibleChoices.add(new WeaponUpgradeAction(id, upgradeCatalog.getWeaponName(id),
-                        upgradeCatalog.getWeaponLevelDescription(id, 1), true));
+                        upgradeCatalog.getWeaponLevelDescription(id, 1), true, weaponFactory));
             } else if (weapon.getLevel() < 5) {
                 final int nextLevel = weapon.getLevel() + 1;
                 possibleChoices
                         .add(new WeaponUpgradeAction(id, upgradeCatalog.getWeaponName(id) + " (Cấp " + nextLevel + ")",
-                                upgradeCatalog.getWeaponLevelDescription(id, nextLevel), false));
+                                upgradeCatalog.getWeaponLevelDescription(id, nextLevel), false, weaponFactory));
             }
         }
 
@@ -84,12 +91,12 @@ public class LevelUpChoiceBuilder {
             final Gear gear = player.getGearManager().getGear(id);
             if (gear == null) {
                 possibleChoices.add(new GearUpgradeAction(id, upgradeCatalog.getGearName(id),
-                        upgradeCatalog.getGearLevelDescription(id, 1), true));
+                        upgradeCatalog.getGearLevelDescription(id, 1), true, gearFactory));
             } else if (gear.getLevel() < 5) {
                 final int nextLevel = gear.getLevel() + 1;
                 possibleChoices
                         .add(new GearUpgradeAction(id, upgradeCatalog.getGearName(id) + " (Cấp " + nextLevel + ")",
-                                upgradeCatalog.getGearLevelDescription(id, nextLevel), false));
+                                upgradeCatalog.getGearLevelDescription(id, nextLevel), false, gearFactory));
             }
         }
 

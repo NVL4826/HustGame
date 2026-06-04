@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import com.badlogic.gdx.utils.Disposable;
 
 import hust.adventure.entities.player.Player;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.items.base.Item;
 
 /**
@@ -21,9 +21,11 @@ public class UIManager implements UIProvider, Disposable {
     private final LevelUpUI levelUpUI;
     private final DamageTextManager damageTextManager;
     private final DebugUI debugUI;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
-    public UIManager(final ProgressContext progressContext) {
+    private final List<InventoryItemData> itemDataList = new ArrayList<>();
+
+    public UIManager(final GameProgressContext progressContext) {
         this.progressContext = progressContext;
         this.hud = new HUD();
         this.statusEffectsHUD = new StatusEffectsHUD();
@@ -40,7 +42,7 @@ public class UIManager implements UIProvider, Disposable {
                 ? player.getController().getJustPressedNum()
                 : 0;
 
-        final List<InventoryItemData> itemDataList = new ArrayList<>();
+        itemDataList.clear();
         if (player != null && player.getInventory() != null) {
             for (final Entry<Item, Integer> entry : player.getInventory().getReadOnlyItems().entrySet()) {
                 final Item item = entry.getKey();

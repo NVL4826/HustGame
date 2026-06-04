@@ -12,14 +12,10 @@ public class WeaponUpgradeAction implements UpgradeAction {
     private final String name;
     private final String description;
     private final boolean isUnlock;
-    private static WeaponFactory weaponFactory;
-
-    public static void setWeaponFactory(final WeaponFactory factory) {
-        weaponFactory = factory;
-    }
+    private final WeaponFactory weaponFactory;
 
     public WeaponUpgradeAction(final String weaponId, final String name, final String description,
-            final boolean isUnlock) {
+            final boolean isUnlock, final WeaponFactory weaponFactory) {
         if (weaponId == null) {
             throw new IllegalArgumentException("Weapon ID cannot be null");
         }
@@ -33,6 +29,7 @@ public class WeaponUpgradeAction implements UpgradeAction {
         this.name = name;
         this.description = description;
         this.isUnlock = isUnlock;
+        this.weaponFactory = weaponFactory;
     }
 
     @Override

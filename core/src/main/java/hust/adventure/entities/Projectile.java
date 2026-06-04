@@ -12,7 +12,7 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.player.Player;
 import hust.adventure.collision.CollisionLayer;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.collision.Collider;
 
 /**
@@ -28,14 +28,14 @@ public class Projectile extends MapObject implements Pool.Poolable {
     private int pierce = 1;
     private final Array<MapObject> hitEntities = new Array<>();
     private Texture texture;
-    private ProgressContext progressContext;
+    private GameProgressContext progressContext;
 
     public Projectile() {
         super(0, 0, 30, 30);
     }
 
     public void init(float x, float y, float vx, float vy, float damage, Color color, boolean isPlayer, Texture texture,
-            final ProgressContext progressContext) {
+            final GameProgressContext progressContext) {
         setX(x);
         setY(y);
         this.vx = vx;

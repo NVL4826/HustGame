@@ -2,12 +2,10 @@ package hust.adventure.items.weapons;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import hust.adventure.core.context.PlayerStats;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -75,10 +73,8 @@ public class BaseWeaponTest {
 
     @Test
     public void testGetEffectiveDamageWithGlobalMultiplier() {
-        ProgressContext mockContext = mock(ProgressContext.class);
-        PlayerStats mockStats = mock(PlayerStats.class);
-        when(mockStats.getDamageMultiplier()).thenReturn(1.2f);
-        when(mockContext.getPlayerStats()).thenReturn(mockStats);
+        GameProgressContext mockContext = mock(GameProgressContext.class);
+        when(mockContext.getDamageMultiplier()).thenReturn(1.2f);
         when(mockPlayer.getProgressContext()).thenReturn(mockContext);
 
         when(mockPlayer.getPowerMultiplier()).thenReturn(1.5f);
@@ -90,7 +86,7 @@ public class BaseWeaponTest {
     public void testUpgradeLogic() {
         weapon.upgrade(5f, 0.2f);
         assertEquals(2, weapon.getLevel());
-        
+
         // baseDamage: 20 + 5 = 25
         // player multiplier: 1.2
         when(mockPlayer.getPowerMultiplier()).thenReturn(1.2f);

@@ -9,6 +9,7 @@ import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
 import hust.adventure.events.ItemPickedUpEvent;
+import hust.adventure.items.base.ItemManager;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -23,7 +24,8 @@ public class ProgressContext implements GameProgressContext, EventListener {
     private final DebugContext debugContext = new DebugContext();
     private final SpellState spellState = new SpellState();
 
-    private Inventory globalInventory = new Inventory();
+    private final ItemManager itemManager;
+    private final Inventory globalInventory;
 
     // Artifacts collected
     private boolean hasNao = false;
@@ -46,7 +48,9 @@ public class ProgressContext implements GameProgressContext, EventListener {
     // State Pattern
     private GameState currentState;
 
-    public ProgressContext() {
+    public ProgressContext(final ItemManager itemManager) {
+        this.itemManager = itemManager;
+        this.globalInventory = new Inventory(itemManager);
         this.currentState = new PlayingGameState();
     }
 
@@ -167,10 +171,6 @@ public class ProgressContext implements GameProgressContext, EventListener {
 
     public Inventory getGlobalInventory() {
         return globalInventory;
-    }
-
-    public void setGlobalInventory(Inventory globalInventory) {
-        this.globalInventory = globalInventory;
     }
 
     public boolean isHasNao() {
@@ -352,5 +352,10 @@ public class ProgressContext implements GameProgressContext, EventListener {
                 coffeeCount++;
             }
         }
+    }
+
+    @Override
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 }

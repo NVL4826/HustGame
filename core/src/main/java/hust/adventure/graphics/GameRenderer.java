@@ -12,7 +12,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.enemies.Enemy;
@@ -59,7 +59,9 @@ public class GameRenderer {
     private final DebugInfoUIData debugInfoData;
     private final java.util.List<String> tempWeaponsList = new java.util.ArrayList<>();
     private final java.util.List<String> tempGearsList = new java.util.ArrayList<>();
-    private final ProgressContext progressContext;
+    private final java.util.List<InventoryItemData> tempInventoryItemsList = new java.util.ArrayList<>();
+    private final StringBuilder sb = new StringBuilder();
+    private final GameProgressContext progressContext;
     private static final Matrix4 uiMatrix = new Matrix4();
     private final GlyphLayout layout = new GlyphLayout();
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
@@ -71,7 +73,7 @@ public class GameRenderer {
             final ShaderProgram silhouetteShader, final ShaderProgram discardShader, final HUD hud,
             final StatusEffectsHUD statusEffectsHUD, final InventoryUI inventoryUI, final LevelUpUI levelUpUI,
             final DamageTextManager damageTextManager, final DebugUI debugUI, final WorldManager worldManager,
-            final ProgressContext progressContext) {
+            final GameProgressContext progressContext) {
         this.cameraManager = cameraManager;
         this.entityManager = entityManager;
         this.batch = batch;
@@ -268,16 +270,16 @@ public class GameRenderer {
             statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
-            final java.util.List<InventoryItemData> itemDataList = new java.util.ArrayList<>();
+            tempInventoryItemsList.clear();
             if (player.getInventory() != null) {
                 for (final java.util.Map.Entry<hust.adventure.items.base.Item, Integer> entry : player.getInventory()
                         .getReadOnlyItems().entrySet()) {
                     final hust.adventure.items.base.Item item = entry.getKey();
-                    itemDataList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(),
+                    tempInventoryItemsList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(),
                             item.getSpritePath(), entry.getValue()));
                 }
             }
-            final InventoryUIData invData = new InventoryUIData(itemDataList);
+            final InventoryUIData invData = new InventoryUIData(tempInventoryItemsList);
             inventoryUI.render(batch, shapeRenderer, font, invData, progressContext != null && progressContext.isInventoryOpen());
         }
         if (levelUpUI != null) {
@@ -309,14 +311,21 @@ public class GameRenderer {
 
                     if (player.getWeaponManager() != null && player.getWeaponManager().getWeapons() != null) {
                         for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
-                            tempWeaponsList.add(String.format("%s (Lv.%d, Dmg:%.1f, CD:%.2fs)", weapon.getName(),
-                                    weapon.getLevel(), weapon.getEffectiveDamage(), weapon.getCooldown()));
+                            sb.setLength(0);
+                            sb.append(weapon.getName()).append(" (Lv.").append(weapon.getLevel()).append(", Dmg:");
+                            appendFloat(sb, weapon.getEffectiveDamage(), 1);
+                            sb.append(", CD:");
+                            appendFloat(sb, weapon.getCooldown(), 2);
+                            sb.append("s)");
+                            tempWeaponsList.add(sb.toString());
                         }
                     }
 
                     if (player.getGearManager() != null && player.getGearManager().getGears() != null) {
                         for (final Gear gear : player.getGearManager().getGears()) {
-                            tempGearsList.add(String.format("%s (Lv.%d)", gear.getName(), gear.getLevel()));
+                            sb.setLength(0);
+                            sb.append(gear.getName()).append(" (Lv.").append(gear.getLevel()).append(")");
+                            tempGearsList.add(sb.toString());
                         }
                     }
                 }
@@ -401,6 +410,39 @@ public class GameRenderer {
                 ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f, entity.getY() - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight(), Color.ORANGE);
             } else {
                 entity.draw(batch);
+            }
+        }
+    }
+
+    private void appendFloat(final StringBuilder builder, final float val, final int decimals) {
+        if (Float.isNaN(val)) {
+            builder.append("NaN");
+            return;
+        }
+        if (Float.isInfinite(val)) {
+            builder.append(val > 0 ? "Infinity" : "-Infinity");
+            return;
+        }
+        float tempVal = val;
+        if (tempVal < 0) {
+            builder.append('-');
+            tempVal = -tempVal;
+        }
+        float rounder = 0.5f;
+        for (int i = 0; i < decimals; i++) {
+            rounder /= 10.0f;
+        }
+        tempVal += rounder;
+        long ipart = (long) tempVal;
+        builder.append(ipart);
+        if (decimals > 0) {
+            builder.append('.');
+            float fpart = tempVal - ipart;
+            for (int i = 0; i < decimals; i++) {
+                fpart *= 10.0f;
+                int digit = (int) fpart;
+                builder.append(digit);
+                fpart -= digit;
             }
         }
     }

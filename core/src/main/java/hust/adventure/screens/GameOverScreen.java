@@ -6,21 +6,19 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import hust.adventure.HustGame;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.LevelConfig;
-import hust.adventure.screens.levels.LevelFactory;
 
 /**
  * Game Over screen – hiện ra khi player chết. Nhấn R → restart từ MAP_1 + reset ProgressContext. Nhấn ESC → thoát game.
  */
 public class GameOverScreen extends BaseScreen {
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
     private static final float UI_W = 800f;
     private static final float UI_H = 600f;
@@ -53,18 +51,6 @@ public class GameOverScreen extends BaseScreen {
         uiCam = new OrthographicCamera();
         uiCam.setToOrtho(false, UI_W, UI_H);
         uiCam.update();
-    }
-
-    // ── Lazy white pixel texture ────────────────────────────────────────────
-    private static Texture getWhitePixel() {
-        if (whitePixel == null) {
-            Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pm.setColor(Color.WHITE);
-            pm.fill();
-            whitePixel = new Texture(pm);
-            pm.dispose();
-        }
-        return whitePixel;
     }
 
     public static void disposeStatic() {
@@ -192,8 +178,7 @@ public class GameOverScreen extends BaseScreen {
 
         // Stats
         font.setColor(0.7f, 0.7f, 0.7f, 1f);
-        layout.setText(font, "Cap do: " + progressContext.getLevel() + "   EXP: "
-                + (int) progressContext.getExp());
+        layout.setText(font, "Cap do: " + progressContext.getLevel() + "   EXP: " + (int) progressContext.getExp());
         font.draw(batch, layout, (UI_W - layout.width) / 2f, UI_H / 2f + 20f);
 
         // Nút text
@@ -228,7 +213,7 @@ public class GameOverScreen extends BaseScreen {
                     template.getAmbientColor(), template.isInfinite());
         }
         progressContext.reset();
-        Screen next = LevelFactory.createLevel(game, savedConfig);
+        Screen next = game.getLevelFactory().createLevel(game, savedConfig);
         if (next != null) {
             game.getScreenTransition().fadeOut(next, 0.5f);
         }

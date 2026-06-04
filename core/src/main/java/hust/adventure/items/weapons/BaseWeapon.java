@@ -131,9 +131,8 @@ public abstract class BaseWeapon extends Item implements Equipable {
             ownerMultiplier = owner.getPowerMultiplier();
         }
         float globalMultiplier = 1.0f;
-        if (owner != null && owner.getProgressContext() != null
-                && owner.getProgressContext().getPlayerStats() != null) {
-            globalMultiplier = owner.getProgressContext().getPlayerStats().getDamageMultiplier();
+        if (owner != null && owner.getProgressContext() != null) {
+            globalMultiplier = owner.getProgressContext().getDamageMultiplier();
         }
         return baseDamage * ownerMultiplier * globalMultiplier;
     }

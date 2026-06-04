@@ -2,7 +2,6 @@ package hust.adventure.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,18 +36,9 @@ public class HUD {
 
     private TimeProvider timeProvider;
 
-    public HUD() {
-    }
+    private final StringBuilder sb = new StringBuilder();
 
-    private static Texture getWhitePixel() {
-        if (whitePixel == null) {
-            Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pm.setColor(Color.WHITE);
-            pm.fill();
-            whitePixel = new Texture(pm);
-            pm.dispose();
-        }
-        return whitePixel;
+    public HUD() {
     }
 
     public static void disposeStatic() {
@@ -96,24 +86,6 @@ public class HUD {
         sr.begin(ShapeRenderer.ShapeType.Line);
         sr.setColor(1f, 1f, 1f, 0.18f);
         sr.rect(x, y, w, h);
-        sr.end();
-        sr.begin(ShapeRenderer.ShapeType.Filled);
-    }
-
-    /**
-     * Draws background panel with thin neon border.
-     */
-    private void drawPanel(ShapeRenderer sr, float x, float y, float w, float h) {
-        // Semi-transparent dark background
-        sr.setColor(0.04f, 0.04f, 0.10f, 0.82f);
-        sr.rect(x, y, w, h);
-        // Inner border glow
-        sr.end();
-        sr.begin(ShapeRenderer.ShapeType.Line);
-        sr.setColor(0.3f, 0.5f, 1.0f, 0.5f);
-        sr.rect(x, y, w, h);
-        sr.setColor(0.2f, 0.3f, 0.7f, 0.25f);
-        sr.rect(x + 1, y + 1, w - 2, h - 2);
         sr.end();
         sr.begin(ShapeRenderer.ShapeType.Filled);
     }
@@ -204,12 +176,23 @@ public class HUD {
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         font.setColor(0.8f, 0.8f, 0.8f, 1f);
-        font.draw(batch, String.format("%02d:%02d", minutes, seconds), 370, 590);
+        sb.setLength(0);
+        appendTwoDigits(sb, minutes);
+        sb.append(':');
+        appendTwoDigits(sb, seconds);
+        font.draw(batch, sb, 370, 590);
 
         font.setColor(Color.WHITE);
         batch.end();
     }
 
     public void dispose() {
+    }
+
+    private void appendTwoDigits(StringBuilder builder, int value) {
+        if (value < 10) {
+            builder.append('0');
+        }
+        builder.append(value);
     }
 }

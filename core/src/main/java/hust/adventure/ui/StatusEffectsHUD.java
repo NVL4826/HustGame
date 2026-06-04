@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * HUD component responsible for rendering active status effects, spells, and collected artifacts.
  */
 public class StatusEffectsHUD {
+    private final StringBuilder sb = new StringBuilder();
 
     public StatusEffectsHUD() {
     }
@@ -52,7 +53,9 @@ public class StatusEffectsHUD {
         }
         if (data.getShowEnemiesTimer() > 0f) {
             font.setColor(0.3f, 1f, 1f, 1f);
-            font.draw(batch, String.format("RADAR %.0fs", data.getShowEnemiesTimer()), 14, spellY);
+            sb.setLength(0);
+            sb.append("RADAR ").append(Math.round(data.getShowEnemiesTimer())).append("s");
+            font.draw(batch, sb, 14, spellY);
             spellY -= 16f;
         }
 

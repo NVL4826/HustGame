@@ -6,12 +6,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
-import hust.adventure.items.base.ItemManager;
 import hust.adventure.events.EventType;
 import hust.adventure.events.ItemPickedUpEvent;
 
@@ -84,7 +82,7 @@ public class LabBehavior implements LevelBehavior, EventListener {
                     if (!usbSpawned) {
                         labCleared = true;
                         context.getEntityFactory().createItemDrop(SPAWN_USB_X, SPAWN_USB_Y,
-                                ItemManager.instance.getItem("usb"), Color.CYAN);
+                                context.getProgressContext().getItemManager().getItem("usb"), Color.CYAN);
                         usbSpawned = true;
                     }
                 }

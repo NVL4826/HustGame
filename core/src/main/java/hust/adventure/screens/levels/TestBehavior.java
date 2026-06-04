@@ -3,7 +3,6 @@ package hust.adventure.screens.levels;
 import com.badlogic.gdx.graphics.Color;
 
 import hust.adventure.items.base.Item;
-import hust.adventure.items.base.ItemManager;
 
 /**
  * Behavior class for the Test level, spawning all entities and items for debugging.
@@ -30,7 +29,7 @@ public class TestBehavior implements LevelBehavior {
         // Spawn Items in a row
         final float itemY = 200f;
         int index = 0;
-        for (final Item item : ItemManager.instance.getAllItems()) {
+        for (final Item item : context.getProgressContext().getItemManager().getAllItems()) {
             if (item != null && item.getSpritePath() != null && !item.getSpritePath().isEmpty()) {
                 context.getEntityFactory().createItemDrop(100f + index * 100f, itemY, item, Color.WHITE);
                 index++;

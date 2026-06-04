@@ -8,14 +8,14 @@ import hust.adventure.items.gear.GearFactory;
  * Action representing a choice to unlock a new gear or upgrade an existing one.
  */
 public class GearUpgradeAction implements UpgradeAction {
-    private static GearFactory gearFactory;
+    private final GearFactory gearFactory;
 
     private final String gearId;
     private final String name;
     private final String description;
     private final boolean isUnlock;
 
-    public GearUpgradeAction(final String gearId, final String name, final String description, final boolean isUnlock) {
+    public GearUpgradeAction(final String gearId, final String name, final String description, final boolean isUnlock, final GearFactory gearFactory) {
         if (gearId == null) {
             throw new IllegalArgumentException("Gear ID cannot be null");
         }
@@ -29,16 +29,10 @@ public class GearUpgradeAction implements UpgradeAction {
         this.name = name;
         this.description = description;
         this.isUnlock = isUnlock;
+        this.gearFactory = gearFactory;
     }
 
-    /**
-     * Sets the GearFactory instance used to instantiate gears and apply effects.
-     *
-     * @param factory the GearFactory instance
-     */
-    public static void setGearFactory(final GearFactory factory) {
-        gearFactory = factory;
-    }
+
 
     @Override
     public String getName() {
@@ -56,8 +50,10 @@ public class GearUpgradeAction implements UpgradeAction {
             return;
         }
         if (isUnlock) {
-            final Gear gear = new Gear(gearId, name, description);
-            gear.equip(player);
+            if (gearFactory != null) {
+                final Gear gear = gearFactory.createGear(gearId);
+                gear.equip(player);
+            }
         } else {
             final Gear gear = player.getGearManager().getGear(gearId);
             if (gear != null) {

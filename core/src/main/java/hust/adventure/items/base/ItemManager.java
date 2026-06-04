@@ -7,10 +7,9 @@ import java.util.Map;
  * Registry and manager for all item definitions.
  */
 public final class ItemManager {
-    public static final ItemManager instance = new ItemManager();
     private final Map<String, Item> items;
 
-    private ItemManager() {
+    public ItemManager() {
         items = new HashMap<>();
     }
 

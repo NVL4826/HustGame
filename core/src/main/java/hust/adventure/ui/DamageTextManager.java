@@ -12,18 +12,17 @@ import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.utils.GamePools;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.FloatingTextInfo;
 import hust.adventure.items.base.Item;
-import hust.adventure.items.base.ItemManager;
 import hust.adventure.items.consumable.ConsumableItem;
 
 public class DamageTextManager implements EventListener {
     private final Array<DamageText> activeTexts;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
-    public DamageTextManager(final ProgressContext progressContext) {
+    public DamageTextManager(final GameProgressContext progressContext) {
         this.progressContext = progressContext;
         activeTexts = new Array<>();
         EventDispatcher.getInstance().addListener(EventType.ENTITY_DAMAGED, this);
@@ -66,7 +65,9 @@ public class DamageTextManager implements EventListener {
             activeTexts.add(dt);
         } else if (event.getType() == EventType.ITEM_USED) {
             final String itemId = (String) event.getData();
-            final Item item = ItemManager.instance.getItem(itemId);
+            final Item item = progressContext != null && progressContext.getItemManager() != null
+                    ? progressContext.getItemManager().getItem(itemId)
+                    : null;
             if (item != null) {
                 final Player player = progressContext != null ? progressContext.getPlayer() : null;
                 if (player != null) {

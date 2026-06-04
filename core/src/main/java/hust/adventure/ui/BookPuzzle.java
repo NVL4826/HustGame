@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
@@ -38,9 +38,9 @@ public class BookPuzzle implements Disposable {
     private final List<PuzzleSlot> slots;
     private final BitmapFont font;
     private boolean isSolved = false;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
-    public BookPuzzle(final Map<String, Integer> bookConfigs, final ProgressContext progressContext) {
+    public BookPuzzle(final Map<String, Integer> bookConfigs, final GameProgressContext progressContext) {
         if (bookConfigs == null || bookConfigs.isEmpty()) {
             throw new IllegalArgumentException("Book configurations cannot be null or empty");
         }

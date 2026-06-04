@@ -20,17 +20,20 @@ import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.LootDropService;
 import hust.adventure.core.context.LevelManager;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.factory.EntityFactoryImpl;
 import hust.adventure.entities.player.Player;
-import hust.adventure.entities.player.PlayerPersistenceService;
 import hust.adventure.entities.player.input.DebugInputHandler;
 import hust.adventure.input.InputReader;
-import hust.adventure.events.*;
+import hust.adventure.events.EventListener;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
+import hust.adventure.events.MapTransitionData;
 import hust.adventure.gamestate.PlayMode;
 import hust.adventure.graphics.CameraManager;
 import hust.adventure.graphics.GameRenderer;
@@ -51,7 +54,7 @@ import hust.adventure.world.WorldManager;
 public class PlayScreen extends BaseScreen implements LevelContext, EventListener {
     private final LevelConfig config;
     private final LevelBehavior behavior;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
     private PlayMode state;
 
     private final WorldManager worldManager;
@@ -193,8 +196,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         float spawnY = (tmxSpawn != null) ? tmxSpawn.y : config.getSpawnY();
 
         if (player == null) {
-            player = entityFactory.createPlayer(spawnX, spawnY, progressContext.getGlobalInventory(),
-                    inputReader);
+            player = entityFactory.createPlayer(spawnX, spawnY, progressContext.getGlobalInventory(), inputReader);
             cameraManager.setTarget(player);
         } else {
             player.setX(spawnX);
@@ -203,7 +205,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         if (lootDropService == null) {
-            lootDropService = new LootDropService(entityFactory, game.getAssetManager());
+            lootDropService = new LootDropService(entityFactory, game.getAssetManager(), game.getItemManager());
         }
 
         gameRenderer = GameRenderer.builder().cameraManager(cameraManager).entityManager(entityManager)
@@ -380,7 +382,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     }
 
     @Override
-    public ProgressContext getProgressContext() {
+    public GameProgressContext getProgressContext() {
         return progressContext;
     }
 

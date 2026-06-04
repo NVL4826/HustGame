@@ -6,7 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 
 import hust.adventure.core.assets.GameAssetManager;
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.player.Player;
 import hust.adventure.events.EventDispatcher;
@@ -15,7 +15,6 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.gamestate.PlayMode;
 import hust.adventure.items.base.Item;
-import hust.adventure.items.base.ItemManager;
 import hust.adventure.ui.DebugOption;
 import hust.adventure.ui.DebugOptionRegistry;
 import hust.adventure.ui.SelectionMode;
@@ -38,7 +37,7 @@ public class DebugInputHandler {
     private final WeaponFactory weaponFactory;
     private final GearFactory gearFactory;
     private final DebugOptionRegistry debugOptionRegistry;
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
     // States for debug selection
     private SelectionMode activeMode = SelectionMode.NONE;
@@ -58,7 +57,7 @@ public class DebugInputHandler {
     public DebugInputHandler(final UIManager uiManager, final EntityFactory entityFactory,
             final GameAssetManager assetManager, final InputReader inputReader, final WeaponFactory weaponFactory,
             final GearFactory gearFactory, final DebugOptionRegistry debugOptionRegistry,
-            final ProgressContext progressContext) {
+            final GameProgressContext progressContext) {
         if (inputReader == null) {
             throw new IllegalArgumentException("inputReader cannot be null");
         }
@@ -261,7 +260,9 @@ public class DebugInputHandler {
 
     private void executeItemAction(final DebugOption option, final Player player) {
         final String itemId = option.getId();
-        final Item item = ItemManager.instance.getItem(itemId);
+        final Item item = progressContext != null && progressContext.getItemManager() != null
+                ? progressContext.getItemManager().getItem(itemId)
+                : null;
         if (item != null && player != null) {
             entityFactory.createItemDrop(player.getX() + 32f, player.getY(), item, Color.WHITE);
         }

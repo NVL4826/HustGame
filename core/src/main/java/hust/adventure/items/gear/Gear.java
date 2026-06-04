@@ -10,15 +10,12 @@ import com.badlogic.gdx.Gdx;
  */
 public class Gear extends Item implements Equipable {
     private int level;
-    private static GearFactory gearFactory;
+    private final GearFactory gearFactory;
 
-    public static void setGearFactory(final GearFactory factory) {
-        gearFactory = factory;
-    }
-
-    public Gear(final String id, final String name, final String description) {
+    public Gear(final String id, final String name, final String description, final GearFactory gearFactory) {
         super(id, name, description, null);
         this.level = 1;
+        this.gearFactory = gearFactory;
     }
 
     public int getLevel() {

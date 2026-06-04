@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.screens.LoadingScreen;
 

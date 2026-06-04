@@ -8,10 +8,8 @@ import hust.adventure.core.data.LevelDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.enemies.EnemyConfig;
 import hust.adventure.items.base.ItemConfig;
-import hust.adventure.core.context.ProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.weapons.BaseWeapon;
-import hust.adventure.items.gear.Gear;
 
 import java.util.ArrayList;
 import java.util.List;

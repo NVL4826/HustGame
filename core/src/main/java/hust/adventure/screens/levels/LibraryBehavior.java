@@ -9,7 +9,6 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.events.MapTransitionData;
-import hust.adventure.items.base.ItemManager;
 import hust.adventure.ui.BookPuzzle;
 
 /**
@@ -87,7 +86,8 @@ public class LibraryBehavior implements LevelBehavior, EventListener {
                 // Não rơi tại vị trí boss (hoặc giữa map nếu boss đã bị xóa)
                 float bx = libraryBoss.isDestroyed() ? CENTER_X : libraryBoss.getX();
                 float by = libraryBoss.isDestroyed() ? CENTER_Y : libraryBoss.getY();
-                ctx.getEntityFactory().createItemDrop(bx, by, ItemManager.instance.getItem("brain"), Color.CYAN);
+                ctx.getEntityFactory().createItemDrop(bx, by,
+                        ctx.getProgressContext().getItemManager().getItem("brain"), Color.CYAN);
                 brainSpawned = true;
             }
         }

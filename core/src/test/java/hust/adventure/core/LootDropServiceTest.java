@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 public class LootDropServiceTest {
     private EntityFactory entityFactory;
     private GameAssetManager assetManager;
+    private ItemManager itemManager;
     private LootDropService lootDropService;
 
     private static class TestConsumable extends Item implements Consumable {
@@ -41,10 +42,11 @@ public class LootDropServiceTest {
         EventDispatcher.resetInstance();
         entityFactory = mock(EntityFactory.class);
         assetManager = mock(GameAssetManager.class);
-        lootDropService = new LootDropService(entityFactory, assetManager);
+        itemManager = new ItemManager();
+        lootDropService = new LootDropService(entityFactory, assetManager, itemManager);
 
         // Register a consumable item in the registry
-        ItemManager.instance.register(new TestConsumable("test_potion"));
+        itemManager.register(new TestConsumable("test_potion"));
     }
 
     @Test

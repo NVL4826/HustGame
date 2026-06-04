@@ -33,7 +33,7 @@ import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.ui.DamageText;
 import hust.adventure.utils.GamePools;
 import hust.adventure.core.context.ProgressContext;
-import hust.adventure.gamestate.PlayingGameState;
+import hust.adventure.core.context.GameProgressContext;
 
 import com.badlogic.gdx.Screen;
 
@@ -52,7 +52,9 @@ import hust.adventure.ui.components.WeaponUpgradeAction;
  * Lớp gốc quản lý vòng đời ứng dụng và lưu trữ các phân hệ trung tâm.
  */
 public class HustGame extends Game implements EventListener {
-    private final ProgressContext progressContext = new ProgressContext();
+    private ProgressContext progressContext;
+    private ItemManager itemManager;
+    private LevelFactory levelFactory;
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
     private BitmapFont font;
@@ -83,6 +85,11 @@ public class HustGame extends Game implements EventListener {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         assetManager = new GameAssetManager();
+        
+        itemManager = new ItemManager();
+        progressContext = new ProgressContext(itemManager);
+        levelFactory = new LevelFactory();
+
         eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.addListener(EventType.MAP_TRANSITION, this);
         eventDispatcher.addListener(EventType.ITEM_PICKED_UP, progressContext);
@@ -114,18 +121,16 @@ public class HustGame extends Game implements EventListener {
         itemDataManager = new ItemDataLoader("configs/items.json");
         final ItemFactory itemFactory = new ItemFactory();
         for (final ItemConfig config : itemDataManager.getAllConfigs()) {
-            ItemManager.instance.register(itemFactory.createItem(config));
+            itemManager.register(itemFactory.createItem(config));
         }
 
         // Nạp và đăng ký cấu hình Gears từ JSON
         gearDataManager = new GearDataLoader("configs/gears.json");
         this.gearFactory = new GearFactory(gearDataManager);
-        GearUpgradeAction.setGearFactory(gearFactory);
 
         // Nạp và đăng ký cấu hình Weapons từ JSON
         weaponDataManager = new WeaponDataLoader("configs/weapons.json");
         this.weaponFactory = new WeaponFactory(weaponDataManager);
-        WeaponUpgradeAction.setWeaponFactory(weaponFactory);
 
         this.playerPersistenceService = new PlayerPersistenceService(progressContext, gearFactory, weaponFactory);
 
@@ -140,8 +145,10 @@ public class HustGame extends Game implements EventListener {
 
         // Khởi tạo các catalog và builder thông qua constructor DI
         upgradeCatalog = new UpgradeCatalog(gearDataManager, weaponDataManager);
-        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager, upgradeCatalog, progressContext);
-        debugOptionRegistry = new DebugOptionRegistry(enemyDataManager, itemDataManager, weaponDataManager, gearDataManager, levelDataManager);
+        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager, upgradeCatalog,
+                progressContext, weaponFactory, gearFactory);
+        debugOptionRegistry = new DebugOptionRegistry(enemyDataManager, itemDataManager, weaponDataManager,
+                gearDataManager, levelDataManager);
 
         // Khởi đầu bằng màn hình tải tài nguyên
         setScreen(new LoadingScreen(this));
@@ -166,7 +173,7 @@ public class HustGame extends Game implements EventListener {
         final LevelConfig config = new LevelConfig(nextId, template.getName(), data.getTargetMap(), data.getSpawnX(),
                 data.getSpawnY(), template.getZoom(), template.getBgmPath(), template.getAmbientColor(),
                 template.isInfinite());
-        final Screen nextScreen = LevelFactory.createLevel(this, config);
+        final Screen nextScreen = levelFactory.createLevel(this, config);
 
         if (nextScreen != null) {
             screenTransition.fadeOut(nextScreen, 0.5f);
@@ -307,8 +314,16 @@ public class HustGame extends Game implements EventListener {
         return debugOptionRegistry;
     }
 
-    public ProgressContext getProgressContext() {
+    public GameProgressContext getProgressContext() {
         return progressContext;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
+    }
+
+    public LevelFactory getLevelFactory() {
+        return levelFactory;
     }
 
     public PlayerPersistenceService getPlayerPersistenceService() {

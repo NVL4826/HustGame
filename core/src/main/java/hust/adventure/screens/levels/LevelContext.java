@@ -14,13 +14,13 @@ import hust.adventure.gamestate.PlayMode;
 import hust.adventure.entities.base.LightProvider;
 import hust.adventure.ui.UIProvider;
 
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 
 /**
  * Interface representing the level context. Decouples concrete behaviors from the rendering screen class.
  */
 public interface LevelContext {
-    ProgressContext getProgressContext();
+    GameProgressContext getProgressContext();
 
     HustGame getGame();
 

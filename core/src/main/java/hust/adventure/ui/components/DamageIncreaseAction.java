@@ -1,12 +1,12 @@
 package hust.adventure.ui.components;
 
-import hust.adventure.core.context.ProgressContext;
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 
 public class DamageIncreaseAction implements UpgradeAction {
-    private final ProgressContext progressContext;
+    private final GameProgressContext progressContext;
 
-    public DamageIncreaseAction(final ProgressContext progressContext) {
+    public DamageIncreaseAction(final GameProgressContext progressContext) {
         this.progressContext = progressContext;
     }
 
