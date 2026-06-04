@@ -26,9 +26,8 @@ public class GameAssetManager {
         manager.load("Boss Room.jpg", Texture.class);
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);
-        for (int i = 4; i <= 25; i++) {
-            manager.load(i + ".png", Texture.class);
-        }
+        // Character assets
+        manager.load("character/atlas.png", Texture.class);
         manager.load("bullet.png", Texture.class);
         manager.load("items/brain.png", Texture.class);
         manager.load("items/coffee.png", Texture.class);

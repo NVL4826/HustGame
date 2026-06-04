@@ -1,0 +1,460 @@
+{
+    "meta": {
+        "image": "atlas.png",
+        "size": {
+            "w": 480,
+            "h": 480
+        },
+        "format": "RGBA8888"
+    },
+    "frames": {
+        "animations/Walking-c046985c/east/frame_000.png": {
+            "frame": {
+                "x": 0,
+                "y": 0,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/east/frame_001.png": {
+            "frame": {
+                "x": 80,
+                "y": 0,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/east/frame_002.png": {
+            "frame": {
+                "x": 160,
+                "y": 0,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/east/frame_003.png": {
+            "frame": {
+                "x": 240,
+                "y": 0,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/east/frame_004.png": {
+            "frame": {
+                "x": 320,
+                "y": 0,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/east/frame_005.png": {
+            "frame": {
+                "x": 400,
+                "y": 0,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/north/frame_000.png": {
+            "frame": {
+                "x": 0,
+                "y": 80,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/north/frame_001.png": {
+            "frame": {
+                "x": 80,
+                "y": 80,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/north/frame_002.png": {
+            "frame": {
+                "x": 160,
+                "y": 80,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/north/frame_003.png": {
+            "frame": {
+                "x": 240,
+                "y": 80,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/north/frame_004.png": {
+            "frame": {
+                "x": 320,
+                "y": 80,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/north/frame_005.png": {
+            "frame": {
+                "x": 400,
+                "y": 80,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/south/frame_000.png": {
+            "frame": {
+                "x": 0,
+                "y": 160,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/south/frame_001.png": {
+            "frame": {
+                "x": 80,
+                "y": 160,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/south/frame_002.png": {
+            "frame": {
+                "x": 160,
+                "y": 160,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/south/frame_003.png": {
+            "frame": {
+                "x": 240,
+                "y": 160,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/south/frame_004.png": {
+            "frame": {
+                "x": 320,
+                "y": 160,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/south/frame_005.png": {
+            "frame": {
+                "x": 400,
+                "y": 160,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/west/frame_000.png": {
+            "frame": {
+                "x": 0,
+                "y": 240,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/west/frame_001.png": {
+            "frame": {
+                "x": 80,
+                "y": 240,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/west/frame_002.png": {
+            "frame": {
+                "x": 160,
+                "y": 240,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/west/frame_003.png": {
+            "frame": {
+                "x": 240,
+                "y": 240,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/west/frame_004.png": {
+            "frame": {
+                "x": 320,
+                "y": 240,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "animations/Walking-c046985c/west/frame_005.png": {
+            "frame": {
+                "x": 400,
+                "y": 240,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/east.png": {
+            "frame": {
+                "x": 0,
+                "y": 320,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/north-east.png": {
+            "frame": {
+                "x": 80,
+                "y": 320,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/north-west.png": {
+            "frame": {
+                "x": 160,
+                "y": 320,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/north.png": {
+            "frame": {
+                "x": 240,
+                "y": 320,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/south-east.png": {
+            "frame": {
+                "x": 320,
+                "y": 320,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/south-west.png": {
+            "frame": {
+                "x": 400,
+                "y": 320,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/south.png": {
+            "frame": {
+                "x": 0,
+                "y": 400,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        },
+        "rotations/west.png": {
+            "frame": {
+                "x": 80,
+                "y": 400,
+                "w": 80,
+                "h": 80
+            },
+            "rotated": false,
+            "trimmed": false,
+            "sourceSize": {
+                "w": 80,
+                "h": 80
+            }
+        }
+    }
+}

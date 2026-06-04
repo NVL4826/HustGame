@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 import hust.adventure.entities.ExpGem;
 import hust.adventure.entities.base.Character;
@@ -40,7 +43,6 @@ public class Player extends Character implements Targetable {
     private final GameProgressContext progressContext;
     private final PlayerPersistenceService persistenceService;
 
-    private Texture[] allTextures;
     private Animation<TextureRegion> walkLeft, walkRight, walkDown, walkUp;
     private TextureRegion idleDown, idleUp, idleLeft, idleRight;
     private Animation<TextureRegion> lastAnim = null;
@@ -50,7 +52,8 @@ public class Player extends Character implements Targetable {
     private static final float IFRAME_DURATION = 0.5f;
 
     private static final float DRAW_SIZE = 50f;
-    private static final float HITBOX_SIZE = 32f;
+    private static final float HITBOX_WIDTH = 15f;
+    private static final float HITBOX_WEIGHT = 45f;
     private static final float MAX_HP = 100f;
 
     // Delegated controllers and handlers
@@ -68,7 +71,7 @@ public class Player extends Character implements Targetable {
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats,
             final GameProgressContext progressContext, final PlayerPersistenceService persistenceService) {
-        super(startX, startY, DRAW_SIZE, DRAW_SIZE, HITBOX_SIZE, HITBOX_SIZE, MAX_HP);
+        super(startX, startY, DRAW_SIZE, DRAW_SIZE, HITBOX_WIDTH, HITBOX_WEIGHT, MAX_HP);
         this.stats = stats;
         this.progressContext = progressContext;
         this.persistenceService = persistenceService;
@@ -101,32 +104,39 @@ public class Player extends Character implements Targetable {
     }
 
     private void loadTextures(final GameAssetManager assetManager) {
-        this.allTextures = new Texture[22];
-        for (int i = 0; i < 22; i++) {
-            allTextures[i] = assetManager.getTexture((i + 4) + ".png");
-        }
+        final Texture atlasTexture = assetManager.getTexture("character/atlas.png");
+        final JsonReader reader = new JsonReader();
+        final JsonValue root = reader.parse(com.badlogic.gdx.Gdx.files.internal("character/atlas.json"));
+        final JsonValue framesValue = root.get("frames");
 
-        final TextureRegion[] frames = new TextureRegion[22];
-        for (int i = 0; i < 22; i++) {
-            frames[i] = new TextureRegion(allTextures[i]);
-        }
+        idleDown = getAtlasRegion(atlasTexture, framesValue, "rotations/south.png");
+        idleUp = getAtlasRegion(atlasTexture, framesValue, "rotations/north.png");
+        idleRight = getAtlasRegion(atlasTexture, framesValue, "rotations/east.png");
+        idleLeft = getAtlasRegion(atlasTexture, framesValue, "rotations/west.png");
 
-        idleDown = frames[0];
-        idleUp = frames[1];
-        idleRight = frames[2];
-        idleLeft = frames[17];
-
-        walkLeft = makeAnim(frames, new int[] { 9, 10, 11, 12, 13, 14, 15 }, 0.1f);
-        walkRight = makeAnim(frames, new int[] { 4, 5, 6, 7 }, 0.1f);
-        walkDown = makeAnim(frames, new int[] { 0, 3 }, 0.2f);
-        walkUp = makeAnim(frames, new int[] { 18, 19, 20, 21 }, 0.1f);
+        walkDown = createWalkAnimation(atlasTexture, framesValue, "south");
+        walkUp = createWalkAnimation(atlasTexture, framesValue, "north");
+        walkRight = createWalkAnimation(atlasTexture, framesValue, "east");
+        walkLeft = createWalkAnimation(atlasTexture, framesValue, "west");
     }
 
-    private Animation<TextureRegion> makeAnim(final TextureRegion[] frames, final int[] indices, final float dur) {
-        final Array<TextureRegion> arr = new Array<>();
-        for (final int idx : indices)
-            arr.add(frames[idx]);
-        return new Animation<>(dur, arr);
+    private TextureRegion getAtlasRegion(final Texture atlasTexture, final JsonValue framesValue, final String path) {
+        final JsonValue frameVal = framesValue.get(path);
+        if (frameVal == null) {
+            throw new GdxRuntimeException("Frame not found in atlas: " + path);
+        }
+        final JsonValue f = frameVal.get("frame");
+        return new TextureRegion(atlasTexture, f.getInt("x"), f.getInt("y"), f.getInt("w"), f.getInt("h"));
+    }
+
+    private Animation<TextureRegion> createWalkAnimation(final Texture atlasTexture, final JsonValue framesValue,
+            final String direction) {
+        final Array<TextureRegion> animFrames = new Array<>();
+        for (int i = 0; i <= 5; i++) {
+            final String path = "animations/Walking-c046985c/" + direction + "/frame_00" + i + ".png";
+            animFrames.add(getAtlasRegion(atlasTexture, framesValue, path));
+        }
+        return new Animation<>(0.1f, animFrames);
     }
 
     @Override
@@ -406,6 +416,5 @@ public class Player extends Character implements Targetable {
         if (eventHandler != null) {
             eventHandler.dispose();
         }
-        allTextures = null;
     }
 }
