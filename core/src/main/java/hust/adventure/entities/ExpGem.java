@@ -1,6 +1,7 @@
 package hust.adventure.entities;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import hust.adventure.collision.Collider;
 import hust.adventure.entities.base.MapObject;
@@ -75,5 +76,10 @@ public class ExpGem extends MapObject implements Pool.Poolable {
     @Override
     public void draw(SpriteBatch batch) {
         // Rendered by GameRenderer in presentation layer
+    }
+
+    @Override
+    public Color getShapeFallbackColor() {
+        return Color.GREEN;
     }
 }

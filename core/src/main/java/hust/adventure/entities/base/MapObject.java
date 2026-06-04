@@ -175,4 +175,15 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     public void setStateTime(final float stateTime) {
         this.stateTime = stateTime;
     }
+
+    /**
+     * Returns the fallback shape color for entities without sprite assets.
+     * Subclasses override to indicate shape-only rendering.
+     * Returns null by default (use sprite rendering via draw()).
+     *
+     * @return fallback color, or null if entity renders via draw()
+     */
+    public Color getShapeFallbackColor() {
+        return null;
+    }
 }

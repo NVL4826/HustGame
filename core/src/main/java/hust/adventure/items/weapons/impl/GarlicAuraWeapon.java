@@ -7,6 +7,7 @@ import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.Damageable;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponConfig;
+import hust.adventure.items.weapons.WeaponEffectVisitor;
 
 /**
  * A garlic weapon that creates an aura damaging all nearby enemies periodically. Renders three rotating concentric
@@ -40,5 +41,10 @@ public class GarlicAuraWeapon extends BaseWeapon {
 
     public float getRotationAngle() {
         return rotationAngle;
+    }
+
+    @Override
+    public void accept(final WeaponEffectVisitor visitor) {
+        visitor.visit(this);
     }
 }

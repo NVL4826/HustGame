@@ -33,9 +33,6 @@ import hust.adventure.ui.DebugInfoUIData;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.world.WorldManager;
-import hust.adventure.entities.ExpGem;
-import hust.adventure.items.weapons.impl.GarlicAuraWeapon;
-import hust.adventure.items.weapons.impl.WhipWeapon;
 
 /**
  * Centralized renderer for the game, responsible for map, entities, and UI.
@@ -67,6 +64,7 @@ public class GameRenderer {
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
     private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
     private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
+    private final GameWeaponRenderer weaponEffectRenderer = new GameWeaponRenderer();
 
     @lombok.Builder
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
@@ -162,29 +160,11 @@ public class GameRenderer {
         }
         font.setColor(Color.WHITE); // Reset font color
 
-        // Draw weapon effects in presentation layer
+        // Draw weapon effects via Visitor Pattern (polymorphic dispatch)
         if (player != null && player.getWeaponManager() != null) {
+            weaponEffectRenderer.begin(batch, player);
             for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
-                if (weapon instanceof GarlicAuraWeapon) {
-                    final GarlicAuraWeapon garlic = (GarlicAuraWeapon) weapon;
-                    final float px = player.getX();
-                    final float py = player.getY();
-                    final float baseRadius = garlic.getArea();
-                    final float rotationAngle = garlic.getRotationAngle();
-                    ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.6f, rotationAngle,
-                            new Color(0.85f, 0.95f, 0.75f, 0.3f));
-                    ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 0.8f, -rotationAngle * 0.7f,
-                            new Color(0.85f, 0.95f, 0.75f, 0.25f));
-                    ShapeDrawUtils.drawDashedCircle(batch, px, py, baseRadius * 1.0f, rotationAngle * 0.4f,
-                            new Color(0.85f, 0.95f, 0.75f, 0.15f));
-                } else if (weapon instanceof WhipWeapon) {
-                    final WhipWeapon whip = (WhipWeapon) weapon;
-                    if (whip.getFlashTimer() > 0) {
-                        final com.badlogic.gdx.math.Rectangle hitArea = whip.getHitArea();
-                        ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height,
-                                new Color(1, 1, 1, 0.5f));
-                    }
-                }
+                weapon.accept(weaponEffectRenderer);
             }
         }
 
@@ -404,10 +384,11 @@ public class GameRenderer {
         entities.sort(yComparator);
 
         for (final MapObject entity : entities) {
-            if (entity instanceof ExpGem) {
-                ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f, entity.getY() - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight(), Color.GREEN);
-            } else if (entity instanceof Enemy && !entity.hasSprite()) {
-                ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f, entity.getY() - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight(), Color.ORANGE);
+            final Color shapeColor = entity.getShapeFallbackColor();
+            if (shapeColor != null) {
+                ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f,
+                        entity.getY() - entity.getHeight() / 2f,
+                        entity.getWidth(), entity.getHeight(), shapeColor);
             } else {
                 entity.draw(batch);
             }

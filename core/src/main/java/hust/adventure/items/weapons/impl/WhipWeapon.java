@@ -12,6 +12,7 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponConfig;
+import hust.adventure.items.weapons.WeaponEffectVisitor;
 
 /**
  * A whip weapon that hits enemies in a rectangular area in front of the player. Supports area scaling and burst strikes
@@ -107,4 +108,8 @@ public class WhipWeapon extends BaseWeapon {
         }
     }
 
+    @Override
+    public void accept(final WeaponEffectVisitor visitor) {
+        visitor.visit(this);
+    }
 }

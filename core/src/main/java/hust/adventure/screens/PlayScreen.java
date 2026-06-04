@@ -375,10 +375,8 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
             }
         }
 
-        // Delegate to behavior if it listens to events
-        if (behavior instanceof EventListener) {
-            ((EventListener) behavior).onEvent(event);
-        }
+        // Delegate to behavior (always safe — default no-op in LevelBehavior)
+        behavior.onEvent(event);
     }
 
     @Override

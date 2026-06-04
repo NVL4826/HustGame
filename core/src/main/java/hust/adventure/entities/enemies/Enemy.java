@@ -229,6 +229,14 @@ public class Enemy extends Character {
         return color;
     }
 
+    @Override
+    public Color getShapeFallbackColor() {
+        if (!hasSprite()) {
+            return color;
+        }
+        return null;
+    }
+
     public final CollisionManager getCollisionManager() {
         return collisionManager;
     }

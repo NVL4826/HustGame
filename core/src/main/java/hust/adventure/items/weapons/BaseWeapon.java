@@ -85,6 +85,16 @@ public abstract class BaseWeapon extends Item implements Equipable {
         // Default implementation does nothing
     }
 
+    /**
+     * Accepts a visitor for rendering weapon visual effects.
+     * Override in subclasses that have visual effects (e.g., aura, flash).
+     *
+     * @param visitor the effect visitor from the presentation layer
+     */
+    public void accept(final WeaponEffectVisitor visitor) {
+        // Default: no visual effect to render
+    }
+
     public void upgrade(final float damageBonus, final float cooldownReduction) {
         if (this.level >= config.getMaxLevel()) {
             return;

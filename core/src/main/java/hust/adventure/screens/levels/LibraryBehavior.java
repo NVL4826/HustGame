@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
@@ -15,7 +14,7 @@ import hust.adventure.ui.BookPuzzle;
  * Behavior cho màn Thư Viện. Flow: 1. Puzzle ghép môn học vào ô (BookPuzzle). 2. PUZZLE_SOLVED → spawn LibraryBoss +
  * các quái. 3. Khi hết quái (boss chết) → Não xuất hiện ở giữa map. 4. Player nhặt Não → chuyển sang màn Lab.
  */
-public class LibraryBehavior implements LevelBehavior, EventListener {
+public class LibraryBehavior implements LevelBehavior {
 
     // Giữa map library (1344 × 768)
     private static final float CENTER_X = 672f;

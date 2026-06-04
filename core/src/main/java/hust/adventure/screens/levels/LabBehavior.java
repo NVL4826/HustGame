@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.events.EventType;
@@ -16,7 +15,7 @@ import hust.adventure.events.ItemPickedUpEvent;
 /**
  * Behavior class for the Lab level, managing custom wave spawns, lighting changes, and USB collection.
  */
-public class LabBehavior implements LevelBehavior, EventListener {
+public class LabBehavior implements LevelBehavior {
     private static final int MAX_WAVE = 5;
     private static final float SPAWN_USB_X = 672f; // giữa map lab (1344 / 2)
     private static final float SPAWN_USB_Y = 384f; // giữa map lab (768 / 2)
