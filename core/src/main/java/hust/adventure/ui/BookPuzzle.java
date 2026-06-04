@@ -81,6 +81,7 @@ public class BookPuzzle implements Disposable {
             for (final PuzzleBook b : books) {
                 if (b.isClicked(mx, my)) {
                     b.setDragging(true);
+                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/book_drag.mp3"));
                     break;
                 }
             }
@@ -106,6 +107,7 @@ public class BookPuzzle implements Disposable {
                     if (s.overlaps(b.getRect())) {
                         if (b.getTargetSemester() == s.getExpectedSemester()) {
                             b.snapToSlot(s);
+                            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/book_snap.mp3"));
                             placed = true;
                         } else {
                             GameEvent<Float> event = new GameEvent<>(EventType.PUZZLE_FAILED, 10f);

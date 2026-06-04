@@ -16,6 +16,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.screens.LoadingScreen;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,6 +181,7 @@ public class BossFightBehavior implements LevelBehavior {
     private void updateCutscene(final LevelContext context) {
         if (context.getInputReader().isEnterJustPressed()) {
             dialogueIndex++;
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/dialogue_next.mp3"));
             if (dialogueIndex >= dialogue.length) {
                 phase = PHASE_QA;
             }
@@ -194,6 +198,7 @@ public class BossFightBehavior implements LevelBehavior {
             if (answerTimer <= 0) {
                 context.getPlayer().takeDamage(TIME_OUT_DAMAGE);
                 shakeTimer = SHAKE_DURATION;
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
                 nextQuestion();
             } else if (context.getInputReader().isSpaceJustPressed()) {
                 handleAnswerInput(context);
@@ -207,6 +212,7 @@ public class BossFightBehavior implements LevelBehavior {
             final float startX = MathUtils.random(100f, 700f);
             final String text = PAPER_TEXTS[MathUtils.random(PAPER_TEXTS.length - 1)];
             fallingPapers.add(new FallingPaper(new Rectangle(startX, 600f, 80f, 30f), text));
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/paper_spawn.mp3"));
         }
 
         // Check collision with player
@@ -230,9 +236,11 @@ public class BossFightBehavior implements LevelBehavior {
             if (answerRects[i].contains(context.getPlayer().getX(), context.getPlayer().getY())) {
                 if (i == questions.get(currentQuestionIndex).correctIndex) {
                     context.getPlayer().heal(ANSWER_HEAL);
+                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_correct.mp3"));
                 } else {
                     context.getPlayer().takeDamage(WRONG_ANSWER_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
+                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
                 }
                 nextQuestion();
                 break;
@@ -265,6 +273,7 @@ public class BossFightBehavior implements LevelBehavior {
                 } else {
                     context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
+                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_wrong.mp3"));
                     textField.setText("");
                 }
             }

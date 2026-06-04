@@ -133,8 +133,11 @@ public class AudioManager implements EventListener, Disposable {
     }
 
     private boolean isPitchRandomizable(String path) {
-        return path.contains("shoot") || path.contains("whip") || path.contains("magic") || path.contains("hit")
-                || path.contains("pickup") || path.contains("die");
+        if (path == null) return false;
+        String lower = path.toLowerCase();
+        return lower.contains("shoot") || lower.contains("whip") || lower.contains("magic")
+                || lower.contains("hit") || lower.contains("pickup") || lower.contains("pick_up")
+                || lower.contains("die") || lower.contains("hurt") || lower.contains("bun dau");
     }
 
     public void playMusic(final String path, boolean loop) {
@@ -235,33 +238,47 @@ public class AudioManager implements EventListener, Disposable {
         case LEVEL_UP:
             playSound("audio/sfx/level_up.wav", false);
             break;
+        case EXP_GAINED:
+            playSound("audio/sfx/interact/pick_up_gem.mp3", false);
+            break;
         case ITEM_PICKED_UP:
-            playSound("audio/sfx/pickup.wav", false);
+            playSound("audio/sfx/interact/pickup_item.mp3", false);
             break;
         case ITEM_USED:
-            playSound("audio/sfx/item_use.wav", false);
+            if (event.getData() instanceof String) {
+                String itemId = (String) event.getData();
+                if (itemId != null && itemId.startsWith("coffee")) {
+                    playSound("audio/sfx/player/Use Consumable (Coffee).mp3", false);
+                } else if ("kho_ga".equals(itemId)) {
+                    playSound("audio/sfx/player/Use Consumable (Khô gà).mp3", false);
+                } else {
+                    playSound("audio/sfx/item_use.wav", false);
+                }
+            } else {
+                playSound("audio/sfx/item_use.wav", false);
+            }
             break;
         case PUZZLE_SOLVED:
-            playSound("audio/sfx/puzzle_solved.wav", false);
+            playSound("audio/sfx/puzzle_boss/puzzle_solved.mp3", false);
             break;
         case PUZZLE_FAILED:
-            playSound("audio/sfx/puzzle_failed.wav", false);
+            playSound("audio/sfx/puzzle_boss/puzzle_failed.mp3", false);
             break;
         case ENTITY_DAMAGED:
             if (event.getData() instanceof EntityDamagedEvent) {
                 EntityDamagedEvent edEvent = (EntityDamagedEvent) event.getData();
                 if (edEvent.getEntity() instanceof Player) {
-                    playSound("audio/sfx/player_hit.wav", false);
+                    playSound("audio/sfx/player/Player Hurt.mp3", false);
                 } else if (edEvent.getEntity() instanceof Enemy) {
-                    playSound("audio/sfx/enemy_hit.wav", false);
+                    playSound("audio/sfx/enemy/enemy_hit.mp3", false);
                 }
             }
             break;
         case ENTITY_DIED:
             if (event.getData() instanceof Player) {
-                playSound("audio/sfx/game_over.wav", false);
+                playSound("audio/sfx/game_over.mp3", false);
             } else if (event.getData() instanceof Enemy) {
-                playSound("audio/sfx/enemy_die.wav", false);
+                playSound("audio/sfx/enemy/enemy_die.mp3", false);
             }
             break;
         default:

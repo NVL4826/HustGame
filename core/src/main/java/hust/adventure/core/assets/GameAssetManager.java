@@ -53,24 +53,46 @@ public class GameAssetManager {
         manager.load("Phong_doc/1.png", Texture.class);
 
         // Sound effects
-        manager.load("audio/sfx/shoot.wav", Sound.class);
-        manager.load("audio/sfx/whip.wav", Sound.class);
-        manager.load("audio/sfx/magic.wav", Sound.class);
-        manager.load("audio/sfx/player_hit.wav", Sound.class);
-        manager.load("audio/sfx/enemy_hit.wav", Sound.class);
-        manager.load("audio/sfx/enemy_die.wav", Sound.class);
-        manager.load("audio/sfx/level_up.wav", Sound.class);
-        manager.load("audio/sfx/pickup.wav", Sound.class);
-        manager.load("audio/sfx/item_use.wav", Sound.class);
         manager.load("audio/sfx/ui_click.wav", Sound.class);
-        manager.load("audio/sfx/puzzle_solved.wav", Sound.class);
-        manager.load("audio/sfx/puzzle_failed.wav", Sound.class);
-        manager.load("audio/sfx/game_over.wav", Sound.class);
+        manager.load("audio/sfx/level_up.wav", Sound.class);
+        manager.load("audio/sfx/item_use.wav", Sound.class);
+
+        // New SFX
+        manager.load("audio/sfx/enemy/enemy_die.mp3", Sound.class);
+        manager.load("audio/sfx/enemy/enemy_hit.mp3", Sound.class);
+        manager.load("audio/sfx/enemy/enemy_spawn.mp3", Sound.class);
+        manager.load("audio/sfx/enemy/time_alarm.mp3", Sound.class);
+
+        manager.load("audio/sfx/interact/chest_open.mp3", Sound.class);
+        manager.load("audio/sfx/interact/pick_up_gem.mp3", Sound.class);
+        manager.load("audio/sfx/interact/pickup_item.mp3", Sound.class);
+
+        manager.load("audio/sfx/player/GarlicPulseAura.mp3", Sound.class);
+        manager.load("audio/sfx/player/Player Firing Bun Dau.wav", Sound.class);
+        manager.load("audio/sfx/player/Player Firing Magic Wand.mp3", Sound.class);
+        manager.load("audio/sfx/player/Player Firing Whip.mp3", Sound.class);
+        manager.load("audio/sfx/player/Player Hurt.mp3", Sound.class);
+        manager.load("audio/sfx/player/Use Consumable (Coffee).mp3", Sound.class);
+        manager.load("audio/sfx/player/Use Consumable (Khô gà).mp3", Sound.class);
+
+        manager.load("audio/sfx/puzzle_boss/answer_correct.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/answer_wrong.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/book_drag.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/book_snap.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/dialogue_next.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/paper_spawn.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/puzzle_failed.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/puzzle_solved.mp3", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/puzzle_wrong.mp3", Sound.class);
 
         // Music tracks
-        manager.load("audio/music/menu_theme.wav", Music.class);
-        manager.load("audio/music/level_theme.wav", Music.class);
-        manager.load("audio/music/boss_theme.wav", Music.class);
+        manager.load("audio/music/menu.mp3", Music.class);
+        manager.load("audio/music/school_ground_map.mp3", Music.class);
+        manager.load("audio/music/library_map.mp3", Music.class);
+        manager.load("audio/music/lab_map.mp3", Music.class);
+        manager.load("audio/music/final_boss.mp3", Music.class);
+        manager.load("audio/music/game_over.mp3", Music.class);
+        manager.load("audio/music/win_menu.mp3", Music.class);
     }
 
     public boolean update() {

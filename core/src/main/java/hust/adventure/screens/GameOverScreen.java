@@ -67,7 +67,7 @@ public class GameOverScreen extends BaseScreen {
         fadeTimer = 0f;
         Gdx.input.setInputProcessor(null);
         if (game.getAudioManager() != null) {
-            game.getAudioManager().playMusic("audio/music/menu_theme.wav", true);
+            game.getAudioManager().playMusic("audio/music/game_over.mp3", true);
         }
     }
 

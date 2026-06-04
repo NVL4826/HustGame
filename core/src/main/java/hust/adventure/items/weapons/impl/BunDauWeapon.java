@@ -56,7 +56,7 @@ public class BunDauWeapon extends BaseWeapon {
             if (projectile != null) {
                 projectile.setPierce(getPierce());
             }
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/shoot.wav"));
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/player/Player Firing Bun Dau.wav"));
         }
     }
 

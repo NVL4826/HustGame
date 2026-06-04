@@ -35,7 +35,7 @@ public class WhipWeapon extends BaseWeapon {
         final boolean isSecondStrike = (getAmount() > 1 && getShotsRemaining() == 1);
         updateHitArea(isSecondStrike);
         flashTimer = FLASH_DURATION;
-        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/whip.wav"));
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/player/Player Firing Whip.mp3"));
 
         final Array<MapObject> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea,
                 CollisionLayer.ENEMY);

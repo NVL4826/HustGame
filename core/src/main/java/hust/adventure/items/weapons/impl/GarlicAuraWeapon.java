@@ -8,6 +8,9 @@ import hust.adventure.entities.base.Damageable;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponConfig;
 import hust.adventure.items.weapons.WeaponEffectVisitor;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
 
 /**
  * A garlic weapon that creates an aura damaging all nearby enemies periodically. Renders three rotating concentric
@@ -31,6 +34,7 @@ public class GarlicAuraWeapon extends BaseWeapon {
                 ((Damageable) target).takeDamage(getEffectiveDamage());
             }
         }
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/player/GarlicPulseAura.mp3"));
     }
 
     @Override

@@ -99,6 +99,7 @@ public class HustGame extends Game implements EventListener {
         eventDispatcher.addListener(EventType.PLAY_SFX, audioManager);
         eventDispatcher.addListener(EventType.PLAY_BGM, audioManager);
         eventDispatcher.addListener(EventType.LEVEL_UP, audioManager);
+        eventDispatcher.addListener(EventType.EXP_GAINED, audioManager);
         eventDispatcher.addListener(EventType.ITEM_PICKED_UP, audioManager);
         eventDispatcher.addListener(EventType.ITEM_USED, audioManager);
         eventDispatcher.addListener(EventType.PUZZLE_SOLVED, audioManager);
@@ -215,6 +216,7 @@ public class HustGame extends Game implements EventListener {
             eventDispatcher.removeListener(EventType.PLAY_SFX, audioManager);
             eventDispatcher.removeListener(EventType.PLAY_BGM, audioManager);
             eventDispatcher.removeListener(EventType.LEVEL_UP, audioManager);
+            eventDispatcher.removeListener(EventType.EXP_GAINED, audioManager);
             eventDispatcher.removeListener(EventType.ITEM_PICKED_UP, audioManager);
             eventDispatcher.removeListener(EventType.ITEM_USED, audioManager);
             eventDispatcher.removeListener(EventType.PUZZLE_SOLVED, audioManager);
