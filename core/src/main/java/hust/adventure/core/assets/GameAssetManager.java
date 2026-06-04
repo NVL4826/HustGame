@@ -23,6 +23,7 @@ public class GameAssetManager {
     public void loadAllAssets() {
         // Textures
         manager.load("Lab.jpg", Texture.class);
+        manager.load("background.jpg", Texture.class);
         manager.load("Boss Room.jpg", Texture.class);
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);
