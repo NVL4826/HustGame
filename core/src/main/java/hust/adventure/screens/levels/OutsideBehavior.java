@@ -36,6 +36,14 @@ public class OutsideBehavior implements LevelBehavior {
     }
 
     @Override
+    public boolean canTransition(final LevelContext context) {
+        if (waveManager == null) {
+            return true;
+        }
+        return waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies();
+    }
+
+    @Override
     public void dispose(final LevelContext context) {
         if (context != null && context.getUIManager() != null && context.getUIManager().getHud() != null) {
             context.getUIManager().getHud().setTimeProvider(null);

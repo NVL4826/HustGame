@@ -132,6 +132,20 @@ public class WaveManager implements TimeProvider {
     }
 
     /**
+     * Checks if all waves have finished spawning.
+     *
+     * @return true if all waves have finished spawning, false otherwise
+     */
+    public boolean isFinished() {
+        for (int i = 0; i < allWaves.size; i++) {
+            if (gameTime < allWaves.get(i).config.getTimeEnd()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Runtime wrapper for a WaveEntry to track state.
      */
     private class ActiveWave {

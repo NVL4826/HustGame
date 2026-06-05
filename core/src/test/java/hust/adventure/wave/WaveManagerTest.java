@@ -182,4 +182,33 @@ public class WaveManagerTest {
         verify(entityFactory, times(2)).createEnemy(eq("bug"), anyFloat(), anyFloat());
         verify(entityFactory, times(1)).createEnemy(eq("error"), anyFloat(), anyFloat());
     }
+
+    @Test
+    public void testIsFinished() throws Exception {
+        Array<WaveEntry> waves = new Array<>();
+        waves.add(makeWave(0f, 10f, 2f, 1, "RANDOM_EDGE", "bug"));
+        waves.add(makeWave(5f, 20f, 2f, 1, "RANDOM_EDGE", "error"));
+
+        WaveManager waveManager = new WaveManager(waves, entityFactory);
+        Camera camera = new Camera() {
+            @Override
+            public void update() {}
+            @Override
+            public void update(boolean updateFrustum) {}
+        };
+        camera.viewportWidth = 800f;
+        camera.viewportHeight = 600f;
+        camera.position.set(400f, 300f, 0f);
+
+        // Before any updates, gameTime is 0, which is < 10 and < 20, so not finished
+        assertFalse(waveManager.isFinished());
+
+        // Update to 15s -> Wave 1 is finished, but Wave 2 is not, so not finished
+        waveManager.update(15f, camera);
+        assertFalse(waveManager.isFinished());
+
+        // Update to 25s -> both waves are finished
+        waveManager.update(10f, camera);
+        assertTrue(waveManager.isFinished());
+    }
 }
