@@ -28,26 +28,66 @@
   "FINAL_OUTSIDE": [
     {
       "timeStart": 0,
-      "timeEnd": 60,
+      "timeEnd": 30,
       "enemyType": "null_pointer",
-      "spawnInterval": 1.5,
+      "spawnInterval": 6.0,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 10,
+      "timeEnd": 120,
+      "enemyType": "segmentation_fault",
+      "spawnInterval": 8.0,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 30,
+      "timeEnd": 60,
+      "enemyType": "syntax_error",
+      "spawnInterval": 5.0,
       "spawnCount": 1,
       "pattern": "RANDOM_EDGE"
     },
     {
       "timeStart": 60,
-      "timeEnd": 120,
+      "timeEnd": 60,
       "enemyType": "null_pointer",
-      "spawnInterval": 2.0,
-      "spawnCount": 2,
+      "spawnInterval": 0,
+      "spawnCount": 10,
+      "pattern": "CIRCLE_AMBUSH"
+    },
+    {
+      "timeStart": 60,
+      "timeEnd": 90,
+      "enemyType": "null_pointer",
+      "spawnInterval": 5.0,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 90,
+      "timeEnd": 120,
+      "enemyType": "infinite_loop",
+      "spawnInterval": 10.0,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 90,
+      "timeEnd": 120,
+      "enemyType": "compilation_error",
+      "spawnInterval": 10.0,
+      "spawnCount": 1,
       "pattern": "RANDOM_EDGE"
     },
     {
       "timeStart": 120,
       "timeEnd": 120,
-      "enemyType": "null_pointer",
+      "enemyType": "stack_overflow",
       "spawnInterval": 0,
-      "spawnCount": 15,
+      "spawnCount": 3,
       "pattern": "CIRCLE_AMBUSH"
     }
   ]

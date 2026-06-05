@@ -33,6 +33,7 @@ import hust.adventure.ui.DebugInfoUIData;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.world.WorldManager;
+import hust.adventure.behavior.ai.TelegraphedBehavior;
 
 /**
  * Centralized renderer for the game, responsible for map, entities, and UI.
@@ -63,8 +64,10 @@ public class GameRenderer {
     private final GlyphLayout layout = new GlyphLayout();
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
     private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
+    private static final float TELEGRAPH_LINE_LENGTH = 80f;
     private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
     private final GameWeaponRenderer weaponEffectRenderer = new GameWeaponRenderer();
+    private final Color telegraphColor = new Color();
 
     @lombok.Builder
     public GameRenderer(final CameraManager cameraManager, final EntityManager entityManager, final SpriteBatch batch,
@@ -226,9 +229,8 @@ public class GameRenderer {
         if (hud != null) {
             final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
             if (progressContext != null) {
-                hudData.set(progressContext.getHp(), progressContext.getMaxHp(),
-                        progressContext.getStamina(), progressContext.getMaxStamina(),
-                        progressContext.getMorale(), progressContext.getExp(),
+                hudData.set(progressContext.getHp(), progressContext.getMaxHp(), progressContext.getStamina(),
+                        progressContext.getMaxStamina(), progressContext.getMorale(), progressContext.getExp(),
                         progressContext.getExpToNextLevel(), progressContext.getLevel(), currentTime);
             }
             hud.render(batch, shapeRenderer, font, hudData);
@@ -244,8 +246,8 @@ public class GameRenderer {
             }
             if (progressContext != null) {
                 statusData.set(progressContext.isHasNao(), progressContext.isHasUsb(),
-                        progressContext.getEnemyTimeScale(), progressContext.getShowEnemiesTimer(),
-                        isSpeedBoosted, isHpRegen, isConfused);
+                        progressContext.getEnemyTimeScale(), progressContext.getShowEnemiesTimer(), isSpeedBoosted,
+                        isHpRegen, isConfused);
             }
             statusEffectsHUD.render(batch, font, statusData);
         }
@@ -255,12 +257,13 @@ public class GameRenderer {
                 for (final java.util.Map.Entry<hust.adventure.items.base.Item, Integer> entry : player.getInventory()
                         .getReadOnlyItems().entrySet()) {
                     final hust.adventure.items.base.Item item = entry.getKey();
-                    tempInventoryItemsList.add(new InventoryItemData(item.getId(), item.getName(), item.getDescription(),
-                            item.getSpritePath(), entry.getValue()));
+                    tempInventoryItemsList.add(new InventoryItemData(item.getId(), item.getName(),
+                            item.getDescription(), item.getSpritePath(), entry.getValue()));
                 }
             }
             final InventoryUIData invData = new InventoryUIData(tempInventoryItemsList);
-            inventoryUI.render(batch, shapeRenderer, font, invData, progressContext != null && progressContext.isInventoryOpen());
+            inventoryUI.render(batch, shapeRenderer, font, invData,
+                    progressContext != null && progressContext.isInventoryOpen());
         }
         if (levelUpUI != null) {
             levelUpUI.render(batch, shapeRenderer, font);
@@ -311,7 +314,8 @@ public class GameRenderer {
                 }
 
                 String mapName = "Unknown";
-                final LevelConfig currentLevelConfig = progressContext != null ? progressContext.getCurrentLevelConfig() : null;
+                final LevelConfig currentLevelConfig = progressContext != null ? progressContext.getCurrentLevelConfig()
+                        : null;
                 if (currentLevelConfig != null) {
                     mapName = currentLevelConfig.getName();
                 }
@@ -338,8 +342,7 @@ public class GameRenderer {
                         progressContext != null && progressContext.isFastRun());
             } else {
                 debugUI.render(batch, shapeRenderer, font, null, player,
-                        progressContext != null && progressContext.isShowDebug(),
-                        false,
+                        progressContext != null && progressContext.isShowDebug(), false,
                         progressContext != null && progressContext.isGodMode(),
                         progressContext != null && progressContext.isFastRun());
             }
@@ -384,11 +387,32 @@ public class GameRenderer {
         entities.sort(yComparator);
 
         for (final MapObject entity : entities) {
+            if (entity instanceof Enemy) {
+                final Enemy enemy = (Enemy) entity;
+                if (!enemy.isDead() && enemy.getMovementBehavior() instanceof TelegraphedBehavior) {
+                    final TelegraphedBehavior tb = (TelegraphedBehavior) enemy.getMovementBehavior();
+                    if (tb.isTelegraphed()) {
+                        final float timer = tb.getTelegraphTimer();
+                        final float alpha = 0.3f + 0.5f * (float) Math.abs(Math.sin(timer * 20f));
+                        telegraphColor.set(1f, 0f, 0f, alpha);
+
+                        final float dx = tb.getTelegraphTargetX() - enemy.getX();
+                        final float dy = tb.getTelegraphTargetY() - enemy.getY();
+                        final float len = (float) Math.sqrt(dx * dx + dy * dy);
+                        if (len > 0) {
+                            final float targetX = enemy.getX() + (dx / len) * TELEGRAPH_LINE_LENGTH;
+                            final float targetY = enemy.getY() + (dy / len) * TELEGRAPH_LINE_LENGTH;
+                            ShapeDrawUtils.drawLine(batch, enemy.getX(), enemy.getY(), targetX, targetY, 6f,
+                                    telegraphColor);
+                        }
+                    }
+                }
+            }
+
             final Color shapeColor = entity.getShapeFallbackColor();
             if (shapeColor != null) {
                 ShapeDrawUtils.drawRect(batch, entity.getX() - entity.getWidth() / 2f,
-                        entity.getY() - entity.getHeight() / 2f,
-                        entity.getWidth(), entity.getHeight(), shapeColor);
+                        entity.getY() - entity.getHeight() / 2f, entity.getWidth(), entity.getHeight(), shapeColor);
             } else {
                 entity.draw(batch);
             }
