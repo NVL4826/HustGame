@@ -1,2 +1,3 @@
-[]thay map final outside hiện tại bằng file mới trong folder Final Ouside trong assets
-[]giảm toàn bộ thanh ML khi nhân vật dùng skill nút E, hồi liên tục theo thời gian, hồi nửa thanh khi dùng item cà phê
+[]thay map final ouside hện tại bằng bản fix trong folder final outside
+[] thay quái segmentation_fault và compilation_error hiện tại đang là ô vung bằng bkav.png và unikey trong folder assets
+

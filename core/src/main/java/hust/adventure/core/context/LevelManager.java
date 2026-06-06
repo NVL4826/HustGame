@@ -12,7 +12,7 @@ public class LevelManager implements EventListener, Disposable {
     private final GameProgressContext progressContext;
     private int currentLevel = 1;
     private float currentExp = 0;
-    private float expToNextLevel = 100f;
+    private float expToNextLevel = 3f;
 
     public LevelManager(final GameProgressContext progressContext) {
         if (progressContext == null) {

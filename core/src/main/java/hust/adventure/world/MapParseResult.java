@@ -5,10 +5,11 @@ import hust.adventure.entities.base.MapObject;
 import hust.adventure.world.WorldManager.Portal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Container holding the parsed map objects (walls, portals, lighting objects).
+ * Container holding the parsed map objects (walls, portals, lighting objects, decor entities).
  */
 public class MapParseResult {
     private final List<WallEntity> walls = new ArrayList<>();
@@ -17,19 +18,19 @@ public class MapParseResult {
     private final List<MapObject> decorEntities = new ArrayList<>();
 
     public List<WallEntity> getWalls() {
-        return walls;
+        return Collections.unmodifiableList(walls);
     }
 
     public List<Portal> getPortals() {
-        return portals;
+        return Collections.unmodifiableList(portals);
     }
 
     public List<LightingObjectData> getLightingObjects() {
-        return lightingObjects;
+        return Collections.unmodifiableList(lightingObjects);
     }
 
     public List<MapObject> getDecorEntities() {
-        return decorEntities;
+        return Collections.unmodifiableList(decorEntities);
     }
 
     /**

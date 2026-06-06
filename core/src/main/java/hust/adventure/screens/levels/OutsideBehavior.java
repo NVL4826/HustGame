@@ -37,10 +37,8 @@ public class OutsideBehavior implements LevelBehavior {
 
     @Override
     public boolean canTransition(final LevelContext context) {
-        if (waveManager == null) {
-            return true;
-        }
-        return waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies();
+        // Cho phép chuyển map (vào portal gototang1) luôn để test/chơi tiếp
+        return true;
     }
 
     @Override

@@ -3,8 +3,8 @@
     {
       "type": "syntax_error",
       "name": "SyntaxErr",
-      "width": 30.0,
-      "height": 30.0,
+      "width": 32.0,
+      "height": 32.0,
       "maxHp": 15.0,
       "speed": 35.0,
       "contactDamage": 0.0,
@@ -35,13 +35,14 @@
       "maxHp": 200.0,
       "speed": 65.0,
       "contactDamage": 15.0,
-      "movementBehavior": "chase"
+      "movementBehavior": "chase",
+      "spritePath": "chatgpt.png"
     },
     {
       "type": "stack_overflow",
       "name": "StackOvfl",
-      "width": 40.0,
-      "height": 40.0,
+      "width": 48.0,
+      "height": 48.0,
       "maxHp": 50.0,
       "speed": 25.0,
       "contactDamage": 20.0,
@@ -61,7 +62,7 @@
       "name": "LibBoss",
       "width": 64.0,
       "height": 64.0,
-      "maxHp": 500.0,
+      "maxHp": 100.0,
       "speed": 35.0,
       "contactDamage": 30.0,
       "movementBehavior": "wander",
@@ -81,12 +82,13 @@
     {
       "type": "segmentation_fault",
       "name": "SegFault",
-      "width": 28.0,
-      "height": 28.0,
+      "width": 36.0,
+      "height": 36.0,
       "maxHp": 8.0,
       "speed": 60.0,
       "contactDamage": 15.0,
-      "movementBehavior": "telegraphed_charge"
+      "movementBehavior": "telegraphed_charge",
+      "spritePath": "bkav.png"
     },
     {
       "type": "compilation_error",
@@ -101,7 +103,8 @@
       "safeDistance": 180.0,
       "fireInterval": 1.2,
       "projectileSpeed": 130.0,
-      "projectileDamage": 12.0
+      "projectileDamage": 12.0,
+      "spritePath": "unikey.png"
     },
     {
       "type": "final_boss",

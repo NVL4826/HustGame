@@ -25,6 +25,14 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     private boolean isDestroyed;
     private EntityState state;
     private Collider collider;
+    private int zIndex = 0;
+    private int subZIndex = 0;
+    protected float sortingY = 0f;
+    protected float rotation = 0f;
+    protected String layerName;
+
+
+
 
     protected Animation<TextureRegion> animation;
     protected TextureRegion staticSprite;
@@ -37,6 +45,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         this.state = EntityState.IDLE;
         this.hitboxWidth = 0f;
         this.hitboxHeight = 0f;
+        this.sortingY = 0f;
     }
 
     public MapObject(final float x, final float y, final float width, final float height) {
@@ -54,6 +63,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
         this.bounds = new Rectangle(x - hitboxWidth / 2f, y - hitboxHeight / 2f, hitboxWidth, hitboxHeight);
         this.isDestroyed = false;
         this.state = EntityState.IDLE;
+        this.sortingY = y;
     }
 
     public void update(float delta) {
@@ -101,6 +111,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
 
     public void setY(final float y) {
         this.y = y;
+        this.sortingY = y;
         updateBounds();
     }
 
@@ -169,6 +180,47 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     public void setCollider(final Collider collider) {
         this.collider = collider;
     }
+
+    public int getZIndex() {
+        return zIndex;
+    }
+
+    public void setZIndex(final int zIndex) {
+        this.zIndex = zIndex;
+    }
+
+    public int getSubZIndex() {
+        return subZIndex;
+    }
+
+    public void setSubZIndex(final int subZIndex) {
+        this.subZIndex = subZIndex;
+    }
+
+    public float getSortingY() {
+        return sortingY;
+    }
+
+    public void setSortingY(final float sortingY) {
+        this.sortingY = sortingY;
+    }
+
+    public String getLayerName() {
+        return layerName;
+    }
+
+    public void setLayerName(String layerName) {
+        this.layerName = layerName;
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(final float rotation) {
+        this.rotation = rotation;
+    }
+
 
     @Override
     public void dispose() {

@@ -16,7 +16,7 @@ public class PlayerStats {
     private float morale = 100f;
     private int level = 1;
     private float exp = 0;
-    private float expToNextLevel = 100f;
+    private float expToNextLevel = 10f;
     private float damageMultiplier = 1.0f;
 
     /**

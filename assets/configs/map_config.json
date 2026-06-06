@@ -1,14 +1,11 @@
 {
   "backgroundLayerNames": [
-    "via he",
-    "duong",
-    "grass",
-    "nha1",
-    "background",
+    "Tile Layer 1",
+    "Ban bao ve",
     "floor",
-    "tile layer 1",
-    "wall",
-    "wall2"
+    "Floor",
+    "Background",
+    "Grass"
   ],
   "collisionFallbackLayerNames": [
     "collision",
@@ -21,6 +18,16 @@
   "decorLayerNames": [
     "chair",
     "sitting_human",
-    "ban_may_tinh"
+    "ban_may_tinh",
+    "moniter-screen",
+    "man_hinh",
+    "ThuVien",
+    "ThuVien2",
+    "ThuVien3",
+    "HUST",
+    "Object",
+    "Object2",
+    "co",
+    "nen"
   ]
 }

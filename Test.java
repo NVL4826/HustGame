@@ -1,0 +1,2 @@
+import com.badlogic.gdx.maps.MapProperties; public class Test { public static void main(String[] args) { MapProperties props = new MapProperties(); System.out.println(" Result: \ + props.get(\spawnLayer\, \Spawn\, String.class)); } }
+import com.badlogic.gdx.maps.MapProperties; public class Test { public static void main(String[] args) { MapProperties props = new MapProperties(); System.out.println(" Result: \ + props.get(\spawnLayer\, \Spawn\, String.class)); } }

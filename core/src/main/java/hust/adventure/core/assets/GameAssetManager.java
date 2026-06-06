@@ -38,6 +38,9 @@ public class GameAssetManager {
         manager.load("character/enemy/library_boss/sprite_0001.png", Texture.class);
         manager.load("character/enemy/library_boss/sprite_0002.png", Texture.class);
         manager.load("character/enemy/library_boss/sprite_0003.png", Texture.class);
+        manager.load("bkav.png", Texture.class);
+        manager.load("unikey.png", Texture.class);
+        manager.load("chatgpt.png", Texture.class);
         manager.load("bullet.png", Texture.class);
         manager.load("items/brain.png", Texture.class);
         manager.load("items/coffee.png", Texture.class);

@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.EntityManager;
+import hust.adventure.entities.StaticObject;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.MapObject;
@@ -65,7 +66,31 @@ public class GameRenderer {
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
     private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
     private static final float TELEGRAPH_LINE_LENGTH = 80f;
-    private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
+    private boolean isGroundLayer(String layerName) {
+        if (layerName == null) return false;
+        String lower = layerName.toLowerCase();
+        return lower.equals("co") || lower.equals("nen") || lower.equals("floor") || lower.equals("ground");
+    }
+
+    private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> {
+        // Ưu tiên: Các layer nền (co, nen) luôn vẽ trước (nằm dưới)
+        boolean e1Ground = isGroundLayer(e1.getLayerName());
+        boolean e2Ground = isGroundLayer(e2.getLayerName());
+        if (e1Ground && !e2Ground) return -1;
+        if (!e1Ground && e2Ground) return 1;
+
+        final float b1 = e1.getSortingY() - e1.getHeight() / 2f;
+        final float b2 = e2.getSortingY() - e2.getHeight() / 2f;
+        final int comp = Float.compare(b2, b1);
+        if (comp != 0) {
+            return comp;
+        }
+        final int compZ = Integer.compare(e1.getZIndex(), e2.getZIndex());
+        if (compZ != 0) {
+            return compZ;
+        }
+        return Integer.compare(e1.getSubZIndex(), e2.getSubZIndex());
+    };
     private final GameWeaponRenderer weaponEffectRenderer = new GameWeaponRenderer();
     private final Color telegraphColor = new Color();
 
@@ -173,32 +198,78 @@ public class GameRenderer {
 
         batch.end();
 
-        // 3. Stencil Buffer cho Foreground
-        Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
-        Gdx.gl.glStencilFunc(GL20.GL_ALWAYS, 1, 0xFF);
-        Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_REPLACE);
-        Gdx.gl.glStencilMask(0xFF);
-
-        mapRenderer.getBatch().setShader(discardShader);
+        // 3. Foreground tile layers - VẼ BÌNH THƯỜNG, KHÔNG DÙNG STENCIL
         mapRenderer.render(foregroundLayers);
-        mapRenderer.getBatch().setShader(null);
 
-        // 4. Vẽ Silhouette nhân vật
-        Gdx.gl.glStencilMask(0x00);
-        Gdx.gl.glStencilFunc(GL20.GL_EQUAL, 1, 0xFF);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        boolean isFinalOutside = false;
+        if (progressContext != null && progressContext.getCurrentLevelConfig() != null) {
+            String levelId = progressContext.getCurrentLevelConfig().getLevelId();
+            if ("FINAL_OUTSIDE".equals(levelId)) {
+                isFinalOutside = true;
+            }
+        }
 
-        batch.setShader(silhouetteShader);
-        batch.begin();
-        drawEntities(batch);
-        batch.end();
-        batch.setShader(null);
+        if (isFinalOutside) {
+            // Lọc ra các tile layer là "Tree" hoặc "Object" trong foregroundLayers
+            java.util.List<Integer> shadowLayerIndices = new java.util.ArrayList<>();
+            com.badlogic.gdx.maps.tiled.TiledMap currentMap = worldManager.getCurrentMap();
+            if (currentMap != null) {
+                for (int i = 0; i < foregroundLayers.length; i++) {
+                    int layerIdx = foregroundLayers[i];
+                    String name = currentMap.getLayers().get(layerIdx).getName();
+                    if (name != null && (name.equalsIgnoreCase("Tree") || name.equalsIgnoreCase("Object"))) {
+                        shadowLayerIndices.add(layerIdx);
+                    }
+                }
+            }
+            int[] stencilTileLayers = new int[shadowLayerIndices.size()];
+            for (int i = 0; i < shadowLayerIndices.size(); i++) {
+                stencilTileLayers[i] = shadowLayerIndices.get(i);
+            }
 
-        // Phục hồi OpenGL
-        Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
-        Gdx.gl.glStencilMask(0xFF);
-        Gdx.gl.glDisable(GL20.GL_BLEND);
+            // 3.5. Stencil Buffer: Ghi các layer cụ thể vào stencil để tạo silhouette
+            Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
+            Gdx.gl.glStencilFunc(GL20.GL_ALWAYS, 1, 0xFF);
+            Gdx.gl.glStencilOp(GL20.GL_KEEP, GL20.GL_KEEP, GL20.GL_REPLACE);
+            Gdx.gl.glStencilMask(0xFF);
+
+            // Tắt ghi màu (Color Mask)
+            Gdx.gl.glColorMask(false, false, false, false);
+
+            // Vẽ các Tile Layers (foreground) có tên Tree, Object vào stencil
+            if (stencilTileLayers.length > 0) {
+                mapRenderer.getBatch().setShader(discardShader);
+                mapRenderer.render(stencilTileLayers);
+                mapRenderer.getBatch().setShader(null);
+            }
+
+            // Vẽ các Object Layers (StaticObject) có tên HUST, Tree, Object vào stencil
+            batch.setProjectionMatrix(cameraManager.getCamera().combined);
+            batch.setShader(discardShader);
+            batch.begin();
+            drawFrontStaticObjects(batch, player);
+            batch.end();
+            batch.setShader(null);
+
+            Gdx.gl.glColorMask(true, true, true, true);
+
+            // 4. Vẽ Silhouette - chỉ player/enemies (không phải StaticObject)
+            Gdx.gl.glStencilMask(0x00);
+            Gdx.gl.glStencilFunc(GL20.GL_EQUAL, 1, 0xFF);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+            batch.setShader(silhouetteShader);
+            batch.begin();
+            drawDynamicEntities(batch);
+            batch.end();
+            batch.setShader(null);
+
+            // Phục hồi OpenGL
+            Gdx.gl.glDisable(GL20.GL_STENCIL_TEST);
+            Gdx.gl.glStencilMask(0xFF);
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+        }
 
         // 4.5 Render Damage Text
         if (damageTextManager != null) {
@@ -380,6 +451,44 @@ public class GameRenderer {
 
     public CameraManager getcameraManager() {
         return cameraManager;
+    }
+
+    /**
+     * Ghi các StaticObject nằm phía trước player (bottomY thấp hơn player) vào stencil buffer.
+     * Theo yêu cầu của user, CHỈ hoạt động với layer HUST và Object2.
+     */
+    private void drawFrontStaticObjects(final SpriteBatch batch, final Player player) {
+        if (player == null) {
+            return;
+        }
+        final float playerBottomY = player.getSortingY() - player.getHeight() / 2f;
+        for (final MapObject entity : entityManager.getEntities()) {
+            if (entity instanceof StaticObject) {
+                final String layerName = entity.getLayerName();
+                if (layerName != null && (layerName.equalsIgnoreCase("HUST") 
+                        || layerName.equalsIgnoreCase("Tree") 
+                        || layerName.equalsIgnoreCase("Object")
+                        || layerName.equalsIgnoreCase("Object2") 
+                        || layerName.equalsIgnoreCase("Object 2"))) {
+                    final float objBottomY = entity.getSortingY() - entity.getHeight() / 2f;
+                    if (objBottomY < playerBottomY) {
+                        entity.draw(batch);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Vẽ chỉ các entity động (player, enemies, projectiles) — bỏ qua StaticObject.
+     * Dùng trong silhouette pass để tránh StaticObject tự vẽ bóng lên chính nó.
+     */
+    private void drawDynamicEntities(final SpriteBatch batch) {
+        for (final MapObject entity : entityManager.getEntities()) {
+            if (!(entity instanceof StaticObject)) {
+                entity.draw(batch);
+            }
+        }
     }
 
     private void drawEntities(final SpriteBatch batch) {

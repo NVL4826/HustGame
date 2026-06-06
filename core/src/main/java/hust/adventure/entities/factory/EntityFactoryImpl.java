@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
+import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
@@ -101,6 +102,29 @@ public class EntityFactoryImpl implements EntityFactory {
         }
         final Enemy enemy = Enemy.builder().x(x).y(y).collisionManager(collisionManager).config(config)
                 .player(progressContext.getPlayer()).entityManager(entityManager).progressContext(progressContext).build();
+
+        float spawnX = x;
+        float spawnY = y;
+        if (collisionManager != null && !collisionManager.canMove(enemy, spawnX, spawnY)) {
+            boolean found = false;
+            // Search in concentric rings of 16px up to 128px
+            for (float radius = 16f; radius <= 128f && !found; radius += 16f) {
+                for (int angleDeg = 0; angleDeg < 360; angleDeg += 45) {
+                    final float checkX = x + radius * MathUtils.cosDeg(angleDeg);
+                    final float checkY = y + radius * MathUtils.sinDeg(angleDeg);
+                    if (collisionManager.canMove(enemy, checkX, checkY)) {
+                        spawnX = checkX;
+                        spawnY = checkY;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (found) {
+                enemy.init(spawnX, spawnY, config.getWidth(), config.getHeight(), config.getHitboxWidth(), config.getHitboxHeight(), config.getMaxHp(), config.getName(), config.getColor(),
+                        collisionManager, config.getContactDamage());
+            }
+        }
 
         if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
             try {
@@ -213,7 +237,7 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public MapObject createStaticNPC(float x, float y, String name, Color color) {
-        StaticObject npc = new StaticObject(x, y, 32f, 32f);
+        StaticObject npc = StaticObject.fromCenter(x, y, 32f, 32f);
         npc.setName(name);
         entityManager.addEntity(npc);
         return npc;
