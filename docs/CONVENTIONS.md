@@ -258,6 +258,7 @@ public void dispose() {
 * **Map Layer & Object Rendering Order**: Render order must be determined dynamically based on the layers and objects XML definitions in the TMX file (via `zIndex` and `subZIndex` fields) instead of relying on hardcoded config list order.
 * **Transitive Connected-Components Overlap Grouping**: Any group of overlapping objects (e.g. Desk -> Monitor -> Monitor Screen) must have their `sortingY` coordinate aligned dynamically to the lowest bottom-Y baseline of the group. This allows the composite setup to Y-sort as a single unified obstacle relative to characters, while tie-breaking the drawing order using their relative `zIndex` and `subZIndex` values.
 * **Rotation Convention**: TMX rotation is clockwise in degrees, whereas GDX `SpriteBatch.draw` expects counter-clockwise. To render correctly around the bottom-left corner of the object (Tiled's rotation origin), negate the rotation (`-rotation`) and pass `(0f, 0f)` as the drawing origin coordinates.
+* **Map Layer Naming & Configuration**: Layer names in TMX must be accurate (`collision`, `Spawn`, `spawn`). Foreground or sorting-dependent decor layers (e.g., grass `co`, `nen`) must be explicitly declared in `map_config.json`'s `decorLayerNames` or `collisionFallbackLayerNames` to ensure correct rendering depth and logic initialization.
 
 ---
 

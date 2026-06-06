@@ -97,11 +97,11 @@ Technical specs, library versions, build structures, and architecture of Hust Ad
     * *Decoupled Hitbox & Sprite*: Visual sprite dimensions (`width`, `height`) are decoupled from physical hitbox/collision boundaries (`hitboxWidth`, `hitboxHeight`). Collision detection, boundary checks, and spatial grid hashing use hitbox sizes, allowing fine-grained collision boundaries (e.g. 32x32 player hitbox on 50x50 sprite). Defaults to sprite size if hitbox size is not specified.
     * *Static vs Dynamic Grid*: `staticGrid` (walls, hashed once during map load) is separate from `dynamicGrid` (moving entities, rebuilt every frame) to optimize performance.
     * *Zero Allocation*: Grid cell arrays (`Array<Collider>`) are pooled.
-    * *Wall Bypass*: Mob group behaviors (`SimpleSwarmBehavior`, `FleeBehavior`) skip `CollisionManager.canMove()` wall collision checks to reduce CPU load under high entity count (they still trigger damage colliders).
+    * *Wall Bypass*: All Enemy entities now bypass `CollisionManager.canMove()` wall collision checks during position updates (`setX`/`setY`) to freely pass through terrain, preventing getting stuck and optimizing navigation. Group behaviors (`SimpleSwarmBehavior`, `FleeBehavior`) also benefit from this zero-collision logic.
   * **Tiled Map Loading (`WorldManager`)**:
     * Finds collision layers via map properties (`collisionLayer`) or layer properties (`collision`/`isCollision`). Fallback order: `"collision"`, `"Border"`, `"Object Layer 1"`.
     * Classifies map layers (background vs foreground) via `classifyLayers()`.
-    * Resolves Player spawn point from layer configured via map property `spawnLayer` or layer property `isSpawn` (default fallback `"Spawn"`, then `LevelConfig`).
+    * Robustly resolves Player spawn point from layer configured via map property `spawnLayer`, layer property `isSpawn`, or exact fallback names (`Spawn`/`spawn`). Flexibly supports extracting coordinates from any `MapObject` (including `RectangleMapObject` and point-based objects) to ensure fault-tolerant map transitions.
     * **Dynamic Depth Sorting & Transitive Grouping**: Assigns `zIndex` based on layer definition index and `subZIndex` based on object XML definition order in the TMX file. Transitive connected-components grouping merges overlapping bounding boxes (e.g., Desk -> Monitor -> Monitor Screen) and aligns their sorting bottom-Y baseline, breaking rendering ties using `zIndex` and `subZIndex` to match Tiled maps rendering behavior.
   * Default viewport: $800 \times 600$ pixels.
   * Default entity size: $32 \times 32$ pixels.
