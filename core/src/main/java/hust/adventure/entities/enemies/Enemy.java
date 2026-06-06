@@ -9,6 +9,7 @@ import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.behavior.BehaviorRegistry;
 import hust.adventure.behavior.EnemyBehaviors;
+import hust.adventure.behavior.ai.EnemySeparationResolver;
 import hust.adventure.behavior.attack.AttackBehavior;
 import hust.adventure.behavior.death.DeathBehavior;
 import hust.adventure.collision.Collider;
@@ -36,6 +37,7 @@ public class Enemy extends Character {
     private boolean split;
     private boolean boss;
     private DeathBehavior deathBehavior;
+    private boolean checkWallCollisions = true;
 
     private final Player player;
     private final EntityManager entityManager;
@@ -93,8 +95,10 @@ public class Enemy extends Character {
             clampedY = Math.max(minY, Math.min(maxY, clampedY));
         }
 
+        this.checkWallCollisions = false;
         setX(clampedX);
         setY(clampedY);
+        this.checkWallCollisions = true;
         this.setMaxHp(maxHp);
         this.setHp(maxHp);
         setName(name);
@@ -129,6 +133,8 @@ public class Enemy extends Character {
             attackBehavior.execute(this, virtualDelta, player, entityManager);
         }
 
+        EnemySeparationResolver.resolve(this, entityManager);
+
         // Clamp to map boundaries after movement updates
         if (collisionManager != null && collisionManager.getMapWidth() > 0 && !collisionManager.isInfinite()) {
             final float minX = getHitboxWidth() / 2f;
@@ -136,6 +142,7 @@ public class Enemy extends Character {
             final float minY = getHitboxHeight() / 2f;
             final float maxY = collisionManager.getMapHeight() - getHitboxHeight() / 2f;
 
+            this.checkWallCollisions = false;
             if (getX() < minX) {
                 setX(minX);
             } else if (getX() > maxX) {
@@ -147,7 +154,34 @@ public class Enemy extends Character {
             } else if (getY() > maxY) {
                 setY(maxY);
             }
+            this.checkWallCollisions = true;
         }
+    }
+
+    /**
+     * Sets the horizontal position of the enemy, checking for wall collisions if enabled.
+     *
+     * @param x the new horizontal coordinate
+     */
+    @Override
+    public void setX(final float x) {
+        if (checkWallCollisions && collisionManager != null && !collisionManager.canMove(this, x, getY())) {
+            return;
+        }
+        super.setX(x);
+    }
+
+    /**
+     * Sets the vertical position of the enemy, checking for wall collisions if enabled.
+     *
+     * @param y the new vertical coordinate
+     */
+    @Override
+    public void setY(final float y) {
+        if (checkWallCollisions && collisionManager != null && !collisionManager.canMove(this, getX(), y)) {
+            return;
+        }
+        super.setY(y);
     }
 
     public final Player getPlayer() {

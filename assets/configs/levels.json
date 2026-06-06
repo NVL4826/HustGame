@@ -51,7 +51,7 @@
     {
       "levelId": "FINAL_OUTSIDE",
       "name": "Final Outside",
-      "mapPath": "Final Outside/Final Outside.tmx",
+      "mapPath": "map/outside.tmx",
       "spawnX": 400.0,
       "spawnY": 400.0,
       "zoom": 1.0,
