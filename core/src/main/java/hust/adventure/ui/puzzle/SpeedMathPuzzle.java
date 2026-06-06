@@ -219,7 +219,15 @@ public class SpeedMathPuzzle implements PuzzleGame {
         final float boxY = y - boxHeight / 2f;
 
         batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
+        
+        final Color origColor = font.getColor();
+        final float r = origColor.r;
+        final float g = origColor.g;
+        final float b = origColor.b;
+        final float a = origColor.a;
+        font.setColor(Color.BLACK);
         font.draw(batch, text, x - layout.width / 2f, y + layout.height / 2f);
+        font.setColor(r, g, b, a);
     }
 
     @Override

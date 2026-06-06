@@ -13,6 +13,7 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.screens.levels.LevelContext;
+import com.badlogic.gdx.graphics.GL20;
 
 /**
  * Simon Game memory mini-game puzzle.
@@ -21,7 +22,7 @@ public class SimonPuzzle implements PuzzleGame {
     private static final int MAX_ROUNDS = 15;
 
     public enum SimonState {
-        IDLE, SHOWING_SEQUENCE, AWAITING_INPUT, EVALUATING, ROUND_WON, GAME_WON
+        IDLE, SHOWING_SEQUENCE, AWAITING_INPUT, EVALUATING, ROUND_WON, GAME_WON, FAILED_DELAY
     }
 
     private SimonState state;
@@ -53,6 +54,12 @@ public class SimonPuzzle implements PuzzleGame {
     private Texture textBoxTexture;
     private final GlyphLayout textLayout = new GlyphLayout();
     private final com.badlogic.gdx.math.Vector2 tmpMouse = new com.badlogic.gdx.math.Vector2();
+
+    private final Color bevelLight = new Color(1f, 1f, 1f, 0.3f);
+    private final Color bevelDark = new Color(0f, 0f, 0f, 0.35f);
+    private final Color slotColor = new Color(0.08f, 0.08f, 0.08f, 1f);
+    private static final float BEVEL_T = 6f;
+    private static final float SLOT_OFFSET = 6f;
 
     public SimonPuzzle() {
         this.state = SimonState.IDLE;
@@ -161,6 +168,12 @@ public class SimonPuzzle implements PuzzleGame {
                 }
             }
             break;
+        case FAILED_DELAY:
+            stateTimer -= delta;
+            if (stateTimer <= 0) {
+                reset();
+            }
+            break;
         default:
             break;
         }
@@ -220,7 +233,8 @@ public class SimonPuzzle implements PuzzleGame {
                         // Wrong answer -> dispatch sfx, wait briefly, reset puzzle
                         EventDispatcher.getInstance().dispatch(
                                 new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_wrong.mp3"));
-                        reset();
+                        state = SimonState.FAILED_DELAY;
+                        stateTimer = 1.5f;
                     } else {
                         inputIndex++;
                         if (inputIndex >= currentRound) {
@@ -272,7 +286,15 @@ public class SimonPuzzle implements PuzzleGame {
         final float boxY = y - boxHeight / 2f;
 
         batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
+        
+        final Color origColor = font.getColor();
+        final float r = origColor.r;
+        final float g = origColor.g;
+        final float b = origColor.b;
+        final float a = origColor.a;
+        font.setColor(Color.BLACK);
         font.draw(batch, text, x - layout.width / 2f, y + layout.height / 2f);
+        font.setColor(r, g, b, a);
     }
 
     @Override
@@ -281,17 +303,49 @@ public class SimonPuzzle implements PuzzleGame {
             return;
         }
 
-        // Draw buttons using ShapeRenderer
+        // Draw slots first to create a sunken board visual slot around keys
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(slotColor);
+        for (int i = 0; i < 4; i++) {
+            final Rectangle rect = buttons[i];
+            shapeRenderer.rect(rect.x - SLOT_OFFSET, rect.y - SLOT_OFFSET, rect.width + SLOT_OFFSET * 2, rect.height + SLOT_OFFSET * 2);
+        }
+
+        // Draw buttons inside slots
         for (int i = 0; i < 4; i++) {
             if (highlightButton == i) {
                 shapeRenderer.setColor(highlightColors[i]);
             } else {
                 shapeRenderer.setColor(baseColors[i]);
             }
-            shapeRenderer.rect(buttons[i].x, buttons[i].y, buttons[i].width, buttons[i].height);
+            final Rectangle rect = buttons[i];
+            shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
         }
         shapeRenderer.end();
+
+        // Draw bevel overlays for 3D raised key look
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (int i = 0; i < 4; i++) {
+            final Rectangle rect = buttons[i];
+            
+            // Top bevel (light)
+            shapeRenderer.setColor(bevelLight);
+            shapeRenderer.rect(rect.x, rect.y + rect.height - BEVEL_T, rect.width, BEVEL_T);
+            
+            // Left bevel (light)
+            shapeRenderer.rect(rect.x, rect.y, BEVEL_T, rect.height);
+            
+            // Bottom bevel (dark)
+            shapeRenderer.setColor(bevelDark);
+            shapeRenderer.rect(rect.x, rect.y, rect.width, BEVEL_T);
+            
+            // Right bevel (dark)
+            shapeRenderer.rect(rect.x + rect.width - BEVEL_T, rect.y, BEVEL_T, rect.height);
+        }
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         // Draw text
         batch.begin();
@@ -312,6 +366,8 @@ public class SimonPuzzle implements PuzzleGame {
             textBuilder.append("Ghi nhớ dãy nút...");
         } else if (state == SimonState.AWAITING_INPUT) {
             textBuilder.append("Hãy lặp lại dãy nút!");
+        } else if (state == SimonState.FAILED_DELAY) {
+            textBuilder.append("Sai rồi! Chuẩn bị thử lại...");
         } else {
             textBuilder.append("Đang kiểm tra...");
         }

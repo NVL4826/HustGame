@@ -22,10 +22,7 @@ public class MemoryCardPuzzle implements PuzzleGame {
     private static final float TIME_LIMIT = 180f; // 3 minutes
 
     public enum MatchState {
-        IDLE,
-        FIRST_CARD_SELECTED,
-        SECOND_CARD_SELECTED,
-        MISMATCH_DELAY
+        IDLE, FIRST_CARD_SELECTED, SECOND_CARD_SELECTED, MISMATCH_DELAY
     }
 
     private MatchState state;
@@ -130,9 +127,8 @@ public class MemoryCardPuzzle implements PuzzleGame {
 
         timeRemaining -= delta;
         if (timeRemaining <= 0f) {
-            EventDispatcher.getInstance().dispatch(
-                    new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_failed.mp3")
-            );
+            EventDispatcher.getInstance()
+                    .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_failed.mp3"));
             reset();
             return;
         }
@@ -196,18 +192,16 @@ public class MemoryCardPuzzle implements PuzzleGame {
         if (card1.getPairId() == card2.getPairId()) {
             card1.setMatched(true);
             card2.setMatched(true);
-            EventDispatcher.getInstance().dispatch(
-                    new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_correct.mp3")
-            );
+            EventDispatcher.getInstance()
+                    .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_correct.mp3"));
             firstSelectedIndex = -1;
             secondSelectedIndex = -1;
             state = MatchState.IDLE;
 
             checkWinCondition();
         } else {
-            EventDispatcher.getInstance().dispatch(
-                    new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3")
-            );
+            EventDispatcher.getInstance()
+                    .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
             state = MatchState.MISMATCH_DELAY;
             mismatchTimer = 1.0f;
         }
@@ -227,23 +221,31 @@ public class MemoryCardPuzzle implements PuzzleGame {
     }
 
     private void playFlipSound() {
-        EventDispatcher.getInstance().dispatch(
-                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/card_flip.mp3")
-        );
+        EventDispatcher.getInstance()
+                .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/card_flip.mp3"));
     }
 
-    private void drawTextInBox(final SpriteBatch batch, final BitmapFont font, final CharSequence text, final float x, final float y, final Texture textBoxTexture, final GlyphLayout layout) {
+    private void drawTextInBox(final SpriteBatch batch, final BitmapFont font, final CharSequence text, final float x,
+            final float y, final Texture textBoxTexture, final GlyphLayout layout) {
         layout.setText(font, text);
         final float paddingX = 20f;
         final float paddingY = 15f;
         final float boxWidth = layout.width + paddingX * 2;
         final float boxHeight = layout.height + paddingY * 2;
-        
+
         final float boxX = x - boxWidth / 2f;
         final float boxY = y - boxHeight / 2f;
-        
+
         batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
+
+        final Color origColor = font.getColor();
+        final float r = origColor.r;
+        final float g = origColor.g;
+        final float b = origColor.b;
+        final float a = origColor.a;
+        font.setColor(Color.BLACK);
         font.draw(batch, text, x - layout.width / 2f, y + layout.height / 2f);
+        font.setColor(r, g, b, a);
     }
 
     @Override
@@ -256,23 +258,24 @@ public class MemoryCardPuzzle implements PuzzleGame {
         batch.begin();
         for (int i = 0; i < NUM_CARDS; i++) {
             final MemoryCard card = cards[i];
-            final Texture tex = (card.isFlipped() || card.isMatched()) ? faceTextures[card.getPairId() - 1] : backTexture;
+            final Texture tex = (card.isFlipped() || card.isMatched()) ? faceTextures[card.getPairId() - 1]
+                    : backTexture;
             batch.draw(tex, card.getBounds().x, card.getBounds().y, card.getBounds().width, card.getBounds().height);
         }
 
         // Render timer overlay numbers
         final BitmapFont font = context.getFont();
         font.setColor(Color.WHITE);
-        
+
         textBuilder.setLength(0);
         textBuilder.append("Ghép thẻ - Thời gian: ").append((int) timeRemaining).append("s");
-        
+
         if (textBoxTexture != null) {
             drawTextInBox(batch, font, textBuilder, 400f, 555f, textBoxTexture, textLayout);
         } else {
             font.draw(batch, textBuilder, 20f, 580f);
         }
-        
+
         batch.end();
 
         // Highlight selected cards & draw timer bar

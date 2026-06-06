@@ -35,6 +35,7 @@ public class PuzzleSequencer implements Disposable {
 
     // Zero-allocation UI rendering buffers
     private final StringBuilder textBuilder;
+    private final Color dimColor = new Color(0f, 0f, 0f, 0.5f);
 
     public PuzzleSequencer() {
         this.puzzles = new ArrayList<>();
@@ -123,6 +124,15 @@ public class PuzzleSequencer implements Disposable {
             shapeRenderer.rect(0, 0, 800, 600);
             shapeRenderer.end();
         }
+
+        // Draw semi-transparent dimming layer over the background
+        com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+        com.badlogic.gdx.Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(dimColor);
+        shapeRenderer.rect(0, 0, 800, 600);
+        shapeRenderer.end();
+        com.badlogic.gdx.Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
     }
 
     public void render(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
