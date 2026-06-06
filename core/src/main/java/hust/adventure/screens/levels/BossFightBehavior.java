@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 import hust.adventure.entities.enemies.Enemy;
@@ -125,7 +125,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     private void initUI(final LevelContext context) {
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new FitViewport(800, 600));
         final Skin skin = new Skin();
         final Pixmap pixmap = new Pixmap(100, 30, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -551,6 +551,13 @@ public class BossFightBehavior implements LevelBehavior {
     public void dispose(final LevelContext context) {
         if (stage != null) {
             stage.dispose();
+        }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        if (stage != null) {
+            stage.getViewport().update(width, height, true);
         }
     }
 

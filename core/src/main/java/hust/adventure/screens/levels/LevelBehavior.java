@@ -28,4 +28,14 @@ public interface LevelBehavior extends EventListener {
     default boolean canTransition(final LevelContext context) {
         return true;
     }
+
+    /**
+     * Checks if a puzzle mini-game is currently active.
+     * @return true if a puzzle is active, false otherwise
+     */
+    default boolean isPuzzleActive() {
+        return false;
+    }
+
+    default void resize(int width, int height) {}
 }

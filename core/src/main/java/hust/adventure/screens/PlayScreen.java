@@ -15,6 +15,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
@@ -87,6 +89,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private ShaderProgram discardShader;
 
     private LootDropService lootDropService;
+    private Viewport viewport;
 
     private static final float VIEW_WIDTH = 800f;
     private static final float VIEW_HEIGHT = 600f;
@@ -188,6 +191,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (cameraManager == null) {
             cameraManager = new CameraManager(VIEW_WIDTH, VIEW_HEIGHT);
         }
+        if (viewport == null) {
+            viewport = new FitViewport(VIEW_WIDTH, VIEW_HEIGHT, cameraManager.getCamera());
+        }
         boolean infinite = config.isInfinite();
         collisionManager.setInfinite(infinite);
         cameraManager.setInfinite(infinite);
@@ -286,12 +292,15 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     @Override
     public void render(float delta) {
         if (state == PlayMode.RUNNING && !game.getScreenTransition().isTransitioning()) {
-            entityManager.update(delta, entityFactory);
-
-            lightingManager.update();
-            collisionManager.update();
-            checkTriggers();
-            updateLevel(delta);
+            if (behavior != null && behavior.isPuzzleActive()) {
+                updateLevel(delta);
+            } else {
+                entityManager.update(delta, entityFactory);
+                lightingManager.update();
+                collisionManager.update();
+                checkTriggers();
+                updateLevel(delta);
+            }
         }
 
         // uiManager.update chạy MỌI lúc (kể cả IN_UI) để nhận input từ LevelUpUI, InventoryUI
@@ -305,8 +314,9 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         });
 
         if (gameRenderer != null) {
+            final boolean puzzleActive = behavior != null && behavior.isPuzzleActive();
             gameRenderer.render(delta, mapRenderer, backgroundLayers, foregroundLayers, player, shapeRenderer, font,
-                    lightingManager);
+                    lightingManager, puzzleActive);
         }
 
         drawLevel();
@@ -479,6 +489,26 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     public LootDropService getLootDropService() {
         return lootDropService;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        if (viewport != null) {
+            viewport.update(width, height, false);
+        }
+        if (gameRenderer != null) {
+            gameRenderer.resize(width, height);
+        }
+        if (behavior != null) {
+            behavior.resize(width, height);
+        }
+    }
+
+    @Override
+    public void unproject(final Vector2 screenCoords) {
+        if (gameRenderer != null && gameRenderer.getUiViewport() != null) {
+            gameRenderer.getUiViewport().unproject(screenCoords);
+        }
     }
 
     @Override

@@ -13,6 +13,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import hust.adventure.HustGame;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.LevelConfig;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Game Over screen – hiện ra khi player chết. Nhấn R → restart từ MAP_1 + reset ProgressContext. Nhấn ESC → thoát game.
@@ -24,6 +27,8 @@ public class GameOverScreen extends BaseScreen {
     private static final float UI_H = 600f;
 
     private final OrthographicCamera uiCam;
+    private final Viewport viewport;
+    private final Vector2 tmpMouse = new Vector2();
     private static Texture whitePixel;
 
     // Fade-in
@@ -49,8 +54,8 @@ public class GameOverScreen extends BaseScreen {
         super(game);
         this.progressContext = game.getProgressContext();
         uiCam = new OrthographicCamera();
-        uiCam.setToOrtho(false, UI_W, UI_H);
-        uiCam.update();
+        viewport = new FitViewport(UI_W, UI_H, uiCam);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     public static void disposeStatic() {
@@ -78,9 +83,11 @@ public class GameOverScreen extends BaseScreen {
         fadeAlpha = Math.max(0f, 1f - fadeTimer / FADE_DURATION);
         pulseTimer += delta;
 
-        // Mouse hover detection (flip Y: libGDX screen Y is top-down)
-        float mx = Gdx.input.getX();
-        float my = UI_H - Gdx.input.getY();
+        // Mouse hover detection using unprojected coordinates
+        tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
+        viewport.unproject(tmpMouse);
+        float mx = tmpMouse.x;
+        float my = tmpMouse.y;
         restartHover = inButton(mx, my, BTN_RESTART_X, BTN_RESTART_Y);
         quitHover = inButton(mx, my, BTN_QUIT_X, BTN_QUIT_Y);
 
@@ -221,6 +228,7 @@ public class GameOverScreen extends BaseScreen {
 
     @Override
     public void resize(int width, int height) {
+        viewport.update(width, height, true);
     }
 
     @Override

@@ -26,6 +26,7 @@ public class GameAssetManager {
     public void loadAllAssets(final LevelDataLoader levelDataLoader) {
         // Textures
         manager.load("background.png", Texture.class);
+        manager.load("text_box.png", Texture.class);
         manager.load("Boss Room.jpg", Texture.class);
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);
@@ -47,6 +48,13 @@ public class GameAssetManager {
         manager.load("items/energy_drink.png", Texture.class);
         manager.load("items/kho_ga.png", Texture.class);
         manager.load("items/usb.png", Texture.class);
+
+        // Load card matching game textures
+        manager.load("puzzle/cards/card_back.png", Texture.class);
+        for (int i = 1; i <= 18; i++) {
+            final String facePath = "puzzle/cards/card_face_" + (i < 10 ? "0" + i : i) + ".png";
+            manager.load(facePath, Texture.class);
+        }
 
         // Load maps dynamically from level configurations (Single Source of Truth)
         if (levelDataLoader != null) {
@@ -96,6 +104,13 @@ public class GameAssetManager {
         manager.load("audio/sfx/puzzle_boss/puzzle_failed.mp3", Sound.class);
         manager.load("audio/sfx/puzzle_boss/puzzle_solved.mp3", Sound.class);
         manager.load("audio/sfx/puzzle_boss/puzzle_wrong.mp3", Sound.class);
+
+        // Load new puzzle SFX
+        manager.load("audio/sfx/puzzle_boss/simon_tone_0.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/simon_tone_1.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/simon_tone_2.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/simon_tone_3.wav", Sound.class);
+        manager.load("audio/sfx/puzzle_boss/card_flip.mp3", Sound.class);
 
         // Music tracks
         manager.load("audio/music/menu.mp3", Music.class);

@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.LevelConfig;
@@ -43,6 +45,8 @@ public class GameRenderer {
     private final CameraManager cameraManager;
     private final EntityManager entityManager;
     private final OrthographicCamera uiCam;
+    private final Viewport uiViewport;
+    private final com.badlogic.gdx.math.Vector2 tmpMouse = new com.badlogic.gdx.math.Vector2();
     private final SpriteBatch batch;
     private final ShaderProgram silhouetteShader;
     private final ShaderProgram discardShader;
@@ -117,8 +121,8 @@ public class GameRenderer {
         this.statusData = new StatusEffectsData(false, false, 1f, 0f, false, false, false);
         this.debugInfoData = new DebugInfoUIData(0f, 0f, 0f, 1f, 1f, 1f, 1f, "None", "None", 0, 0, 0L, 0L, null, null);
         this.uiCam = new OrthographicCamera();
-        this.uiCam.setToOrtho(false, 800, 600);
-        this.uiCam.update();
+        this.uiViewport = new FitViewport(800, 600, uiCam);
+        this.uiViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     /**
@@ -126,7 +130,7 @@ public class GameRenderer {
      */
     public void render(final float delta, final OrthogonalTiledMapRenderer mapRenderer, final int[] backgroundLayers,
             final int[] foregroundLayers, final Player player, final ShapeRenderer shapeRenderer, final BitmapFont font,
-            final LightingManager lightingManager) {
+            final LightingManager lightingManager, final boolean puzzleActive) {
 
         if (cameraManager != null) {
             cameraManager.update();
@@ -139,6 +143,13 @@ public class GameRenderer {
         // 0. Xóa màu nền, Depth Buffer và Stencil Buffer
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_STENCIL_BUFFER_BIT);
+
+        if (puzzleActive) {
+            shapeRenderer.setProjectionMatrix(uiCam.combined);
+            batch.setProjectionMatrix(uiCam.combined);
+            renderUI(batch, shapeRenderer, font, player, true);
+            return;
+        }
 
         mapRenderer.setView(cameraManager.getCamera());
 
@@ -292,35 +303,37 @@ public class GameRenderer {
         // 6. Render UI
         shapeRenderer.setProjectionMatrix(uiCam.combined);
         batch.setProjectionMatrix(uiCam.combined);
-        renderUI(batch, shapeRenderer, font, player);
+        renderUI(batch, shapeRenderer, font, player, false);
     }
 
     private void renderUI(final SpriteBatch batch, final ShapeRenderer shapeRenderer, final BitmapFont font,
-            final Player player) {
-        if (hud != null) {
-            final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
-            if (progressContext != null) {
-                hudData.set(progressContext.getHp(), progressContext.getMaxHp(), progressContext.getStamina(),
-                        progressContext.getMaxStamina(), progressContext.getMorale(), progressContext.getExp(),
-                        progressContext.getExpToNextLevel(), progressContext.getLevel(), currentTime);
+            final Player player, final boolean puzzleActive) {
+        if (!puzzleActive) {
+            if (hud != null) {
+                final float currentTime = hud.getTimeProvider() != null ? hud.getTimeProvider().getCurrentTime() : 0f;
+                if (progressContext != null) {
+                    hudData.set(progressContext.getHp(), progressContext.getMaxHp(), progressContext.getStamina(),
+                            progressContext.getMaxStamina(), progressContext.getMorale(), progressContext.getExp(),
+                            progressContext.getExpToNextLevel(), progressContext.getLevel(), currentTime);
+                }
+                hud.render(batch, shapeRenderer, font, hudData);
             }
-            hud.render(batch, shapeRenderer, font, hudData);
-        }
-        if (statusEffectsHUD != null) {
-            boolean isSpeedBoosted = false;
-            boolean isHpRegen = false;
-            boolean isConfused = false;
-            if (player != null) {
-                isSpeedBoosted = player.hasStatus(StatusFlag.SPEED_BOOSTED);
-                isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
-                isConfused = player.hasStatus(StatusFlag.CONFUSED);
+            if (statusEffectsHUD != null) {
+                boolean isSpeedBoosted = false;
+                boolean isHpRegen = false;
+                boolean isConfused = false;
+                if (player != null) {
+                    isSpeedBoosted = player.hasStatus(StatusFlag.SPEED_BOOSTED);
+                    isHpRegen = player.hasStatus(StatusFlag.REGEN_HP);
+                    isConfused = player.hasStatus(StatusFlag.CONFUSED);
+                }
+                if (progressContext != null) {
+                    statusData.set(progressContext.isHasNao(), progressContext.isHasUsb(),
+                            progressContext.getEnemyTimeScale(), progressContext.getShowEnemiesTimer(), isSpeedBoosted,
+                            isHpRegen, isConfused);
+                }
+                statusEffectsHUD.render(batch, font, statusData);
             }
-            if (progressContext != null) {
-                statusData.set(progressContext.isHasNao(), progressContext.isHasUsb(),
-                        progressContext.getEnemyTimeScale(), progressContext.getShowEnemiesTimer(), isSpeedBoosted,
-                        isHpRegen, isConfused);
-            }
-            statusEffectsHUD.render(batch, font, statusData);
         }
         if (inventoryUI != null && player != null) {
             tempInventoryItemsList.clear();
@@ -333,8 +346,10 @@ public class GameRenderer {
                 }
             }
             final InventoryUIData invData = new InventoryUIData(tempInventoryItemsList);
+            tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
+            uiViewport.unproject(tmpMouse);
             inventoryUI.render(batch, shapeRenderer, font, invData,
-                    progressContext != null && progressContext.isInventoryOpen());
+                    progressContext != null && progressContext.isInventoryOpen(), tmpMouse.x, tmpMouse.y);
         }
         if (levelUpUI != null) {
             levelUpUI.render(batch, shapeRenderer, font);
@@ -558,6 +573,16 @@ public class GameRenderer {
                 builder.append(digit);
                 fpart -= digit;
             }
+        }
+    }
+
+    public Viewport getUiViewport() {
+        return uiViewport;
+    }
+
+    public void resize(int width, int height) {
+        if (uiViewport != null) {
+            uiViewport.update(width, height, true);
         }
     }
 }

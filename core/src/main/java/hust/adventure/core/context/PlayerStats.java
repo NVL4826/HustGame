@@ -202,7 +202,7 @@ public class PlayerStats {
         morale = 100f;
         level = 1;
         exp = 0;
-        expToNextLevel = 100f;
+        expToNextLevel = 10f;
         damageMultiplier = 1.0f;
     }
 }

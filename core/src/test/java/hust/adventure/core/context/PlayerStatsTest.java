@@ -30,7 +30,7 @@ public class PlayerStatsTest {
         assertEquals(100f, stats.getMorale(), 0.01f);
         assertEquals(1, stats.getLevel());
         assertEquals(0f, stats.getExp(), 0.01f);
-        assertEquals(100f, stats.getExpToNextLevel(), 0.01f);
+        assertEquals(10f, stats.getExpToNextLevel(), 0.01f);
         assertEquals(1.0f, stats.getDamageMultiplier(), 0.01f);
     }
 

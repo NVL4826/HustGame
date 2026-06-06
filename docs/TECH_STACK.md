@@ -12,7 +12,7 @@ Technical specs, library versions, build structures, and architecture of Hust Ad
   * **Native Memory & Static Resources**: Release non-JVM heap resources (`Texture`, `Shader`, `SpriteBatch`, `ShapeRenderer`, `TiledMap`, `RayHandler`, `World`) by implementing `Disposable` and calling `dispose()`.
     * Reuse `ShapeRenderer` in `ScreenTransition`: Inherits `BaseScreen`, uses global `ShapeRenderer` shared by `HustGame` to avoid extra native allocation.
     * Clean static fields holding native resources (e.g., `bulletTexture` in `Projectile`, `whitePixel` in `ShapeDrawUtils`) using static `disposeStatic()` or `disposeStaticResources()` on game shutdown.
-  * **Zero-Allocation UI rendering**: Avoid string manipulation in rendering path. UI components (e.g., `DebugUI`) must use class-level shared `StringBuilder` (cleared via `setLength(0)`) and custom non-allocating float formatter (`appendFloat()`) instead of `String.format()` or `+` operator. `BitmapFont.draw()` draws `CharSequence` directly.
+  * **Zero-Allocation UI rendering**: Avoid string manipulation in rendering path. UI components (e.g., `DebugUI`, `SimonPuzzle`, `MemoryCardPuzzle`, `SpeedMathPuzzle`) must use class-level shared `StringBuilder` (cleared via `setLength(0)`) and custom non-allocating float formatter (e.g. `appendFloat()`) instead of `String.format()` or `+` operator. `BitmapFont.draw()` draws `CharSequence` directly.
 
 ---
 

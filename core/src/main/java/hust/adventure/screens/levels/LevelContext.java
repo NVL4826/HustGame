@@ -51,4 +51,6 @@ public interface LevelContext {
     void setState(final PlayMode state);
 
     LightProvider getLightingManager();
+
+    void unproject(final com.badlogic.gdx.math.Vector2 screenCoords);
 }

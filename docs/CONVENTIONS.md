@@ -313,7 +313,7 @@ public void render(float delta) {
   8. Draw UI Layer overlay (HUD, inventory, level up, debug panel).
 
 > [!IMPORTANT]
-> The UI (`HUD`, `StatusEffectsHUD`, `InventoryUI`, `LevelUpUI`, `DebugUI`) is rendered manually via `SpriteBatch` and `ShapeRenderer` matching a single centralized `uiCam` in `GameRenderer`. Do not use Scene2D `Stage` for in-game HUD overlay rendering (use manual SpriteBatch/ShapeRenderer for zero-allocation hot path). Scene2D `Stage` + `Table` is permitted for non-gameplay screens (e.g., MainMenuScreen, Settings) where allocation is acceptable.
+> The UI (`HUD`, `StatusEffectsHUD`, `InventoryUI`, `LevelUpUI`, `DebugUI`, and the library mini-games like `SimonPuzzle`, `MemoryCardPuzzle`, `SpeedMathPuzzle` managed by `PuzzleSequencer`) is rendered manually via `SpriteBatch` and `ShapeRenderer` matching a single centralized `uiCam` in `GameRenderer`. Do not use Scene2D `Stage` for in-game HUD overlay or puzzle rendering (use manual SpriteBatch/ShapeRenderer for zero-allocation hot path). Scene2D `Stage` + `Table` is permitted for non-gameplay screens (e.g., MainMenuScreen, Settings) where allocation is acceptable.
 
 ---
 
@@ -442,3 +442,4 @@ public class Player extends Character implements EventListener {
 * **Singleton Cleanup**: Call `EventDispatcher.resetInstance()` in `@BeforeEach` setup steps to isolate unit test states.
 * **Bypass Native camera logic**: Avoid native libGDX dependency errors (like UnsatisfiedLinkError in `Matrix4.prj`) when testing code that uses a `Camera` by mocking `Camera` or creating a lightweight `Camera` subclass that overrides `update()` methods to do nothing.
 * **Reflection for private fields**: When checking private fields of instantiated entities that do not expose public getters (like the private `amount` field in `ExpGem`), use Java reflection to inspect the field values in test assertions.
+* **Mock Asset Manager chain**: Mock the dependencies of the asset manager (`mockContext.getGame()`, `mockGame.getAssetManager()`, and asset getters) in unit tests for UI or puzzle components that load textures or sounds dynamically on initialization, preventing `NullPointerException` failures in the test runner.

@@ -66,13 +66,9 @@ public class InventoryUI {
     public InventoryUI() {
     }
 
-    public void render(final SpriteBatch batch, final ShapeRenderer sr, final BitmapFont font, final InventoryUIData data, final boolean isInventoryOpen) {
+    public void render(final SpriteBatch batch, final ShapeRenderer sr, final BitmapFont font, final InventoryUIData data, final boolean isInventoryOpen, final float mx, final float my) {
         if (!isInventoryOpen)
             return;
-
-        // Mouse (flip Y)
-        final float mx = Gdx.input.getX();
-        final float my = 600f - Gdx.input.getY();
 
         this.itemList.clear();
         if (data != null && data.getItems() != null) {
