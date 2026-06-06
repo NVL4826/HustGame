@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
+import hust.adventure.entities.base.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -47,6 +47,13 @@ import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.world.InfiniteMapRenderer;
 import hust.adventure.world.MapChunk;
 import hust.adventure.world.WorldManager;
+import hust.adventure.world.MapConfig;
+import hust.adventure.world.MapConfigLoader;
+import hust.adventure.world.LightingObjectData;
+import hust.adventure.world.parsers.WallParser;
+import hust.adventure.world.parsers.PortalParser;
+import hust.adventure.world.parsers.LightingObjectParser;
+import hust.adventure.world.parsers.StaticDecorParser;
 
 /**
  * Concrete gameplay screen. Manages systems lifecycles and delegates gameplay logic to LevelBehavior.
@@ -97,7 +104,19 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         this.progressContext = game.getProgressContext();
         this.state = PlayMode.RUNNING;
 
-        this.worldManager = new WorldManager();
+        final MapConfig mapConfig = MapConfigLoader.load();
+        this.worldManager = new WorldManager(mapConfig);
+        this.worldManager.registerParser("collision", new WallParser());
+        this.worldManager.registerParser(mapConfig.getPortalLayerName(), new PortalParser());
+        this.worldManager.registerParser(mapConfig.getLightingLayerName(), new LightingObjectParser());
+
+        final StaticDecorParser decorParser = new StaticDecorParser();
+        if (mapConfig.getDecorLayerNames() != null) {
+            for (final String name : mapConfig.getDecorLayerNames()) {
+                this.worldManager.registerParser(name, decorParser);
+            }
+        }
+
         this.levelManager = new LevelManager(progressContext);
         this.entityManager = new EntityManager();
         this.collisionManager = new CollisionManager(entityManager, 64f);
@@ -150,6 +169,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         lightingManager.setAmbientLight(config.getAmbientColor());
         worldManager.loadMap(game.getAssetManager().getTiledMap(config.getMapPath()));
         spawnMapLightingObjects();
+        spawnMapDecorObjects();
         collisionManager.setMap(worldManager.getCurrentMap(), worldManager.getWalls());
         mapRenderer = new OrthogonalTiledMapRenderer(worldManager.getCurrentMap());
 
@@ -228,27 +248,20 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         foregroundLayers = layers[1];
     }
 
-    /**
-     * Spawns static lighting entities from the "LightingObjects" layer of the map.
-     */
     private void spawnMapLightingObjects() {
-        final TiledMap map = worldManager.getCurrentMap();
-        if (map == null) {
-            return;
-        }
-        final MapLayer lightLayer = map.getLayers().get("LightingObjects");
-        if (lightLayer != null) {
-            for (final MapObject obj : lightLayer.getObjects()) {
-                final float x = obj.getProperties().get("x", 0f, Float.class);
-                final float y = obj.getProperties().get("y", 0f, Float.class);
-                final String name = obj.getName();
-
-                if ("Book".equalsIgnoreCase(name)) {
-                    entityFactory.createFloatingBook(x, y, lightingManager);
-                } else if ("Candle".equalsIgnoreCase(name)) {
-                    entityFactory.createCandle(x, y, lightingManager);
-                }
+        for (final LightingObjectData data : worldManager.getParseResult().getLightingObjects()) {
+            final String name = data.getName();
+            if ("Book".equalsIgnoreCase(name)) {
+                entityFactory.createFloatingBook(data.getX(), data.getY(), lightingManager);
+            } else if ("Candle".equalsIgnoreCase(name)) {
+                entityFactory.createCandle(data.getX(), data.getY(), lightingManager);
             }
+        }
+    }
+
+    private void spawnMapDecorObjects() {
+        for (final MapObject decor : worldManager.getParseResult().getDecorEntities()) {
+            entityManager.addEntity(decor);
         }
     }
 

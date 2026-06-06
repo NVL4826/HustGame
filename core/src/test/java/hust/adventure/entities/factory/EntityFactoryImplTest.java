@@ -14,7 +14,7 @@ import hust.adventure.entities.EntityManager;
 import hust.adventure.entities.ExpGem;
 import hust.adventure.entities.ItemDrop;
 import hust.adventure.entities.Projectile;
-import hust.adventure.entities.StaticNPC;
+import hust.adventure.entities.StaticObject;
 import hust.adventure.entities.base.LightProvider;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.enemies.Enemy;
@@ -193,9 +193,10 @@ public class EntityFactoryImplTest {
 
     @Test
     public void testCreateStaticNPC() {
-        StaticNPC npc = entityFactory.createStaticNPC(200f, 220f, "HustGuy", Color.WHITE);
+        MapObject npc = entityFactory.createStaticNPC(200f, 220f, "HustGuy", Color.WHITE);
 
         assertNotNull(npc);
+        assertTrue(npc instanceof StaticObject);
         assertEquals(200f, npc.getX());
         assertEquals(220f, npc.getY());
         assertEquals("HustGuy", npc.getName());

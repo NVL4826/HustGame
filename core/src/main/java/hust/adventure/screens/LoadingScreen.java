@@ -6,7 +6,7 @@ public class LoadingScreen extends BaseScreen {
 
     public LoadingScreen(HustGame game) {
         super(game);
-        game.getAssetManager().loadAllAssets();
+        game.getAssetManager().loadAllAssets(game.getLevelDataManager());
     }
 
     @Override

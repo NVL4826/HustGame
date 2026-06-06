@@ -9,28 +9,47 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import hust.adventure.entities.WallEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Manages the game world state, including the map, collisions, and portals.
  */
 public class WorldManager implements Disposable {
-    private static final Set<String> KNOWN_BACKGROUND_LAYERS = Set.of("Via He", "Duong", "Grass", "Nha1", "Background",
-            "Floor", "Tile Layer 1");
-
+    private final MapConfig config;
+    private final MapParseResult parseResult;
+    private final ObjectMap<String, MapObjectParser> parserRegistry;
     private TiledMap currentMap;
-    private final List<WallEntity> walls;
-    private final List<Portal> portals;
     private InfiniteMapRenderer mapRenderer;
 
-    public WorldManager() {
-        this.walls = new ArrayList<>();
-        this.portals = new ArrayList<>();
+    /**
+     * Constructs a WorldManager with the given configuration.
+     *
+     * @param config the MapConfig containing layer specifications
+     */
+    public WorldManager(final MapConfig config) {
+        if (config == null) {
+            throw new IllegalArgumentException("MapConfig cannot be null");
+        }
+        this.config = config;
+        this.parseResult = new MapParseResult();
+        this.parserRegistry = new ObjectMap<>();
+    }
+
+    /**
+     * Registers a parser for a specific layer name.
+     *
+     * @param layerName the layer name to associate with the parser
+     * @param parser    the MapObjectParser to handle the layer
+     */
+    public void registerParser(final String layerName, final MapObjectParser parser) {
+        if (layerName != null && parser != null) {
+            parserRegistry.put(layerName, parser);
+        }
     }
 
     /**
@@ -39,24 +58,31 @@ public class WorldManager implements Disposable {
      * @param map the TiledMap instance to load
      */
     public void loadMap(final TiledMap map) {
-        if (map == null)
+        if (map == null) {
             throw new IllegalArgumentException("Map cannot be null");
+        }
         this.currentMap = map;
+        parseResult.clear();
 
-        setupWalls();
-        setupPortals();
-    }
-
-    private void setupWalls() {
-        walls.clear();
-
-        // Find collision layers using map properties, layer properties, or fallbacks
+        // 1. Find and parse collision layers
         final List<MapLayer> collisionLayers = findCollisionLayers();
-        for (final MapLayer layer : collisionLayers) {
-            for (final MapObject obj : layer.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    final Rectangle rect = ((RectangleMapObject) obj).getRectangle();
-                    walls.add(new WallEntity(rect));
+        final MapObjectParser wallParser = parserRegistry.get("collision");
+        if (wallParser != null) {
+            for (final MapLayer layer : collisionLayers) {
+                wallParser.parse(layer, parseResult);
+            }
+        }
+
+        // 2. Parse other layers using the registry, avoiding double parsing collision layers
+        for (final MapLayer layer : map.getLayers()) {
+            if (collisionLayers.contains(layer)) {
+                continue;
+            }
+            final String name = layer.getName();
+            if (name != null) {
+                final MapObjectParser parser = parserRegistry.get(name);
+                if (parser != null) {
+                    parser.parse(layer, parseResult);
                 }
             }
         }
@@ -96,32 +122,18 @@ public class WorldManager implements Disposable {
         }
 
         // 3. Fallback to default known collision layer names
-        final String[] defaultLayerNames = { "collision", "Border", "Object Layer 1" };
-        for (final String name : defaultLayerNames) {
-            final MapLayer layer = currentMap.getLayers().get(name);
-            if (layer != null) {
-                foundLayers.add(layer);
-                break; // Prioritize the first matching fallback layer
+        final List<String> fallbackNames = config.getCollisionFallbackLayerNames();
+        if (fallbackNames != null) {
+            for (final String name : fallbackNames) {
+                final MapLayer layer = currentMap.getLayers().get(name);
+                if (layer != null) {
+                    foundLayers.add(layer);
+                    break; // Prioritize the first matching fallback layer
+                }
             }
         }
 
         return foundLayers;
-    }
-
-    private void setupPortals() {
-        portals.clear();
-        MapLayer portalLayer = currentMap.getLayers().get("Portals");
-        if (portalLayer != null) {
-            for (MapObject obj : portalLayer.getObjects()) {
-                if (obj instanceof RectangleMapObject) {
-                    Rectangle rect = ((RectangleMapObject) obj).getRectangle();
-                    String target = obj.getProperties().get("target", String.class);
-                    float spawnX = obj.getProperties().get("spawnX", 0f, Float.class);
-                    float spawnY = obj.getProperties().get("spawnY", 0f, Float.class);
-                    portals.add(new Portal(rect, target, spawnX, spawnY));
-                }
-            }
-        }
     }
 
     public void initInfiniteWorld(final InfiniteMapRenderer mapRenderer) {
@@ -142,25 +154,29 @@ public class WorldManager implements Disposable {
     }
 
     public List<WallEntity> getWalls() {
-        return walls;
+        return parseResult.getWalls();
     }
 
     public List<Portal> getPortals() {
-        return portals;
+        return parseResult.getPortals();
+    }
+
+    public MapParseResult getParseResult() {
+        return parseResult;
     }
 
     /**
-     * Reads the spawn point of the player from the "Spawn" objectgroup in TMX. Supports custom properties for flexible
-     * configuration.
+     * Reads the spawn point of the player from the spawn layer in TMX.
      *
      * @return the spawn point coordinates as a Vector2, or null if not found
      */
     public Vector2 getSpawnPoint() {
-        if (currentMap == null)
+        if (currentMap == null) {
             return null;
+        }
 
-        // Check for custom spawn layer name in map properties, fallback to "Spawn"
-        final String spawnLayerName = currentMap.getProperties().get("spawnLayer", "Spawn", String.class);
+        // Check for custom spawn layer name in map properties, fallback to config spawnLayerName
+        final String spawnLayerName = currentMap.getProperties().get("spawnLayer", config.getSpawnLayerName(), String.class);
         MapLayer spawnLayer = currentMap.getLayers().get(spawnLayerName);
         if (spawnLayer == null) {
             // Also try scanning for any layer with a property "isSpawn" or similar
@@ -173,8 +189,9 @@ public class WorldManager implements Disposable {
             }
         }
 
-        if (spawnLayer == null)
+        if (spawnLayer == null) {
             return null;
+        }
         for (final MapObject obj : spawnLayer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 final Rectangle rect = ((RectangleMapObject) obj).getRectangle();
@@ -187,8 +204,7 @@ public class WorldManager implements Disposable {
     }
 
     /**
-     * Analyzes map layers and classifies them into background/foreground. Prioritizes the "isBackground" property on
-     * each layer, falling back to a known name list.
+     * Analyzes map layers and classifies them into background/foreground.
      *
      * @return a 2D array where index [0] contains background layers and index [1] contains foreground layers.
      */
@@ -220,7 +236,15 @@ public class WorldManager implements Disposable {
             return "true".equalsIgnoreCase((String) isBgProp) || "1".equals(isBgProp);
         }
         final String name = layer.getName();
-        return name != null && KNOWN_BACKGROUND_LAYERS.contains(name);
+        if (name != null && config.getBackgroundLayerNames() != null) {
+            final String lowerName = name.toLowerCase(java.util.Locale.ROOT);
+            for (final String bgName : config.getBackgroundLayerNames()) {
+                if (lowerName.equals(bgName.toLowerCase(java.util.Locale.ROOT))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -228,8 +252,7 @@ public class WorldManager implements Disposable {
         // NOTE: currentMap is owned by GameAssetManager and must NOT be disposed here.
         // Disposing it would invalidate the AssetManager's cache and crash on next map load.
         currentMap = null;
-        walls.clear();
-        portals.clear();
+        parseResult.clear();
     }
 
     public static class Portal {

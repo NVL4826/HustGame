@@ -8,7 +8,12 @@
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/school_ground_map.mp3",
-      "ambientColor": { "r": 0.9, "g": 0.9, "b": 0.9, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+      },
       "isInfinite": false
     },
     {
@@ -19,18 +24,28 @@
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/library_map.mp3",
-      "ambientColor": { "r": 0.6, "g": 0.6, "b": 0.6, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.6,
+        "g": 0.6,
+        "b": 0.6,
+        "a": 1.0
+      },
       "isInfinite": false
     },
     {
       "levelId": "LAB",
       "name": "Lab",
-      "mapPath": "lab.tmx",
+      "mapPath": "map/lab.tmx",
       "spawnX": 400.0,
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/lab_map.mp3",
-      "ambientColor": { "r": 0.6, "g": 0.6, "b": 0.6, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.6,
+        "g": 0.6,
+        "b": 0.6,
+        "a": 1.0
+      },
       "isInfinite": false
     },
     {
@@ -41,7 +56,12 @@
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/school_ground_map.mp3",
-      "ambientColor": { "r": 0.9, "g": 0.9, "b": 0.9, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+      },
       "isInfinite": false
     },
     {
@@ -52,7 +72,12 @@
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/final_boss.mp3",
-      "ambientColor": { "r": 0.6, "g": 0.6, "b": 0.6, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.6,
+        "g": 0.6,
+        "b": 0.6,
+        "a": 1.0
+      },
       "isInfinite": false
     },
     {
@@ -63,7 +88,12 @@
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/school_ground_map.mp3",
-      "ambientColor": { "r": 0.9, "g": 0.9, "b": 0.9, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+      },
       "isInfinite": false
     },
     {
@@ -74,7 +104,12 @@
       "spawnY": 400.0,
       "zoom": 1.0,
       "bgmPath": "audio/music/school_ground_map.mp3",
-      "ambientColor": { "r": 0.9, "g": 0.9, "b": 0.9, "a": 1.0 },
+      "ambientColor": {
+        "r": 0.9,
+        "g": 0.9,
+        "b": 0.9,
+        "a": 1.0
+      },
       "isInfinite": true
     }
   ]

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import hust.adventure.entities.ExpGem;
 import hust.adventure.entities.ItemDrop;
 import hust.adventure.entities.Projectile;
-import hust.adventure.entities.StaticNPC;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.inventory.Inventory;
 import hust.adventure.items.base.Item;
@@ -31,7 +30,7 @@ public interface EntityFactory {
 
     MapObject createCandle(float x, float y, LightProvider lightProvider);
 
-    StaticNPC createStaticNPC(float x, float y, String name, Color color);
+    MapObject createStaticNPC(float x, float y, String name, Color color);
 
     void freeEntity(MapObject entity);
 }

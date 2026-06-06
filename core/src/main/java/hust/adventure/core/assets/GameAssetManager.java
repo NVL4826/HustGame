@@ -11,6 +11,9 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
 
+import hust.adventure.core.data.LevelConfig;
+import hust.adventure.core.data.LevelDataLoader;
+
 public class GameAssetManager {
     private final AssetManager manager;
     private Texture whitePixel;
@@ -20,15 +23,21 @@ public class GameAssetManager {
         manager.setLoader(TiledMap.class, new TmxMapLoader());
     }
 
-    public void loadAllAssets() {
+    public void loadAllAssets(final LevelDataLoader levelDataLoader) {
         // Textures
-        manager.load("Lab.jpg", Texture.class);
-        manager.load("background.jpg", Texture.class);
+        manager.load("background.png", Texture.class);
         manager.load("Boss Room.jpg", Texture.class);
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);
         // Character assets
         manager.load("character/atlas.png", Texture.class);
+        manager.load("character/enemy/syntax_error.png", Texture.class);
+        manager.load("character/enemy/null_pointer.png", Texture.class);
+        manager.load("character/enemy/stack_overflow.png", Texture.class);
+        manager.load("character/enemy/library_boss/sprite_0000.png", Texture.class);
+        manager.load("character/enemy/library_boss/sprite_0001.png", Texture.class);
+        manager.load("character/enemy/library_boss/sprite_0002.png", Texture.class);
+        manager.load("character/enemy/library_boss/sprite_0003.png", Texture.class);
         manager.load("bullet.png", Texture.class);
         manager.load("items/brain.png", Texture.class);
         manager.load("items/coffee.png", Texture.class);
@@ -36,15 +45,14 @@ public class GameAssetManager {
         manager.load("items/kho_ga.png", Texture.class);
         manager.load("items/usb.png", Texture.class);
 
-        // Maps
-        manager.load("Final Outside.tmx", TiledMap.class);
-        manager.load("tang1.tmx", TiledMap.class);
-        manager.load("Phong_doc.tmx", TiledMap.class);
-        manager.load("library.tmx", TiledMap.class);
-        manager.load("lab.tmx", TiledMap.class);
-        manager.load("boss_room.tmx", TiledMap.class);
-        manager.load("test.tmx", TiledMap.class);
-        manager.load("tsx/map_1.tmx", TiledMap.class);
+        // Load maps dynamically from level configurations (Single Source of Truth)
+        if (levelDataLoader != null) {
+            for (final LevelConfig config : levelDataLoader.getAllConfigs()) {
+                if (config.getMapPath() != null && !config.getMapPath().isEmpty()) {
+                    manager.load(config.getMapPath(), TiledMap.class);
+                }
+            }
+        }
 
         // Phong_doc textures
         for (int i = 19; i <= 29; i++)
@@ -88,12 +96,17 @@ public class GameAssetManager {
 
         // Music tracks
         manager.load("audio/music/menu.mp3", Music.class);
-        manager.load("audio/music/school_ground_map.mp3", Music.class);
-        manager.load("audio/music/library_map.mp3", Music.class);
-        manager.load("audio/music/lab_map.mp3", Music.class);
-        manager.load("audio/music/final_boss.mp3", Music.class);
         manager.load("audio/music/game_over.mp3", Music.class);
         manager.load("audio/music/win_menu.mp3", Music.class);
+
+        // Load level-specific BGM tracks dynamically from level configurations
+        if (levelDataLoader != null) {
+            for (final LevelConfig config : levelDataLoader.getAllConfigs()) {
+                if (config.getBgmPath() != null && !config.getBgmPath().isEmpty()) {
+                    manager.load(config.getBgmPath(), Music.class);
+                }
+            }
+        }
     }
 
     public boolean update() {

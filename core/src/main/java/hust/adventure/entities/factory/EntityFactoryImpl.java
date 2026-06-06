@@ -27,7 +27,7 @@ import hust.adventure.entities.ExpGem;
 import hust.adventure.entities.FloatingBook;
 import hust.adventure.entities.ItemDrop;
 import hust.adventure.entities.Projectile;
-import hust.adventure.entities.StaticNPC;
+import hust.adventure.entities.StaticObject;
 import hust.adventure.utils.GamePools;
 
 /**
@@ -212,8 +212,9 @@ public class EntityFactoryImpl implements EntityFactory {
     }
 
     @Override
-    public StaticNPC createStaticNPC(float x, float y, String name, Color color) {
-        StaticNPC npc = new StaticNPC(x, y, name, color);
+    public MapObject createStaticNPC(float x, float y, String name, Color color) {
+        StaticObject npc = new StaticObject(x, y, 32f, 32f);
+        npc.setName(name);
         entityManager.addEntity(npc);
         return npc;
     }

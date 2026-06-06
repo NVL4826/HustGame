@@ -7,6 +7,7 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.ui.BookPuzzle;
 
@@ -23,11 +24,6 @@ public class LibraryBehavior implements LevelBehavior {
     // Spawn boss hơi cao hơn trung tâm
     private static final float BOSS_SPAWN_X = 672f;
     private static final float BOSS_SPAWN_Y = 480f;
-
-    // Target map sau khi nhặt não
-    private static final String NEXT_MAP = "lab.tmx";
-    private static final float NEXT_SPAWN_X = 400f;
-    private static final float NEXT_SPAWN_Y = 300f;
 
     // Số quái thường spawn cùng boss
     private static final int MINION_COUNT = 4;
@@ -140,9 +136,18 @@ public class LibraryBehavior implements LevelBehavior {
             if ("brain".equals(data.getItem().getId())) {
                 libraryCleared = true;
 
-                // Chuyển sang màn Lab
-                final MapTransitionData trans = new MapTransitionData(NEXT_MAP, NEXT_SPAWN_X, NEXT_SPAWN_Y);
-                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.MAP_TRANSITION, trans));
+                // Transition to the Lab level dynamically using config (Single Source of Truth)
+                if (context != null && context.getGame() != null) {
+                    final LevelConfig labConfig = context.getGame().getLevelDataManager().getLevelConfig("LAB");
+                    if (labConfig != null) {
+                        final MapTransitionData trans = new MapTransitionData(
+                                labConfig.getMapPath(),
+                                labConfig.getSpawnX(),
+                                labConfig.getSpawnY()
+                        );
+                        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.MAP_TRANSITION, trans));
+                    }
+                }
             }
             break;
 

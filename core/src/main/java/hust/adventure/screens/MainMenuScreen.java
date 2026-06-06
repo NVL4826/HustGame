@@ -22,8 +22,8 @@ import hust.adventure.HustGame;
 import hust.adventure.core.data.LevelConfig;
 
 /**
- * MainMenuScreen represents the main landing menu of the game.
- * It is structured into isolated, testable, and SRP-compliant inner components.
+ * MainMenuScreen represents the main landing menu of the game. It is structured into isolated, testable, and
+ * SRP-compliant inner components.
  */
 public class MainMenuScreen extends BaseScreen {
 
@@ -76,7 +76,8 @@ public class MainMenuScreen extends BaseScreen {
                 parameter.size = 48;
                 titleFont = generator.generateFont(parameter);
             } catch (Exception e) {
-                Gdx.app.log("MenuSkinFactory", "Failed to generate FreeType fonts. Falling back to default BitmapFont.", e);
+                Gdx.app.log("MenuSkinFactory", "Failed to generate FreeType fonts. Falling back to default BitmapFont.",
+                        e);
                 // Fallback to default BitmapFonts
                 if (skin.has("default", BitmapFont.class)) {
                     menuFont = skin.getFont("default");
@@ -128,8 +129,7 @@ public class MainMenuScreen extends BaseScreen {
     }
 
     /**
-     * Layout builder that builds the layout table.
-     * Keeps layout separate from lifecycle and routing logic (DIP).
+     * Layout builder that builds the layout table. Keeps layout separate from lifecycle and routing logic (DIP).
      */
     static class MenuLayoutBuilder {
         static Table build(final Skin skin, final ButtonActionRouter router) {
@@ -141,7 +141,7 @@ public class MainMenuScreen extends BaseScreen {
             // Menu Title Label
             final Label titleLabel = new Label("HUST ADVENTURE", skin, "menu-title");
             titleLabel.setAlignment(com.badlogic.gdx.utils.Align.center);
-            
+
             // Add title row (spanning across default settings if needed, here just single column)
             table.add(titleLabel).width(600).height(80).padBottom(40).row();
 
@@ -187,7 +187,7 @@ public class MainMenuScreen extends BaseScreen {
 
     @Override
     public void show() {
-        backgroundTexture = game.getAssetManager().getTexture("background.jpg");
+        backgroundTexture = game.getAssetManager().getTexture("background.png");
         skin = MenuSkinFactory.create();
 
         final ButtonActionRouter router = new ButtonActionRouter() {
@@ -195,9 +195,9 @@ public class MainMenuScreen extends BaseScreen {
             public void onStartGame() {
                 final LevelConfig template = game.getLevelDataManager().getLevelConfig("FINAL_OUTSIDE");
                 if (template != null) {
-                    final LevelConfig config = new LevelConfig("FINAL_OUTSIDE", template.getName(), template.getMapPath(),
-                            template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
-                            template.getAmbientColor(), template.isInfinite());
+                    final LevelConfig config = new LevelConfig("FINAL_OUTSIDE", template.getName(),
+                            template.getMapPath(), template.getSpawnX(), template.getSpawnY(), template.getZoom(),
+                            template.getBgmPath(), template.getAmbientColor(), template.isInfinite());
                     final com.badlogic.gdx.Screen nextScreen = game.getLevelFactory().createLevel(game, config);
                     if (nextScreen != null) {
                         game.getScreenTransition().fadeOut(nextScreen, 0.5f);

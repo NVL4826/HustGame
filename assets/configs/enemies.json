@@ -13,7 +13,8 @@
       "safeDistance": 200.0,
       "fireInterval": 1.5,
       "projectileSpeed": 200.0,
-      "projectileDamage": 10.0
+      "projectileDamage": 10.0,
+      "spritePath": "character/enemy/syntax_error.png"
     },
     {
       "type": "null_pointer",
@@ -23,7 +24,8 @@
       "maxHp": 10.0,
       "speed": 60.0,
       "contactDamage": 10.0,
-      "movementBehavior": "chase"
+      "movementBehavior": "chase",
+      "spritePath": "character/enemy/null_pointer.png"
     },
     {
       "type": "infinite_loop",
@@ -51,7 +53,8 @@
       "deathBehavior": "split",
       "splitType": "stack_overflow",
       "splitCount": 2,
-      "splitOffset": 30.0
+      "splitOffset": 30.0,
+      "spritePath": "character/enemy/stack_overflow.png"
     },
     {
       "type": "library_boss",
@@ -66,7 +69,14 @@
       "fireInterval": 0.5,
       "projectileSpeed": 150.0,
       "projectileDamage": 15.0,
-      "boss": true
+      "boss": true,
+      "animationFrames": [
+        "character/enemy/library_boss/sprite_0000.png",
+        "character/enemy/library_boss/sprite_0001.png",
+        "character/enemy/library_boss/sprite_0002.png",
+        "character/enemy/library_boss/sprite_0003.png"
+      ],
+      "frameDuration": 0.15
     },
     {
       "type": "segmentation_fault",

@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.GameEvent;
+import hust.adventure.core.data.LevelConfig;
 import hust.adventure.events.MapTransitionData;
 import hust.adventure.events.EventType;
 import hust.adventure.events.ItemPickedUpEvent;
@@ -19,9 +20,6 @@ public class LabBehavior implements LevelBehavior {
     private static final int MAX_WAVE = 5;
     private static final float SPAWN_USB_X = 672f; // giữa map lab (1344 / 2)
     private static final float SPAWN_USB_Y = 384f; // giữa map lab (768 / 2)
-    private static final float BOSS_SPAWN_X = 400f;
-    private static final float BOSS_SPAWN_Y = 100f;
-    private static final String BOSS_MAP = "boss_room.tmx";
 
     private static final int LIGHTS_OUT_WAVE = 4;
     private static final float LIGHTS_OUT_AMBIENT = 0.15f;
@@ -160,9 +158,19 @@ public class LabBehavior implements LevelBehavior {
         if (event.getType() == EventType.ITEM_PICKED_UP) {
             final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
             if (data.getItem().getId().equals("usb")) {
-                final MapTransitionData transData = new MapTransitionData(BOSS_MAP, BOSS_SPAWN_X, BOSS_SPAWN_Y);
-                final GameEvent<MapTransitionData> transEvent = new GameEvent<>(EventType.MAP_TRANSITION, transData);
-                EventDispatcher.getInstance().dispatch(transEvent);
+                // Transition to the Boss Room level dynamically using config (Single Source of Truth)
+                if (context != null && context.getGame() != null) {
+                    final LevelConfig bossConfig = context.getGame().getLevelDataManager().getLevelConfig("BOSS_ROOM");
+                    if (bossConfig != null) {
+                        final MapTransitionData transData = new MapTransitionData(
+                                bossConfig.getMapPath(),
+                                bossConfig.getSpawnX(),
+                                bossConfig.getSpawnY()
+                        );
+                        final GameEvent<MapTransitionData> transEvent = new GameEvent<>(EventType.MAP_TRANSITION, transData);
+                        EventDispatcher.getInstance().dispatch(transEvent);
+                    }
+                }
             }
         }
     }

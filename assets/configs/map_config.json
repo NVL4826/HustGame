@@ -1,0 +1,26 @@
+{
+  "backgroundLayerNames": [
+    "via he",
+    "duong",
+    "grass",
+    "nha1",
+    "background",
+    "floor",
+    "tile layer 1",
+    "wall",
+    "wall2"
+  ],
+  "collisionFallbackLayerNames": [
+    "collision",
+    "Border",
+    "Object Layer 1"
+  ],
+  "portalLayerName": "Portals",
+  "spawnLayerName": "Spawn",
+  "lightingLayerName": "LightingObjects",
+  "decorLayerNames": [
+    "chair",
+    "sitting_human",
+    "ban_may_tinh"
+  ]
+}
