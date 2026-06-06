@@ -3,8 +3,8 @@
     {
       "type": "syntax_error",
       "name": "SyntaxErr",
-      "width": 30.0,
-      "height": 30.0,
+      "width": 32.0,
+      "height": 32.0,
       "maxHp": 15.0,
       "speed": 35.0,
       "contactDamage": 0.0,
@@ -41,8 +41,8 @@
     {
       "type": "stack_overflow",
       "name": "StackOvfl",
-      "width": 40.0,
-      "height": 40.0,
+      "width": 48.0,
+      "height": 48.0,
       "maxHp": 50.0,
       "speed": 25.0,
       "contactDamage": 20.0,
@@ -82,8 +82,8 @@
     {
       "type": "segmentation_fault",
       "name": "SegFault",
-      "width": 28.0,
-      "height": 28.0,
+      "width": 36.0,
+      "height": 36.0,
       "maxHp": 8.0,
       "speed": 60.0,
       "contactDamage": 15.0,

@@ -286,7 +286,7 @@
   <object id="443" gid="239" x="715.636" y="804.413" width="30.5795" height="15.6553"/>
   <object id="446" gid="241" x="951.15" y="672.537" width="30.6157" height="16.0928" rotation="358.591"/>
  </objectgroup>
- <objectgroup id="17" name="colision">
+ <objectgroup id="17" name="Colision">
   <object id="365" x="309" y="807" width="138.667" height="57.3333"/>
   <object id="366" x="307.666" y="677.667" width="138.667" height="57.3333"/>
   <object id="367" x="305" y="549.667" width="138.667" height="57.3333"/>
