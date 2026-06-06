@@ -65,7 +65,19 @@ public class GameRenderer {
     private static final float ENEMY_NAME_OFFSET_Y = 15f;
     private static final float FLASHLIGHT_CULL_DIST_SQ = 10000f;
     private static final float TELEGRAPH_LINE_LENGTH = 80f;
-    private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
+    private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> {
+        final float b1 = e1.getSortingY() - e1.getHeight() / 2f;
+        final float b2 = e2.getSortingY() - e2.getHeight() / 2f;
+        final int comp = Float.compare(b2, b1);
+        if (comp != 0) {
+            return comp;
+        }
+        final int compZ = Integer.compare(e1.getZIndex(), e2.getZIndex());
+        if (compZ != 0) {
+            return compZ;
+        }
+        return Integer.compare(e1.getSubZIndex(), e2.getSubZIndex());
+    };
     private final GameWeaponRenderer weaponEffectRenderer = new GameWeaponRenderer();
     private final Color telegraphColor = new Color();
 

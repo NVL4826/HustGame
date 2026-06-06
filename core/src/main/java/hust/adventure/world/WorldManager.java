@@ -66,7 +66,7 @@ public class WorldManager implements Disposable {
 
         // 1. Find and parse collision layers
         final List<MapLayer> collisionLayers = findCollisionLayers();
-        final MapObjectParser wallParser = parserRegistry.get("collision");
+        final MapObjectParser wallParser = parserRegistry.get(config.getCollisionLayerKey());
         if (wallParser != null) {
             for (final MapLayer layer : collisionLayers) {
                 wallParser.parse(layer, parseResult);
@@ -74,7 +74,8 @@ public class WorldManager implements Disposable {
         }
 
         // 2. Parse other layers using the registry, avoiding double parsing collision layers
-        for (final MapLayer layer : map.getLayers()) {
+        for (int i = 0; i < map.getLayers().size(); i++) {
+            final MapLayer layer = map.getLayers().get(i);
             if (collisionLayers.contains(layer)) {
                 continue;
             }
@@ -82,8 +83,62 @@ public class WorldManager implements Disposable {
             if (name != null) {
                 final MapObjectParser parser = parserRegistry.get(name);
                 if (parser != null) {
+                    final int beforeCount = parseResult.getDecorEntities().size();
                     parser.parse(layer, parseResult);
+                    final int afterCount = parseResult.getDecorEntities().size();
+                    for (int j = beforeCount; j < afterCount; j++) {
+                        final hust.adventure.entities.base.MapObject decor = parseResult.getDecorEntities().get(j);
+                        decor.setZIndex(i); // Set XML layer index as zIndex
+                    }
                 }
+            }
+        }
+
+        // 3. Align sortingY for overlapping decor entities across all layers (using transitive connected components)
+        final List<hust.adventure.entities.base.MapObject> decorEntities = new ArrayList<>(parseResult.getDecorEntities());
+        final List<List<hust.adventure.entities.base.MapObject>> groups = new ArrayList<>();
+
+        for (final hust.adventure.entities.base.MapObject obj : decorEntities) {
+            final List<List<hust.adventure.entities.base.MapObject>> overlappingGroups = new ArrayList<>();
+            for (final List<hust.adventure.entities.base.MapObject> group : groups) {
+                for (final hust.adventure.entities.base.MapObject other : group) {
+                    if (obj.getBounds().overlaps(other.getBounds())) {
+                        overlappingGroups.add(group);
+                        break;
+                    }
+                }
+            }
+
+            if (overlappingGroups.isEmpty()) {
+                final List<hust.adventure.entities.base.MapObject> newGroup = new ArrayList<>();
+                newGroup.add(obj);
+                groups.add(newGroup);
+            } else if (overlappingGroups.size() == 1) {
+                overlappingGroups.get(0).add(obj);
+            } else {
+                final List<hust.adventure.entities.base.MapObject> mergedGroup = overlappingGroups.get(0);
+                mergedGroup.add(obj);
+                for (int idx = 1; idx < overlappingGroups.size(); idx++) {
+                    final List<hust.adventure.entities.base.MapObject> toMerge = overlappingGroups.get(idx);
+                    mergedGroup.addAll(toMerge);
+                    groups.remove(toMerge);
+                }
+            }
+        }
+
+        for (final List<hust.adventure.entities.base.MapObject> group : groups) {
+            if (group.size() <= 1) {
+                continue;
+            }
+            float minBottomY = Float.MAX_VALUE;
+            for (final hust.adventure.entities.base.MapObject obj : group) {
+                final float bottomY = obj.getY() - obj.getHeight() / 2f;
+                if (bottomY < minBottomY) {
+                    minBottomY = bottomY;
+                }
+            }
+            for (final hust.adventure.entities.base.MapObject obj : group) {
+                obj.setSortingY(minBottomY + obj.getHeight() / 2f);
             }
         }
     }

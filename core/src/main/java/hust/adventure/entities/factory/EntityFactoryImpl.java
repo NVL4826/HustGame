@@ -213,7 +213,7 @@ public class EntityFactoryImpl implements EntityFactory {
 
     @Override
     public MapObject createStaticNPC(float x, float y, String name, Color color) {
-        StaticObject npc = new StaticObject(x, y, 32f, 32f);
+        StaticObject npc = StaticObject.fromCenter(x, y, 32f, 32f);
         npc.setName(name);
         entityManager.addEntity(npc);
         return npc;

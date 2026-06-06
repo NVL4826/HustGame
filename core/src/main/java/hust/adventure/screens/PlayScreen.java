@@ -92,6 +92,10 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
     private static final float VIEW_HEIGHT = 600f;
 
     public PlayScreen(final HustGame game, final LevelConfig config, final LevelBehavior behavior) {
+        this(game, config, behavior, MapConfigLoader.load());
+    }
+
+    public PlayScreen(final HustGame game, final LevelConfig config, final LevelBehavior behavior, final MapConfig mapConfig) {
         super(game);
         if (config == null) {
             throw new IllegalArgumentException("LevelConfig cannot be null");
@@ -99,14 +103,16 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         if (behavior == null) {
             throw new IllegalArgumentException("LevelBehavior cannot be null");
         }
+        if (mapConfig == null) {
+            throw new IllegalArgumentException("MapConfig cannot be null");
+        }
         this.config = config;
         this.behavior = behavior;
         this.progressContext = game.getProgressContext();
         this.state = PlayMode.RUNNING;
 
-        final MapConfig mapConfig = MapConfigLoader.load();
         this.worldManager = new WorldManager(mapConfig);
-        this.worldManager.registerParser("collision", new WallParser());
+        this.worldManager.registerParser(mapConfig.getCollisionLayerKey(), new WallParser());
         this.worldManager.registerParser(mapConfig.getPortalLayerName(), new PortalParser());
         this.worldManager.registerParser(mapConfig.getLightingLayerName(), new LightingObjectParser());
 

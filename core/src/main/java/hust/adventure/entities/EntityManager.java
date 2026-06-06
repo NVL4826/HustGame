@@ -20,7 +20,19 @@ public class EntityManager implements Disposable {
     public EntityManager() {
         this.entities = new Array<>();
         this.pendingAdd = new Array<>();
-        this.yComparator = (e1, e2) -> Float.compare(e2.getY(), e1.getY());
+        this.yComparator = (e1, e2) -> {
+            final float b1 = e1.getSortingY() - e1.getHeight() / 2f;
+            final float b2 = e2.getSortingY() - e2.getHeight() / 2f;
+            final int comp = Float.compare(b2, b1);
+            if (comp != 0) {
+                return comp;
+            }
+            final int compZ = Integer.compare(e1.getZIndex(), e2.getZIndex());
+            if (compZ != 0) {
+                return compZ;
+            }
+            return Integer.compare(e1.getSubZIndex(), e2.getSubZIndex());
+        };
     }
 
     public void addEntity(final MapObject entity) {
