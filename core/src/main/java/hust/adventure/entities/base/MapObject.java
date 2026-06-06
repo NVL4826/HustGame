@@ -29,6 +29,7 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
     private int subZIndex = 0;
     protected float sortingY = 0f;
     protected float rotation = 0f;
+    protected String layerName;
 
 
 
@@ -202,6 +203,14 @@ public abstract class MapObject extends GameObject implements Collidable, Dispos
 
     public void setSortingY(final float sortingY) {
         this.sortingY = sortingY;
+    }
+
+    public String getLayerName() {
+        return layerName;
+    }
+
+    public void setLayerName(String layerName) {
+        this.layerName = layerName;
     }
 
     public float getRotation() {

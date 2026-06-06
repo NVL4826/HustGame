@@ -35,7 +35,8 @@
       "maxHp": 200.0,
       "speed": 65.0,
       "contactDamage": 15.0,
-      "movementBehavior": "chase"
+      "movementBehavior": "chase",
+      "spritePath": "chatgpt.png"
     },
     {
       "type": "stack_overflow",
@@ -86,7 +87,8 @@
       "maxHp": 8.0,
       "speed": 60.0,
       "contactDamage": 15.0,
-      "movementBehavior": "telegraphed_charge"
+      "movementBehavior": "telegraphed_charge",
+      "spritePath": "bkav.png"
     },
     {
       "type": "compilation_error",
@@ -101,7 +103,8 @@
       "safeDistance": 180.0,
       "fireInterval": 1.2,
       "projectileSpeed": 130.0,
-      "projectileDamage": 12.0
+      "projectileDamage": 12.0,
+      "spritePath": "unikey.png"
     },
     {
       "type": "final_boss",

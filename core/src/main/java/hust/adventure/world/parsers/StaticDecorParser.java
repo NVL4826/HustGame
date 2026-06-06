@@ -36,6 +36,9 @@ public class StaticDecorParser implements MapObjectParser {
                     if (tileObj.getName() != null) {
                         decor.setName(tileObj.getName());
                     }
+                    if (layer.getName() != null) {
+                        decor.setLayerName(layer.getName());
+                    }
                     final Object idProp = tileObj.getProperties().get("id");
                     if (idProp != null) {
                         decor.setId(idProp.toString());
