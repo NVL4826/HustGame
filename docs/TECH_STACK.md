@@ -97,7 +97,7 @@ Technical specs, library versions, build structures, and architecture of Hust Ad
     * *Decoupled Hitbox & Sprite*: Visual sprite dimensions (`width`, `height`) are decoupled from physical hitbox/collision boundaries (`hitboxWidth`, `hitboxHeight`). Collision detection, boundary checks, and spatial grid hashing use hitbox sizes, allowing fine-grained collision boundaries (e.g. 32x32 player hitbox on 50x50 sprite). Defaults to sprite size if hitbox size is not specified.
     * *Static vs Dynamic Grid*: `staticGrid` (walls, hashed once during map load) is separate from `dynamicGrid` (moving entities, rebuilt every frame) to optimize performance.
     * *Zero Allocation*: Grid cell arrays (`Array<Collider>`) are pooled.
-    * *Wall Bypass*: All Enemy entities now bypass `CollisionManager.canMove()` wall collision checks during position updates (`setX`/`setY`) to freely pass through terrain, preventing getting stuck and optimizing navigation. Group behaviors (`SimpleSwarmBehavior`, `FleeBehavior`) also benefit from this zero-collision logic.
+    * *Wall Collision Checks*: All Enemy entities respect `CollisionManager.canMove()` wall collision checks during position updates (`setX`/`setY`) to prevent walking through terrain/obstacles. The `checkWallCollisions` flag allows selectively bypassing checks during spawn initialization or boundary clamping.
   * **Tiled Map Loading (`WorldManager`)**:
     * Finds collision layers via map properties (`collisionLayer`) or layer properties (`collision`/`isCollision`). Fallback order: `"collision"`, `"Border"`, `"Object Layer 1"`.
     * Classifies map layers (background vs foreground) via `classifyLayers()`.

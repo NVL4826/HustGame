@@ -165,6 +165,9 @@ public class Enemy extends Character {
      */
     @Override
     public void setX(final float x) {
+        if (checkWallCollisions && collisionManager != null && !collisionManager.canMove(this, x, getY())) {
+            return;
+        }
         super.setX(x);
     }
 
@@ -175,6 +178,9 @@ public class Enemy extends Character {
      */
     @Override
     public void setY(final float y) {
+        if (checkWallCollisions && collisionManager != null && !collisionManager.canMove(this, getX(), y)) {
+            return;
+        }
         super.setY(y);
     }
 

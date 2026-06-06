@@ -115,7 +115,7 @@ sequenceDiagram
 
 ### Key Loop Details:
 1. **Death Trigger**: When HP drops to `<= 0` in `PlayerStats`, `PLAYER_DIED` event fires. `PlayScreen` transitions to `GameOverScreen` with a fade-out.
-2. **AI Execution**: `EntityManager.update()` processes all Mobs. `Enemy` scale time delta with `progressContext.getEnemyTimeScale()`, calculates movement via `AIBehavior`, evaluates `AttackBehavior`, and clamps bounds. *(All enemy mobs bypass wall collisions during movement to allow free navigation)*.
+2. **AI Execution**: `EntityManager.update()` processes all Mobs. `Enemy` scale time delta with `progressContext.getEnemyTimeScale()`, calculates movement via `AIBehavior`, evaluates `AttackBehavior`, and clamps bounds. *(All enemy mobs respect wall collisions during movement updates)*.
 3. **Collision Phase**: `CollisionManager` evaluates Spatial Hashing grid to push entities out of walls and resolve bullet collisions. *(Enemies do not participate in wall push-out calculations but still register attacks)*.
 4. **Input Handling**: Done at the end of the frame via `handleInput()`. Key states flushed in `inputReader.update()`.
 

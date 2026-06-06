@@ -8,7 +8,7 @@
         "format": "RGBA8888"
     },
     "frames": {
-        "animations/Walking-c046985c/east/frame_000.png": {
+        "rotations/east.png": {
             "frame": {
                 "x": 2,
                 "y": 2,
@@ -22,7 +22,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/east/frame_001.png": {
+        "animations/Walking-c046985c/east/frame_000.png": {
             "frame": {
                 "x": 38,
                 "y": 2,
@@ -36,7 +36,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/east/frame_002.png": {
+        "animations/Walking-c046985c/north/frame_000.png": {
             "frame": {
                 "x": 74,
                 "y": 2,
@@ -50,7 +50,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/east/frame_003.png": {
+        "animations/Walking-c046985c/south/frame_000.png": {
             "frame": {
                 "x": 110,
                 "y": 2,
@@ -64,7 +64,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/east/frame_004.png": {
+        "animations/Walking-c046985c/west/frame_000.png": {
             "frame": {
                 "x": 146,
                 "y": 2,
@@ -78,7 +78,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/east/frame_005.png": {
+        "animations/Walking-c046985c/east/frame_001.png": {
             "frame": {
                 "x": 182,
                 "y": 2,
@@ -92,7 +92,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/north/frame_000.png": {
+        "animations/Walking-c046985c/north/frame_001.png": {
             "frame": {
                 "x": 218,
                 "y": 2,
@@ -106,7 +106,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/north/frame_001.png": {
+        "animations/Walking-c046985c/south/frame_001.png": {
             "frame": {
                 "x": 254,
                 "y": 2,
@@ -120,7 +120,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/north/frame_002.png": {
+        "animations/Walking-c046985c/west/frame_001.png": {
             "frame": {
                 "x": 290,
                 "y": 2,
@@ -134,7 +134,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/north/frame_003.png": {
+        "animations/Walking-c046985c/east/frame_002.png": {
             "frame": {
                 "x": 326,
                 "y": 2,
@@ -148,7 +148,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/north/frame_004.png": {
+        "animations/Walking-c046985c/north/frame_002.png": {
             "frame": {
                 "x": 362,
                 "y": 2,
@@ -162,7 +162,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/north/frame_005.png": {
+        "animations/Walking-c046985c/south/frame_002.png": {
             "frame": {
                 "x": 398,
                 "y": 2,
@@ -176,7 +176,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/south/frame_000.png": {
+        "animations/Walking-c046985c/west/frame_002.png": {
             "frame": {
                 "x": 434,
                 "y": 2,
@@ -190,7 +190,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/south/frame_001.png": {
+        "animations/Walking-c046985c/east/frame_003.png": {
             "frame": {
                 "x": 470,
                 "y": 2,
@@ -204,7 +204,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/south/frame_002.png": {
+        "animations/Walking-c046985c/north/frame_003.png": {
             "frame": {
                 "x": 506,
                 "y": 2,
@@ -232,7 +232,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/south/frame_004.png": {
+        "animations/Walking-c046985c/west/frame_003.png": {
             "frame": {
                 "x": 578,
                 "y": 2,
@@ -246,7 +246,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/south/frame_005.png": {
+        "animations/Walking-c046985c/east/frame_004.png": {
             "frame": {
                 "x": 614,
                 "y": 2,
@@ -260,7 +260,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/west/frame_000.png": {
+        "animations/Walking-c046985c/north/frame_004.png": {
             "frame": {
                 "x": 650,
                 "y": 2,
@@ -274,7 +274,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/west/frame_001.png": {
+        "animations/Walking-c046985c/south/frame_004.png": {
             "frame": {
                 "x": 686,
                 "y": 2,
@@ -288,7 +288,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/west/frame_002.png": {
+        "animations/Walking-c046985c/west/frame_004.png": {
             "frame": {
                 "x": 722,
                 "y": 2,
@@ -302,7 +302,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/west/frame_003.png": {
+        "animations/Walking-c046985c/east/frame_005.png": {
             "frame": {
                 "x": 758,
                 "y": 2,
@@ -316,7 +316,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/west/frame_004.png": {
+        "animations/Walking-c046985c/north/frame_005.png": {
             "frame": {
                 "x": 794,
                 "y": 2,
@@ -330,7 +330,7 @@
                 "h": 74
             }
         },
-        "animations/Walking-c046985c/west/frame_005.png": {
+        "animations/Walking-c046985c/south/frame_005.png": {
             "frame": {
                 "x": 830,
                 "y": 2,
@@ -344,7 +344,7 @@
                 "h": 74
             }
         },
-        "rotations/east.png": {
+        "animations/Walking-c046985c/west/frame_005.png": {
             "frame": {
                 "x": 866,
                 "y": 2,
