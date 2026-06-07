@@ -90,8 +90,8 @@ public class GameAssetManager {
 
         manager.load("audio/sfx/player/GarlicPulseAura.mp3", Sound.class);
         manager.load("audio/sfx/player/Player Firing Bun Dau.wav", Sound.class);
-        manager.load("audio/sfx/player/Player Firing Magic Wand.mp3", Sound.class);
-        manager.load("audio/sfx/player/Player Firing Whip.mp3", Sound.class);
+        // manager.load("audio/sfx/player/Player Firing Magic Wand.mp3", Sound.class);
+        // manager.load("audio/sfx/player/Player Firing Whip.mp3", Sound.class);
         manager.load("audio/sfx/player/Player Hurt.mp3", Sound.class);
         manager.load("audio/sfx/player/Use Consumable (Coffee).mp3", Sound.class);
         manager.load("audio/sfx/player/Use Consumable (Khô gà).mp3", Sound.class);
