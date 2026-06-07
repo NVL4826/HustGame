@@ -9,7 +9,7 @@
    eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
   </data>
  </layer>
- <objectgroup id="2" name="Object Layer 1" visible="0">
+ <objectgroup id="2" name="Object Layer 1">
   <object id="1" x="0" y="0" width="1024" height="32"/>
   <object id="2" x="0" y="992" width="1024" height="32"/>
   <object id="3" x="0" y="0" width="32" height="1024"/>
@@ -39,7 +39,6 @@
   <object id="44" x="396.5" y="384" width="15" height="31"/>
   <object id="45" x="404" y="376" width="10.5" height="8.5"/>
   <object id="46" x="449" y="542" width="29" height="56.25"/>
-  <object id="47" x="268.182" y="496.091" width="17.4545" height="51.5455"/>
   <object id="48" x="374" y="411.667" width="40.6667" height="41.3333"/>
   <object id="49" x="410.333" y="432.667" width="11.3333" height="14.6667"/>
   <object id="50" x="380.333" y="396" width="17" height="15.6667"/>
@@ -140,7 +139,6 @@
   <object id="160" x="27.6667" y="702.333" width="18.3333" height="22.6667"/>
   <object id="161" x="42.3333" y="704.333" width="12.3333" height="13.6667"/>
   <object id="162" x="27.3333" y="715.333" width="14.3333" height="19.6667"/>
-  <object id="165" x="785.5" y="505.5" width="16.5" height="51"/>
  </objectgroup>
  <objectgroup color="#ffffff" id="5" name="Portals" opacity="0.75">
   <object id="151" name="GoToLibrary" x="337.833" y="323.833" width="102.333" height="72.1667" visible="0">
