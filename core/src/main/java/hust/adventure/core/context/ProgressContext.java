@@ -292,6 +292,11 @@ public class ProgressContext implements GameProgressContext, EventListener {
 
     public void setCurrentLevelConfig(LevelConfig currentLevelConfig) {
         this.currentLevelConfig = currentLevelConfig;
+        if (currentLevelConfig != null) {
+            if (checkpointSnapshot == null || !currentLevelConfig.getLevelId().equals(checkpointLevelId)) {
+                saveCheckpoint();
+            }
+        }
     }
 
     public float getDamageMultiplier() {
@@ -341,7 +346,34 @@ public class ProgressContext implements GameProgressContext, EventListener {
         autoAttackAllowed = true;
         weaponLevels.clear();
         gearLevels.clear();
+        globalInventory.clear();
+        checkpointSnapshot = null;
+        checkpointLevelId = null;
         setGameState(new PlayingGameState());
+    }
+
+    // Checkpoint properties
+    private String checkpointLevelId = null;
+    private ProgressSnapshot checkpointSnapshot = null;
+
+    @Override
+    public void saveCheckpoint() {
+        if (currentLevelConfig != null) {
+            this.checkpointLevelId = currentLevelConfig.getLevelId();
+            this.checkpointSnapshot = new ProgressSnapshot();
+        }
+    }
+
+    @Override
+    public void restoreCheckpoint() {
+        if (checkpointSnapshot != null) {
+            checkpointSnapshot.restore();
+        }
+    }
+
+    @Override
+    public boolean hasCheckpoint() {
+        return checkpointSnapshot != null;
     }
 
     @Override
@@ -369,5 +401,94 @@ public class ProgressContext implements GameProgressContext, EventListener {
     @Override
     public ItemManager getItemManager() {
         return itemManager;
+    }
+
+    /**
+     * Snapshot representing a snapshot of the player's level entry progress.
+     */
+    private class ProgressSnapshot {
+        private final float hp;
+        private final float maxHp;
+        private final float stamina;
+        private final float maxStamina;
+        private final float morale;
+        private final int level;
+        private final float exp;
+        private final float expToNextLevel;
+        private final float damageMultiplier;
+
+        private final boolean hasNao;
+        private final boolean hasUsb;
+        private final int coffeeCount;
+        private final boolean libraryCleared;
+        private final boolean labCleared;
+
+        private final Map<String, Integer> weaponLevels = new HashMap<>();
+        private final Map<String, Integer> gearLevels = new HashMap<>();
+        private final Map<String, Integer> inventoryItems = new HashMap<>();
+
+        public ProgressSnapshot() {
+            this.hp = playerStats.getHp();
+            this.maxHp = playerStats.getMaxHp();
+            this.stamina = playerStats.getStamina();
+            this.maxStamina = playerStats.getMaxStamina();
+            this.morale = playerStats.getMorale();
+            this.level = playerStats.getLevel();
+            this.exp = playerStats.getExp();
+            this.expToNextLevel = playerStats.getExpToNextLevel();
+            this.damageMultiplier = playerStats.getDamageMultiplier();
+
+            this.hasNao = ProgressContext.this.hasNao;
+            this.hasUsb = ProgressContext.this.hasUsb;
+            this.coffeeCount = ProgressContext.this.coffeeCount;
+            this.libraryCleared = ProgressContext.this.libraryCleared;
+            this.labCleared = ProgressContext.this.labCleared;
+
+            for (Map.Entry<String, Integer> entry : ProgressContext.this.weaponLevels.entrySet()) {
+                this.weaponLevels.put(entry.getKey(), entry.getValue());
+            }
+            for (Map.Entry<String, Integer> entry : ProgressContext.this.gearLevels.entrySet()) {
+                this.gearLevels.put(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<hust.adventure.items.base.Item, Integer> entry : ProgressContext.this.globalInventory.getReadOnlyItems().entrySet()) {
+                this.inventoryItems.put(entry.getKey().getId(), entry.getValue());
+            }
+        }
+
+        public void restore() {
+            playerStats.setMaxHp(this.maxHp);
+            playerStats.setHp(this.hp > 0 ? this.hp : this.maxHp);
+            playerStats.setMaxStamina(this.maxStamina);
+            playerStats.setStamina(this.stamina);
+            playerStats.setMorale(this.morale);
+            playerStats.setLevel(this.level);
+            playerStats.setExp(this.exp);
+            playerStats.setExpToNextLevel(this.expToNextLevel);
+            playerStats.setDamageMultiplier(this.damageMultiplier);
+
+            ProgressContext.this.hasNao = this.hasNao;
+            ProgressContext.this.hasUsb = this.hasUsb;
+            ProgressContext.this.coffeeCount = this.coffeeCount;
+            ProgressContext.this.libraryCleared = this.libraryCleared;
+            ProgressContext.this.labCleared = this.labCleared;
+
+            ProgressContext.this.weaponLevels.clear();
+            for (Map.Entry<String, Integer> entry : this.weaponLevels.entrySet()) {
+                ProgressContext.this.weaponLevels.put(entry.getKey(), entry.getValue());
+            }
+
+            ProgressContext.this.gearLevels.clear();
+            for (Map.Entry<String, Integer> entry : this.gearLevels.entrySet()) {
+                ProgressContext.this.gearLevels.put(entry.getKey(), entry.getValue());
+            }
+
+            ProgressContext.this.globalInventory.clear();
+            for (Map.Entry<String, Integer> entry : this.inventoryItems.entrySet()) {
+                ProgressContext.this.globalInventory.addItem(entry.getKey(), entry.getValue());
+            }
+
+            ProgressContext.this.spellState.reset();
+        }
     }
 }

@@ -2,14 +2,14 @@
   "gears": [
     {
       "id": "spinach",
-      "name": "Hành Tây (Spinach)",
+      "name": "Bánh Mì",
       "description": "Tăng sát thương cho tất cả vũ khí.",
       "levelDescriptions": [
-        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 1).",
-        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 2).",
-        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 3).",
-        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 4).",
-        "Tăng 10% sát thương cho tất cả vũ khí (Cấp 5)."
+        "Tăng 10% sát thương cho tất cả vũ khí.",
+        "Tăng 10% sát thương cho tất cả vũ khí.",
+        "Tăng 10% sát thương cho tất cả vũ khí.",
+        "Tăng 10% sát thương cho tất cả vũ khí.",
+        "Tăng 10% sát thương cho tất cả vũ khí."
       ],
       "maxLevel": 5,
       "onEquipEffect": "add_power",
@@ -17,14 +17,14 @@
     },
     {
       "id": "empty_tome",
-      "name": "Sách Rỗng (Empty Tome)",
+      "name": "Đề Cương Ôn Tập",
       "description": "Giảm thời gian hồi chiêu của vũ khí.",
       "levelDescriptions": [
-        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 1).",
-        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 2).",
-        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 3).",
-        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 4).",
-        "Giảm 8% thời gian hồi chiêu của vũ khí (Cấp 5)."
+        "Giảm 8% thời gian hồi chiêu của vũ khí.",
+        "Giảm 8% thời gian hồi chiêu của vũ khí.",
+        "Giảm 8% thời gian hồi chiêu của vũ khí.",
+        "Giảm 8% thời gian hồi chiêu của vũ khí.",
+        "Giảm 8% thời gian hồi chiêu của vũ khí."
       ],
       "maxLevel": 5,
       "onEquipEffect": "reduce_cooldown",
@@ -32,14 +32,14 @@
     },
     {
       "id": "wings",
-      "name": "Đôi Cánh (Wings)",
+      "name": "Giày Thượng Đình",
       "description": "Tăng tốc độ di chuyển của nhân vật.",
       "levelDescriptions": [
-        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 1).",
-        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 2).",
-        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 3).",
-        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 4).",
-        "Tăng 10% tốc độ di chuyển của nhân vật (Cấp 5)."
+        "Tăng 10% tốc độ di chuyển của nhân vật.",
+        "Tăng 10% tốc độ di chuyển của nhân vật.",
+        "Tăng 10% tốc độ di chuyển của nhân vật.",
+        "Tăng 10% tốc độ di chuyển của nhân vật.",
+        "Tăng 10% tốc độ di chuyển của nhân vật."
       ],
       "maxLevel": 5,
       "onEquipEffect": "add_speed",
@@ -47,14 +47,14 @@
     },
     {
       "id": "hollow_heart",
-      "name": "Trái Tim Rỗng (Hollow Heart)",
+      "name": "Mì Tôm Hảo Hảo",
       "description": "Tăng lượng HP tối đa.",
       "levelDescriptions": [
-        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 1).",
-        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 2).",
-        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 3).",
-        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 4).",
-        "Tăng 20% lượng HP tối đa (+20 HP) (Cấp 5)."
+        "Tăng 20% lượng HP tối đa.",
+        "Tăng 20% lượng HP tối đa.",
+        "Tăng 20% lượng HP tối đa.",
+        "Tăng 20% lượng HP tối đa.",
+        "Tăng 20% lượng HP tối đa."
       ],
       "maxLevel": 5,
       "onEquipEffect": "increase_max_hp",
@@ -62,14 +62,14 @@
     },
     {
       "id": "candelabrador",
-      "name": "Chân Nến (Candelabrador)",
+      "name": "Thước Kẻ Gỗ",
       "description": "Tăng phạm vi tấn công của vũ khí.",
       "levelDescriptions": [
-        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 1).",
-        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 2).",
-        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 3).",
-        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 4).",
-        "Tăng 20% phạm vi tấn công của vũ khí (Cấp 5)."
+        "Tăng 20% phạm vi tấn công của vũ khí.",
+        "Tăng 20% phạm vi tấn công của vũ khí.",
+        "Tăng 20% phạm vi tấn công của vũ khí.",
+        "Tăng 20% phạm vi tấn công của vũ khí.",
+        "Tăng 20% phạm vi tấn công của vũ khí."
       ],
       "maxLevel": 5,
       "onEquipEffect": "add_area",
@@ -77,14 +77,14 @@
     },
     {
       "id": "attractorb",
-      "name": "Nam Châm (Attractorb)",
+      "name": "Thẻ Thư Viện",
       "description": "Tăng phạm vi hút ngọc kinh nghiệm.",
       "levelDescriptions": [
-        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 1).",
-        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 2).",
-        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 3).",
-        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 4).",
-        "Tăng 20% phạm vi hút ngọc kinh nghiệm (Cấp 5)."
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm.",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm.",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm.",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm.",
+        "Tăng 20% phạm vi hút ngọc kinh nghiệm."
       ],
       "maxLevel": 5,
       "onEquipEffect": "add_magnet",

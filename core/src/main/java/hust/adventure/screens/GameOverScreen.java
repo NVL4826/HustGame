@@ -219,7 +219,11 @@ public class GameOverScreen extends BaseScreen {
                     template.getSpawnX(), template.getSpawnY(), template.getZoom(), template.getBgmPath(),
                     template.getAmbientColor(), template.isInfinite());
         }
-        progressContext.reset();
+        if (progressContext.hasCheckpoint()) {
+            progressContext.restoreCheckpoint();
+        } else {
+            progressContext.reset();
+        }
         final LevelLoadingScreen loadingScreen = new LevelLoadingScreen(game, savedConfig);
         game.getScreenTransition().fadeOut(loadingScreen, 0.5f);
     }

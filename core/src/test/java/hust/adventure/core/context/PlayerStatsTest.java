@@ -23,8 +23,8 @@ public class PlayerStatsTest {
 
     @Test
     public void testDefaultValues() {
-        assertEquals(100f, stats.getHp(), 0.01f);
-        assertEquals(100f, stats.getMaxHp(), 0.01f);
+        assertEquals(300f, stats.getHp(), 0.01f);
+        assertEquals(300f, stats.getMaxHp(), 0.01f);
         assertEquals(100f, stats.getStamina(), 0.01f);
         assertEquals(100f, stats.getMaxStamina(), 0.01f);
         assertEquals(100f, stats.getMorale(), 0.01f);
@@ -36,8 +36,8 @@ public class PlayerStatsTest {
 
     @Test
     public void testHpClamping() {
-        stats.setHp(150f);
-        assertEquals(100f, stats.getHp(), 0.01f); // Cap to maxHp
+        stats.setHp(350f);
+        assertEquals(300f, stats.getHp(), 0.01f); // Cap to maxHp
 
         stats.setHp(-50f);
         assertEquals(0f, stats.getHp(), 0.01f); // Floor to 0
@@ -65,7 +65,7 @@ public class PlayerStatsTest {
         stats.setStamina(30f);
         stats.setLevel(5);
         stats.reset();
-        assertEquals(100f, stats.getHp(), 0.01f);
+        assertEquals(300f, stats.getHp(), 0.01f);
         assertEquals(100f, stats.getStamina(), 0.01f);
         assertEquals(1, stats.getLevel());
     }

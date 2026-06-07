@@ -19,7 +19,7 @@ import com.badlogic.gdx.graphics.GL20;
  * Simon Game memory mini-game puzzle.
  */
 public class SimonPuzzle implements PuzzleGame {
-    private static final int MAX_ROUNDS = 10;
+    private static final int MAX_ROUNDS = 8;
 
     public enum SimonState {
         IDLE, SHOWING_SEQUENCE, AWAITING_INPUT, EVALUATING, ROUND_WON, GAME_WON, FAILED_DELAY

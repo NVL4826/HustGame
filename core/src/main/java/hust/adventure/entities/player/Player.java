@@ -55,7 +55,7 @@ public class Player extends Character implements Targetable {
     private static final float DRAW_HEIGHT = 74f;
     private static final float HITBOX_WIDTH = 30f;
     private static final float HITBOX_HEIGHT = 70f;
-    private static final float MAX_HP = 100f;
+    private static final float MAX_HP = 300f;
 
     // Delegated controllers and handlers
     private final SpellController spellController;

@@ -19,7 +19,7 @@ import hust.adventure.screens.levels.LevelContext;
  * Speed Math (Addition Only) mini-game puzzle.
  */
 public class SpeedMathPuzzle implements PuzzleGame {
-    private static final int MAX_ROUNDS = 10;
+    private static final int MAX_ROUNDS = 7;
     private static final float FEEDBACK_DURATION = 0.5f;
 
     public enum MathState {
@@ -70,9 +70,9 @@ public class SpeedMathPuzzle implements PuzzleGame {
         this.context = ctx;
 
         // Compute round time limits
-        // Rounds 1-10: linearly from 20.0s to 10.0s
-        for (int i = 0; i < 10; i++) {
-            roundTimeLimits[i] = 20.0f - (i * (20.0f - 10.0f) / 9f);
+        // Rounds 1 to MAX_ROUNDS: linearly from 20.0s to 10.0s
+        for (int i = 0; i < MAX_ROUNDS; i++) {
+            roundTimeLimits[i] = 20.0f - (i * (20.0f - 10.0f) / (MAX_ROUNDS - 1f));
         }
 
         textBoxTexture = ctx.getGame().getAssetManager().getTexture("text_box.png");
@@ -93,13 +93,8 @@ public class SpeedMathPuzzle implements PuzzleGame {
     }
 
     private void generateQuestion() {
-        if (currentRound <= 5) {
-            operandA = MathUtils.random(10, 99);
-            operandB = MathUtils.random(10, 99);
-        } else {
-            operandA = MathUtils.random(100, 999);
-            operandB = MathUtils.random(100, 999);
-        }
+        operandA = MathUtils.random(10, 99);
+        operandB = MathUtils.random(10, 99);
         correctAnswer = operandA + operandB;
         timeRemaining = roundTimeLimits[currentRound - 1];
     }
@@ -193,7 +188,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
     }
 
     private void appendDigit(final char digit) {
-        if (answerBuilder.length() < 4) { // 999+999 = 1998 (4 digits max)
+        if (answerBuilder.length() < 3) { // 99+99 = 198 (3 digits max)
             answerBuilder.append(digit);
         }
     }

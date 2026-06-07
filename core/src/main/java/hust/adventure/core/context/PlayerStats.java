@@ -9,8 +9,8 @@ import hust.adventure.events.GameEvent;
  * ProgressContext.
  */
 public class PlayerStats {
-    private float hp = 100f;
-    private float maxHp = 100f;
+    private float hp = 300f;
+    private float maxHp = 300f;
     private float stamina = 100f;
     private float maxStamina = 100f;
     private float morale = 100f;
@@ -195,8 +195,8 @@ public class PlayerStats {
      * Resets player statistics to default new-game values.
      */
     public void reset() {
-        hp = 100f;
-        maxHp = 100f;
+        hp = 300f;
+        maxHp = 300f;
         stamina = 100f;
         maxStamina = 100f;
         morale = 100f;

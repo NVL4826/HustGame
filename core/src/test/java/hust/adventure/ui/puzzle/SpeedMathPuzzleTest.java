@@ -44,9 +44,9 @@ public class SpeedMathPuzzleTest {
         timeLimitsField.setAccessible(true);
         float[] roundTimeLimits = (float[]) timeLimitsField.get(puzzle);
 
-        // Check Round 1 and Round 10 time limits
+        // Check Round 1 and Round 7 (index 6) time limits
         assertEquals(20.0f, roundTimeLimits[0], 0.001f);
-        assertEquals(10.0f, roundTimeLimits[9], 0.001f);
+        assertEquals(10.0f, roundTimeLimits[6], 0.001f);
     }
 
     @Test
@@ -86,8 +86,8 @@ public class SpeedMathPuzzleTest {
         int b6 = opBField.getInt(puzzle);
         int ans6 = ansField.getInt(puzzle);
 
-        assertTrue(a6 >= 100 && a6 <= 999);
-        assertTrue(b6 >= 100 && b6 <= 999);
+        assertTrue(a6 >= 10 && a6 <= 99);
+        assertTrue(b6 >= 10 && b6 <= 99);
         assertEquals(a6 + b6, ans6);
     }
 }

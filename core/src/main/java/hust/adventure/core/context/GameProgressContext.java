@@ -133,5 +133,11 @@ public interface GameProgressContext {
 
     void reset();
 
+    void saveCheckpoint();
+
+    void restoreCheckpoint();
+
+    boolean hasCheckpoint();
+
     ItemManager getItemManager();
 }
