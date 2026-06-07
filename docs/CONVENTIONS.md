@@ -182,9 +182,12 @@ public class HUD {
 * **Mob Speed Control**: Mobs retrieve speed dynamically using `enemy.getSpeed()`. Do not store speed parameters in AI constructors.
 * **Mob Wall Collisions**: Mob coordinates are updated via `setX` and `setY`, which automatically perform wall collision checks using `CollisionManager.canMove()` (when `checkWallCollisions` is enabled) to prevent enemies from passing through terrain, ensuring unified and simple collision enforcement.
 * **Weapon Damage Output**: All weapon classes must calculate damage using `getEffectiveDamage()` instead of `getBaseDamage()` to automatically integrate player power multipliers and global multipliers.
-* **Zero Hardcoding in Debug Menu & Transitions**: Options are loaded dynamically. Spawn scripts must use literal string configuration IDs matching JSON configurations (e.g., `"null_pointer"`). Level behaviors must not hardcode target map paths or spawn coordinates for transitions; they must look up target `LevelConfig` objects by Level ID from the `LevelDataLoader` (Single Source of Truth).
+* **Zero Hardcoding in Debug Menu & Transitions**: Options are loaded dynamically. Spawn scripts must use literal string configuration IDs matching JSON configurations (e.g., `"null_pointer"`). Level behaviors and Debug transition commands must not hardcode target map paths or spawn coordinates for transitions; they must look up target `LevelConfig` objects from `LevelDataLoader` (Single Source of Truth) and use their configured default coordinates as the fallback, so that both debug and normal map transitions share the same spawn resolution logic.
 * **Decoupled Hitbox & Sprite**: `MapObject` separates visual sprite dimensions (`width`, `height`) and physical collision boundaries (`hitboxWidth`, `hitboxHeight`). Always use `getHitboxWidth()` and `getHitboxHeight()` for collision detection, movement boundaries, and spatial hashing, keeping `width` and `height` solely for sprite drawing.
 * **Wave Survival Levels Transition Lock**: Wave-based levels (e.g., maps using `WaveManager`) must override `canTransition()` to check `waveManager.isFinished()` and confirm no active enemies remain using `EntityManager.hasActiveEnemies()`, preventing premature level transitions while waves are active.
+* **Decoupled Combat Restrictions**: Auto-attacks and manual attacks are restricted during non-combat phases (e.g., Floor 1, Library puzzles, final Boss Room Q&A) via the abstract `isAutoAttackAllowed()` method on `LevelBehavior`. This capability is propagated to the domain layer (`Player` and `BaseWeapon`) through the `GameProgressContext` interface to ensure zero coupling between entities and specific screen/level behaviors.
+* **Intermediate Loading Screen**: Map transitions (e.g., portal stepping), game start, and game over restarts must be routed through `LevelLoadingScreen` to ensure the screen flushes rendering before blocking synchronous asset loads.
+* **Settings & Guide Screens**: The Settings button is removed from the game menu. A Hướng dẫn (Guide) button is used instead to overlay gameplay controls.
 
 ### 3.2 State Pattern
 * Character states (`MovingState`, `IdleState`, `DeadState`) must implement the `EntityState` interface.
@@ -253,12 +256,14 @@ public void dispose() {
 
 ### 3.9 Coordinate Conventions & Factory Methods
 * Avoid overloaded constructors with ambiguous coordinate conventions (e.g., one expecting bottom-left and another expecting center). Instead, hide constructors under package-private/private visibility and expose descriptive public static factory methods (e.g., `StaticObject.fromBottomLeft(...)` and `StaticObject.fromCenter(...)`) to document the expected coordinate system.
+* **Tiled Map Spawn Points**: Coordinate parsing of spawn objects (e.g. Point or Rectangle map objects on the spawn layer) must resolve coordinates to their center point (both center-X and center-Y) so that they directly align with the player hitbox's center coordinate convention. Rectangle coordinates must not be parsed using top/bottom edges as offsets.
 
 ### 3.10 Tiled Rendering & Depth-Sorting Order
 * **Map Layer & Object Rendering Order**: Render order must be determined dynamically based on the layers and objects XML definitions in the TMX file (via `zIndex` and `subZIndex` fields) instead of relying on hardcoded config list order.
 * **Transitive Connected-Components Overlap Grouping**: Any group of overlapping objects (e.g. Desk -> Monitor -> Monitor Screen) must have their `sortingY` coordinate aligned dynamically to the lowest bottom-Y baseline of the group. This allows the composite setup to Y-sort as a single unified obstacle relative to characters, while tie-breaking the drawing order using their relative `zIndex` and `subZIndex` values.
 * **Rotation Convention**: TMX rotation is clockwise in degrees, whereas GDX `SpriteBatch.draw` expects counter-clockwise. To render correctly around the bottom-left corner of the object (Tiled's rotation origin), negate the rotation (`-rotation`) and pass `(0f, 0f)` as the drawing origin coordinates.
 * **Map Layer Naming & Configuration**: Layer names in TMX must be accurate (`collision`, `Spawn`, `spawn`). Foreground or sorting-dependent decor layers (e.g., grass `co`, `nen`) must be explicitly declared in `map_config.json`'s `decorLayerNames` or `collisionFallbackLayerNames` to ensure correct rendering depth and logic initialization.
+* **Tiled Map Tile Dimensions**: Static tile objects (e.g., chairs, desks) parsed from tile layers (`TiledMapTileLayer`) must be instantiated using their native `TextureRegion` dimensions (`region.getRegionWidth()` and `region.getRegionHeight()`) to prevent distortion/stretching caused by hardcoding their dimensions to the grid cell size (`tileWidth` / `tileHeight`).
 
 ---
 
@@ -313,7 +318,7 @@ public void render(float delta) {
   8. Draw UI Layer overlay (HUD, inventory, level up, debug panel).
 
 > [!IMPORTANT]
-> The UI (`HUD`, `StatusEffectsHUD`, `InventoryUI`, `LevelUpUI`, `DebugUI`, and the library mini-games like `SimonPuzzle`, `MemoryCardPuzzle`, `SpeedMathPuzzle` managed by `PuzzleSequencer`) is rendered manually via `SpriteBatch` and `ShapeRenderer` matching a single centralized `uiCam` in `GameRenderer`. Do not use Scene2D `Stage` for in-game HUD overlay or puzzle rendering (use manual SpriteBatch/ShapeRenderer for zero-allocation hot path). Scene2D `Stage` + `Table` is permitted for non-gameplay screens (e.g., MainMenuScreen, Settings) where allocation is acceptable.
+> The UI (`HUD`, `StatusEffectsHUD`, `InventoryUI`, `LevelUpUI`, `DebugUI`, and the library mini-games like `SimonPuzzle`, `MemoryCardPuzzle`, `SpeedMathPuzzle` managed by `PuzzleSequencer`) is rendered manually via `SpriteBatch` and `ShapeRenderer` matching a single centralized `uiCam` in `GameRenderer`. Do not use Scene2D `Stage` for in-game HUD overlay or puzzle rendering (use manual SpriteBatch/ShapeRenderer for zero-allocation hot path). Scene2D `Stage` + `Table` is permitted for non-gameplay screens (e.g., MainMenuScreen, Hướng dẫn) where allocation is acceptable.
 
 ---
 

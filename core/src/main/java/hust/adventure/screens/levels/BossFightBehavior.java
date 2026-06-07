@@ -548,6 +548,11 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     @Override
+    public boolean isAutoAttackAllowed() {
+        return false;
+    }
+
+    @Override
     public void dispose(final LevelContext context) {
         if (stage != null) {
             stage.dispose();

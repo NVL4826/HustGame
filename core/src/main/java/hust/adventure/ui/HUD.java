@@ -16,17 +16,16 @@ public class HUD {
 
     // Layout constants
     private static final float PANEL_X = 14f;
-    private static final float PANEL_Y = 498f;
+    private static final float PANEL_Y = 517f;
     private static final float PANEL_W = 210f;
-    private static final float PANEL_H = 98f;
+    private static final float PANEL_H = 79f;
 
     private static final float BAR_X = 42f;
     private static final float BAR_W = 155f;
     private static final float BAR_H = 13f;
     private static final float BAR_HP_Y = 575f;
     private static final float BAR_SP_Y = 556f;
-    private static final float BAR_MR_Y = 537f;
-    private static final float BAR_EX_Y = 518f;
+    private static final float BAR_EX_Y = 537f;
 
     // White pixel for drawing solid rects via SpriteBatch (avoids ShapeRenderer flush)
     private static Texture whitePixel;
@@ -98,7 +97,6 @@ public class HUD {
 
         float hpPct = Math.max(0, Math.min(1, data.getHp() / data.getMaxHp()));
         float spPct = Math.max(0, Math.min(1, data.getStamina() / data.getMaxStamina()));
-        float mrPct = Math.max(0, Math.min(1, data.getMorale() / 100f));
         float exPct = Math.max(0, Math.min(1, data.getExp() / data.getExpToNextLevel()));
 
         // Pulse timer for low HP warning
@@ -129,10 +127,6 @@ public class HUD {
         drawBar(sr, BAR_X, BAR_SP_Y, BAR_W, BAR_H, spPct, new Color(0.5f, 0.1f, 0.9f, 1f),
                 new Color(0.1f, 0.7f, 1.0f, 1f), 0.55f);
 
-        // Morale bar: orange -> bright yellow
-        drawBar(sr, BAR_X, BAR_MR_Y, BAR_W, BAR_H, mrPct, new Color(0.9f, 0.5f, 0.0f, 1f),
-                new Color(1.0f, 0.9f, 0.2f, 1f), 0.55f);
-
         // EXP bar: dark purple -> pink
         drawBar(sr, BAR_X, BAR_EX_Y, BAR_W, BAR_H, exPct, new Color(0.5f, 0.0f, 0.7f, 1f),
                 new Color(1.0f, 0.3f, 0.9f, 1f), 0.55f);
@@ -157,8 +151,6 @@ public class HUD {
         font.draw(batch, "HP", PANEL_X + 3, BAR_HP_Y + BAR_H - 1);
         font.setColor(0.6f, 0.4f, 1.0f, 1f);
         font.draw(batch, "SP", PANEL_X + 3, BAR_SP_Y + BAR_H - 1);
-        font.setColor(1.0f, 0.8f, 0.2f, 1f);
-        font.draw(batch, "ML", PANEL_X + 3, BAR_MR_Y + BAR_H - 1);
         font.setColor(0.9f, 0.4f, 1.0f, 1f);
         font.draw(batch, "EX", PANEL_X + 3, BAR_EX_Y + BAR_H - 1);
 
@@ -167,7 +159,6 @@ public class HUD {
         font.draw(batch, (int) data.getHp() + "/" + (int) data.getMaxHp(), BAR_X + BAR_W + 4, BAR_HP_Y + BAR_H - 1);
         font.draw(batch, (int) data.getStamina() + "/" + (int) data.getMaxStamina(), BAR_X + BAR_W + 4,
                 BAR_SP_Y + BAR_H - 1);
-        font.draw(batch, (int) data.getMorale() + "%", BAR_X + BAR_W + 4, BAR_MR_Y + BAR_H - 1);
         font.setColor(0.8f, 0.6f, 1f, 1f);
         font.draw(batch, "LV" + data.getLevel(), BAR_X + BAR_W + 4, BAR_EX_Y + BAR_H - 1);
 

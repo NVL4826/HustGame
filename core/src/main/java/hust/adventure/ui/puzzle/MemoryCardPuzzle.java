@@ -2,6 +2,7 @@ package hust.adventure.ui.puzzle;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -28,6 +29,7 @@ public class MemoryCardPuzzle implements PuzzleGame {
     private MatchState state;
     private LevelContext context;
     private boolean isSolved;
+    private boolean showIntro = true;
 
     private float timeRemaining;
     private final MemoryCard[] cards = new MemoryCard[NUM_CARDS];
@@ -92,6 +94,7 @@ public class MemoryCardPuzzle implements PuzzleGame {
     @Override
     public void reset() {
         this.isSolved = false;
+        this.showIntro = true;
         this.timeRemaining = TIME_LIMIT;
         this.firstSelectedIndex = -1;
         this.secondSelectedIndex = -1;
@@ -122,6 +125,29 @@ public class MemoryCardPuzzle implements PuzzleGame {
     @Override
     public void update(final float delta) {
         if (isSolved) {
+            return;
+        }
+
+        if (showIntro) {
+            if (Gdx.input.justTouched()) {
+                tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
+                if (context != null) {
+                    context.unproject(tmpMouse);
+                }
+                final float mx = tmpMouse.x;
+                final float my = tmpMouse.y;
+
+                final float btnW = 160f;
+                final float btnH = 45f;
+                final float btnX = 400f - btnW / 2f;
+                final float btnY = 110f;
+
+                if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
+                    showIntro = false;
+                    EventDispatcher.getInstance()
+                            .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
+                }
+            }
             return;
         }
 
@@ -254,6 +280,11 @@ public class MemoryCardPuzzle implements PuzzleGame {
             return;
         }
 
+        if (showIntro) {
+            drawIntro(shapeRenderer, batch);
+            return;
+        }
+
         // Draw cards
         batch.begin();
         for (int i = 0; i < NUM_CARDS; i++) {
@@ -313,5 +344,82 @@ public class MemoryCardPuzzle implements PuzzleGame {
     @Override
     public void dispose() {
         // No custom fonts/textures instantiated locally, using shared context components
+    }
+
+    private void drawIntro(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
+        final float boxW = 620f;
+        final float boxH = 460f;
+        final float boxX = 90f;
+        final float boxY = 70f;
+
+        final float btnW = 160f;
+        final float btnH = 45f;
+        final float btnX = 400f - btnW / 2f;
+        final float btnY = 110f;
+
+        // Check hover
+        tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
+        if (context != null) {
+            context.unproject(tmpMouse);
+        }
+        final boolean isHovered = (tmpMouse.x >= btnX && tmpMouse.x <= btnX + btnW && tmpMouse.y >= btnY
+                && tmpMouse.y <= btnY + btnH);
+
+        // Draw overlay using ShapeRenderer
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0f, 0f, 0f, 0.75f));
+        shapeRenderer.rect(0, 0, 800, 600);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        // Draw Text Box and Texts using SpriteBatch
+        batch.begin();
+        if (textBoxTexture != null) {
+            batch.setColor(Color.WHITE);
+            batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
+        }
+
+        final BitmapFont font = context.getFont();
+        final Color origColor = font.getColor();
+
+        // Draw title
+        font.setColor(new Color(0.6f, 0.1f, 0.1f, 1f));
+        textLayout.setText(font, "THỬ THÁCH 2: LẬT BÀI CẶP");
+        font.draw(batch, "THỬ THÁCH 2: LẬT BÀI CẶP", 400f - textLayout.width / 2f, 480f);
+
+        // Draw intro body text
+        font.setColor(Color.BLACK);
+        final String introText = "Chào mừng bạn đến với thử thách thứ hai!\n\n" + "Luật chơi Lật Bài rất đơn giản:\n"
+                + "1. Trên màn hình là 36 tấm thẻ chứa các khái niệm lập trình.\n"
+                + "2. Hãy click để lật các thẻ lên và tìm các cặp thẻ giống nhau.\n"
+                + "3. Bạn được phép sai nhiều lần, nhưng phải ghép đúng toàn bộ.\n"
+                + "4. Hoàn thành toàn bộ cặp bài trước khi hết 3 phút.\n\n"
+                + "Hãy nhấn nút bên dưới để bắt đầu lật bài!";
+
+        font.draw(batch, introText, 140f, 420f);
+
+        // Draw Start Button Box
+        if (textBoxTexture != null) {
+            batch.setColor(isHovered ? Color.LIGHT_GRAY : Color.WHITE);
+            batch.draw(textBoxTexture, btnX, btnY, btnW, btnH);
+        }
+
+        // Draw Start Button Text
+        font.setColor(isHovered ? new Color(0.1f, 0.6f, 0.1f, 1f) : new Color(0.1f, 0.4f, 0.1f, 1f));
+        textLayout.setText(font, "BẮT ĐẦU");
+        font.draw(batch, "BẮT ĐẦU", 400f - textLayout.width / 2f, btnY + btnH / 2f + textLayout.height / 2f);
+
+        font.setColor(origColor);
+        batch.end();
+
+        // Draw Gold highlight border if hovered
+        if (isHovered) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.GOLD);
+            shapeRenderer.rect(btnX - 2, btnY - 2, btnW + 4, btnH + 4);
+            shapeRenderer.end();
+        }
     }
 }

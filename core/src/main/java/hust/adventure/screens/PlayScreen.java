@@ -125,6 +125,16 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
                 this.worldManager.registerParser(name, decorParser);
             }
         }
+        if (mapConfig.getBackgroundLayerNames() != null) {
+            for (final String name : mapConfig.getBackgroundLayerNames()) {
+                this.worldManager.registerParser(name, decorParser);
+            }
+        }
+        if (mapConfig.getGroundLayerNames() != null) {
+            for (final String name : mapConfig.getGroundLayerNames()) {
+                this.worldManager.registerParser(name, decorParser);
+            }
+        }
 
         this.levelManager = new LevelManager(progressContext);
         this.entityManager = new EntityManager();
@@ -279,10 +289,16 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
 
     private void initLevel() {
         behavior.init(this);
+        if (progressContext != null) {
+            progressContext.setAutoAttackAllowed(behavior.isAutoAttackAllowed());
+        }
     }
 
     private void updateLevel(float delta) {
         behavior.update(this, delta);
+        if (progressContext != null) {
+            progressContext.setAutoAttackAllowed(behavior.isAutoAttackAllowed());
+        }
     }
 
     private void drawLevel() {
@@ -368,7 +384,7 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
 
         for (final WorldManager.Portal portal : worldManager.getPortals()) {
-            if (portal.getBounds().contains(player.getX(), player.getY())) {
+            if (portal.getBounds().overlaps(player.getBounds())) {
                 MapTransitionData data = new MapTransitionData(portal.getTargetMap(), portal.getSpawnX(),
                         portal.getSpawnY());
                 GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);

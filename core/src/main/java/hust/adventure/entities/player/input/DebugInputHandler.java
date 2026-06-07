@@ -24,6 +24,8 @@ import hust.adventure.items.weapons.WeaponFactory;
 import hust.adventure.items.gear.Gear;
 import hust.adventure.items.gear.GearFactory;
 import hust.adventure.events.ExpGainedEvent;
+import hust.adventure.core.data.LevelConfig;
+import java.util.Optional;
 
 /**
  * Handles debug shortcut keys (F4-F8), manages selection states for debug options, and executes corresponding debug
@@ -253,7 +255,19 @@ public class DebugInputHandler {
 
     private void executeMapAction(final DebugOption option) {
         final String targetMap = option.getId();
-        final MapTransitionData data = new MapTransitionData(targetMap, 400f, 400f);
+        float spawnX = 400f;
+        float spawnY = 400f;
+        if (debugOptionRegistry != null) {
+            final Optional<LevelConfig> levelConfigOpt = debugOptionRegistry.getLevelConfigByMapPath(targetMap);
+            if (levelConfigOpt.isPresent()) {
+                final LevelConfig template = levelConfigOpt.get();
+                spawnX = template.getSpawnX();
+                spawnY = template.getSpawnY();
+            } else {
+                Gdx.app.error("DebugMode", "Failed to lookup LevelConfig for map: " + targetMap + ", falling back to (400, 400)");
+            }
+        }
+        final MapTransitionData data = new MapTransitionData(targetMap, spawnX, spawnY);
         final GameEvent<MapTransitionData> event = new GameEvent<>(EventType.MAP_TRANSITION, data);
         EventDispatcher.getInstance().dispatch(event);
     }

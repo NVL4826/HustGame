@@ -46,7 +46,23 @@ public class GameWeaponRenderer implements WeaponEffectVisitor {
     public void visit(final WhipWeapon weapon) {
         if (weapon.getFlashTimer() > 0) {
             final com.badlogic.gdx.math.Rectangle hitArea = weapon.getHitArea();
-            ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height, WHIP_FLASH_COLOR);
+            com.badlogic.gdx.graphics.Texture weaponTexture = null;
+            if (owner != null && owner.getProgressContext() != null) {
+                // Fallback texture grab via progress context
+                try {
+                    // Let's use HustGame assetManager if we can find it
+                    final hust.adventure.HustGame game = (hust.adventure.HustGame) com.badlogic.gdx.Gdx.app.getApplicationListener();
+                    weaponTexture = game.getAssetManager().getTexture("giai_tich.png");
+                } catch (Exception e) {
+                    // Safe catch
+                }
+            }
+
+            if (weaponTexture != null) {
+                batch.draw(weaponTexture, hitArea.x, hitArea.y, hitArea.width, hitArea.height);
+            } else {
+                ShapeDrawUtils.drawRect(batch, hitArea.x, hitArea.y, hitArea.width, hitArea.height, WHIP_FLASH_COLOR);
+            }
         }
     }
 }

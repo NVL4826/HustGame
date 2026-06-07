@@ -44,18 +44,21 @@ public class PlayerMovementBehavior implements MovementBehavior {
         if (player.getProgressContext() != null && player.getProgressContext().isFastRun()) {
             currentSpeed *= 3.0f;
             player.restoreStamina(player.getMaxStamina()); // debug mode: SP luôn đầy
-        } else if (player.getStamina() <= 0) {
-            currentSpeed *= 0.6f; // speed -40% when 0 stamina
-        } else if (isSprinting) {
-            currentSpeed *= 1.8f; // Gấp 1.8 lần khi chạy
-            player.restoreStamina(-10 * delta); // consume stamina
-            staminaRegenTimer = 0f; // reset timer khi đang sprint
         } else {
-            // Hồi 1 SP mỗi 0.5 giây khi không sprint
-            staminaRegenTimer += delta;
-            if (staminaRegenTimer >= SP_REGEN_INTERVAL) {
-                player.restoreStamina(SP_REGEN_AMOUNT);
-                staminaRegenTimer -= SP_REGEN_INTERVAL;
+            if (player.getStamina() <= 0) {
+                currentSpeed *= 0.6f; // speed -40% when 0 stamina
+            }
+            if (isSprinting) {
+                currentSpeed *= 1.8f; // Gấp 1.8 lần khi chạy
+                player.restoreStamina(-10 * delta); // consume stamina
+                staminaRegenTimer = 0f; // reset timer khi đang sprint
+            } else {
+                // Hồi 1 SP mỗi 0.5 giây khi không sprint
+                staminaRegenTimer += delta;
+                if (staminaRegenTimer >= SP_REGEN_INTERVAL) {
+                    player.restoreStamina(SP_REGEN_AMOUNT);
+                    staminaRegenTimer -= SP_REGEN_INTERVAL;
+                }
             }
         }
 

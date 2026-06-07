@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="80" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="18" nextobjectid="325">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="80" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="19" nextobjectid="331">
  <tileset firstgid="1" source="../tsx/outside.tsx"/>
  <tileset firstgid="139" source="../tsx/hoaco.tsx"/>
  <tileset firstgid="167" source="../tsx/brick.tsx"/>
@@ -328,8 +328,8 @@
  <objectgroup id="9" name="collision">
   <object id="191" x="2072.38" y="795.97" width="49.3856" height="14.0246"/>
   <object id="204" x="2031.72" y="812.483" width="69.0672" height="21.5835"/>
-  <object id="214" x="1149.47" y="1362.91" width="273.198" height="73.7075"/>
-  <object id="229" x="998.36" y="547.346" width="97.2426" height="554.692"/>
+  <object id="214" x="1149.47" y="1362.91" width="269.198" height="76.7075"/>
+  <object id="229" x="993.36" y="547.346" width="102.243" height="561.359"/>
   <object id="230" x="1069.57" y="1054.1" width="26.0227" height="87.655"/>
   <object id="231" x="1162.71" y="1060.95" width="27.3923" height="75.3287"/>
   <object id="232" x="1369.52" y="1059.58" width="16.4353" height="86.2854"/>
@@ -379,14 +379,20 @@
   <object id="322" x="2346.18" y="319.818" width="8.72727" height="24.9091"/>
   <object id="323" x="1545.25" y="286.25" width="10.75" height="28.25"/>
   <object id="324" x="509" y="104.667" width="69.3333" height="23.6667"/>
+  <object id="326" x="1056" y="1055" width="136" height="49"/>
+  <object id="328" x="1363" y="1056" width="113" height="52"/>
+  <object id="329" x="1152" y="1015" width="238" height="83"/>
  </objectgroup>
  <objectgroup id="10" name="Portals">
-  <object id="238" name="Gototang1" x="1187.57" y="1062.33" width="172.147" height="67.3712">
+  <object id="238" name="Gototang1" x="1193.57" y="1098.33" width="172.147" height="67.3712">
    <properties>
     <property name="spawnX" type="float" value="660"/>
     <property name="spawnY" type="float" value="174"/>
     <property name="target" value="tang1.tmx"/>
    </properties>
   </object>
+ </objectgroup>
+ <objectgroup id="18" name="Spawn">
+  <object id="325" x="1258.67" y="1245.33" width="38.6667" height="33.3333"/>
  </objectgroup>
 </map>

@@ -27,6 +27,7 @@ public class GameAssetManager {
         // Textures
         manager.load("background.png", Texture.class);
         manager.load("text_box.png", Texture.class);
+        manager.load("giai_tich.png", Texture.class);
         manager.load("Boss Room.jpg", Texture.class);
         manager.load("Boss THT.png", Texture.class);
         manager.load("Library1.jpg", Texture.class);

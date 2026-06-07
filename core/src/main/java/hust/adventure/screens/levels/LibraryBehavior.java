@@ -140,6 +140,11 @@ public class LibraryBehavior implements LevelBehavior {
     }
 
     @Override
+    public boolean isAutoAttackAllowed() {
+        return puzzleSolved;
+    }
+
+    @Override
     public boolean canTransition(final LevelContext ctx) {
         return libraryCleared;
     }

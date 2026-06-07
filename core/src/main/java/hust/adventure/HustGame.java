@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.screens.LoadingScreen;
 import hust.adventure.screens.ScreenTransition;
+import hust.adventure.screens.LevelLoadingScreen;
 import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.ItemDataLoader;
@@ -85,7 +86,7 @@ public class HustGame extends Game implements EventListener {
         spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         assetManager = new GameAssetManager();
-        
+
         itemManager = new ItemManager();
         progressContext = new ProgressContext(itemManager);
         levelFactory = new LevelFactory();
@@ -174,11 +175,9 @@ public class HustGame extends Game implements EventListener {
         final LevelConfig config = new LevelConfig(nextId, template.getName(), data.getTargetMap(), data.getSpawnX(),
                 data.getSpawnY(), template.getZoom(), template.getBgmPath(), template.getAmbientColor(),
                 template.isInfinite());
-        final Screen nextScreen = levelFactory.createLevel(this, config);
 
-        if (nextScreen != null) {
-            screenTransition.fadeOut(nextScreen, 0.5f);
-        }
+        final LevelLoadingScreen loadingScreen = new LevelLoadingScreen(this, config);
+        screenTransition.fadeOut(loadingScreen, 0.5f);
     }
 
     @Override

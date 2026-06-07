@@ -13,6 +13,7 @@ public class MapConfig {
     private String spawnLayerName = "Spawn";
     private String lightingLayerName = "LightingObjects";
     private List<String> decorLayerNames = new ArrayList<>();
+    private List<String> groundLayerNames = new ArrayList<>();
     private String collisionLayerKey = "collision";
 
     public List<String> getBackgroundLayerNames() {
@@ -61,6 +62,14 @@ public class MapConfig {
 
     public void setDecorLayerNames(final List<String> decorLayerNames) {
         this.decorLayerNames = decorLayerNames;
+    }
+
+    public List<String> getGroundLayerNames() {
+        return groundLayerNames;
+    }
+
+    public void setGroundLayerNames(final List<String> groundLayerNames) {
+        this.groundLayerNames = groundLayerNames;
     }
 
     public String getCollisionLayerKey() {

@@ -19,7 +19,7 @@ import com.badlogic.gdx.graphics.GL20;
  * Simon Game memory mini-game puzzle.
  */
 public class SimonPuzzle implements PuzzleGame {
-    private static final int MAX_ROUNDS = 15;
+    private static final int MAX_ROUNDS = 10;
 
     public enum SimonState {
         IDLE, SHOWING_SEQUENCE, AWAITING_INPUT, EVALUATING, ROUND_WON, GAME_WON, FAILED_DELAY
@@ -28,6 +28,7 @@ public class SimonPuzzle implements PuzzleGame {
     private SimonState state;
     private LevelContext context;
     private boolean isSolved;
+    private boolean showIntro = true;
 
     // Sequence details
     private final int[] sequence = new int[MAX_ROUNDS];
@@ -109,6 +110,7 @@ public class SimonPuzzle implements PuzzleGame {
     public void reset() {
         this.currentRound = 1;
         this.isSolved = false;
+        this.showIntro = true;
         this.highlightButton = -1;
         this.highlightTimer = 0f;
         this.playbackIndex = 0;
@@ -129,6 +131,29 @@ public class SimonPuzzle implements PuzzleGame {
     @Override
     public void update(final float delta) {
         if (isSolved) {
+            return;
+        }
+
+        if (showIntro) {
+            if (Gdx.input.justTouched()) {
+                tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
+                if (context != null) {
+                    context.unproject(tmpMouse);
+                }
+                final float mx = tmpMouse.x;
+                final float my = tmpMouse.y;
+
+                final float btnW = 160f;
+                final float btnH = 45f;
+                final float btnX = 400f - btnW / 2f;
+                final float btnY = 110f;
+
+                if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
+                    showIntro = false;
+                    EventDispatcher.getInstance()
+                            .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
+                }
+            }
             return;
         }
 
@@ -286,7 +311,7 @@ public class SimonPuzzle implements PuzzleGame {
         final float boxY = y - boxHeight / 2f;
 
         batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
-        
+
         final Color origColor = font.getColor();
         final float r = origColor.r;
         final float g = origColor.g;
@@ -303,12 +328,18 @@ public class SimonPuzzle implements PuzzleGame {
             return;
         }
 
+        if (showIntro) {
+            drawIntro(shapeRenderer, batch);
+            return;
+        }
+
         // Draw slots first to create a sunken board visual slot around keys
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(slotColor);
         for (int i = 0; i < 4; i++) {
             final Rectangle rect = buttons[i];
-            shapeRenderer.rect(rect.x - SLOT_OFFSET, rect.y - SLOT_OFFSET, rect.width + SLOT_OFFSET * 2, rect.height + SLOT_OFFSET * 2);
+            shapeRenderer.rect(rect.x - SLOT_OFFSET, rect.y - SLOT_OFFSET, rect.width + SLOT_OFFSET * 2,
+                    rect.height + SLOT_OFFSET * 2);
         }
 
         // Draw buttons inside slots
@@ -329,18 +360,18 @@ public class SimonPuzzle implements PuzzleGame {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (int i = 0; i < 4; i++) {
             final Rectangle rect = buttons[i];
-            
+
             // Top bevel (light)
             shapeRenderer.setColor(bevelLight);
             shapeRenderer.rect(rect.x, rect.y + rect.height - BEVEL_T, rect.width, BEVEL_T);
-            
+
             // Left bevel (light)
             shapeRenderer.rect(rect.x, rect.y, BEVEL_T, rect.height);
-            
+
             // Bottom bevel (dark)
             shapeRenderer.setColor(bevelDark);
             shapeRenderer.rect(rect.x, rect.y, rect.width, BEVEL_T);
-            
+
             // Right bevel (dark)
             shapeRenderer.rect(rect.x + rect.width - BEVEL_T, rect.y, BEVEL_T, rect.height);
         }
@@ -388,5 +419,81 @@ public class SimonPuzzle implements PuzzleGame {
     @Override
     public void dispose() {
         // No custom fonts/textures instantiated locally, using shared context components
+    }
+
+    private void drawIntro(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
+        final float boxW = 620f;
+        final float boxH = 460f;
+        final float boxX = 90f;
+        final float boxY = 70f;
+
+        final float btnW = 160f;
+        final float btnH = 45f;
+        final float btnX = 400f - btnW / 2f;
+        final float btnY = 110f;
+
+        // Check hover
+        tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
+        if (context != null) {
+            context.unproject(tmpMouse);
+        }
+        final boolean isHovered = (tmpMouse.x >= btnX && tmpMouse.x <= btnX + btnW && tmpMouse.y >= btnY
+                && tmpMouse.y <= btnY + btnH);
+
+        // Draw overlay using ShapeRenderer
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0f, 0f, 0f, 0.75f));
+        shapeRenderer.rect(0, 0, 800, 600);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        // Draw Text Box and Texts using SpriteBatch
+        batch.begin();
+        if (textBoxTexture != null) {
+            batch.setColor(Color.WHITE);
+            batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
+        }
+
+        final BitmapFont font = context.getFont();
+        final Color origColor = font.getColor();
+
+        // Draw title
+        font.setColor(new Color(0.6f, 0.1f, 0.1f, 1f));
+        textLayout.setText(font, "THỬ THÁCH 1: SIMON GAME");
+        font.draw(batch, "THỬ THÁCH 1: SIMON GAME", 400f - textLayout.width / 2f, 480f);
+
+        // Draw intro body text
+        font.setColor(Color.BLACK);
+        final String introText = "Chào mừng bạn đến với thử thách đầu tiên!\n\n"
+                + "Luật chơi Simon Game rất đơn giản:\n"
+                + "1. Hệ thống sẽ phát một chuỗi các ô màu sáng kèm âm thanh.\n"
+                + "2. Hãy ghi nhớ và bấm lại đúng thứ tự các ô màu đó.\n" + "3. Vượt qua đủ " + MAX_ROUNDS
+                + " vòng để hoàn thành thử thách.\n\n" + "Chú ý: Bấm sai bất kỳ ô nào sẽ phải chơi lại từ đầu!";
+
+        font.draw(batch, introText, 140f, 420f);
+
+        // Draw Start Button Box
+        if (textBoxTexture != null) {
+            batch.setColor(isHovered ? Color.LIGHT_GRAY : Color.WHITE);
+            batch.draw(textBoxTexture, btnX, btnY, btnW, btnH);
+        }
+
+        // Draw Start Button Text
+        font.setColor(isHovered ? new Color(0.1f, 0.6f, 0.1f, 1f) : new Color(0.1f, 0.4f, 0.1f, 1f));
+        textLayout.setText(font, "BẮT ĐẦU");
+        font.draw(batch, "BẮT ĐẦU", 400f - textLayout.width / 2f, btnY + btnH / 2f + textLayout.height / 2f);
+
+        font.setColor(origColor);
+        batch.end();
+
+        // Draw Gold highlight border if hovered
+        if (isHovered) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.GOLD);
+            shapeRenderer.rect(btnX - 2, btnY - 2, btnW + 4, btnH + 4);
+            shapeRenderer.end();
+        }
     }
 }

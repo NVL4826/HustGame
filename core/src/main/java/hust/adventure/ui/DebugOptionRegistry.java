@@ -13,6 +13,7 @@ import hust.adventure.items.weapons.BaseWeapon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Registry containing dynamic lists of debug options for maps, items, and monsters.
@@ -134,5 +135,18 @@ public class DebugOptionRegistry {
         default:
             return null;
         }
+    }
+
+    /**
+     * Finds the LevelConfig for a given map path.
+     *
+     * @param mapPath the map path to search for
+     * @return an Optional containing the LevelConfig if found, or empty if not
+     */
+    public Optional<LevelConfig> getLevelConfigByMapPath(final String mapPath) {
+        if (levelDataManager == null || mapPath == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(levelDataManager.getLevelConfigByMapPath(mapPath));
     }
 }

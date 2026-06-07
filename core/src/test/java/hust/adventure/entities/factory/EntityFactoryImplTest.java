@@ -57,6 +57,7 @@ public class EntityFactoryImplTest {
 
         // Mock textures for constructor cache
         when(assetManager.getTexture(anyString())).thenReturn(mock(Texture.class));
+        when(collisionManager.canMove(any(), anyFloat(), anyFloat())).thenReturn(true);
 
         entityFactory = new EntityFactoryImpl(
                 assetManager,
@@ -201,5 +202,51 @@ public class EntityFactoryImplTest {
         assertEquals(220f, npc.getY());
         assertEquals("HustGuy", npc.getName());
         verify(entityManager).addEntity(npc);
+    }
+
+    @Test
+    public void testCreateEnemyCollisionReposition() {
+        EnemyConfig config = mock(EnemyConfig.class);
+        when(config.getType()).thenReturn("bug");
+        when(config.getName()).thenReturn("BugEnemy");
+        when(config.getMaxHp()).thenReturn(20f);
+        when(config.getWidth()).thenReturn(32f);
+        when(config.getHeight()).thenReturn(32f);
+        when(config.getSpeed()).thenReturn(50f);
+        when(config.getColor()).thenReturn(Color.RED);
+        when(config.getContactDamage()).thenReturn(5f);
+
+        when(enemyDataManager.getEnemyConfig("bug")).thenReturn(config);
+
+        Player mockPlayer = mock(Player.class);
+        when(progressContext.getPlayer()).thenReturn(mockPlayer);
+        when(mockPlayer.getX()).thenReturn(500f);
+        when(mockPlayer.getY()).thenReturn(500f);
+
+        when(collisionManager.getMapWidth()).thenReturn(800f);
+        when(collisionManager.getMapHeight()).thenReturn(600f);
+        when(collisionManager.isInfinite()).thenReturn(false);
+
+        // Make canMove return false for initial spawn at 100f, 150f, and concentric search
+        when(collisionManager.canMove(any(), anyFloat(), anyFloat())).thenReturn(false);
+
+        // Let's make a point along the vector to player valid (spawn at 100, 150, player at 500, 500)
+        float dx = 400f;
+        float dy = 350f;
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+        float dirX = dx / dist;
+        float dirY = dy / dist;
+        float expectedX = 100f + dirX * 32f;
+        float expectedY = 150f + dirY * 32f;
+
+        when(collisionManager.canMove(any(), eq(expectedX), eq(expectedY))).thenReturn(true);
+
+        MapObject created = entityFactory.createEnemy("bug", 100f, 150f);
+
+        assertNotNull(created);
+        assertTrue(created instanceof Enemy);
+        Enemy enemy = (Enemy) created;
+        assertEquals(expectedX, enemy.getX(), 0.1f);
+        assertEquals(expectedY, enemy.getY(), 0.1f);
     }
 }

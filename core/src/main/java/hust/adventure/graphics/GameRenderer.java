@@ -73,7 +73,28 @@ public class GameRenderer {
     private boolean isGroundLayer(String layerName) {
         if (layerName == null) return false;
         String lower = layerName.toLowerCase();
-        return lower.equals("co") || lower.equals("nen") || lower.equals("floor") || lower.equals("ground");
+        if (lower.equals("co") || lower.equals("nen") || lower.equals("floor") || lower.equals("ground")
+                || lower.contains("grass") || lower.contains("background") || lower.contains("carpet")
+                || lower.contains("tham") || lower.contains("road") || lower.contains("path")
+                || lower.contains("duong") || lower.contains("via he") || lower.contains("vỉa hè")
+                || lower.contains("nha1") || lower.contains("tile layer 1")) {
+            return true;
+        }
+        if (worldManager != null && worldManager.getBackgroundLayerNames() != null) {
+            for (String bgName : worldManager.getBackgroundLayerNames()) {
+                if (lower.equalsIgnoreCase(bgName)) {
+                    return true;
+                }
+            }
+        }
+        if (worldManager != null && worldManager.getGroundLayerNames() != null) {
+            for (String gName : worldManager.getGroundLayerNames()) {
+                if (lower.equalsIgnoreCase(gName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private final java.util.Comparator<MapObject> yComparator = (e1, e2) -> {
@@ -212,32 +233,9 @@ public class GameRenderer {
         // 3. Foreground tile layers - VẼ BÌNH THƯỜNG, KHÔNG DÙNG STENCIL
         mapRenderer.render(foregroundLayers);
 
-        boolean isFinalOutside = false;
-        if (progressContext != null && progressContext.getCurrentLevelConfig() != null) {
-            String levelId = progressContext.getCurrentLevelConfig().getLevelId();
-            if ("FINAL_OUTSIDE".equals(levelId)) {
-                isFinalOutside = true;
-            }
-        }
+        final boolean isSilhouetteEnabled = (silhouetteShader != null && discardShader != null);
 
-        if (isFinalOutside) {
-            // Lọc ra các tile layer là "Tree" hoặc "Object" trong foregroundLayers
-            java.util.List<Integer> shadowLayerIndices = new java.util.ArrayList<>();
-            com.badlogic.gdx.maps.tiled.TiledMap currentMap = worldManager.getCurrentMap();
-            if (currentMap != null) {
-                for (int i = 0; i < foregroundLayers.length; i++) {
-                    int layerIdx = foregroundLayers[i];
-                    String name = currentMap.getLayers().get(layerIdx).getName();
-                    if (name != null && (name.equalsIgnoreCase("Tree") || name.equalsIgnoreCase("Object"))) {
-                        shadowLayerIndices.add(layerIdx);
-                    }
-                }
-            }
-            int[] stencilTileLayers = new int[shadowLayerIndices.size()];
-            for (int i = 0; i < shadowLayerIndices.size(); i++) {
-                stencilTileLayers[i] = shadowLayerIndices.get(i);
-            }
-
+        if (isSilhouetteEnabled) {
             // 3.5. Stencil Buffer: Ghi các layer cụ thể vào stencil để tạo silhouette
             Gdx.gl.glEnable(GL20.GL_STENCIL_TEST);
             Gdx.gl.glStencilFunc(GL20.GL_ALWAYS, 1, 0xFF);
@@ -247,14 +245,7 @@ public class GameRenderer {
             // Tắt ghi màu (Color Mask)
             Gdx.gl.glColorMask(false, false, false, false);
 
-            // Vẽ các Tile Layers (foreground) có tên Tree, Object vào stencil
-            if (stencilTileLayers.length > 0) {
-                mapRenderer.getBatch().setShader(discardShader);
-                mapRenderer.render(stencilTileLayers);
-                mapRenderer.getBatch().setShader(null);
-            }
-
-            // Vẽ các Object Layers (StaticObject) có tên HUST, Tree, Object vào stencil
+            // Vẽ các Object Layers (StaticObject) có tên thuộc decorLayerNames vào stencil
             batch.setProjectionMatrix(cameraManager.getCamera().combined);
             batch.setShader(discardShader);
             batch.begin();
@@ -468,9 +459,22 @@ public class GameRenderer {
         return cameraManager;
     }
 
+    private boolean isDecorLayer(final String layerName) {
+        if (layerName == null) {
+            return false;
+        }
+        if (worldManager != null && worldManager.getDecorLayerNames() != null) {
+            for (final String name : worldManager.getDecorLayerNames()) {
+                if (layerName.equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+        }
+        return layerName.equalsIgnoreCase("Tree") || layerName.equalsIgnoreCase("Object 2");
+    }
+
     /**
      * Ghi các StaticObject nằm phía trước player (bottomY thấp hơn player) vào stencil buffer.
-     * Theo yêu cầu của user, CHỈ hoạt động với layer HUST và Object2.
      */
     private void drawFrontStaticObjects(final SpriteBatch batch, final Player player) {
         if (player == null) {
@@ -480,11 +484,7 @@ public class GameRenderer {
         for (final MapObject entity : entityManager.getEntities()) {
             if (entity instanceof StaticObject) {
                 final String layerName = entity.getLayerName();
-                if (layerName != null && (layerName.equalsIgnoreCase("HUST") 
-                        || layerName.equalsIgnoreCase("Tree") 
-                        || layerName.equalsIgnoreCase("Object")
-                        || layerName.equalsIgnoreCase("Object2") 
-                        || layerName.equalsIgnoreCase("Object 2"))) {
+                if (layerName != null && isDecorLayer(layerName)) {
                     final float objBottomY = entity.getSortingY() - entity.getHeight() / 2f;
                     if (objBottomY < playerBottomY) {
                         entity.draw(batch);

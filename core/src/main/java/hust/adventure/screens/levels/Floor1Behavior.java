@@ -42,6 +42,11 @@ public class Floor1Behavior implements LevelBehavior {
         // Floor 1 specific cleanup if any
     }
 
+    @Override
+    public boolean isAutoAttackAllowed() {
+        return false;
+    }
+
     public String getActiveHint() {
         return activeHint;
     }

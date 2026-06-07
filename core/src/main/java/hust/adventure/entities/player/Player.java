@@ -196,9 +196,15 @@ public class Player extends Character implements Targetable {
         }
 
         if (controller.isSpaceJustPressed()) {
-            for (final BaseWeapon weapon : weaponManager.getWeapons()) {
-                if (!weapon.isAutoFiring()) {
-                    weapon.fire();
+            boolean allowed = true;
+            if (progressContext != null) {
+                allowed = progressContext.isAutoAttackAllowed();
+            }
+            if (allowed) {
+                for (final BaseWeapon weapon : weaponManager.getWeapons()) {
+                    if (!weapon.isAutoFiring()) {
+                        weapon.fire();
+                    }
                 }
             }
         }

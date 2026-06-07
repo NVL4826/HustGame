@@ -50,17 +50,24 @@ public abstract class BaseWeapon extends Item implements Equipable {
             currentCooldownTimer -= deltaTime;
         }
 
-        if (shotsRemaining > 0) {
-            shotTimer -= deltaTime;
-            if (shotTimer <= 0) {
-                executeAttackAction();
-                shotsRemaining--;
-                shotTimer = projectileInterval;
-            }
+        boolean allowed = true;
+        if (owner != null && owner.getProgressContext() != null) {
+            allowed = owner.getProgressContext().isAutoAttackAllowed();
         }
 
-        if (isAutoFiring() && currentCooldownTimer <= 0 && shotsRemaining == 0) {
-            fire();
+        if (allowed) {
+            if (shotsRemaining > 0) {
+                shotTimer -= deltaTime;
+                if (shotTimer <= 0) {
+                    executeAttackAction();
+                    shotsRemaining--;
+                    shotTimer = projectileInterval;
+                }
+            }
+
+            if (isAutoFiring() && currentCooldownTimer <= 0 && shotsRemaining == 0) {
+                fire();
+            }
         }
     }
 

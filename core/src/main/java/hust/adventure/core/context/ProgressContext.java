@@ -41,6 +41,7 @@ public class ProgressContext implements GameProgressContext, EventListener {
     private boolean isInventoryOpen = false;
     private LevelConfig currentLevelConfig = null; // Current level configuration
     private Player player = null;
+    private boolean autoAttackAllowed = true;
 
     private final Map<String, Integer> weaponLevels = new HashMap<>();
     private final Map<String, Integer> gearLevels = new HashMap<>();
@@ -317,6 +318,16 @@ public class ProgressContext implements GameProgressContext, EventListener {
         return gearLevels;
     }
 
+    @Override
+    public boolean isAutoAttackAllowed() {
+        return autoAttackAllowed;
+    }
+
+    @Override
+    public void setAutoAttackAllowed(final boolean allowed) {
+        this.autoAttackAllowed = allowed;
+    }
+
     public void reset() {
         playerStats.reset();
         debugContext.reset();
@@ -327,6 +338,7 @@ public class ProgressContext implements GameProgressContext, EventListener {
         libraryCleared = false;
         labCleared = false;
         player = null;
+        autoAttackAllowed = true;
         weaponLevels.clear();
         gearLevels.clear();
         setGameState(new PlayingGameState());

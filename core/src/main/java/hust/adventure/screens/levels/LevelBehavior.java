@@ -37,5 +37,13 @@ public interface LevelBehavior extends EventListener {
         return false;
     }
 
+    /**
+     * Checks if auto-attack/weapons auto-fire is allowed in this level/phase.
+     * @return true if auto-attack is allowed, false otherwise.
+     */
+    default boolean isAutoAttackAllowed() {
+        return true;
+    }
+
     default void resize(int width, int height) {}
 }

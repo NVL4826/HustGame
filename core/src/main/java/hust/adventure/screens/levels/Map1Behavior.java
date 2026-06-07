@@ -35,6 +35,14 @@ public class Map1Behavior implements LevelBehavior {
     }
 
     @Override
+    public boolean canTransition(final LevelContext context) {
+        if (waveManager != null) {
+            return waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies();
+        }
+        return true;
+    }
+
+    @Override
     public void dispose(final LevelContext context) {
         // Reset the HUD's time provider when leaving Map 1
         if (context != null && context.getUIManager() != null && context.getUIManager().getHud() != null) {

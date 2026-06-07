@@ -220,8 +220,23 @@ public class WorldManager implements Disposable {
         return parseResult;
     }
 
+    public List<String> getBackgroundLayerNames() {
+        return config.getBackgroundLayerNames();
+    }
+
+    public List<String> getGroundLayerNames() {
+        return config.getGroundLayerNames();
+    }
+
+    public List<String> getDecorLayerNames() {
+        return config.getDecorLayerNames();
+    }
+
     /**
      * Reads the spawn point of the player from the spawn layer in TMX.
+     *
+     * <p>Tiled Point map objects are preferred for exact positioning. Rectangle map objects are also supported
+     * and will be resolved using their center coordinates (center-X and center-Y) to align with player hitbox origins.</p>
      *
      * @return the spawn point coordinates as a Vector2, or null if not found
      */
@@ -261,7 +276,7 @@ public class WorldManager implements Disposable {
         for (final MapObject obj : spawnLayer.getObjects()) {
             if (obj instanceof RectangleMapObject) {
                 final Rectangle rect = ((RectangleMapObject) obj).getRectangle();
-                return new Vector2(rect.x + rect.width / 2f, rect.y + rect.height);
+                return new Vector2(rect.x + rect.width / 2f, rect.y + rect.height / 2f);
             } else {
                 Float x = obj.getProperties().get("x", Float.class);
                 Float y = obj.getProperties().get("y", Float.class);
@@ -270,7 +285,7 @@ public class WorldManager implements Disposable {
                 if (x != null && y != null) {
                     float width = w != null ? w : 0;
                     float height = h != null ? h : 0;
-                    return new Vector2(x + width / 2f, y + height);
+                    return new Vector2(x + width / 2f, y + height / 2f);
                 }
             }
         }

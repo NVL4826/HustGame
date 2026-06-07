@@ -253,8 +253,9 @@
     {
       "type": "base",
       "id": "whip",
-      "name": "Roi da",
-      "description": "Tấn công kẻ địch trước mặt theo hình chữ nhật."
+      "name": "Sách giải tích",
+      "description": "Tấn công kẻ địch trước mặt theo hình chữ nhật.",
+      "spritePath": "giai_tich.png"
     },
     {
       "type": "base",

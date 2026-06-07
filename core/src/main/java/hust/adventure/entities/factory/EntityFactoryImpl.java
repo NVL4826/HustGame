@@ -120,6 +120,32 @@ public class EntityFactoryImpl implements EntityFactory {
                     }
                 }
             }
+            if (!found && progressContext.getPlayer() != null) {
+                final Player p = progressContext.getPlayer();
+                final float dx = p.getX() - x;
+                final float dy = p.getY() - y;
+                final float dist = (float) Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0) {
+                    final float dirX = dx / dist;
+                    final float dirY = dy / dist;
+                    // Step towards the player in 16px increments
+                    for (float step = 16f; step < dist && !found; step += 16f) {
+                        final float checkX = x + dirX * step;
+                        final float checkY = y + dirY * step;
+                        if (collisionManager.canMove(enemy, checkX, checkY)) {
+                            spawnX = checkX;
+                            spawnY = checkY;
+                            found = true;
+                        }
+                    }
+                }
+                if (!found) {
+                    // Final fallback: spawn at player's position
+                    spawnX = p.getX();
+                    spawnY = p.getY();
+                    found = true;
+                }
+            }
             if (found) {
                 enemy.init(spawnX, spawnY, config.getWidth(), config.getHeight(), config.getHitboxWidth(), config.getHitboxHeight(), config.getMaxHp(), config.getName(), config.getColor(),
                         collisionManager, config.getContactDamage());

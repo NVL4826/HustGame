@@ -127,6 +127,10 @@ public interface GameProgressContext {
 
     Map<String, Integer> getGearLevels();
 
+    boolean isAutoAttackAllowed();
+
+    void setAutoAttackAllowed(boolean allowed);
+
     void reset();
 
     ItemManager getItemManager();

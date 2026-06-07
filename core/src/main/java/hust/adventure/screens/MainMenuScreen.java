@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -30,6 +31,8 @@ public class MainMenuScreen extends BaseScreen {
     private Stage stage;
     private Skin skin;
     private Texture backgroundTexture;
+    private boolean showGuide = false;
+    private final GlyphLayout glyphLayout = new GlyphLayout();
 
     /**
      * Interface defining button actions. MainMenuScreen supplies concrete lambdas.
@@ -38,8 +41,8 @@ public class MainMenuScreen extends BaseScreen {
         /** Triggered when the user starts the game. */
         void onStartGame();
 
-        /** Triggered when the user opens the settings menu. */
-        void onSettings();
+        /** Triggered when the user opens the guide. */
+        void onGuide();
 
         /** Triggered when the user exits the game. */
         void onExit();
@@ -147,7 +150,7 @@ public class MainMenuScreen extends BaseScreen {
 
             // Text Buttons
             final TextButton startBtn = new TextButton("Bắt đầu", skin, "menu-button");
-            final TextButton settingsBtn = new TextButton("Cài đặt", skin, "menu-button");
+            final TextButton guideBtn = new TextButton("Hướng dẫn", skin, "menu-button");
             final TextButton exitBtn = new TextButton("Thoát", skin, "menu-button");
 
             // Attach listeners to router
@@ -158,10 +161,10 @@ public class MainMenuScreen extends BaseScreen {
                 }
             });
 
-            settingsBtn.addListener(new ChangeListener() {
+            guideBtn.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                    router.onSettings();
+                    router.onGuide();
                 }
             });
 
@@ -174,7 +177,7 @@ public class MainMenuScreen extends BaseScreen {
 
             // Add buttons to table layout
             table.add(startBtn).row();
-            table.add(settingsBtn).row();
+            table.add(guideBtn).row();
             table.add(exitBtn).row();
 
             return table;
@@ -198,16 +201,14 @@ public class MainMenuScreen extends BaseScreen {
                     final LevelConfig config = new LevelConfig("FINAL_OUTSIDE", template.getName(),
                             template.getMapPath(), template.getSpawnX(), template.getSpawnY(), template.getZoom(),
                             template.getBgmPath(), template.getAmbientColor(), template.isInfinite());
-                    final com.badlogic.gdx.Screen nextScreen = game.getLevelFactory().createLevel(game, config);
-                    if (nextScreen != null) {
-                        game.getScreenTransition().fadeOut(nextScreen, 0.5f);
-                    }
+                    final LevelLoadingScreen loadingScreen = new LevelLoadingScreen(game, config);
+                    game.getScreenTransition().fadeOut(loadingScreen, 0.5f);
                 }
             }
 
             @Override
-            public void onSettings() {
-                Gdx.app.log("MainMenuScreen", "Settings button clicked. Not yet implemented.");
+            public void onGuide() {
+                openGuide();
             }
 
             @Override
@@ -228,6 +229,27 @@ public class MainMenuScreen extends BaseScreen {
         }
     }
 
+    private void openGuide() {
+        showGuide = true;
+        Gdx.input.setInputProcessor(new com.badlogic.gdx.InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                closeGuide();
+                return true;
+            }
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                closeGuide();
+                return true;
+            }
+        });
+    }
+
+    private void closeGuide() {
+        showGuide = false;
+        Gdx.input.setInputProcessor(stage);
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -245,8 +267,37 @@ public class MainMenuScreen extends BaseScreen {
         }
         batch.end();
 
-        stage.act(delta);
-        stage.draw();
+        if (showGuide) {
+            batch.begin();
+            final Texture textBox = game.getAssetManager().getTexture("text_box.png");
+            if (textBox != null) {
+                batch.draw(textBox, 80f, 60f, 640f, 480f);
+            }
+
+            font.setColor(Color.YELLOW);
+            final String header = "HƯỚNG DẪN CHƠI";
+            glyphLayout.setText(font, header);
+            font.draw(batch, header, 400f - glyphLayout.width / 2f, 500f);
+
+            font.setColor(Color.BLACK);
+            final String details =
+                "Di chuyển: W, A, S, D hoặc các phím mũi tên\n" +
+                "Chạy nhanh: Giữ phím SHIFT\n" +
+                "Mở túi đồ: Phím I\n\n" +
+                "Các kỹ năng chính:\n" +
+                "  - Kỹ năng [Q]: Làm chậm thời gian (Yêu cầu Não)\n" +
+                "  - Kỹ năng [E]: Làm choáng kẻ địch xung quanh (Tốn 20 SP)\n" +
+                "  - Kỹ năng [F]: Định vị mọi kẻ địch trên bản đồ (Tốn 10 SP)\n\n" +
+                "Nhấn phím bất kỳ hoặc Click chuột để quay lại.";
+            glyphLayout.setText(font, details);
+            font.draw(batch, details, 120f, 430f);
+
+            font.setColor(Color.WHITE);
+            batch.end();
+        } else {
+            stage.act(delta);
+            stage.draw();
+        }
     }
 
     @Override

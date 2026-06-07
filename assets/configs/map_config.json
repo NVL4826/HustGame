@@ -5,7 +5,17 @@
     "floor",
     "Floor",
     "Background",
-    "Grass"
+    "Grass",
+    "via he",
+    "duong",
+    "grass",
+    "nha1",
+    "tile layer 1",
+    "co",
+    "nen",
+    "wall",
+    "wall2",
+    "entity"
   ],
   "collisionFallbackLayerNames": [
     "collision",
@@ -15,19 +25,21 @@
   "portalLayerName": "Portals",
   "spawnLayerName": "Spawn",
   "lightingLayerName": "LightingObjects",
-  "decorLayerNames": [
-    "chair",
-    "sitting_human",
-    "ban_may_tinh",
-    "moniter-screen",
-    "man_hinh",
+  "groundLayerNames": [
     "ThuVien",
+    "cua"
+  ],
+  "decorLayerNames": [
+    "ban_may_tinh",
+    "man_hinh",
+    "sitting_human",
+    "chair",
+    "moniter-screen",
     "ThuVien2",
     "ThuVien3",
     "HUST",
     "Object",
     "Object2",
-    "co",
-    "nen"
+    "Tree"
   ]
 }

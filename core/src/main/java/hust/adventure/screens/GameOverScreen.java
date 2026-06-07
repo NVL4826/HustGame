@@ -220,10 +220,8 @@ public class GameOverScreen extends BaseScreen {
                     template.getAmbientColor(), template.isInfinite());
         }
         progressContext.reset();
-        Screen next = game.getLevelFactory().createLevel(game, savedConfig);
-        if (next != null) {
-            game.getScreenTransition().fadeOut(next, 0.5f);
-        }
+        final LevelLoadingScreen loadingScreen = new LevelLoadingScreen(game, savedConfig);
+        game.getScreenTransition().fadeOut(loadingScreen, 0.5f);
     }
 
     @Override
