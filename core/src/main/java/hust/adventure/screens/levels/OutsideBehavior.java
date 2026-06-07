@@ -39,7 +39,7 @@ public class OutsideBehavior implements LevelBehavior {
     public void update(final LevelContext context, final float delta) {
         if (waveManager != null) {
             waveManager.update(delta, context.getCamera());
-            if (waveManager.isFinished() && !messageTriggered) {
+            if (waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies() && !messageTriggered) {
                 messageTriggered = true;
                 messageTimer = MESSAGE_DURATION;
             }

@@ -116,7 +116,7 @@ public class GameAssetManager {
         // Music tracks
         manager.load("audio/music/menu.mp3", Music.class);
         manager.load("audio/music/game_over.mp3", Music.class);
-        manager.load("audio/music/win_menu.mp3", Music.class);
+        manager.load("audio/sfx/music/win_menu.mp3", Music.class);
 
         // Load level-specific BGM tracks dynamically from level configurations
         if (levelDataLoader != null) {

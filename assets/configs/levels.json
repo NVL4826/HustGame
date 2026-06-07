@@ -71,7 +71,7 @@
       "spawnX": 400.0,
       "spawnY": 400.0,
       "zoom": 1.0,
-      "bgmPath": "audio/music/final_boss.mp3",
+      "bgmPath": "audio/sfx/music/final_boss.mp3",
       "ambientColor": {
         "r": 0.6,
         "g": 0.6,

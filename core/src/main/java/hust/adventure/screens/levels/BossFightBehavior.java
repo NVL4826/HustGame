@@ -270,6 +270,7 @@ public class BossFightBehavior implements LevelBehavior {
                     phase = PHASE_VICTORY;
                     textField.setVisible(false);
                     Gdx.input.setInputProcessor((com.badlogic.gdx.InputProcessor) context.getInputReader());
+                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_BGM, "audio/sfx/music/win_menu.mp3"));
                 } else {
                     context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
