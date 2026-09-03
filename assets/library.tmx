@@ -103,4 +103,13 @@
  <objectgroup id="7" name="Spawn">
   <object id="49" x="614" y="580" width="55" height="44"/>
  </objectgroup>
+ <objectgroup color="#ffffff" id="8" name="Portals" opacity="0.75">
+  <object id="50" name="GoToLab" x="600" y="30" width="144" height="60">
+   <properties>
+    <property name="spawnX" type="float" value="400"/>
+    <property name="spawnY" type="float" value="400"/>
+    <property name="target" value="map/lab.tmx"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>
