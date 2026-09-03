@@ -36,9 +36,7 @@ public class PlayerStats {
     public void setHp(float hp) {
         float oldHp = this.hp;
         this.hp = Math.max(0, Math.min(this.maxHp, hp));
-        if (oldHp > 0 && this.hp <= 0) {
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAYER_DIED, null));
-        }
+        checkDeath(oldHp);
     }
 
     /**
@@ -59,8 +57,13 @@ public class PlayerStats {
         this.maxHp = maxHp;
         float oldHp = this.hp;
         this.hp = Math.min(this.hp, this.maxHp);
+        checkDeath(oldHp);
+    }
+
+    private void checkDeath(final float oldHp) {
         if (oldHp > 0 && this.hp <= 0) {
             EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAYER_DIED, null));
+            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ACADEMIC_SUSPENSION, null));
         }
     }
 

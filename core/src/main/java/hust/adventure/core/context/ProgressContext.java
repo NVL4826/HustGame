@@ -404,6 +404,10 @@ public class ProgressContext implements GameProgressContext, EventListener {
             if ("coffee".equals(itemId)) {
                 coffeeCount++;
             }
+        } else if (event.getType() == EventType.ACADEMIC_SUSPENSION || event.getType() == EventType.PLAYER_DIED) {
+            if (mapDirector != null) {
+                mapDirector.resetRun();
+            }
         }
     }
 

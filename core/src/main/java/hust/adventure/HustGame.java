@@ -95,6 +95,8 @@ public class HustGame extends Game implements EventListener {
         eventDispatcher.addListener(EventType.MAP_TRANSITION, this);
         eventDispatcher.addListener(EventType.ITEM_PICKED_UP, progressContext);
         eventDispatcher.addListener(EventType.ITEM_USED, progressContext);
+        eventDispatcher.addListener(EventType.PLAYER_DIED, progressContext);
+        eventDispatcher.addListener(EventType.ACADEMIC_SUSPENSION, progressContext);
 
         audioManager = new AudioManager(assetManager);
         eventDispatcher.addListener(EventType.PLAY_SFX, audioManager);
@@ -219,6 +221,8 @@ public class HustGame extends Game implements EventListener {
         if (progressContext != null) {
             eventDispatcher.removeListener(EventType.ITEM_PICKED_UP, progressContext);
             eventDispatcher.removeListener(EventType.ITEM_USED, progressContext);
+            eventDispatcher.removeListener(EventType.PLAYER_DIED, progressContext);
+            eventDispatcher.removeListener(EventType.ACADEMIC_SUSPENSION, progressContext);
         }
         if (audioManager != null) {
             eventDispatcher.removeListener(EventType.PLAY_SFX, audioManager);

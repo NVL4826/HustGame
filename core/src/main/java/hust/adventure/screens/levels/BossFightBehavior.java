@@ -2,6 +2,7 @@ package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -14,11 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.screens.LoadingScreen;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
+import hust.adventure.progression.MapDirector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -265,12 +268,10 @@ public class BossFightBehavior implements LevelBehavior {
             if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
                 final String answer = textField.getText().trim().toUpperCase();
                 if (answer.equals("PASS") || answer.equals("GRADUATE")) {
-                    finalBoss.takeDamage(finalBoss.getHp());
-                    victory = true;
-                    phase = PHASE_VICTORY;
-                    textField.setVisible(false);
-                    Gdx.input.setInputProcessor((com.badlogic.gdx.InputProcessor) context.getInputReader());
-                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_BGM, "audio/sfx/music/win_menu.mp3"));
+                    if (finalBoss != null) {
+                        finalBoss.takeDamage(finalBoss.getHp());
+                    }
+                    onBossDefeated(context);
                 } else {
                     context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
@@ -546,6 +547,40 @@ public class BossFightBehavior implements LevelBehavior {
                     "Thời gian kết thúc: " + (int) victoryTimer + "s", 100f, 250f);
         }
         context.getGame().getSpriteBatch().end();
+    }
+
+    /**
+     * Handles boss defeat, unlocking graduation and triggering victory sequences.
+     *
+     * @param context the level context providing subsystems
+     */
+    public void onBossDefeated(final LevelContext context) {
+        victory = true;
+        phase = PHASE_VICTORY;
+        if (textField != null) {
+            textField.setVisible(false);
+        }
+        if (context != null && context.getInputReader() instanceof InputProcessor) {
+            Gdx.input.setInputProcessor((InputProcessor) context.getInputReader());
+        }
+
+        final GameProgressContext progress = context != null ? context.getProgressContext() : null;
+        if (progress != null && progress.getMapDirector() != null) {
+            progress.getMapDirector().onBossDefeated();
+        }
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.GRADUATION, null));
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_BGM, "audio/sfx/music/win_menu.mp3"));
+    }
+
+    @Override
+    public boolean canTransition(final LevelContext context) {
+        if (context != null && context.getProgressContext() != null) {
+            final MapDirector director = context.getProgressContext().getMapDirector();
+            if (director != null) {
+                return director.canTransition();
+            }
+        }
+        return victory;
     }
 
     @Override

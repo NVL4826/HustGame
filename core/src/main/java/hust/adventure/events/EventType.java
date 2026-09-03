@@ -18,5 +18,7 @@ public enum EventType {
     ENTITY_DAMAGED,
     TIME_LIMIT_REACHED,
     PLAY_SFX,
-    PLAY_BGM
+    PLAY_BGM,
+    GRADUATION,
+    ACADEMIC_SUSPENSION
 }
