@@ -12,7 +12,7 @@ public enum CampusMap {
     /**
      * Map 2: First floor lecture hall building.
      */
-    MAP_2_FLOOR_1("TANG_1", "Lecture Notes", "note"),
+    MAP_2_FLOOR_1("TANG_1", "Lecture Notes", "lecture_notes"),
 
     /**
      * Map 3: University library archives containing academic challenges and guardian boss.

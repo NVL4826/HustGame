@@ -238,6 +238,13 @@
     },
     {
       "type": "base",
+      "id": "lecture_notes",
+      "name": "Bài Giảng",
+      "description": "Tập bài giảng và ghi chép kiến thức trên lớp.",
+      "spritePath": "items/usb.png"
+    },
+    {
+      "type": "base",
       "id": "usb",
       "name": "USB",
       "description": "USB chứa mã nguồn sửa lỗi hệ thống.",

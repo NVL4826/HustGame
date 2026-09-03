@@ -90,5 +90,31 @@
       "spawnCount": 3,
       "pattern": "CIRCLE_AMBUSH"
     }
+  ],
+  "TANG_1": [
+    {
+      "timeStart": 0,
+      "timeEnd": 30,
+      "enemyType": "null_pointer",
+      "spawnInterval": 5.0,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 15,
+      "timeEnd": 45,
+      "enemyType": "syntax_error",
+      "spawnInterval": 6.0,
+      "spawnCount": 1,
+      "pattern": "RANDOM_EDGE"
+    },
+    {
+      "timeStart": 45,
+      "timeEnd": 45,
+      "enemyType": "null_pointer",
+      "spawnInterval": 0,
+      "spawnCount": 6,
+      "pattern": "CIRCLE_AMBUSH"
+    }
   ]
 }
