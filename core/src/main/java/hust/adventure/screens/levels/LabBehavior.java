@@ -5,41 +5,54 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.GameEvent;
-import hust.adventure.core.data.LevelConfig;
-import hust.adventure.events.MapTransitionData;
 import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
+import hust.adventure.progression.MapDirector;
 
 /**
- * Behavior class for the Lab level, managing custom wave spawns, lighting changes, and USB collection.
+ * Behavior class for the Computer Lab level (Map 4).
+ * Coordinates escalating Bug Deadlines, dynamic lighting and blink mechanics, and Source Code USB gating.
  */
 public class LabBehavior implements LevelBehavior {
     private static final int MAX_WAVE = 5;
-    private static final float SPAWN_USB_X = 672f; // giữa map lab (1344 / 2)
-    private static final float SPAWN_USB_Y = 384f; // giữa map lab (768 / 2)
+    // Central floor position in front of GotoBoss portal on lab.tmx (1088x928)
+    private static final float SPAWN_USB_X = 550f;
+    private static final float SPAWN_USB_Y = 280f;
 
     private static final int LIGHTS_OUT_WAVE = 4;
     private static final float LIGHTS_OUT_AMBIENT = 0.15f;
+    private static final Color LIGHTS_OUT_COLOR =
+            new Color(LIGHTS_OUT_AMBIENT, LIGHTS_OUT_AMBIENT, LIGHTS_OUT_AMBIENT, 1f);
     private static final float WAVE_TRANSITION_DELAY = 3f;
 
     private int currentWave = 1;
     private boolean waveActive = false;
     private float waveTimer = 2f;
-    private boolean labCleared = false;
+    private boolean deadlinesCompleted = false;
     private boolean usbSpawned = false;
+    private boolean usbAcquired = false;
     private OrthographicCamera uiCam;
+    private final StringBuilder deadlineTextBuilder = new StringBuilder();
 
-    // Blink effect cho wave 3
-    private static final float BLINK_INTERVAL = 1.0f; // 1 giây hiện, 1 giây ẩn
+    // Blink effect for wave 3
+    private static final float BLINK_INTERVAL = 1.0f;
     private float blinkTimer = 0f;
-    private boolean blinkPhase = true; // true = hiện, false = ẩn
+    private boolean blinkPhase = true;
     private LevelContext context;
 
+    /**
+     * Initializes the Computer Lab environment and commences escalating Deadlines.
+     *
+     * @param context the level context providing subsystems
+     */
     @Override
     public void init(final LevelContext context) {
+        if (context == null) {
+            throw new IllegalArgumentException("LevelContext cannot be null");
+        }
         this.context = context;
         uiCam = new OrthographicCamera();
         uiCam.setToOrtho(false, 800, 600);
@@ -48,14 +61,20 @@ public class LabBehavior implements LevelBehavior {
         EventDispatcher.getInstance().addListener(EventType.ITEM_PICKED_UP, this);
     }
 
+    /**
+     * Updates Deadline timers, blink intervals, and USB spawn triggers.
+     *
+     * @param context the active level context
+     * @param delta the elapsed frame time in seconds
+     */
     @Override
     public void update(final LevelContext context, final float delta) {
-        if (labCleared) {
+        if (usbAcquired) {
             return;
         }
 
-        // ── Blink logic cho wave 3 ────────────────────────────────────────────
-        if (currentWave == 3 && waveActive) {
+        // Blink logic for wave 3
+        if (currentWave == 3 && waveActive && context.getProgressContext() != null) {
             blinkTimer += delta;
             if (blinkTimer >= BLINK_INTERVAL) {
                 blinkTimer = 0f;
@@ -65,7 +84,7 @@ public class LabBehavior implements LevelBehavior {
         }
 
         if (waveActive) {
-            if (!context.getEntityManager().hasActiveEnemies()) {
+            if (context.getEntityManager() != null && !context.getEntityManager().hasActiveEnemies()) {
                 waveActive = false;
                 waveTimer = WAVE_TRANSITION_DELAY;
             }
@@ -75,70 +94,92 @@ public class LabBehavior implements LevelBehavior {
                 if (currentWave < MAX_WAVE) {
                     currentWave++;
                     startLabWave(context, currentWave);
-                } else {
-                    if (!usbSpawned) {
-                        labCleared = true;
-                        context.getEntityFactory().createItemDrop(SPAWN_USB_X, SPAWN_USB_Y,
-                                context.getProgressContext().getItemManager().getItem("usb"), Color.CYAN);
-                        usbSpawned = true;
+                } else if (!usbSpawned) {
+                    deadlinesCompleted = true;
+                    final GameProgressContext progress = context.getProgressContext();
+                    if (progress != null && progress.getMapDirector() != null) {
+                        progress.getMapDirector().onDeadlinesCleared();
                     }
+
+                    if (context.getEntityFactory() != null && progress != null
+                            && progress.getItemManager() != null) {
+                        context.getEntityFactory().createItemDrop(SPAWN_USB_X, SPAWN_USB_Y,
+                                progress.getItemManager().getItem("usb"), Color.CYAN);
+                    }
+                    usbSpawned = true;
                 }
             }
         }
     }
 
+    /**
+     * Renders Deadline progress indicator without per-frame allocations.
+     *
+     * @param context the active level context
+     */
     @Override
     public void draw(final LevelContext context) {
         final SpriteBatch batch = context.getBatch();
         final BitmapFont font = context.getFont();
+        if (batch == null || font == null || uiCam == null) {
+            return;
+        }
+
+        deadlineTextBuilder.setLength(0);
+        deadlineTextBuilder.append("Deadline: ").append(currentWave).append("/").append(MAX_WAVE);
+
         batch.setProjectionMatrix(uiCam.combined);
         batch.begin();
         font.setColor(Color.WHITE);
-        font.draw(batch, "Wave: " + currentWave + "/" + MAX_WAVE, 350, 580);
+        font.draw(batch, deadlineTextBuilder, 350, 580);
         batch.end();
     }
 
-    private void startLabWave(final LevelContext context, int wave) {
+    private void startLabWave(final LevelContext context, final int wave) {
         waveActive = true;
-        // Reset blink khi vào wave mới (chỉ wave 3 mới blink)
         blinkTimer = 0f;
         blinkPhase = true;
-        context.getProgressContext().setEnemyBlinkVisible(true);
-        context.getProgressContext().setLightsOut(wave == LIGHTS_OUT_WAVE);
 
-        if (wave == LIGHTS_OUT_WAVE) {
-            context.getLightingManager()
-                    .setAmbientLight(new Color(LIGHTS_OUT_AMBIENT, LIGHTS_OUT_AMBIENT, LIGHTS_OUT_AMBIENT, 1f));
-        } else {
-            context.getLightingManager().setAmbientLight(context.getConfig().getAmbientColor());
+        final GameProgressContext progress = context.getProgressContext();
+        if (progress != null) {
+            progress.setEnemyBlinkVisible(true);
+            progress.setLightsOut(wave == LIGHTS_OUT_WAVE);
+        }
+
+        if (context.getLightingManager() != null) {
+            if (wave == LIGHTS_OUT_WAVE) {
+                context.getLightingManager().setAmbientLight(LIGHTS_OUT_COLOR);
+            } else if (context.getConfig() != null) {
+                context.getLightingManager().setAmbientLight(context.getConfig().getAmbientColor());
+            }
         }
 
         switch (wave) {
         case 1:
             for (int i = 0; i < 5; i++) {
-                spawnLabEnemy(context, "null_pointer", MathUtils.random(100, 700), MathUtils.random(300, 500));
+                spawnRandomLabEnemy(context, "null_pointer", 100, 700, 300, 500);
             }
             break;
         case 2:
             for (int i = 0; i < 3; i++) {
-                spawnLabEnemy(context, "null_pointer", MathUtils.random(100, 700), MathUtils.random(300, 500));
+                spawnRandomLabEnemy(context, "null_pointer", 100, 700, 300, 500);
             }
             for (int i = 0; i < 2; i++) {
-                spawnLabEnemy(context, "syntax_error", MathUtils.random(100, 700), MathUtils.random(300, 500));
+                spawnRandomLabEnemy(context, "syntax_error", 100, 700, 300, 500);
             }
             break;
         case 3:
             spawnLabEnemy(context, "infinite_loop", 400, 400);
             for (int i = 0; i < 4; i++) {
-                spawnLabEnemy(context, "null_pointer", MathUtils.random(100, 700), MathUtils.random(300, 500));
+                spawnRandomLabEnemy(context, "null_pointer", 100, 700, 300, 500);
             }
             break;
         case 4:
             for (int i = 0; i < 2; i++) {
-                spawnLabEnemy(context, "infinite_loop", MathUtils.random(100, 700), MathUtils.random(300, 500));
+                spawnRandomLabEnemy(context, "infinite_loop", 100, 700, 300, 500);
             }
             for (int i = 0; i < 2; i++) {
-                spawnLabEnemy(context, "syntax_error", MathUtils.random(100, 700), MathUtils.random(300, 500));
+                spawnRandomLabEnemy(context, "syntax_error", 100, 700, 300, 500);
             }
             break;
         case 5:
@@ -146,48 +187,81 @@ public class LabBehavior implements LevelBehavior {
             spawnLabEnemy(context, "null_pointer", 200, 400);
             spawnLabEnemy(context, "syntax_error", 600, 400);
             break;
+        default:
+            break;
         }
     }
 
-    private void spawnLabEnemy(final LevelContext context, final String type, final float x, final float y) {
-        context.getEntityFactory().createEnemy(type, x, y);
+    private void spawnRandomLabEnemy(final LevelContext context, final String type,
+            final float minX, final float maxX, final float minY, final float maxY) {
+        spawnLabEnemy(context, type, MathUtils.random(minX, maxX), MathUtils.random(minY, maxY));
     }
 
+    private void spawnLabEnemy(final LevelContext context, final String type, final float x, final float y) {
+        if (context.getEntityFactory() != null) {
+            context.getEntityFactory().createEnemy(type, x, y);
+        }
+    }
+
+    /**
+     * Intercepts item pickup events to register Source Code USB acquisition.
+     *
+     * @param event the triggered game event
+     */
     @Override
     public void onEvent(final GameEvent<?> event) {
         if (event.getType() == EventType.ITEM_PICKED_UP) {
             final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
-            if (data.getItem().getId().equals("usb")) {
-                // Transition to the Boss Room level dynamically using config (Single Source of Truth)
-                if (context != null && context.getGame() != null) {
-                    final LevelConfig bossConfig = context.getGame().getLevelDataManager().getLevelConfig("BOSS_ROOM");
-                    if (bossConfig != null) {
-                        final MapTransitionData transData = new MapTransitionData(
-                                bossConfig.getMapPath(),
-                                bossConfig.getSpawnX(),
-                                bossConfig.getSpawnY()
-                        );
-                        final GameEvent<MapTransitionData> transEvent = new GameEvent<>(EventType.MAP_TRANSITION, transData);
-                        EventDispatcher.getInstance().dispatch(transEvent);
-                    }
-                }
+            if (data != null && data.getItem() != null && "usb".equals(data.getItem().getId())) {
+                usbAcquired = true;
             }
         }
     }
 
+    /**
+     * Verifies if stage transition to Final Map is permitted.
+     * Requires both MapDirector fulfillment and enemy clearance.
+     *
+     * @param context the level context
+     * @return true if player can transition through the portal
+     */
     @Override
     public boolean canTransition(final LevelContext context) {
-        return labCleared;
+        if (context == null || context.getProgressContext() == null) {
+            return false;
+        }
+        final MapDirector director = context.getProgressContext().getMapDirector();
+        if (director == null || !director.canTransition()) {
+            return false;
+        }
+        if (context.getEntityManager() != null && context.getEntityManager().hasActiveEnemies()) {
+            return false;
+        }
+        return true;
     }
 
+    /**
+     * Cleans up listeners, lighting overrides, and context references.
+     *
+     * @param context the level context being disposed
+     */
     @Override
     public void dispose(final LevelContext context) {
         EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
-        context.getProgressContext().setLightsOut(false);
-        context.getProgressContext().setEnemyBlinkVisible(true); // reset blink khi rời màn lab
+        if (context != null && context.getProgressContext() != null) {
+            context.getProgressContext().setLightsOut(false);
+            context.getProgressContext().setEnemyBlinkVisible(true);
+        }
+        this.context = null;
     }
 
+    /**
+     * Checks if lights-out mode is active in the lab.
+     *
+     * @return true if lights are currently dimmed
+     */
     public boolean isLightsOut() {
-        return context != null ? context.getProgressContext().isLightsOut() : false;
+        return context != null && context.getProgressContext() != null
+                && context.getProgressContext().isLightsOut();
     }
 }
