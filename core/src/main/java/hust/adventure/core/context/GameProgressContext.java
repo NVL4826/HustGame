@@ -6,6 +6,7 @@ import hust.adventure.inventory.Inventory;
 import hust.adventure.core.data.LevelConfig;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.progression.MapDirector;
 
 /**
  * Interface representing the progress context in the game, decoupling context from concrete game states.
@@ -140,4 +141,18 @@ public interface GameProgressContext {
     boolean hasCheckpoint();
 
     ItemManager getItemManager();
+
+    /**
+     * Gets the active campus progression director.
+     *
+     * @return the MapDirector managing stages and gating.
+     */
+    MapDirector getMapDirector();
+
+    /**
+     * Sets the campus progression director.
+     *
+     * @param mapDirector the director instance to set.
+     */
+    void setMapDirector(MapDirector mapDirector);
 }

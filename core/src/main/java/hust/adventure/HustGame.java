@@ -167,6 +167,11 @@ public class HustGame extends Game implements EventListener {
         if (screenTransition.isTransitioning())
             return;
 
+        if (progressContext != null && progressContext.getMapDirector() != null
+                && !progressContext.getMapDirector().canTransition()) {
+            return;
+        }
+
         final LevelConfig template = levelDataManager.getLevelConfigByMapPath(data.getTargetMap());
         if (template == null)
             return;
@@ -175,6 +180,10 @@ public class HustGame extends Game implements EventListener {
         final LevelConfig config = new LevelConfig(nextId, template.getName(), data.getTargetMap(), data.getSpawnX(),
                 data.getSpawnY(), template.getZoom(), template.getBgmPath(), template.getAmbientColor(),
                 template.isInfinite());
+
+        if (progressContext != null && progressContext.getMapDirector() != null) {
+            progressContext.getMapDirector().advanceToNextMap();
+        }
 
         final LevelLoadingScreen loadingScreen = new LevelLoadingScreen(this, config);
         screenTransition.fadeOut(loadingScreen, 0.5f);

@@ -6,12 +6,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import hust.adventure.core.context.GameProgressContext;
+import hust.adventure.entities.player.Player;
+import hust.adventure.items.base.Item;
+import hust.adventure.items.base.ItemManager;
+import hust.adventure.progression.MapDirector;
 import hust.adventure.wave.WaveEntry;
 import hust.adventure.wave.WaveManager;
 
 /**
- * Behavior class for the Outside area.
- * Loads and ticks enemy waves configured for the map.
+ * Behavior class for the Outside area (Map 1).
+ * Loads and ticks enemy waves and handles Admission Note gating.
  */
 public class OutsideBehavior implements LevelBehavior {
     private WaveManager waveManager;
@@ -42,6 +47,22 @@ public class OutsideBehavior implements LevelBehavior {
             if (waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies() && !messageTriggered) {
                 messageTriggered = true;
                 messageTimer = MESSAGE_DURATION;
+
+                final GameProgressContext progress = context.getProgressContext();
+                if (progress != null && progress.getMapDirector() != null) {
+                    progress.getMapDirector().onDeadlinesCleared();
+                }
+
+                if (context.getEntityFactory() != null && progress != null && progress.getItemManager() != null) {
+                    final ItemManager itemManager = progress.getItemManager();
+                    final Item noteItem = itemManager.getItem("note");
+                    if (noteItem != null) {
+                        final Player player = progress.getPlayer();
+                        final float spawnX = player != null ? player.getX() + 120f : 400f;
+                        final float spawnY = player != null ? player.getY() + 80f : 400f;
+                        context.getEntityFactory().createItemDrop(spawnX, spawnY, noteItem, Color.WHITE);
+                    }
+                }
             }
         }
         if (messageTimer > 0) {
@@ -74,7 +95,7 @@ public class OutsideBehavior implements LevelBehavior {
             batch.setColor(1f, 1f, 1f, alpha);
             font.setColor(0f, 0f, 0f, alpha); // Black text on textbox
 
-            final String text = "Đã kết thúc tất cả các đợt quái!\nHãy tiến vào Thư viện.";
+            final String text = "Đã kết thúc tất cả các đợt quái!\nHãy nhặt Giấy Báo Nhập Học và tiến vào Tầng 1.";
             glyphLayout.setText(font, text);
 
             final float boxW = glyphLayout.width + 40f;
@@ -93,10 +114,13 @@ public class OutsideBehavior implements LevelBehavior {
 
     @Override
     public boolean canTransition(final LevelContext context) {
-        if (waveManager != null) {
-            return waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies();
+        if (context != null && context.getProgressContext() != null) {
+            final MapDirector director = context.getProgressContext().getMapDirector();
+            if (director != null) {
+                return director.canTransition();
+            }
         }
-        return true;
+        return false;
     }
 
     @Override

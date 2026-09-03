@@ -10,6 +10,8 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.EventType;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.progression.MapDirector;
+import hust.adventure.progression.MapDirectorImpl;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class ProgressContext implements GameProgressContext, EventListener {
 
     private final ItemManager itemManager;
     private final Inventory globalInventory;
+    private MapDirector mapDirector = new MapDirectorImpl();
 
     // Artifacts collected
     private boolean hasNao = false;
@@ -349,6 +352,9 @@ public class ProgressContext implements GameProgressContext, EventListener {
         globalInventory.clear();
         checkpointSnapshot = null;
         checkpointLevelId = null;
+        if (mapDirector != null) {
+            mapDirector.resetRun();
+        }
         setGameState(new PlayingGameState());
     }
 
@@ -382,6 +388,9 @@ public class ProgressContext implements GameProgressContext, EventListener {
             final ItemPickedUpEvent data = (ItemPickedUpEvent) event.getData();
             if (data != null && data.getItem() != null) {
                 final String itemId = data.getItem().getId();
+                if (mapDirector != null) {
+                    mapDirector.onKeyItemCollected(itemId);
+                }
                 if ("brain".equals(itemId)) {
                     hasNao = true;
                     libraryCleared = true;
@@ -401,6 +410,16 @@ public class ProgressContext implements GameProgressContext, EventListener {
     @Override
     public ItemManager getItemManager() {
         return itemManager;
+    }
+
+    @Override
+    public MapDirector getMapDirector() {
+        return mapDirector;
+    }
+
+    @Override
+    public void setMapDirector(final MapDirector mapDirector) {
+        this.mapDirector = mapDirector;
     }
 
     /**
