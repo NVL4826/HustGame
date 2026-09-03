@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import hust.adventure.HustGame;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.data.LevelConfig;
 
 /**
@@ -24,7 +25,7 @@ public class LevelLoadingScreen extends BaseScreen {
             throw new IllegalArgumentException("LevelConfig cannot be null");
         }
         this.targetConfig = targetConfig;
-        this.textBoxTexture = game.getAssetManager().getTexture("text_box.png");
+        this.textBoxTexture = game.getAssetManager().getTexture(AssetPaths.UI_TEXT_BOX);
     }
 
     @Override

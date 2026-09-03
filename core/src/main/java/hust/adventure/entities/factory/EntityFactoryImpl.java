@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.collision.Collider;
 import hust.adventure.collision.CollisionLayer;
 import hust.adventure.collision.CollisionManager;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.core.data.EnemyDataLoader;
 import hust.adventure.entities.base.MapObject;
@@ -193,7 +194,7 @@ public class EntityFactoryImpl implements EntityFactory {
             boolean isPlayer) {
         // Projectiles still use pooling
         Projectile p = GamePools.obtain(Projectile.class);
-        Texture bulletTexture = assetManager.getTexture("bullet.png");
+        Texture bulletTexture = assetManager.getTexture(AssetPaths.CHARACTER_BULLET);
         p.init(x, y, vx, vy, damage, color, isPlayer, bulletTexture, progressContext);
         int layer = isPlayer ? CollisionLayer.PLAYER_BULLET : CollisionLayer.ENEMY_BULLET;
 

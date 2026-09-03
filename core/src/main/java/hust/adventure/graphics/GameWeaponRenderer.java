@@ -52,7 +52,7 @@ public class GameWeaponRenderer implements WeaponEffectVisitor {
                 try {
                     // Let's use HustGame assetManager if we can find it
                     final hust.adventure.HustGame game = (hust.adventure.HustGame) com.badlogic.gdx.Gdx.app.getApplicationListener();
-                    weaponTexture = game.getAssetManager().getTexture("giai_tich.png");
+                    weaponTexture = game.getAssetManager().getTexture("items/giai_tich.png");
                 } catch (Exception e) {
                     // Safe catch
                 }

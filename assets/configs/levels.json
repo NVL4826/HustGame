@@ -3,7 +3,7 @@
     {
       "levelId": "TANG_1",
       "name": "Floor 1 (tang1)",
-      "mapPath": "tang1.tmx",
+      "mapPath": "map/tang1.tmx",
       "spawnX": 400.0,
       "spawnY": 400.0,
       "zoom": 1.0,
@@ -19,7 +19,7 @@
     {
       "levelId": "LIBRARY",
       "name": "Library",
-      "mapPath": "library.tmx",
+      "mapPath": "map/library.tmx",
       "spawnX": 400.0,
       "spawnY": 400.0,
       "zoom": 1.0,
@@ -67,11 +67,11 @@
     {
       "levelId": "BOSS_ROOM",
       "name": "Boss Room",
-      "mapPath": "boss_room.tmx",
+      "mapPath": "map/boss_room.tmx",
       "spawnX": 400.0,
       "spawnY": 400.0,
       "zoom": 1.0,
-      "bgmPath": "audio/sfx/music/final_boss.mp3",
+      "bgmPath": "audio/music/final_boss.mp3",
       "ambientColor": {
         "r": 0.6,
         "g": 0.6,
@@ -79,38 +79,6 @@
         "a": 1.0
       },
       "isInfinite": false
-    },
-    {
-      "levelId": "TEST_LEVEL",
-      "name": "Test Map",
-      "mapPath": "test.tmx",
-      "spawnX": 400.0,
-      "spawnY": 400.0,
-      "zoom": 1.0,
-      "bgmPath": "audio/music/school_ground_map.mp3",
-      "ambientColor": {
-        "r": 0.9,
-        "g": 0.9,
-        "b": 0.9,
-        "a": 1.0
-      },
-      "isInfinite": false
-    },
-    {
-      "levelId": "MAP_1",
-      "name": "Map 1",
-      "mapPath": "tsx/map_1.tmx",
-      "spawnX": 400.0,
-      "spawnY": 400.0,
-      "zoom": 1.0,
-      "bgmPath": "audio/music/school_ground_map.mp3",
-      "ambientColor": {
-        "r": 0.9,
-        "g": 0.9,
-        "b": 0.9,
-        "a": 1.0
-      },
-      "isInfinite": true
     }
   ]
 }

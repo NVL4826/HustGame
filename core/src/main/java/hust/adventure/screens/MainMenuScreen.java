@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import hust.adventure.HustGame;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.data.LevelConfig;
 
 /**
@@ -190,7 +191,7 @@ public class MainMenuScreen extends BaseScreen {
 
     @Override
     public void show() {
-        backgroundTexture = game.getAssetManager().getTexture("background.png");
+        backgroundTexture = game.getAssetManager().getTexture(AssetPaths.UI_BACKGROUND);
         skin = MenuSkinFactory.create();
 
         final ButtonActionRouter router = new ButtonActionRouter() {
@@ -269,7 +270,7 @@ public class MainMenuScreen extends BaseScreen {
 
         if (showGuide) {
             batch.begin();
-            final Texture textBox = game.getAssetManager().getTexture("text_box.png");
+            final Texture textBox = game.getAssetManager().getTexture(AssetPaths.UI_TEXT_BOX);
             if (textBox != null) {
                 batch.draw(textBox, 80f, 60f, 640f, 480f);
             }

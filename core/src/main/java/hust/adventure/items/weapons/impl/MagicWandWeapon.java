@@ -3,14 +3,10 @@ package hust.adventure.items.weapons.impl;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import hust.adventure.collision.CollisionLayer;
-import hust.adventure.entities.Projectile;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.player.Player;
-import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.GameEvent;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponConfig;
-import hust.adventure.events.EventType;
 
 /**
  * A magic wand weapon that fires projectiles at the nearest enemy.
@@ -42,14 +38,8 @@ public class MagicWandWeapon extends BaseWeapon {
         final float vx = tmpDirection.x * PROJECTILE_SPEED;
         final float vy = tmpDirection.y * PROJECTILE_SPEED;
 
-        if (getOwner().getFactory() != null) {
-            final Projectile projectile = getOwner().getFactory().createProjectile(startX, startY, vx, vy,
-                    getEffectiveDamage(), Color.CYAN, true);
-            if (projectile != null) {
-                projectile.setPierce(getPierce());
-            }
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/player/Player Firing Magic Wand.mp3"));
-        }
+        spawnPlayerProjectile(startX, startY, vx, vy, Color.CYAN,
+                "audio/sfx/player/Player Firing Magic Wand.mp3");
     }
 
 }

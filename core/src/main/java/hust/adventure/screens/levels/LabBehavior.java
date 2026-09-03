@@ -228,11 +228,7 @@ public class LabBehavior implements LevelBehavior {
      */
     @Override
     public boolean canTransition(final PlayScreen context) {
-        if (context == null || context.getProgressContext() == null) {
-            return false;
-        }
-        final MapDirector director = context.getProgressContext().getMapDirector();
-        if (director == null || !director.canTransition()) {
+        if (!LevelBehavior.super.canTransition(context)) {
             return false;
         }
         if (context.getEntityManager() != null && context.getEntityManager().hasActiveEnemies()) {

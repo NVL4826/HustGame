@@ -262,7 +262,7 @@
       "id": "whip",
       "name": "Sách giải tích",
       "description": "Tấn công kẻ địch trước mặt theo hình chữ nhật.",
-      "spritePath": "giai_tich.png"
+      "spritePath": "items/giai_tich.png"
     },
     {
       "type": "base",

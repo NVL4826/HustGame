@@ -18,7 +18,7 @@ import com.badlogic.gdx.graphics.GL20;
 /**
  * Simon Game memory mini-game puzzle.
  */
-public class SimonPuzzle implements PuzzleGame {
+public class SimonPuzzle extends BasePuzzleGame {
     private static final int MAX_ROUNDS = 8;
 
     public enum SimonState {
@@ -26,9 +26,6 @@ public class SimonPuzzle implements PuzzleGame {
     }
 
     private SimonState state;
-    private PlayScreen context;
-    private boolean isSolved;
-    private boolean showIntro = true;
 
     // Sequence details
     private final int[] sequence = new int[MAX_ROUNDS];
@@ -52,9 +49,6 @@ public class SimonPuzzle implements PuzzleGame {
     // Rendering assets & buffers
     private final StringBuilder textBuilder;
     private float stateTimer;
-    private Texture textBoxTexture;
-    private final GlyphLayout textLayout = new GlyphLayout();
-    private final com.badlogic.gdx.math.Vector2 tmpMouse = new com.badlogic.gdx.math.Vector2();
 
     private final Color bevelLight = new Color(1f, 1f, 1f, 0.3f);
     private final Color bevelDark = new Color(0f, 0f, 0f, 0.35f);
@@ -70,13 +64,8 @@ public class SimonPuzzle implements PuzzleGame {
     }
 
     @Override
-    public String getBackgroundPath() {
-        return "Library1.jpg";
-    }
-
-    @Override
     public void init(final PlayScreen ctx) {
-        this.context = ctx;
+        super.init(ctx);
 
         // Button boundaries: TL, TR, BL, BR
         buttons[0] = new Rectangle(240, 310, 150, 150); // Red
@@ -100,8 +89,6 @@ public class SimonPuzzle implements PuzzleGame {
         tones[1] = "audio/sfx/puzzle_boss/simon_tone_1.wav";
         tones[2] = "audio/sfx/puzzle_boss/simon_tone_2.wav";
         tones[3] = "audio/sfx/puzzle_boss/simon_tone_3.wav";
-
-        textBoxTexture = ctx.getGame().getAssetManager().getTexture("text_box.png");
 
         reset();
     }
@@ -134,26 +121,10 @@ public class SimonPuzzle implements PuzzleGame {
             return;
         }
 
+        if (checkIntroClick()) {
+            return;
+        }
         if (showIntro) {
-            if (Gdx.input.justTouched()) {
-                tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
-                if (context != null) {
-                    context.unproject(tmpMouse);
-                }
-                final float mx = tmpMouse.x;
-                final float my = tmpMouse.y;
-
-                final float btnW = 160f;
-                final float btnH = 45f;
-                final float btnX = 400f - btnW / 2f;
-                final float btnY = 110f;
-
-                if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
-                    showIntro = false;
-                    EventDispatcher.getInstance()
-                            .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
-                }
-            }
             return;
         }
 
@@ -299,28 +270,6 @@ public class SimonPuzzle implements PuzzleGame {
         return 0.18f;
     }
 
-    private void drawTextInBox(final SpriteBatch batch, final BitmapFont font, final CharSequence text, final float x,
-            final float y, final Texture textBoxTexture, final GlyphLayout layout) {
-        layout.setText(font, text);
-        final float paddingX = 20f;
-        final float paddingY = 15f;
-        final float boxWidth = layout.width + paddingX * 2;
-        final float boxHeight = layout.height + paddingY * 2;
-
-        final float boxX = x - boxWidth / 2f;
-        final float boxY = y - boxHeight / 2f;
-
-        batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
-
-        final Color origColor = font.getColor();
-        final float r = origColor.r;
-        final float g = origColor.g;
-        final float b = origColor.b;
-        final float a = origColor.a;
-        font.setColor(Color.BLACK);
-        font.draw(batch, text, x - layout.width / 2f, y + layout.height / 2f);
-        font.setColor(r, g, b, a);
-    }
 
     @Override
     public void render(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
@@ -412,88 +361,17 @@ public class SimonPuzzle implements PuzzleGame {
     }
 
     @Override
-    public boolean isSolved() {
-        return isSolved;
-    }
-
-    @Override
     public void dispose() {
         // No custom fonts/textures instantiated locally, using shared context components
     }
 
     private void drawIntro(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
-        final float boxW = 620f;
-        final float boxH = 460f;
-        final float boxX = 90f;
-        final float boxY = 70f;
-
-        final float btnW = 160f;
-        final float btnH = 45f;
-        final float btnX = 400f - btnW / 2f;
-        final float btnY = 110f;
-
-        // Check hover
-        tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
-        if (context != null) {
-            context.unproject(tmpMouse);
-        }
-        final boolean isHovered = (tmpMouse.x >= btnX && tmpMouse.x <= btnX + btnW && tmpMouse.y >= btnY
-                && tmpMouse.y <= btnY + btnH);
-
-        // Draw overlay using ShapeRenderer
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(new Color(0f, 0f, 0f, 0.75f));
-        shapeRenderer.rect(0, 0, 800, 600);
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        // Draw Text Box and Texts using SpriteBatch
-        batch.begin();
-        if (textBoxTexture != null) {
-            batch.setColor(Color.WHITE);
-            batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
-        }
-
-        final BitmapFont font = context.getFont();
-        final Color origColor = font.getColor();
-
-        // Draw title
-        font.setColor(new Color(0.6f, 0.1f, 0.1f, 1f));
-        textLayout.setText(font, "THỬ THÁCH 1: SIMON GAME");
-        font.draw(batch, "THỬ THÁCH 1: SIMON GAME", 400f - textLayout.width / 2f, 480f);
-
-        // Draw intro body text
-        font.setColor(Color.BLACK);
         final String introText = "Chào mừng bạn đến với thử thách đầu tiên!\n\n"
                 + "Luật chơi Simon Game rất đơn giản:\n"
                 + "1. Hệ thống sẽ phát một chuỗi các ô màu sáng kèm âm thanh.\n"
                 + "2. Hãy ghi nhớ và bấm lại đúng thứ tự các ô màu đó.\n" + "3. Vượt qua đủ " + MAX_ROUNDS
                 + " vòng để hoàn thành thử thách.\n\n" + "Chú ý: Bấm sai bất kỳ ô nào sẽ phải chơi lại từ đầu!";
 
-        font.draw(batch, introText, 140f, 420f);
-
-        // Draw Start Button Box
-        if (textBoxTexture != null) {
-            batch.setColor(isHovered ? Color.LIGHT_GRAY : Color.WHITE);
-            batch.draw(textBoxTexture, btnX, btnY, btnW, btnH);
-        }
-
-        // Draw Start Button Text
-        font.setColor(isHovered ? new Color(0.1f, 0.6f, 0.1f, 1f) : new Color(0.1f, 0.4f, 0.1f, 1f));
-        textLayout.setText(font, "BẮT ĐẦU");
-        font.draw(batch, "BẮT ĐẦU", 400f - textLayout.width / 2f, btnY + btnH / 2f + textLayout.height / 2f);
-
-        font.setColor(origColor);
-        batch.end();
-
-        // Draw Gold highlight border if hovered
-        if (isHovered) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.GOLD);
-            shapeRenderer.rect(btnX - 2, btnY - 2, btnW + 4, btnH + 4);
-            shapeRenderer.end();
-        }
+        drawIntroModal(shapeRenderer, batch, "THỬ THÁCH 1: SIMON GAME", introText);
     }
 }

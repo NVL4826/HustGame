@@ -11,8 +11,12 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.audio.Music;
 
+import hust.adventure.core.data.EnemyDataLoader;
+import hust.adventure.core.data.ItemDataLoader;
 import hust.adventure.core.data.LevelConfig;
 import hust.adventure.core.data.LevelDataLoader;
+import hust.adventure.entities.enemies.EnemyConfig;
+import hust.adventure.items.base.ItemConfig;
 
 public class GameAssetManager {
     private final AssetManager manager;
@@ -24,31 +28,44 @@ public class GameAssetManager {
     }
 
     public void loadAllAssets(final LevelDataLoader levelDataLoader) {
-        // Textures
-        manager.load("background.png", Texture.class);
-        manager.load("text_box.png", Texture.class);
-        manager.load("giai_tich.png", Texture.class);
-        manager.load("Boss Room.jpg", Texture.class);
-        manager.load("Boss THT.png", Texture.class);
-        manager.load("Library1.jpg", Texture.class);
-        // Character assets
-        manager.load("character/atlas.png", Texture.class);
-        manager.load("character/enemy/syntax_error.png", Texture.class);
-        manager.load("character/enemy/null_pointer.png", Texture.class);
-        manager.load("character/enemy/stack_overflow.png", Texture.class);
-        manager.load("character/enemy/library_boss/sprite_0000.png", Texture.class);
-        manager.load("character/enemy/library_boss/sprite_0001.png", Texture.class);
-        manager.load("character/enemy/library_boss/sprite_0002.png", Texture.class);
-        manager.load("character/enemy/library_boss/sprite_0003.png", Texture.class);
-        manager.load("bkav.png", Texture.class);
-        manager.load("unikey.png", Texture.class);
-        manager.load("chatgpt.png", Texture.class);
-        manager.load("bullet.png", Texture.class);
-        manager.load("items/brain.png", Texture.class);
-        manager.load("items/coffee.png", Texture.class);
-        manager.load("items/energy_drink.png", Texture.class);
-        manager.load("items/kho_ga.png", Texture.class);
-        manager.load("items/usb.png", Texture.class);
+        loadAllAssets(levelDataLoader, null, null);
+    }
+
+    public void loadAllAssets(final LevelDataLoader levelDataLoader,
+                              final ItemDataLoader itemDataLoader,
+                              final EnemyDataLoader enemyDataLoader) {
+        // UI and shared background textures
+        manager.load(AssetPaths.UI_BACKGROUND, Texture.class);
+        manager.load(AssetPaths.UI_TEXT_BOX, Texture.class);
+        manager.load(AssetPaths.MAP_BOSS_ROOM_BG, Texture.class);
+        manager.load(AssetPaths.MAP_LIBRARY_BG, Texture.class);
+        manager.load(AssetPaths.CHARACTER_ATLAS, Texture.class);
+        manager.load(AssetPaths.CHARACTER_BULLET, Texture.class);
+
+        // Load items dynamically from ItemDataLoader (Single Source of Truth)
+        if (itemDataLoader != null) {
+            for (final ItemConfig config : itemDataLoader.getAllConfigs()) {
+                if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
+                    manager.load(config.getSpritePath(), Texture.class);
+                }
+            }
+        }
+
+        // Load enemies dynamically from EnemyDataLoader (Single Source of Truth)
+        if (enemyDataLoader != null) {
+            for (final EnemyConfig config : enemyDataLoader.getAllConfigs()) {
+                if (config.getSpritePath() != null && !config.getSpritePath().isEmpty()) {
+                    manager.load(config.getSpritePath(), Texture.class);
+                }
+                if (config.getAnimationFrames() != null) {
+                    for (final String frame : config.getAnimationFrames()) {
+                        if (frame != null && !frame.isEmpty()) {
+                            manager.load(frame, Texture.class);
+                        }
+                    }
+                }
+            }
+        }
 
         // Load card matching game textures
         manager.load("puzzle/cards/card_back.png", Texture.class);
@@ -90,8 +107,8 @@ public class GameAssetManager {
 
         manager.load("audio/sfx/player/GarlicPulseAura.mp3", Sound.class);
         manager.load("audio/sfx/player/Player Firing Bun Dau.wav", Sound.class);
-        // manager.load("audio/sfx/player/Player Firing Magic Wand.mp3", Sound.class);
-        // manager.load("audio/sfx/player/Player Firing Whip.mp3", Sound.class);
+        manager.load("audio/sfx/player/Player Firing Magic Wand.mp3", Sound.class);
+        manager.load("audio/sfx/player/Player Firing Whip.mp3", Sound.class);
         manager.load("audio/sfx/player/Player Hurt.mp3", Sound.class);
         manager.load("audio/sfx/player/Use Consumable (Coffee).mp3", Sound.class);
         manager.load("audio/sfx/player/Use Consumable (Khô gà).mp3", Sound.class);
@@ -116,7 +133,7 @@ public class GameAssetManager {
         // Music tracks
         manager.load("audio/music/menu.mp3", Music.class);
         manager.load("audio/music/game_over.mp3", Music.class);
-        manager.load("audio/sfx/music/win_menu.mp3", Music.class);
+        manager.load("audio/music/win_menu.mp3", Music.class);
 
         // Load level-specific BGM tracks dynamically from level configurations
         if (levelDataLoader != null) {

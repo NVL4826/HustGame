@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import hust.adventure.HustGame;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.screens.PlayScreen;
@@ -29,7 +30,7 @@ public class SpeedMathPuzzleTest {
 
         when(mockContext.getGame()).thenReturn(mockGame);
         when(mockGame.getAssetManager()).thenReturn(mockAssetManager);
-        when(mockAssetManager.getTexture("text_box.png")).thenReturn(mockTexture);
+        when(mockAssetManager.getTexture(AssetPaths.UI_TEXT_BOX)).thenReturn(mockTexture);
 
         EventDispatcher.resetInstance(); // Reset Singleton event dispatcher state
     }

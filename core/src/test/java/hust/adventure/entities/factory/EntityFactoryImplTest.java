@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import hust.adventure.collision.CollisionManager;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.context.PlayerStats;
@@ -122,7 +123,7 @@ public class EntityFactoryImplTest {
 
     @Test
     public void testCreateProjectile() {
-        when(assetManager.getTexture("bullet.png")).thenReturn(mock(Texture.class));
+        when(assetManager.getTexture(AssetPaths.CHARACTER_BULLET)).thenReturn(mock(Texture.class));
 
         Projectile p = entityFactory.createProjectile(10f, 20f, 1f, 2f, 15f, Color.BLUE, true);
 

@@ -1,10 +1,15 @@
 package hust.adventure.items.weapons;
 
 import hust.adventure.entities.player.Player;
+import hust.adventure.entities.Projectile;
+import hust.adventure.events.EventDispatcher;
+import hust.adventure.events.EventType;
+import hust.adventure.events.GameEvent;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.Equipable;
 import java.util.Objects;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -260,5 +265,32 @@ public abstract class BaseWeapon extends Item implements Equipable {
     @Override
     public int hashCode() {
         return java.util.Objects.hash(getId());
+    }
+
+    /**
+     * Spawns a student projectile with the weapon's effective damage and pierce, and dispatches the sound effect.
+     *
+     * @param startX spawn X position
+     * @param startY spawn Y position
+     * @param vx X velocity
+     * @param vy Y velocity
+     * @param color projectile color
+     * @param sfxPath sound effect path to play
+     * @return the created Projectile, or null if owner factory is unavailable
+     */
+    protected Projectile spawnPlayerProjectile(final float startX, final float startY, final float vx, final float vy,
+                                               final Color color, final String sfxPath) {
+        if (owner.getFactory() != null) {
+            final Projectile projectile = owner.getFactory().createProjectile(startX, startY, vx, vy,
+                    getEffectiveDamage(), color, true);
+            if (projectile != null) {
+                projectile.setPierce(getPierce());
+            }
+            if (sfxPath != null && !sfxPath.isEmpty()) {
+                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, sfxPath));
+            }
+            return projectile;
+        }
+        return null;
     }
 }

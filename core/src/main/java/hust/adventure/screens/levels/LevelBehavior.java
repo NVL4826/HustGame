@@ -2,6 +2,7 @@ package hust.adventure.screens.levels;
 
 import hust.adventure.events.EventListener;
 import hust.adventure.events.GameEvent;
+import hust.adventure.progression.MapDirector;
 import hust.adventure.screens.PlayScreen;
 
 /**
@@ -23,12 +24,19 @@ public interface LevelBehavior extends EventListener {
 
     /**
      * Checks if the level allows transitioning to another map.
+     * Delegates to the progression MapDirector by default.
      *
      * @param context the play screen context
      * @return true if transitioning is allowed, false otherwise
      */
     default boolean canTransition(final PlayScreen context) {
-        return true;
+        if (context != null && context.getProgressContext() != null) {
+            final MapDirector director = context.getProgressContext().getMapDirector();
+            if (director != null) {
+                return director.canTransition();
+            }
+        }
+        return false;
     }
 
     /**

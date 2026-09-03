@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-up" width="64" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="166">
- <tileset firstgid="1" source="tang1.tsx"/>
+ <tileset firstgid="1" source="../tsx/tang1.tsx"/>
  <imagelayer id="1" name="Grass">
   <image source="tang1.png" width="1024" height="1024"/>
  </imagelayer>

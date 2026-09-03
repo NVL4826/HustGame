@@ -17,7 +17,7 @@ import hust.adventure.screens.PlayScreen;
 /**
  * Memory Card matching mini-game puzzle.
  */
-public class MemoryCardPuzzle implements PuzzleGame {
+public class MemoryCardPuzzle extends BasePuzzleGame {
     private static final int NUM_CARDS = 36;
     private static final int NUM_PAIRS = 18;
     private static final float TIME_LIMIT = 180f; // 3 minutes
@@ -27,9 +27,6 @@ public class MemoryCardPuzzle implements PuzzleGame {
     }
 
     private MatchState state;
-    private PlayScreen context;
-    private boolean isSolved;
-    private boolean showIntro = true;
 
     private float timeRemaining;
     private final MemoryCard[] cards = new MemoryCard[NUM_CARDS];
@@ -44,18 +41,10 @@ public class MemoryCardPuzzle implements PuzzleGame {
     private final Texture[] faceTextures = new Texture[NUM_PAIRS];
     private final StringBuilder textBuilder = new StringBuilder();
     private final StringBuilder tempBuilder = new StringBuilder();
-    private Texture textBoxTexture;
-    private final GlyphLayout textLayout = new GlyphLayout();
-    private final com.badlogic.gdx.math.Vector2 tmpMouse = new com.badlogic.gdx.math.Vector2();
-
-    @Override
-    public String getBackgroundPath() {
-        return "Library1.jpg";
-    }
 
     @Override
     public void init(final PlayScreen ctx) {
-        this.context = ctx;
+        super.init(ctx);
 
         // Card dimensions & positioning parameters
         final float cardWidth = 49f;
@@ -63,7 +52,7 @@ public class MemoryCardPuzzle implements PuzzleGame {
         final float gapX = 15f;
         final float gapY = 10f;
         final float startX = 215.5f;
-        final float startY = 80f;
+        final float startY = 85f;
 
         // Create cards grid
         for (int i = 0; i < NUM_CARDS; i++) {
@@ -76,7 +65,6 @@ public class MemoryCardPuzzle implements PuzzleGame {
 
         // Cache textures from GameAssetManager
         backTexture = ctx.getGame().getAssetManager().getTexture("puzzle/cards/card_back.png");
-        textBoxTexture = ctx.getGame().getAssetManager().getTexture("text_box.png");
         for (int i = 0; i < NUM_PAIRS; i++) {
             // Reusable buffer to avoid allocations
             tempBuilder.setLength(0);
@@ -128,26 +116,10 @@ public class MemoryCardPuzzle implements PuzzleGame {
             return;
         }
 
+        if (checkIntroClick()) {
+            return;
+        }
         if (showIntro) {
-            if (Gdx.input.justTouched()) {
-                tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
-                if (context != null) {
-                    context.unproject(tmpMouse);
-                }
-                final float mx = tmpMouse.x;
-                final float my = tmpMouse.y;
-
-                final float btnW = 160f;
-                final float btnH = 45f;
-                final float btnX = 400f - btnW / 2f;
-                final float btnY = 110f;
-
-                if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
-                    showIntro = false;
-                    EventDispatcher.getInstance()
-                            .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
-                }
-            }
             return;
         }
 
@@ -251,28 +223,6 @@ public class MemoryCardPuzzle implements PuzzleGame {
                 .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/card_flip.mp3"));
     }
 
-    private void drawTextInBox(final SpriteBatch batch, final BitmapFont font, final CharSequence text, final float x,
-            final float y, final Texture textBoxTexture, final GlyphLayout layout) {
-        layout.setText(font, text);
-        final float paddingX = 20f;
-        final float paddingY = 15f;
-        final float boxWidth = layout.width + paddingX * 2;
-        final float boxHeight = layout.height + paddingY * 2;
-
-        final float boxX = x - boxWidth / 2f;
-        final float boxY = y - boxHeight / 2f;
-
-        batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
-
-        final Color origColor = font.getColor();
-        final float r = origColor.r;
-        final float g = origColor.g;
-        final float b = origColor.b;
-        final float a = origColor.a;
-        font.setColor(Color.BLACK);
-        font.draw(batch, text, x - layout.width / 2f, y + layout.height / 2f);
-        font.setColor(r, g, b, a);
-    }
 
     @Override
     public void render(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
@@ -337,60 +287,11 @@ public class MemoryCardPuzzle implements PuzzleGame {
     }
 
     @Override
-    public boolean isSolved() {
-        return isSolved;
-    }
-
-    @Override
     public void dispose() {
         // No custom fonts/textures instantiated locally, using shared context components
     }
 
     private void drawIntro(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
-        final float boxW = 620f;
-        final float boxH = 460f;
-        final float boxX = 90f;
-        final float boxY = 70f;
-
-        final float btnW = 160f;
-        final float btnH = 45f;
-        final float btnX = 400f - btnW / 2f;
-        final float btnY = 110f;
-
-        // Check hover
-        tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
-        if (context != null) {
-            context.unproject(tmpMouse);
-        }
-        final boolean isHovered = (tmpMouse.x >= btnX && tmpMouse.x <= btnX + btnW && tmpMouse.y >= btnY
-                && tmpMouse.y <= btnY + btnH);
-
-        // Draw overlay using ShapeRenderer
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(new Color(0f, 0f, 0f, 0.75f));
-        shapeRenderer.rect(0, 0, 800, 600);
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        // Draw Text Box and Texts using SpriteBatch
-        batch.begin();
-        if (textBoxTexture != null) {
-            batch.setColor(Color.WHITE);
-            batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
-        }
-
-        final BitmapFont font = context.getFont();
-        final Color origColor = font.getColor();
-
-        // Draw title
-        font.setColor(new Color(0.6f, 0.1f, 0.1f, 1f));
-        textLayout.setText(font, "THỬ THÁCH 2: LẬT BÀI CẶP");
-        font.draw(batch, "THỬ THÁCH 2: LẬT BÀI CẶP", 400f - textLayout.width / 2f, 480f);
-
-        // Draw intro body text
-        font.setColor(Color.BLACK);
         final String introText = "Chào mừng bạn đến với thử thách thứ hai!\n\n" + "Luật chơi Lật Bài rất đơn giản:\n"
                 + "1. Trên màn hình là 36 tấm thẻ chứa các khái niệm lập trình.\n"
                 + "2. Hãy click để lật các thẻ lên và tìm các cặp thẻ giống nhau.\n"
@@ -398,28 +299,6 @@ public class MemoryCardPuzzle implements PuzzleGame {
                 + "4. Hoàn thành toàn bộ cặp bài trước khi hết 3 phút.\n\n"
                 + "Hãy nhấn nút bên dưới để bắt đầu lật bài!";
 
-        font.draw(batch, introText, 140f, 420f);
-
-        // Draw Start Button Box
-        if (textBoxTexture != null) {
-            batch.setColor(isHovered ? Color.LIGHT_GRAY : Color.WHITE);
-            batch.draw(textBoxTexture, btnX, btnY, btnW, btnH);
-        }
-
-        // Draw Start Button Text
-        font.setColor(isHovered ? new Color(0.1f, 0.6f, 0.1f, 1f) : new Color(0.1f, 0.4f, 0.1f, 1f));
-        textLayout.setText(font, "BẮT ĐẦU");
-        font.draw(batch, "BẮT ĐẦU", 400f - textLayout.width / 2f, btnY + btnH / 2f + textLayout.height / 2f);
-
-        font.setColor(origColor);
-        batch.end();
-
-        // Draw Gold highlight border if hovered
-        if (isHovered) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.GOLD);
-            shapeRenderer.rect(btnX - 2, btnY - 2, btnW + 4, btnH + 4);
-            shapeRenderer.end();
-        }
+        drawIntroModal(shapeRenderer, batch, "THỬ THÁCH 2: LẬT BÀI CẶP", introText);
     }
 }

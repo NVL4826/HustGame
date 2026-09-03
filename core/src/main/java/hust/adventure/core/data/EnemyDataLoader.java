@@ -66,4 +66,13 @@ public class EnemyDataLoader {
         }
         return types;
     }
+
+    /**
+     * Retrieves all loaded enemy configurations.
+     *
+     * @return an iterable collection of all EnemyConfig
+     */
+    public Iterable<EnemyConfig> getAllConfigs() {
+        return enemyConfigs.values();
+    }
 }

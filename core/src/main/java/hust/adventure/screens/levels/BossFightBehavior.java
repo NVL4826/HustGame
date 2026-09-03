@@ -103,7 +103,7 @@ public class BossFightBehavior implements LevelBehavior {
     public void init(final PlayScreen context) {
         finalBoss = (Enemy) context.getEntityFactory().createEnemy("final_boss", 370, 450);
 
-        bgTexture = context.getGame().getAssetManager().getTexture("Boss Room.jpg");
+        bgTexture = context.getGame().getAssetManager().getTexture("map/Boss Room.jpg");
 
         initBossContent();
         initUI(context);
@@ -570,18 +570,12 @@ public class BossFightBehavior implements LevelBehavior {
             progress.getMapDirector().onBossDefeated();
         }
         EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.GRADUATION, null));
-        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_BGM, "audio/sfx/music/win_menu.mp3"));
+        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_BGM, "audio/music/win_menu.mp3"));
     }
 
     @Override
     public boolean canTransition(final PlayScreen context) {
-        if (context != null && context.getProgressContext() != null) {
-            final MapDirector director = context.getProgressContext().getMapDirector();
-            if (director != null) {
-                return director.canTransition();
-            }
-        }
-        return victory;
+        return LevelBehavior.super.canTransition(context) || victory;
     }
 
     @Override

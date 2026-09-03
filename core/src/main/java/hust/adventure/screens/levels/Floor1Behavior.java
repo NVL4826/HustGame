@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
@@ -57,7 +58,7 @@ public class Floor1Behavior implements LevelBehavior {
         }
 
         if (context.getGame() != null && context.getGame().getAssetManager() != null) {
-            this.textBoxTexture = context.getGame().getAssetManager().getTexture("text_box.png");
+            this.textBoxTexture = context.getGame().getAssetManager().getTexture(AssetPaths.UI_TEXT_BOX);
         }
     }
 
@@ -142,12 +143,7 @@ public class Floor1Behavior implements LevelBehavior {
 
     @Override
     public boolean canTransition(final PlayScreen context) {
-        if (context == null || context.getProgressContext() == null) {
-            return false;
-        }
-
-        final MapDirector director = context.getProgressContext().getMapDirector();
-        if (director == null || !director.canTransition()) {
+        if (!LevelBehavior.super.canTransition(context)) {
             return false;
         }
 

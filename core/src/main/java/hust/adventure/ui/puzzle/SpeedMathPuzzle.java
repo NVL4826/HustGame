@@ -19,22 +19,15 @@ import hust.adventure.screens.PlayScreen;
 /**
  * Speed Math (Addition Only) mini-game puzzle.
  */
-public class SpeedMathPuzzle implements PuzzleGame {
+public class SpeedMathPuzzle extends BasePuzzleGame {
     private static final int MAX_ROUNDS = 7;
     private static final float FEEDBACK_DURATION = 0.5f;
-
-    private static final Color INTRO_OVERLAY_COLOR = new Color(0f, 0f, 0f, 0.75f);
-    private static final Color INTRO_TITLE_COLOR = new Color(0.6f, 0.1f, 0.1f, 1f);
-    private static final Color INTRO_BTN_HOVER_COLOR = new Color(0.1f, 0.6f, 0.1f, 1f);
-    private static final Color INTRO_BTN_NORMAL_COLOR = new Color(0.1f, 0.4f, 0.1f, 1f);
 
     public enum MathState {
         AWAITING_INPUT, CORRECT_FEEDBACK, WRONG_FEEDBACK
     }
 
     private MathState state;
-    private PlayScreen context;
-    private boolean isSolved;
 
     private int currentRound;
     private float timeRemaining;
@@ -52,10 +45,6 @@ public class SpeedMathPuzzle implements PuzzleGame {
     // Buffers for zero-allocation
     private final StringBuilder answerBuilder;
     private final StringBuilder renderBuilder;
-    private Texture textBoxTexture;
-    private final GlyphLayout textLayout = new GlyphLayout();
-    private final Vector2 tmpMouse = new Vector2();
-    private boolean showIntro = true;
 
     public SpeedMathPuzzle() {
         this.state = MathState.AWAITING_INPUT;
@@ -67,21 +56,14 @@ public class SpeedMathPuzzle implements PuzzleGame {
     }
 
     @Override
-    public String getBackgroundPath() {
-        return "Library1.jpg";
-    }
-
-    @Override
     public void init(final PlayScreen ctx) {
-        this.context = ctx;
+        super.init(ctx);
 
         // Compute round time limits
         // Rounds 1 to MAX_ROUNDS: linearly from 20.0s to 10.0s
         for (int i = 0; i < MAX_ROUNDS; i++) {
             roundTimeLimits[i] = 20.0f - (i * (20.0f - 10.0f) / (MAX_ROUNDS - 1f));
         }
-
-        textBoxTexture = ctx.getGame().getAssetManager().getTexture("text_box.png");
 
         reset();
     }
@@ -115,26 +97,10 @@ public class SpeedMathPuzzle implements PuzzleGame {
             return;
         }
 
+        if (checkIntroClick()) {
+            return;
+        }
         if (showIntro) {
-            if (Gdx.input.justTouched()) {
-                tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
-                if (context != null) {
-                    context.unproject(tmpMouse);
-                }
-                final float mx = tmpMouse.x;
-                final float my = tmpMouse.y;
-
-                final float btnW = 160f;
-                final float btnH = 45f;
-                final float btnX = 400f - btnW / 2f;
-                final float btnY = 110f;
-
-                if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
-                    showIntro = false;
-                    EventDispatcher.getInstance()
-                            .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
-                }
-            }
             return;
         }
 
@@ -232,28 +198,6 @@ public class SpeedMathPuzzle implements PuzzleGame {
                 .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
     }
 
-    private void drawTextInBox(final SpriteBatch batch, final BitmapFont font, final CharSequence text, final float x,
-            final float y, final Texture textBoxTexture, final GlyphLayout layout) {
-        layout.setText(font, text);
-        final float paddingX = 20f;
-        final float paddingY = 15f;
-        final float boxWidth = layout.width + paddingX * 2;
-        final float boxHeight = layout.height + paddingY * 2;
-
-        final float boxX = x - boxWidth / 2f;
-        final float boxY = y - boxHeight / 2f;
-
-        batch.draw(textBoxTexture, boxX, boxY, boxWidth, boxHeight);
-
-        final Color origColor = font.getColor();
-        final float r = origColor.r;
-        final float g = origColor.g;
-        final float b = origColor.b;
-        final float a = origColor.a;
-        font.setColor(Color.BLACK);
-        font.draw(batch, text, x - layout.width / 2f, y + layout.height / 2f);
-        font.setColor(r, g, b, a);
-    }
 
     @Override
     public void render(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
@@ -342,60 +286,11 @@ public class SpeedMathPuzzle implements PuzzleGame {
     }
 
     @Override
-    public boolean isSolved() {
-        return isSolved;
-    }
-
-    @Override
     public void dispose() {
         // No custom fonts/textures instantiated locally, using shared context components
     }
 
     private void drawIntro(final ShapeRenderer shapeRenderer, final SpriteBatch batch) {
-        final float boxW = 620f;
-        final float boxH = 460f;
-        final float boxX = 90f;
-        final float boxY = 70f;
-
-        final float btnW = 160f;
-        final float btnH = 45f;
-        final float btnX = 400f - btnW / 2f;
-        final float btnY = 110f;
-
-        // Check hover
-        tmpMouse.set(Gdx.input.getX(), Gdx.input.getY());
-        if (context != null) {
-            context.unproject(tmpMouse);
-        }
-        final boolean isHovered = (tmpMouse.x >= btnX && tmpMouse.x <= btnX + btnW && tmpMouse.y >= btnY
-                && tmpMouse.y <= btnY + btnH);
-
-        // Draw overlay using ShapeRenderer
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(INTRO_OVERLAY_COLOR);
-        shapeRenderer.rect(0, 0, 800, 600);
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        // Draw Text Box and Texts using SpriteBatch
-        batch.begin();
-        if (textBoxTexture != null) {
-            batch.setColor(Color.WHITE);
-            batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
-        }
-
-        final BitmapFont font = context.getFont();
-        final Color origColor = font.getColor();
-
-        // Draw title
-        font.setColor(INTRO_TITLE_COLOR);
-        textLayout.setText(font, "THỬ THÁCH 3: TÍNH NHẨM NHANH");
-        font.draw(batch, "THỬ THÁCH 3: TÍNH NHẨM NHANH", 400f - textLayout.width / 2f, 480f);
-
-        // Draw intro body text
-        font.setColor(Color.BLACK);
         final String introText = "Chào mừng bạn đến với thử thách cuối cùng!\n\n"
                 + "Luật chơi Tính Nhẩm rất đơn giản:\n" + "1. Hệ thống sẽ đưa ra các phép toán cộng ngẫu nhiên.\n"
                 + "2. Nhập đáp án bằng các phím số từ bàn phím của bạn.\n"
@@ -404,29 +299,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
                 + "5. Thời gian giới hạn cho mỗi câu sẽ ngắn dần theo từng vòng!\n\n"
                 + "Hãy nhấn nút bên dưới để bắt đầu tính nhẩm!";
 
-        font.draw(batch, introText, 140f, 420f);
-
-        // Draw Start Button Box
-        if (textBoxTexture != null) {
-            batch.setColor(isHovered ? Color.LIGHT_GRAY : Color.WHITE);
-            batch.draw(textBoxTexture, btnX, btnY, btnW, btnH);
-        }
-
-        // Draw Start Button Text
-        font.setColor(isHovered ? INTRO_BTN_HOVER_COLOR : INTRO_BTN_NORMAL_COLOR);
-        textLayout.setText(font, "BẮT ĐẦU");
-        font.draw(batch, "BẮT ĐẦU", 400f - textLayout.width / 2f, btnY + btnH / 2f + textLayout.height / 2f);
-
-        font.setColor(origColor);
-        batch.end();
-
-        // Draw Gold highlight border if hovered
-        if (isHovered) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.GOLD);
-            shapeRenderer.rect(btnX - 2, btnY - 2, btnW + 4, btnH + 4);
-            shapeRenderer.end();
-        }
+        drawIntroModal(shapeRenderer, batch, "THỬ THÁCH 3: TÍNH NHẨM NHANH", introText);
     }
 
     public float[] getRoundTimeLimits() {

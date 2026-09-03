@@ -138,16 +138,6 @@ public class LibraryBehavior implements LevelBehavior {
         return puzzleSolved;
     }
 
-    @Override
-    public boolean canTransition(final PlayScreen ctx) {
-        if (ctx != null && ctx.getProgressContext() != null) {
-            final MapDirector director = ctx.getProgressContext().getMapDirector();
-            if (director != null) {
-                return director.canTransition();
-            }
-        }
-        return false;
-    }
 
     @Override
     public void dispose(final PlayScreen ctx) {
