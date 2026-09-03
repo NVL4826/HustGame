@@ -8,8 +8,8 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.screens.levels.Floor1Behavior;
-import hust.adventure.screens.levels.LevelContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,7 +86,7 @@ public class Map2Floor1IntegrationTest {
     @DisplayName("Floor1Behavior canTransition delegates directly to MapDirector")
     void floor1BehaviorDelegatesToDirector() {
         final Floor1Behavior floor1Behavior = new Floor1Behavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         assertFalse(floor1Behavior.canTransition(mockContext));
@@ -102,7 +102,7 @@ public class Map2Floor1IntegrationTest {
     @DisplayName("End-to-end Map 2 loop: Init -> Classroom Deadlines -> Notes Pickup -> Portal Unlock -> Map 3 Advance")
     void endToEndMap2ProgressionLoop() {
         final Floor1Behavior floor1Behavior = new Floor1Behavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         // 1. Initial State

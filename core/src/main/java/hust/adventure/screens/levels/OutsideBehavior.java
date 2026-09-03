@@ -11,6 +11,7 @@ import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
 import hust.adventure.progression.MapDirector;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.wave.WaveEntry;
 import hust.adventure.wave.WaveManager;
 
@@ -27,21 +28,25 @@ public class OutsideBehavior implements LevelBehavior {
     private final GlyphLayout glyphLayout = new GlyphLayout();
 
     @Override
-    public void init(final LevelContext context) {
+    public void init(final PlayScreen context) {
         if (context == null) {
-            throw new IllegalArgumentException("LevelContext cannot be null");
+            throw new IllegalArgumentException("PlayScreen context cannot be null");
         }
 
         final String levelId = context.getConfig().getLevelId();
         final Array<WaveEntry> waves = context.getGame().getWaveDataManager().getWaves(levelId);
         this.waveManager = new WaveManager(waves, context.getEntityFactory());
-        context.getUIManager().getHud().setTimeProvider(this.waveManager);
+        if (context.getUIManager() != null && context.getUIManager().getHud() != null) {
+            context.getUIManager().getHud().setTimeProvider(this.waveManager);
+        }
 
-        this.textBoxTexture = context.getGame().getAssetManager().getTexture("text_box.png");
+        if (context.getGame() != null && context.getGame().getAssetManager() != null) {
+            this.textBoxTexture = context.getGame().getAssetManager().getTexture("text_box.png");
+        }
     }
 
     @Override
-    public void update(final LevelContext context, final float delta) {
+    public void update(final PlayScreen context, final float delta) {
         if (waveManager != null) {
             waveManager.update(delta, context.getCamera());
             if (waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies() && !messageTriggered) {
@@ -71,7 +76,7 @@ public class OutsideBehavior implements LevelBehavior {
     }
 
     @Override
-    public void draw(final LevelContext context) {
+    public void draw(final PlayScreen context) {
         if (messageTimer > 0) {
             final float progress = messageTimer / MESSAGE_DURATION;
             final float alpha = Math.min(1f, progress * 2f); // Fades out in the last 2 seconds
@@ -103,7 +108,9 @@ public class OutsideBehavior implements LevelBehavior {
             final float boxX = 400f - boxW / 2f;
             final float boxY = 300f - boxH / 2f;
 
-            batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
+            if (textBoxTexture != null) {
+                batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
+            }
             font.draw(batch, text, 400f - glyphLayout.width / 2f, 300f + glyphLayout.height / 2f);
 
             batch.setColor(origBatchR, origBatchG, origBatchB, origBatchA);
@@ -113,18 +120,22 @@ public class OutsideBehavior implements LevelBehavior {
     }
 
     @Override
-    public boolean canTransition(final LevelContext context) {
-        if (context != null && context.getProgressContext() != null) {
-            final MapDirector director = context.getProgressContext().getMapDirector();
-            if (director != null) {
-                return director.canTransition();
-            }
+    public boolean canTransition(final PlayScreen context) {
+        if (context == null || context.getProgressContext() == null) {
+            return false;
         }
-        return false;
+        final MapDirector director = context.getProgressContext().getMapDirector();
+        if (director == null || !director.canTransition()) {
+            return false;
+        }
+        if (waveManager != null && (!waveManager.isFinished() || (context.getEntityManager() != null && context.getEntityManager().hasActiveEnemies()))) {
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public void dispose(final LevelContext context) {
+    public void dispose(final PlayScreen context) {
         if (context != null && context.getUIManager() != null && context.getUIManager().getHud() != null) {
             context.getUIManager().getHud().setTimeProvider(null);
         }

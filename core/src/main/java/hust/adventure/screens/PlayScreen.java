@@ -41,7 +41,6 @@ import hust.adventure.graphics.CameraManager;
 import hust.adventure.graphics.GameRenderer;
 import hust.adventure.graphics.LightingManager;
 import hust.adventure.screens.levels.LevelBehavior;
-import hust.adventure.screens.levels.LevelContext;
 import hust.adventure.ui.UIManager;
 import hust.adventure.ui.LevelUpChoiceData;
 import hust.adventure.ui.LevelUpUIData;
@@ -60,7 +59,7 @@ import hust.adventure.world.parsers.StaticDecorParser;
 /**
  * Concrete gameplay screen. Manages systems lifecycles and delegates gameplay logic to LevelBehavior.
  */
-public class PlayScreen extends BaseScreen implements LevelContext, EventListener {
+public class PlayScreen extends BaseScreen implements EventListener {
     private final LevelConfig config;
     private final LevelBehavior behavior;
     private final GameProgressContext progressContext;
@@ -424,77 +423,62 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         behavior.onEvent(event);
     }
 
-    @Override
     public GameProgressContext getProgressContext() {
         return progressContext;
     }
 
-    @Override
     public HustGame getGame() {
         return game;
     }
 
-    @Override
     public LevelConfig getConfig() {
         return config;
     }
 
-    @Override
     public EntityFactory getEntityFactory() {
         return entityFactory;
     }
 
-    @Override
     public EntityManager getEntityManager() {
         return entityManager;
     }
 
-    @Override
     public UIManager getUIManager() {
         return uiManager;
     }
 
-    @Override
     public InputReader getInputReader() {
         return inputReader;
     }
 
-    @Override
     public Player getPlayer() {
         return player;
     }
 
-    @Override
     public void setPlayer(final Player player) {
         this.player = player;
     }
 
-    @Override
     public Camera getCamera() {
         return cameraManager.getCamera();
     }
 
-    @Override
     public SpriteBatch getBatch() {
         return batch;
     }
 
-    @Override
     public ShapeRenderer getShapeRenderer() {
         return shapeRenderer;
     }
 
-    @Override
     public BitmapFont getFont() {
         return font;
     }
 
-    @Override
     public PlayMode getState() {
         return state;
     }
 
-    @Override
     public void setState(final PlayMode state) {
         this.state = state;
     }
@@ -520,7 +504,6 @@ public class PlayScreen extends BaseScreen implements LevelContext, EventListene
         }
     }
 
-    @Override
     public void unproject(final Vector2 screenCoords) {
         if (gameRenderer != null && gameRenderer.getUiViewport() != null) {
             gameRenderer.getUiViewport().unproject(screenCoords);

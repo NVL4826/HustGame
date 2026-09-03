@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 import com.badlogic.gdx.graphics.GL20;
 
 /**
@@ -26,7 +26,7 @@ public class SimonPuzzle implements PuzzleGame {
     }
 
     private SimonState state;
-    private LevelContext context;
+    private PlayScreen context;
     private boolean isSolved;
     private boolean showIntro = true;
 
@@ -75,7 +75,7 @@ public class SimonPuzzle implements PuzzleGame {
     }
 
     @Override
-    public void init(final LevelContext ctx) {
+    public void init(final PlayScreen ctx) {
         this.context = ctx;
 
         // Button boundaries: TL, TR, BL, BR

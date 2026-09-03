@@ -8,7 +8,7 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.screens.levels.OutsideBehavior;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,7 +66,7 @@ public class Map1OutsideIntegrationTest {
     @DisplayName("OutsideBehavior canTransition delegates directly to MapDirector")
     void outsideBehaviorDelegatesToDirector() {
         final OutsideBehavior outsideBehavior = new OutsideBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         assertFalse(outsideBehavior.canTransition(mockContext));
@@ -82,7 +82,7 @@ public class Map1OutsideIntegrationTest {
     @DisplayName("End-to-end Map 1 loop: Init -> Deadlines -> Note Pickup -> Portal Unlock -> Map 2 Advance")
     void endToEndMap1ProgressionLoop() {
         final OutsideBehavior outsideBehavior = new OutsideBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         // 1. Initial State

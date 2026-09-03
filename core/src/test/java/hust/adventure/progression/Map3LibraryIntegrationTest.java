@@ -10,7 +10,7 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.screens.levels.LibraryBehavior;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,7 +92,7 @@ public class Map3LibraryIntegrationTest {
     @DisplayName("LibraryBehavior canTransition delegates directly to MapDirector")
     void libraryBehaviorDelegatesToDirector() {
         final LibraryBehavior libraryBehavior = new LibraryBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         assertFalse(libraryBehavior.canTransition(mockContext));
@@ -109,7 +109,7 @@ public class Map3LibraryIntegrationTest {
     @DisplayName("End-to-end Map 3 loop: Challenges -> Boss Defeated -> Brain Picked Up -> Portal Unlock -> Map 4 Advance")
     void endToEndMap3ProgressionLoop() {
         final LibraryBehavior libraryBehavior = new LibraryBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         // 1. Initial State in Library

@@ -11,6 +11,7 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.progression.MapDirector;
+import hust.adventure.screens.PlayScreen;
 
 /**
  * Behavior class for the Computer Lab level (Map 4).
@@ -41,17 +42,17 @@ public class LabBehavior implements LevelBehavior {
     private static final float BLINK_INTERVAL = 1.0f;
     private float blinkTimer = 0f;
     private boolean blinkPhase = true;
-    private LevelContext context;
+    private PlayScreen context;
 
     /**
      * Initializes the Computer Lab environment and commences escalating Deadlines.
      *
-     * @param context the level context providing subsystems
+     * @param context the play screen context providing subsystems
      */
     @Override
-    public void init(final LevelContext context) {
+    public void init(final PlayScreen context) {
         if (context == null) {
-            throw new IllegalArgumentException("LevelContext cannot be null");
+            throw new IllegalArgumentException("PlayScreen context cannot be null");
         }
         this.context = context;
         uiCam = new OrthographicCamera();
@@ -64,11 +65,11 @@ public class LabBehavior implements LevelBehavior {
     /**
      * Updates Deadline timers, blink intervals, and USB spawn triggers.
      *
-     * @param context the active level context
+     * @param context the active play screen context
      * @param delta the elapsed frame time in seconds
      */
     @Override
-    public void update(final LevelContext context, final float delta) {
+    public void update(final PlayScreen context, final float delta) {
         if (usbAcquired) {
             return;
         }
@@ -115,10 +116,10 @@ public class LabBehavior implements LevelBehavior {
     /**
      * Renders Deadline progress indicator without per-frame allocations.
      *
-     * @param context the active level context
+     * @param context the active play screen context
      */
     @Override
-    public void draw(final LevelContext context) {
+    public void draw(final PlayScreen context) {
         final SpriteBatch batch = context.getBatch();
         final BitmapFont font = context.getFont();
         if (batch == null || font == null || uiCam == null) {
@@ -135,7 +136,7 @@ public class LabBehavior implements LevelBehavior {
         batch.end();
     }
 
-    private void startLabWave(final LevelContext context, final int wave) {
+    private void startLabWave(final PlayScreen context, final int wave) {
         waveActive = true;
         blinkTimer = 0f;
         blinkPhase = true;
@@ -192,12 +193,12 @@ public class LabBehavior implements LevelBehavior {
         }
     }
 
-    private void spawnRandomLabEnemy(final LevelContext context, final String type,
+    private void spawnRandomLabEnemy(final PlayScreen context, final String type,
             final float minX, final float maxX, final float minY, final float maxY) {
         spawnLabEnemy(context, type, MathUtils.random(minX, maxX), MathUtils.random(minY, maxY));
     }
 
-    private void spawnLabEnemy(final LevelContext context, final String type, final float x, final float y) {
+    private void spawnLabEnemy(final PlayScreen context, final String type, final float x, final float y) {
         if (context.getEntityFactory() != null) {
             context.getEntityFactory().createEnemy(type, x, y);
         }
@@ -222,11 +223,11 @@ public class LabBehavior implements LevelBehavior {
      * Verifies if stage transition to Final Map is permitted.
      * Requires both MapDirector fulfillment and enemy clearance.
      *
-     * @param context the level context
+     * @param context the play screen context
      * @return true if player can transition through the portal
      */
     @Override
-    public boolean canTransition(final LevelContext context) {
+    public boolean canTransition(final PlayScreen context) {
         if (context == null || context.getProgressContext() == null) {
             return false;
         }
@@ -243,10 +244,10 @@ public class LabBehavior implements LevelBehavior {
     /**
      * Cleans up listeners, lighting overrides, and context references.
      *
-     * @param context the level context being disposed
+     * @param context the play screen context being disposed
      */
     @Override
-    public void dispose(final LevelContext context) {
+    public void dispose(final PlayScreen context) {
         EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
         if (context != null && context.getProgressContext() != null) {
             context.getProgressContext().setLightsOut(false);

@@ -7,8 +7,8 @@ import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventListener;
 import hust.adventure.events.EventType;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.screens.levels.BossFightBehavior;
-import hust.adventure.screens.levels.LevelContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -85,7 +85,7 @@ public class Map5BossGraduationIntegrationTest {
         EventDispatcher.getInstance().addListener(EventType.GRADUATION, listener);
 
         final BossFightBehavior bossFightBehavior = new BossFightBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         assertFalse(director.canTransition());
@@ -210,7 +210,7 @@ public class Map5BossGraduationIntegrationTest {
         assertFalse(director.canTransition());
 
         final BossFightBehavior bossFightBehavior = new BossFightBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         assertFalse(bossFightBehavior.canTransition(mockContext));

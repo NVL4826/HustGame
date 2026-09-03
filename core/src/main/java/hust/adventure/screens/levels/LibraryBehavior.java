@@ -8,6 +8,7 @@ import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.progression.MapDirector;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.ui.puzzle.MemoryCardPuzzle;
 import hust.adventure.ui.puzzle.PuzzleSequencer;
 import hust.adventure.ui.puzzle.SimonPuzzle;
@@ -32,7 +33,7 @@ public class LibraryBehavior implements LevelBehavior {
     private static final float BOSS_SPAWN_X = 672f;
     private static final float BOSS_SPAWN_Y = 480f;
 
-    private LevelContext context;
+    private PlayScreen context;
     private PuzzleSequencer sequencer;
     private Enemy libraryBoss;
 
@@ -42,9 +43,9 @@ public class LibraryBehavior implements LevelBehavior {
     private boolean libraryCleared = false;
 
     @Override
-    public void init(final LevelContext ctx) {
+    public void init(final PlayScreen ctx) {
         if (ctx == null) {
-            throw new IllegalArgumentException("LevelContext cannot be null");
+            throw new IllegalArgumentException("PlayScreen context cannot be null");
         }
         this.context = ctx;
 
@@ -60,7 +61,7 @@ public class LibraryBehavior implements LevelBehavior {
     }
 
     @Override
-    public void update(final LevelContext ctx, final float delta) {
+    public void update(final PlayScreen ctx, final float delta) {
         if (libraryCleared) {
             return;
         }
@@ -92,7 +93,7 @@ public class LibraryBehavior implements LevelBehavior {
     }
 
     @Override
-    public void draw(final LevelContext ctx) {
+    public void draw(final PlayScreen ctx) {
         if (!puzzleSolved && sequencer != null) {
             sequencer.render(ctx.getShapeRenderer(), ctx.getBatch());
         }
@@ -138,7 +139,7 @@ public class LibraryBehavior implements LevelBehavior {
     }
 
     @Override
-    public boolean canTransition(final LevelContext ctx) {
+    public boolean canTransition(final PlayScreen ctx) {
         if (ctx != null && ctx.getProgressContext() != null) {
             final MapDirector director = ctx.getProgressContext().getMapDirector();
             if (director != null) {
@@ -149,7 +150,7 @@ public class LibraryBehavior implements LevelBehavior {
     }
 
     @Override
-    public void dispose(final LevelContext ctx) {
+    public void dispose(final PlayScreen ctx) {
         EventDispatcher.getInstance().removeListener(EventType.ITEM_PICKED_UP, this);
         if (sequencer != null) {
             sequencer.dispose();

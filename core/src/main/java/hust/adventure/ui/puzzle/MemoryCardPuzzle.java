@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.MathUtils;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 
 /**
  * Memory Card matching mini-game puzzle.
@@ -27,7 +27,7 @@ public class MemoryCardPuzzle implements PuzzleGame {
     }
 
     private MatchState state;
-    private LevelContext context;
+    private PlayScreen context;
     private boolean isSolved;
     private boolean showIntro = true;
 
@@ -54,7 +54,7 @@ public class MemoryCardPuzzle implements PuzzleGame {
     }
 
     @Override
-    public void init(final LevelContext ctx) {
+    public void init(final PlayScreen ctx) {
         this.context = ctx;
 
         // Card dimensions & positioning parameters

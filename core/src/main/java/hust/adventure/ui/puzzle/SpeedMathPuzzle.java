@@ -10,10 +10,11 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 
 /**
  * Speed Math (Addition Only) mini-game puzzle.
@@ -22,12 +23,17 @@ public class SpeedMathPuzzle implements PuzzleGame {
     private static final int MAX_ROUNDS = 7;
     private static final float FEEDBACK_DURATION = 0.5f;
 
+    private static final Color INTRO_OVERLAY_COLOR = new Color(0f, 0f, 0f, 0.75f);
+    private static final Color INTRO_TITLE_COLOR = new Color(0.6f, 0.1f, 0.1f, 1f);
+    private static final Color INTRO_BTN_HOVER_COLOR = new Color(0.1f, 0.6f, 0.1f, 1f);
+    private static final Color INTRO_BTN_NORMAL_COLOR = new Color(0.1f, 0.4f, 0.1f, 1f);
+
     public enum MathState {
         AWAITING_INPUT, CORRECT_FEEDBACK, WRONG_FEEDBACK
     }
 
     private MathState state;
-    private LevelContext context;
+    private PlayScreen context;
     private boolean isSolved;
 
     private int currentRound;
@@ -48,7 +54,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
     private final StringBuilder renderBuilder;
     private Texture textBoxTexture;
     private final GlyphLayout textLayout = new GlyphLayout();
-    private final com.badlogic.gdx.math.Vector2 tmpMouse = new com.badlogic.gdx.math.Vector2();
+    private final Vector2 tmpMouse = new Vector2();
     private boolean showIntro = true;
 
     public SpeedMathPuzzle() {
@@ -66,7 +72,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
     }
 
     @Override
-    public void init(final LevelContext ctx) {
+    public void init(final PlayScreen ctx) {
         this.context = ctx;
 
         // Compute round time limits
@@ -92,11 +98,15 @@ public class SpeedMathPuzzle implements PuzzleGame {
         generateQuestion();
     }
 
-    private void generateQuestion() {
+    void generateQuestion() {
         operandA = MathUtils.random(10, 99);
         operandB = MathUtils.random(10, 99);
         correctAnswer = operandA + operandB;
         timeRemaining = roundTimeLimits[currentRound - 1];
+    }
+
+    void setCurrentRound(final int round) {
+        this.currentRound = round;
     }
 
     @Override
@@ -364,7 +374,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(new Color(0f, 0f, 0f, 0.75f));
+        shapeRenderer.setColor(INTRO_OVERLAY_COLOR);
         shapeRenderer.rect(0, 0, 800, 600);
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -380,7 +390,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
         final Color origColor = font.getColor();
 
         // Draw title
-        font.setColor(new Color(0.6f, 0.1f, 0.1f, 1f));
+        font.setColor(INTRO_TITLE_COLOR);
         textLayout.setText(font, "THỬ THÁCH 3: TÍNH NHẨM NHANH");
         font.draw(batch, "THỬ THÁCH 3: TÍNH NHẨM NHANH", 400f - textLayout.width / 2f, 480f);
 
@@ -403,7 +413,7 @@ public class SpeedMathPuzzle implements PuzzleGame {
         }
 
         // Draw Start Button Text
-        font.setColor(isHovered ? new Color(0.1f, 0.6f, 0.1f, 1f) : new Color(0.1f, 0.4f, 0.1f, 1f));
+        font.setColor(isHovered ? INTRO_BTN_HOVER_COLOR : INTRO_BTN_NORMAL_COLOR);
         textLayout.setText(font, "BẮT ĐẦU");
         font.draw(batch, "BẮT ĐẦU", 400f - textLayout.width / 2f, btnY + btnH / 2f + textLayout.height / 2f);
 
@@ -417,5 +427,21 @@ public class SpeedMathPuzzle implements PuzzleGame {
             shapeRenderer.rect(btnX - 2, btnY - 2, btnW + 4, btnH + 4);
             shapeRenderer.end();
         }
+    }
+
+    public float[] getRoundTimeLimits() {
+        return roundTimeLimits;
+    }
+
+    public int getOperandA() {
+        return operandA;
+    }
+
+    public int getOperandB() {
+        return operandB;
+    }
+
+    public int getCorrectAnswer() {
+        return correctAnswer;
     }
 }

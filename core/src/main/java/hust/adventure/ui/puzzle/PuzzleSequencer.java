@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class PuzzleSequencer implements Disposable {
     private int activeIndex;
     private SequencerState state;
     private float transitionTimer;
-    private LevelContext context;
+    private PlayScreen context;
 
     // Zero-allocation UI rendering buffers
     private final StringBuilder textBuilder;
@@ -59,9 +59,9 @@ public class PuzzleSequencer implements Disposable {
     /**
      * Initializes all registered puzzles.
      *
-     * @param ctx The level context.
+     * @param ctx The play screen context.
      */
-    public void init(final LevelContext ctx) {
+    public void init(final PlayScreen ctx) {
         this.context = ctx;
         for (final PuzzleGame puzzle : puzzles) {
             puzzle.init(ctx);

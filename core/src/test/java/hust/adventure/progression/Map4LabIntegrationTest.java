@@ -11,8 +11,8 @@ import hust.adventure.events.GameEvent;
 import hust.adventure.events.ItemPickedUpEvent;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.screens.levels.LabBehavior;
-import hust.adventure.screens.levels.LevelContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,7 +94,7 @@ public class Map4LabIntegrationTest {
     @DisplayName("LabBehavior canTransition checks both MapDirector and active enemy clearance")
     void labBehaviorChecksDirectorAndEnemies() {
         final LabBehavior labBehavior = new LabBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         final EntityManager mockEntityManager = Mockito.mock(EntityManager.class);
 
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
@@ -120,7 +120,7 @@ public class Map4LabIntegrationTest {
     @DisplayName("End-to-end Map 4 loop: Lab Deadlines -> USB Pickup -> Portal Unlock -> Final Boss Room Advance")
     void endToEndMap4ProgressionLoop() {
         final LabBehavior labBehavior = new LabBehavior();
-        final LevelContext mockContext = Mockito.mock(LevelContext.class);
+        final PlayScreen mockContext = Mockito.mock(PlayScreen.class);
         Mockito.when(mockContext.getProgressContext()).thenReturn(progressContext);
 
         // 1. Initial State in Lab

@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.screens.LoadingScreen;
+import hust.adventure.screens.PlayScreen;
 import hust.adventure.events.EventDispatcher;
 import hust.adventure.events.EventType;
 import hust.adventure.events.GameEvent;
@@ -99,7 +100,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     @Override
-    public void init(final LevelContext context) {
+    public void init(final PlayScreen context) {
         finalBoss = (Enemy) context.getEntityFactory().createEnemy("final_boss", 370, 450);
 
         bgTexture = context.getGame().getAssetManager().getTexture("Boss Room.jpg");
@@ -127,7 +128,7 @@ public class BossFightBehavior implements LevelBehavior {
         fallingPapers = new ArrayList<>();
     }
 
-    private void initUI(final LevelContext context) {
+    private void initUI(final PlayScreen context) {
         stage = new Stage(new FitViewport(800, 600));
         final Skin skin = new Skin();
         final Pixmap pixmap = new Pixmap(100, 30, Pixmap.Format.RGBA8888);
@@ -150,7 +151,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     @Override
-    public void update(final LevelContext context, final float delta) {
+    public void update(final PlayScreen context, final float delta) {
         // Cập nhật shake timer
         if (shakeTimer > 0) {
             shakeTimer -= delta;
@@ -181,7 +182,7 @@ public class BossFightBehavior implements LevelBehavior {
         }
     }
 
-    private void updateCutscene(final LevelContext context) {
+    private void updateCutscene(final PlayScreen context) {
         if (context.getInputReader().isEnterJustPressed()) {
             dialogueIndex++;
             EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/dialogue_next.mp3"));
@@ -191,7 +192,7 @@ public class BossFightBehavior implements LevelBehavior {
         }
     }
 
-    private void updateBattle(final LevelContext context, float dt) {
+    private void updateBattle(final PlayScreen context, float dt) {
         if (currentQuestionIndex < questions.size()) {
             answerTimer -= dt;
             if (phase == PHASE_DODGE) {
@@ -209,7 +210,7 @@ public class BossFightBehavior implements LevelBehavior {
         }
     }
 
-    private void updateDodge(final LevelContext context, float dt) {
+    private void updateDodge(final PlayScreen context, float dt) {
         // Spawn falling papers
         if (MathUtils.random() < 2f * dt) {
             final float startX = MathUtils.random(100f, 700f);
@@ -234,7 +235,7 @@ public class BossFightBehavior implements LevelBehavior {
         }
     }
 
-    private void handleAnswerInput(final LevelContext context) {
+    private void handleAnswerInput(final PlayScreen context) {
         for (int i = 0; i < 3; i++) {
             if (answerRects[i].contains(context.getPlayer().getX(), context.getPlayer().getY())) {
                 if (i == questions.get(currentQuestionIndex).correctIndex) {
@@ -257,7 +258,7 @@ public class BossFightBehavior implements LevelBehavior {
         checkPhase();
     }
 
-    private void updateFinalPhase(final LevelContext context, float delta) {
+    private void updateFinalPhase(final PlayScreen context, float delta) {
         if (!typingPhase) {
             typingPhase = true;
             Gdx.input.setInputProcessor(stage);
@@ -292,7 +293,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     @Override
-    public void draw(final LevelContext context) {
+    public void draw(final PlayScreen context) {
         // ── Camera shake ──────────────────────────────────────────────────
         float shakeX = 0f, shakeY = 0f;
         if (shakeTimer > 0) {
@@ -323,7 +324,7 @@ public class BossFightBehavior implements LevelBehavior {
         restoreCamera(context, shakeX, shakeY);
     }
 
-    private void drawCutscene(final LevelContext context) {
+    private void drawCutscene(final PlayScreen context) {
         final float BOX_X = 80f, BOX_Y = 40f, BOX_W = 640f, BOX_H = 110f;
 
         context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
@@ -366,7 +367,7 @@ public class BossFightBehavior implements LevelBehavior {
         context.getGame().getSpriteBatch().end();
     }
 
-    private void drawBattle(final LevelContext context) {
+    private void drawBattle(final PlayScreen context) {
         if (currentQuestionIndex < questions.size()) {
             final Question q = questions.get(currentQuestionIndex);
 
@@ -494,7 +495,7 @@ public class BossFightBehavior implements LevelBehavior {
         }
     }
 
-    private void drawFinalPhase(final LevelContext context) {
+    private void drawFinalPhase(final PlayScreen context) {
         // Draw code puzzle box background
         context.getShapeRenderer().setProjectionMatrix(context.getCamera().combined);
         context.getShapeRenderer().begin(ShapeType.Filled);
@@ -515,7 +516,7 @@ public class BossFightBehavior implements LevelBehavior {
         stage.draw();
     }
 
-    private void drawVictory(final LevelContext context) {
+    private void drawVictory(final PlayScreen context) {
         // White screen victory fade-in
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -554,7 +555,7 @@ public class BossFightBehavior implements LevelBehavior {
      *
      * @param context the level context providing subsystems
      */
-    public void onBossDefeated(final LevelContext context) {
+    public void onBossDefeated(final PlayScreen context) {
         victory = true;
         phase = PHASE_VICTORY;
         if (textField != null) {
@@ -573,7 +574,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     @Override
-    public boolean canTransition(final LevelContext context) {
+    public boolean canTransition(final PlayScreen context) {
         if (context != null && context.getProgressContext() != null) {
             final MapDirector director = context.getProgressContext().getMapDirector();
             if (director != null) {
@@ -589,7 +590,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     @Override
-    public void dispose(final LevelContext context) {
+    public void dispose(final PlayScreen context) {
         if (stage != null) {
             stage.dispose();
         }
@@ -603,7 +604,7 @@ public class BossFightBehavior implements LevelBehavior {
     }
 
     /** Gọi sau khi draw() xong để khôi phục camera về vị trí gốc (undo shake). */
-    private void restoreCamera(final LevelContext context, float shakeX, float shakeY) {
+    private void restoreCamera(final PlayScreen context, float shakeX, float shakeY) {
         if (shakeX != 0f || shakeY != 0f) {
             context.getCamera().position.add(-shakeX, -shakeY, 0);
             context.getCamera().update();

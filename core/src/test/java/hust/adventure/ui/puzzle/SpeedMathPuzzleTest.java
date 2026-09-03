@@ -6,22 +6,22 @@ import com.badlogic.gdx.graphics.Texture;
 import hust.adventure.HustGame;
 import hust.adventure.core.assets.GameAssetManager;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SpeedMathPuzzleTest {
-    private LevelContext mockContext;
+    private PlayScreen mockContext;
 
     @BeforeEach
     public void setUp() {
         Gdx.app = mock(Application.class);
-        mockContext = mock(LevelContext.class);
+        mockContext = mock(PlayScreen.class);
 
         final HustGame mockGame = mock(HustGame.class);
         final GameAssetManager mockAssetManager = mock(GameAssetManager.class);
@@ -35,14 +35,11 @@ public class SpeedMathPuzzleTest {
     }
 
     @Test
-    public void testRoundTimeLimitsCalculation() throws Exception {
-        SpeedMathPuzzle puzzle = new SpeedMathPuzzle();
+    public void testRoundTimeLimitsCalculation() {
+        final SpeedMathPuzzle puzzle = new SpeedMathPuzzle();
         puzzle.init(mockContext);
 
-        // Access private roundTimeLimits array via reflection
-        Field timeLimitsField = SpeedMathPuzzle.class.getDeclaredField("roundTimeLimits");
-        timeLimitsField.setAccessible(true);
-        float[] roundTimeLimits = (float[]) timeLimitsField.get(puzzle);
+        final float[] roundTimeLimits = puzzle.getRoundTimeLimits();
 
         // Check Round 1 and Round 7 (index 6) time limits
         assertEquals(20.0f, roundTimeLimits[0], 0.001f);
@@ -50,41 +47,27 @@ public class SpeedMathPuzzleTest {
     }
 
     @Test
-    public void testQuestionGenerationBounds() throws Exception {
-        SpeedMathPuzzle puzzle = new SpeedMathPuzzle();
+    public void testQuestionGenerationBounds() {
+        final SpeedMathPuzzle puzzle = new SpeedMathPuzzle();
         puzzle.init(mockContext);
 
-        // Access operands via reflection
-        Field opAField = SpeedMathPuzzle.class.getDeclaredField("operandA");
-        Field opBField = SpeedMathPuzzle.class.getDeclaredField("operandB");
-        Field ansField = SpeedMathPuzzle.class.getDeclaredField("correctAnswer");
-        Field roundField = SpeedMathPuzzle.class.getDeclaredField("currentRound");
-
-        opAField.setAccessible(true);
-        opBField.setAccessible(true);
-        ansField.setAccessible(true);
-        roundField.setAccessible(true);
-
-        java.lang.reflect.Method generateQuestionMethod = SpeedMathPuzzle.class.getDeclaredMethod("generateQuestion");
-        generateQuestionMethod.setAccessible(true);
-
         // Test Tier 1 (Round 1)
-        roundField.setInt(puzzle, 1);
-        generateQuestionMethod.invoke(puzzle);
-        int a1 = opAField.getInt(puzzle);
-        int b1 = opBField.getInt(puzzle);
-        int ans1 = ansField.getInt(puzzle);
+        puzzle.setCurrentRound(1);
+        puzzle.generateQuestion();
+        final int a1 = puzzle.getOperandA();
+        final int b1 = puzzle.getOperandB();
+        final int ans1 = puzzle.getCorrectAnswer();
 
         assertTrue(a1 >= 10 && a1 <= 99);
         assertTrue(b1 >= 10 && b1 <= 99);
         assertEquals(a1 + b1, ans1);
 
         // Test Tier 2 (Round 6)
-        roundField.setInt(puzzle, 6);
-        generateQuestionMethod.invoke(puzzle);
-        int a6 = opAField.getInt(puzzle);
-        int b6 = opBField.getInt(puzzle);
-        int ans6 = ansField.getInt(puzzle);
+        puzzle.setCurrentRound(6);
+        puzzle.generateQuestion();
+        final int a6 = puzzle.getOperandA();
+        final int b6 = puzzle.getOperandB();
+        final int ans6 = puzzle.getCorrectAnswer();
 
         assertTrue(a6 >= 10 && a6 <= 99);
         assertTrue(b6 >= 10 && b6 <= 99);

@@ -2,58 +2,55 @@ package hust.adventure.ui.puzzle;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import hust.adventure.screens.levels.LevelContext;
+import hust.adventure.screens.PlayScreen;
 
 /**
- * Interface representing a puzzle game stage.
+ * Common interface for all puzzle mini-games.
  */
 public interface PuzzleGame {
     /**
-     * Initializes the puzzle with the LevelContext.
+     * Returns the relative path to the background texture for this puzzle.
      *
-     * @param context The current level context.
+     * @return texture path string
      */
-    void init(final LevelContext context);
+    String getBackgroundPath();
 
     /**
-     * Updates the puzzle logic per frame.
+     * Initializes the puzzle with the PlayScreen context.
      *
-     * @param delta The time step in seconds.
+     * @param context the active play screen
+     */
+    void init(final PlayScreen context);
+
+    /**
+     * Updates puzzle logic, animations, and timers.
+     *
+     * @param delta frame time in seconds
      */
     void update(final float delta);
 
     /**
-     * Renders the puzzle geometries and text.
+     * Renders puzzle UI elements and interaction prompts.
      *
-     * @param shapeRenderer The shape renderer to draw lines/rectangles.
-     * @param batch         The sprite batch to draw textures/fonts.
+     * @param shapeRenderer the shape renderer
+     * @param batch the sprite batch
      */
     void render(final ShapeRenderer shapeRenderer, final SpriteBatch batch);
 
     /**
-     * Resets the puzzle state entirely on failure.
-     */
-    void reset();
-
-    /**
-     * Checks if the puzzle has been successfully solved.
+     * Returns whether the puzzle has been successfully solved.
      *
-     * @return true if solved, false otherwise.
+     * @return true if solved
      */
     boolean isSolved();
 
     /**
-     * Disposes of any native or custom resources allocated by the puzzle.
+     * Resets puzzle state for replay.
      */
-    void dispose();
+    void reset();
 
     /**
-     * Gets the background texture path for the puzzle game.
-     * Return null or empty to fallback to a neutral gray-white color.
-     *
-     * @return The background texture path, or null if none.
+     * Disposes resources held by the puzzle.
      */
-    default String getBackgroundPath() {
-        return null;
-    }
+    void dispose();
 }
