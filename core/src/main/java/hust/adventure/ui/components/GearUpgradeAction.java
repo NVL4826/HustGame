@@ -49,6 +49,10 @@ public class GearUpgradeAction implements UpgradeAction {
         if (player == null) {
             return;
         }
+        if (player.getEquipment() != null) {
+            player.getEquipment().applyUpgrade(gearId);
+            return;
+        }
         if (isUnlock) {
             if (gearFactory != null) {
                 final Gear gear = gearFactory.createGear(gearId);

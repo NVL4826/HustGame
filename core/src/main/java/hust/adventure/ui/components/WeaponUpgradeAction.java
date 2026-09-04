@@ -47,6 +47,10 @@ public class WeaponUpgradeAction implements UpgradeAction {
         if (player == null) {
             return;
         }
+        if (player.getEquipment() != null) {
+            player.getEquipment().applyUpgrade(weaponId);
+            return;
+        }
         if (isUnlock) {
             if (weaponFactory != null) {
                 player.getWeaponManager().addWeapon(weaponFactory.createWeapon(weaponId, player));

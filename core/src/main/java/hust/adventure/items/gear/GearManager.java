@@ -1,15 +1,23 @@
 package hust.adventure.items.gear;
 
 import com.badlogic.gdx.utils.Array;
+import hust.adventure.items.equipment.StudentEquipment;
 
 /**
- * Manages the collection of passive Gear items for the player.
+ * Adapter module maintaining backward compatibility for passive gear operations while delegating
+ * to the deepened StudentEquipment module when present.
  */
 public class GearManager {
-    private final Array<Gear> gears;
+    private final StudentEquipment equipment;
+    private final Array<Gear> legacyGears;
 
     public GearManager() {
-        this.gears = new Array<>();
+        this(null);
+    }
+
+    public GearManager(final StudentEquipment equipment) {
+        this.equipment = equipment;
+        this.legacyGears = (equipment == null) ? new Array<>() : null;
     }
 
     /**
@@ -18,7 +26,7 @@ public class GearManager {
      * @return Array of Gear items.
      */
     public Array<Gear> getGears() {
-        return gears;
+        return equipment != null ? equipment.getGears() : legacyGears;
     }
 
     /**
@@ -31,7 +39,10 @@ public class GearManager {
         if (id == null) {
             return null;
         }
-        for (final Gear gear : gears) {
+        if (equipment != null) {
+            return equipment.getGear(id);
+        }
+        for (final Gear gear : legacyGears) {
             if (gear.getId().equalsIgnoreCase(id)) {
                 return gear;
             }
@@ -48,8 +59,12 @@ public class GearManager {
         if (gear == null) {
             throw new IllegalArgumentException("Gear cannot be null");
         }
-        if (getGear(gear.getId()) == null) {
-            gears.add(gear);
+        if (equipment != null) {
+            equipment.addGear(gear);
+        } else {
+            if (getGear(gear.getId()) == null) {
+                legacyGears.add(gear);
+            }
         }
     }
 }

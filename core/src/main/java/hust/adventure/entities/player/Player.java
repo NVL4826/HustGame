@@ -28,6 +28,12 @@ import hust.adventure.core.context.PlayerStats;
 import hust.adventure.entities.factory.EntityFactory;
 import hust.adventure.entities.player.input.PlayerController;
 import hust.adventure.entities.base.MapObject;
+import hust.adventure.items.equipment.StudentEquipment;
+import hust.adventure.items.equipment.DefaultStudentEquipment;
+import hust.adventure.items.weapons.WeaponFactory;
+import hust.adventure.items.gear.GearFactory;
+import hust.adventure.core.data.WeaponDataLoader;
+import hust.adventure.core.data.GearDataLoader;
 
 /**
  * Main player character class.
@@ -35,6 +41,7 @@ import hust.adventure.entities.base.MapObject;
 public class Player extends Character implements Targetable {
     private final Inventory inventory;
     private final PlayerController controller;
+    private final StudentEquipment equipment;
     private final WeaponManager weaponManager;
     private final GearManager gearManager;
     private CollisionManager collisionManager;
@@ -71,7 +78,8 @@ public class Player extends Character implements Targetable {
     @lombok.Builder
     public Player(final float startX, final float startY, final Inventory inventory, final PlayerController controller,
             final CollisionManager collisionManager, final GameAssetManager assetManager, final PlayerStats stats,
-            final GameProgressContext progressContext, final PlayerPersistenceService persistenceService) {
+            final GameProgressContext progressContext, final PlayerPersistenceService persistenceService,
+            final StudentEquipment equipment) {
         super(startX, startY, DRAW_WIDTH, DRAW_HEIGHT, HITBOX_WIDTH, HITBOX_HEIGHT, MAX_HP);
         this.stats = stats;
         this.progressContext = progressContext;
@@ -82,8 +90,18 @@ public class Player extends Character implements Targetable {
         this.inventory = inventory;
         this.controller = controller;
         this.collisionManager = collisionManager;
-        this.weaponManager = new WeaponManager(this);
-        this.gearManager = new GearManager();
+
+        if (equipment != null) {
+            this.equipment = equipment;
+        } else {
+            final WeaponFactory wf = persistenceService != null ? persistenceService.getWeaponFactory() : null;
+            final GearFactory gf = persistenceService != null ? persistenceService.getGearFactory() : null;
+            final WeaponDataLoader wdl = wf != null ? wf.getDataManager() : null;
+            final GearDataLoader gdl = gf != null ? gf.getDataManager() : null;
+            this.equipment = new DefaultStudentEquipment(this, wf, gf, wdl, gdl);
+        }
+        this.weaponManager = new WeaponManager(this, this.equipment);
+        this.gearManager = new GearManager(this.equipment);
         this.iframeTimer = 0f;
 
         // Restore weapons and gears from global context via persistence service
@@ -156,7 +174,8 @@ public class Player extends Character implements Targetable {
             progressContext.setPlayer(this);
         }
 
-        setSpeedMultiplier(speedMultiplier);
+        final float currentSpeedMult = equipment != null ? equipment.getSpeedMultiplier() : speedMultiplier;
+        setSpeedMultiplier(currentSpeedMult);
 
         super.update(delta);
 
@@ -265,6 +284,10 @@ public class Player extends Character implements Targetable {
         return collisionManager;
     }
 
+    public final StudentEquipment getEquipment() {
+        return equipment;
+    }
+
     public final WeaponManager getWeaponManager() {
         return weaponManager;
     }
@@ -274,19 +297,19 @@ public class Player extends Character implements Targetable {
     }
 
     public float getPowerMultiplier() {
-        return powerMultiplier;
+        return equipment != null ? equipment.getPowerMultiplier() : powerMultiplier;
     }
 
     public float getCooldownMultiplier() {
-        return cooldownMultiplier;
+        return equipment != null ? equipment.getCooldownMultiplier() : cooldownMultiplier;
     }
 
     public float getAreaMultiplier() {
-        return areaMultiplier;
+        return equipment != null ? equipment.getAreaMultiplier() : areaMultiplier;
     }
 
     public float getMagnetMultiplier() {
-        return magnetMultiplier;
+        return equipment != null ? equipment.getMagnetMultiplier() : magnetMultiplier;
     }
 
     public void addPowerMultiplier(final float amount) {

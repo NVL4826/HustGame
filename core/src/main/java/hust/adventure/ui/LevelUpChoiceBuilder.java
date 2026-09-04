@@ -16,6 +16,8 @@ import hust.adventure.ui.components.GearUpgradeAction;
 import hust.adventure.ui.components.HealAction;
 import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.ui.components.WeaponUpgradeAction;
+import hust.adventure.items.equipment.UpgradeOption;
+import java.util.List;
 import lombok.Builder;
 
 /**
@@ -53,6 +55,18 @@ public class LevelUpChoiceBuilder {
     public Array<UpgradeAction> getLevelUpChoices(final Player player) {
         if (player == null) {
             return new Array<>();
+        }
+        if (player.getEquipment() != null) {
+            final List<UpgradeOption> options = player.getEquipment().getAvailableUpgrades(3);
+            final Array<UpgradeAction> choices = new Array<>();
+            for (final UpgradeOption opt : options) {
+                if (opt.isWeapon()) {
+                    choices.add(new WeaponUpgradeAction(opt.id(), opt.name(), opt.description(), opt.isUnlock(), weaponFactory));
+                } else {
+                    choices.add(new GearUpgradeAction(opt.id(), opt.name(), opt.description(), opt.isUnlock(), gearFactory));
+                }
+            }
+            return choices;
         }
         final Array<UpgradeAction> possibleChoices = new Array<>();
 

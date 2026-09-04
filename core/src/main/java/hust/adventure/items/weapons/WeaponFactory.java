@@ -59,4 +59,8 @@ public class WeaponFactory {
 
         return provider.create(player, config);
     }
+
+    public WeaponDataLoader getDataManager() {
+        return weaponDataManager;
+    }
 }

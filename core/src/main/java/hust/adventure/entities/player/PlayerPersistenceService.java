@@ -23,6 +23,14 @@ public class PlayerPersistenceService {
         this.weaponFactory = weaponFactory;
     }
 
+    public GearFactory getGearFactory() {
+        return gearFactory;
+    }
+
+    public WeaponFactory getWeaponFactory() {
+        return weaponFactory;
+    }
+
     /**
      * Saves the player's active weapons and gears levels to the ProgressContext.
      *
@@ -34,14 +42,21 @@ public class PlayerPersistenceService {
         }
 
         progressContext.getWeaponLevels().clear();
-        for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
-            progressContext.getWeaponLevels().put(weapon.getId().toLowerCase(), weapon.getLevel());
-        }
-
         progressContext.getGearLevels().clear();
-        if (player.getGearManager() != null) {
-            for (final Gear gear : player.getGearManager().getGears()) {
-                progressContext.getGearLevels().put(gear.getId().toLowerCase(), gear.getLevel());
+
+        if (player.getEquipment() != null) {
+            progressContext.getWeaponLevels().putAll(player.getEquipment().getWeaponLevels());
+            progressContext.getGearLevels().putAll(player.getEquipment().getGearLevels());
+        } else {
+            if (player.getWeaponManager() != null) {
+                for (final BaseWeapon weapon : player.getWeaponManager().getWeapons()) {
+                    progressContext.getWeaponLevels().put(weapon.getId().toLowerCase(), weapon.getLevel());
+                }
+            }
+            if (player.getGearManager() != null) {
+                for (final Gear gear : player.getGearManager().getGears()) {
+                    progressContext.getGearLevels().put(gear.getId().toLowerCase(), gear.getLevel());
+                }
             }
         }
     }
@@ -53,6 +68,11 @@ public class PlayerPersistenceService {
      */
     public void restore(final Player player) {
         if (progressContext == null || player == null) {
+            return;
+        }
+
+        if (player.getEquipment() != null) {
+            player.getEquipment().restore(progressContext.getWeaponLevels(), progressContext.getGearLevels());
             return;
         }
 
