@@ -42,7 +42,6 @@ import hust.adventure.items.base.ItemConfig;
 import hust.adventure.items.base.ItemFactory;
 import hust.adventure.items.base.ItemManager;
 import hust.adventure.items.gear.GearFactory;
-import hust.adventure.items.UpgradeCatalog;
 import hust.adventure.items.weapons.WeaponFactory;
 import hust.adventure.ui.LevelUpChoiceBuilder;
 import hust.adventure.ui.DebugOptionRegistry;
@@ -74,7 +73,6 @@ public class HustGame extends Game implements EventListener {
     private WeaponDataLoader weaponDataManager;
     private EnemyDataLoader enemyDataManager;
 
-    private UpgradeCatalog upgradeCatalog;
     private LevelUpChoiceBuilder levelUpChoiceBuilder;
     private DebugOptionRegistry debugOptionRegistry;
 
@@ -147,9 +145,8 @@ public class HustGame extends Game implements EventListener {
         // Nạp cấu hình Enemies từ JSON
         enemyDataManager = new EnemyDataLoader("configs/enemies.json");
 
-        // Khởi tạo các catalog và builder thông qua constructor DI
-        upgradeCatalog = new UpgradeCatalog(gearDataManager, weaponDataManager);
-        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager, upgradeCatalog,
+        // Khởi tạo các builder thông qua constructor DI
+        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager,
                 progressContext, weaponFactory, gearFactory);
         debugOptionRegistry = new DebugOptionRegistry(enemyDataManager, itemDataManager, weaponDataManager,
                 gearDataManager, levelDataManager);
@@ -316,9 +313,6 @@ public class HustGame extends Game implements EventListener {
         return enemyDataManager;
     }
 
-    public UpgradeCatalog getUpgradeCatalog() {
-        return upgradeCatalog;
-    }
 
     public LevelUpChoiceBuilder getLevelUpChoiceBuilder() {
         return levelUpChoiceBuilder;

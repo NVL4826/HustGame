@@ -256,31 +256,6 @@
       "name": "Não Hoạt Động 100%",
       "description": "Bảo vật từ thư viện - giúp tư duy sáng suốt.",
       "spritePath": "items/brain.png"
-    },
-    {
-      "type": "base",
-      "id": "whip",
-      "name": "Sách giải tích",
-      "description": "Tấn công kẻ địch trước mặt theo hình chữ nhật.",
-      "spritePath": "items/giai_tich.png"
-    },
-    {
-      "type": "base",
-      "id": "magic_wand",
-      "name": "Gậy phép",
-      "description": "Bắn tia phép vào kẻ địch gần nhất."
-    },
-    {
-      "type": "base",
-      "id": "garlic",
-      "name": "Tỏi bảo hộ",
-      "description": "Tạo vòng hào quang gây sát thương xung quanh."
-    },
-    {
-      "type": "base",
-      "id": "bun_dau",
-      "name": "Bun Dau",
-      "description": "Bắn một viên đậu theo hướng nhìn của người chơi."
     }
   ]
 }

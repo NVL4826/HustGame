@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Array;
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
 import hust.adventure.entities.player.Player;
-import hust.adventure.items.UpgradeCatalog;
 import hust.adventure.items.gear.GearManager;
 import hust.adventure.items.weapons.WeaponManager;
 import hust.adventure.ui.components.UpgradeAction;
@@ -22,7 +21,6 @@ import static org.mockito.Mockito.*;
 public class LevelUpChoiceBuilderTest {
     private GearDataLoader mockGearLoader;
     private WeaponDataLoader mockWeaponLoader;
-    private UpgradeCatalog upgradeCatalog;
     private LevelUpChoiceBuilder choiceBuilder;
 
     private Player mockPlayer;
@@ -34,11 +32,10 @@ public class LevelUpChoiceBuilderTest {
         Gdx.app = mock(Application.class);
         mockGearLoader = mock(GearDataLoader.class);
         mockWeaponLoader = mock(WeaponDataLoader.class);
-        upgradeCatalog = new UpgradeCatalog(mockGearLoader, mockWeaponLoader);
         GameProgressContext mockProgressContext = mock(GameProgressContext.class);
         WeaponFactory mockWeaponFactory = mock(WeaponFactory.class);
         GearFactory mockGearFactory = mock(GearFactory.class);
-        choiceBuilder = new LevelUpChoiceBuilder(mockGearLoader, mockWeaponLoader, upgradeCatalog, mockProgressContext, mockWeaponFactory, mockGearFactory);
+        choiceBuilder = new LevelUpChoiceBuilder(mockGearLoader, mockWeaponLoader, mockProgressContext, mockWeaponFactory, mockGearFactory);
 
         mockPlayer = mock(Player.class);
         mockWeaponManager = mock(WeaponManager.class);
