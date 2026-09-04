@@ -72,7 +72,13 @@ public class OutsideBehavior implements LevelBehavior {
         banner.update(delta);
     }
 
-    String resolveRequiredKeyItemId(final GameProgressContext progress) {
+    /**
+     * Resolves the required key item identifier for this behavior, preferring the progress context.
+     *
+     * @param progress the game progress context, or null.
+     * @return the resolved key item identifier.
+     */
+    public String resolveRequiredKeyItemId(final GameProgressContext progress) {
         if (progress != null) {
             final String stageItemId = progress.getCurrentStageKeyItemId();
             if (stageItemId != null) {

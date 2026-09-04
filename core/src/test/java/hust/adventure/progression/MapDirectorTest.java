@@ -1,15 +1,20 @@
 package hust.adventure.progression;
 
+import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.events.EventDispatcher;
+import hust.adventure.screens.levels.Floor1Behavior;
+import hust.adventure.screens.levels.OutsideBehavior;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the MapDirector progression and gating state machine through its public interface.
@@ -230,5 +235,23 @@ public class MapDirectorTest {
         assertEquals(0f, director.getStageElapsedTime(), 0.001f);
         assertFalse(director.canTransition());
         assertFalse(director.isPortalActive());
+    }
+
+    @Test
+    @DisplayName("OutsideBehavior and Floor1Behavior query authoritative CampusMap key item identifiers")
+    void behaviorsQueryAuthoritativeKeyItemIdentifiers() {
+        final OutsideBehavior outside = new OutsideBehavior();
+        final Floor1Behavior floor1 = new Floor1Behavior();
+
+        // When progress context is null: fall back to their canonical stage IDs
+        assertEquals("note", outside.resolveRequiredKeyItemId(null));
+        assertEquals("lecture_notes", floor1.resolveRequiredKeyItemId(null));
+
+        final GameProgressContext mockProgress = Mockito.mock(GameProgressContext.class);
+        when(mockProgress.getCurrentStageKeyItemId()).thenReturn(CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId());
+        assertEquals(CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId(), outside.resolveRequiredKeyItemId(mockProgress));
+
+        when(mockProgress.getCurrentStageKeyItemId()).thenReturn(CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId());
+        assertEquals(CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId(), floor1.resolveRequiredKeyItemId(mockProgress));
     }
 }

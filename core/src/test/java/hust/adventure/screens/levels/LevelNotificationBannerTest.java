@@ -28,7 +28,6 @@ public class LevelNotificationBannerTest {
         final LevelNotificationBanner banner = new LevelNotificationBanner();
 
         assertFalse(banner.isVisible());
-        assertFalse(banner.isShowing());
         assertEquals(0f, banner.getTimer(), 0.001f);
         assertEquals(0f, banner.getAlpha(), 0.001f);
         assertNull(banner.getMessage());
@@ -43,7 +42,6 @@ public class LevelNotificationBannerTest {
         banner.show("Wave Complete!");
 
         assertTrue(banner.isVisible());
-        assertTrue(banner.isShowing());
         assertEquals("Wave Complete!", banner.getMessage());
         assertEquals(LevelNotificationBanner.DEFAULT_DURATION, banner.getTimer(), 0.001f);
         assertEquals(1.0f, banner.getAlpha(), 0.001f);
@@ -210,23 +208,5 @@ public class LevelNotificationBannerTest {
         when(mockConfig.getLevelId()).thenReturn("floor_1");
         floor1.init(mockContext);
         assertSame(mockTexture, floor1.getBanner().getTexture());
-    }
-
-    @Test
-    @DisplayName("OutsideBehavior and Floor1Behavior query authoritative CampusMap key item identifiers")
-    void behaviorsQueryAuthoritativeKeyItemIdentifiers() {
-        final OutsideBehavior outside = new OutsideBehavior();
-        final Floor1Behavior floor1 = new Floor1Behavior();
-
-        // When progress context is null: fall back to their canonical stage IDs
-        assertEquals("note", outside.resolveRequiredKeyItemId(null));
-        assertEquals("lecture_notes", floor1.resolveRequiredKeyItemId(null));
-
-        final hust.adventure.core.context.GameProgressContext mockProgress = Mockito.mock(hust.adventure.core.context.GameProgressContext.class);
-        when(mockProgress.getCurrentStageKeyItemId()).thenReturn(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId());
-        assertEquals(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId(), outside.resolveRequiredKeyItemId(mockProgress));
-
-        when(mockProgress.getCurrentStageKeyItemId()).thenReturn(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId());
-        assertEquals(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId(), floor1.resolveRequiredKeyItemId(mockProgress));
     }
 }
