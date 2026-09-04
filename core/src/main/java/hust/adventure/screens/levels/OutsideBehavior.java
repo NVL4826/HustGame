@@ -7,6 +7,7 @@ import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.progression.CampusMap;
 import hust.adventure.progression.MapDirector;
 import hust.adventure.screens.PlayScreen;
 import hust.adventure.wave.WaveEntry;
@@ -57,7 +58,8 @@ public class OutsideBehavior implements LevelBehavior {
 
                 if (context.getEntityFactory() != null && progress != null && progress.getItemManager() != null) {
                     final ItemManager itemManager = progress.getItemManager();
-                    final Item noteItem = itemManager.getItem("note");
+                    final String keyItemId = resolveRequiredKeyItemId(progress);
+                    final Item noteItem = itemManager.getItem(keyItemId);
                     if (noteItem != null) {
                         final Player player = progress.getPlayer();
                         final float spawnX = player != null ? player.getX() + 120f : 400f;
@@ -68,6 +70,16 @@ public class OutsideBehavior implements LevelBehavior {
             }
         }
         banner.update(delta);
+    }
+
+    String resolveRequiredKeyItemId(final GameProgressContext progress) {
+        if (progress != null && progress.getMapDirector() != null && progress.getMapDirector().getCurrentStage() != null) {
+            final String stageItemId = progress.getMapDirector().getCurrentStage().getRequiredKeyItemId();
+            if (stageItemId != null) {
+                return stageItemId;
+            }
+        }
+        return CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId();
     }
 
     @Override

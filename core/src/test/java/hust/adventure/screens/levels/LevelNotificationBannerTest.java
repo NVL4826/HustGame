@@ -211,4 +211,25 @@ public class LevelNotificationBannerTest {
         floor1.init(mockContext);
         assertSame(mockTexture, floor1.getBanner().getTexture());
     }
+
+    @Test
+    @DisplayName("OutsideBehavior and Floor1Behavior query authoritative CampusMap key item identifiers")
+    void behaviorsQueryAuthoritativeKeyItemIdentifiers() {
+        final OutsideBehavior outside = new OutsideBehavior();
+        final Floor1Behavior floor1 = new Floor1Behavior();
+
+        // When progress context is null: fall back to their canonical stage IDs
+        assertEquals("note", outside.resolveRequiredKeyItemId(null));
+        assertEquals("lecture_notes", floor1.resolveRequiredKeyItemId(null));
+
+        final hust.adventure.core.context.GameProgressContext mockProgress = Mockito.mock(hust.adventure.core.context.GameProgressContext.class);
+        final hust.adventure.progression.MapDirector mockDirector = Mockito.mock(hust.adventure.progression.MapDirector.class);
+        when(mockProgress.getMapDirector()).thenReturn(mockDirector);
+
+        when(mockDirector.getCurrentStage()).thenReturn(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE);
+        assertEquals(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId(), outside.resolveRequiredKeyItemId(mockProgress));
+
+        when(mockDirector.getCurrentStage()).thenReturn(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1);
+        assertEquals(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId(), floor1.resolveRequiredKeyItemId(mockProgress));
+    }
 }

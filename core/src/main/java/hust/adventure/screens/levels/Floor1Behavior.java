@@ -7,6 +7,7 @@ import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.base.Item;
 import hust.adventure.items.base.ItemManager;
+import hust.adventure.progression.CampusMap;
 import hust.adventure.progression.MapDirector;
 import hust.adventure.screens.PlayScreen;
 import hust.adventure.wave.WaveEntry;
@@ -74,21 +75,31 @@ public class Floor1Behavior implements LevelBehavior {
                 if (!notesSpawned && context.getEntityFactory() != null && progress != null) {
                     notesSpawned = true;
                     final ItemManager itemManager = progress.getItemManager();
-                    Item notesItem = itemManager != null ? itemManager.getItem("lecture_notes") : null;
-                    if (notesItem == null && itemManager != null) {
-                        notesItem = itemManager.getItem("note");
-                    }
-                    if (notesItem != null) {
-                        final Player player = progress.getPlayer();
-                        final float spawnX = player != null ? player.getX() + 100f : 500f;
-                        final float spawnY = player != null ? player.getY() + 60f : 300f;
-                        context.getEntityFactory().createItemDrop(spawnX, spawnY, notesItem, Color.WHITE);
+                    if (itemManager != null) {
+                        final String keyItemId = resolveRequiredKeyItemId(progress);
+                        final Item notesItem = itemManager.getItem(keyItemId);
+                        if (notesItem != null) {
+                            final Player player = progress.getPlayer();
+                            final float spawnX = player != null ? player.getX() + 100f : 500f;
+                            final float spawnY = player != null ? player.getY() + 60f : 300f;
+                            context.getEntityFactory().createItemDrop(spawnX, spawnY, notesItem, Color.WHITE);
+                        }
                     }
                 }
             }
         }
 
         banner.update(delta);
+    }
+
+    String resolveRequiredKeyItemId(final GameProgressContext progress) {
+        if (progress != null && progress.getMapDirector() != null && progress.getMapDirector().getCurrentStage() != null) {
+            final String stageItemId = progress.getMapDirector().getCurrentStage().getRequiredKeyItemId();
+            if (stageItemId != null) {
+                return stageItemId;
+            }
+        }
+        return CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId();
     }
 
     @Override

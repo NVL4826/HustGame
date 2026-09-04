@@ -83,8 +83,7 @@ public class MapDirectorImpl implements MapDirector {
     public void onKeyItemCollected(final String keyItemId) {
         if (keyItemId != null && currentStage != null) {
             final String requiredId = currentStage.getRequiredKeyItemId();
-            if (requiredId != null && (requiredId.equalsIgnoreCase(keyItemId.trim())
-                    || (currentStage == CampusMap.MAP_2_FLOOR_1 && "note".equalsIgnoreCase(keyItemId.trim())))) {
+            if (requiredId != null && requiredId.equalsIgnoreCase(keyItemId.trim())) {
                 stagesWithKeyItemCollected.add(currentStage);
             }
         }

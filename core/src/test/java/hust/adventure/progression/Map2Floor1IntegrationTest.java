@@ -59,7 +59,7 @@ public class Map2Floor1IntegrationTest {
         assertFalse(director.canTransition(), "Portal locked until Lecture Notes are collected");
 
         final MapObject mockPicker = Mockito.mock(MapObject.class);
-        final Item notesItem = new Item("note", "Lecture Notes", "Classroom knowledge notes", "note.png");
+        final Item notesItem = new Item("lecture_notes", "Lecture Notes", "Classroom knowledge notes", "note.png");
         final ItemPickedUpEvent payload = new ItemPickedUpEvent(notesItem, mockPicker);
         EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ITEM_PICKED_UP, payload));
 
@@ -68,18 +68,18 @@ public class Map2Floor1IntegrationTest {
     }
 
     @Test
-    @DisplayName("lecture_notes item ID unlocks Map 2 portal")
-    void lectureNotesIdUnlocksPortal() {
+    @DisplayName("Picking up old note does not unlock Map 2 portal")
+    void noteItemDoesNotUnlockMap2Portal() {
         director.onDeadlinesCleared();
         assertFalse(director.canTransition());
 
         final MapObject mockPicker = Mockito.mock(MapObject.class);
-        final Item notesItem = new Item("lecture_notes", "Lecture Notes", "Classroom notes", "note.png");
-        final ItemPickedUpEvent payload = new ItemPickedUpEvent(notesItem, mockPicker);
+        final Item noteItem = new Item("note", "Admission Note", "Old note", "note.png");
+        final ItemPickedUpEvent payload = new ItemPickedUpEvent(noteItem, mockPicker);
         EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ITEM_PICKED_UP, payload));
 
-        assertTrue(director.canTransition());
-        assertTrue(director.isPortalActive());
+        assertFalse(director.canTransition(), "Old Admission Note must not unlock Map 2 portal");
+        assertFalse(director.isPortalActive());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class Map2Floor1IntegrationTest {
         director.onDeadlinesCleared();
         assertFalse(floor1Behavior.canTransition(mockContext));
 
-        director.onKeyItemCollected("note");
+        director.onKeyItemCollected("lecture_notes");
         assertTrue(floor1Behavior.canTransition(mockContext));
     }
 
@@ -117,7 +117,7 @@ public class Map2Floor1IntegrationTest {
 
         // 3. Lecture Notes Collected
         final MapObject mockPicker = Mockito.mock(MapObject.class);
-        final Item notesItem = new Item("note", "Lecture Notes", "Classroom knowledge notes", "note.png");
+        final Item notesItem = new Item("lecture_notes", "Lecture Notes", "Classroom knowledge notes", "note.png");
         final ItemPickedUpEvent payload = new ItemPickedUpEvent(notesItem, mockPicker);
         EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.ITEM_PICKED_UP, payload));
 

@@ -32,7 +32,7 @@ public class MapDirectorTest {
 
     private void completeStage2Floor1() {
         director.onDeadlinesCleared();
-        director.onKeyItemCollected("note");
+        director.onKeyItemCollected("lecture_notes");
         director.advanceToNextMap();
     }
 
@@ -82,7 +82,7 @@ public class MapDirectorTest {
         assertFalse(director.canTransition(), "New stage reset transition flags");
         assertFalse(director.isAutoAttackAllowed(), "Floor 1 lecture hall is a peaceful phase");
         director.onDeadlinesCleared();
-        director.onKeyItemCollected("note");
+        director.onKeyItemCollected("lecture_notes");
         assertTrue(director.canTransition());
         assertEquals(CampusMap.MAP_3_LIBRARY, director.advanceToNextMap());
 
@@ -179,6 +179,24 @@ public class MapDirectorTest {
 
         director.onBossDefeated();
         assertTrue(director.canTransition(), "Defeating Professor T.H.T fulfills Graduation criteria");
+    }
+
+    @Test
+    @DisplayName("Floor 1 strictly requires lecture_notes and rejects note without fallback")
+    void floor1RejectsNoteFallback() {
+        completeStage1Outside();
+        assertEquals(CampusMap.MAP_2_FLOOR_1, director.getCurrentStage());
+
+        director.onDeadlinesCleared();
+        // Collect "note" (Map 1 item) on Floor 1 - should not satisfy Map 2
+        director.onKeyItemCollected("note");
+        assertFalse(director.canTransition(), "Floor 1 must not accept 'note' fallback");
+        assertFalse(director.isPortalActive());
+
+        // Collect authoritative Map 2 item "lecture_notes"
+        director.onKeyItemCollected("lecture_notes");
+        assertTrue(director.canTransition());
+        assertTrue(director.isPortalActive());
     }
 
     @Test
