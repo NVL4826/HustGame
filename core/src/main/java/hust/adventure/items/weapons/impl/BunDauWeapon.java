@@ -2,6 +2,7 @@ package hust.adventure.items.weapons.impl;
 
 import com.badlogic.gdx.graphics.Color;
 
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.entities.base.Direction;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.weapons.BaseWeapon;
@@ -47,7 +48,7 @@ public class BunDauWeapon extends BaseWeapon {
         }
 
         spawnPlayerProjectile(getOwner().getX(), getOwner().getY(), vx, vy, PROJECTILE_COLOR,
-                "audio/sfx/player/Player Firing Bun Dau.wav");
+                AssetPaths.SFX_WEAPON_BUN_DAU);
     }
 
 }

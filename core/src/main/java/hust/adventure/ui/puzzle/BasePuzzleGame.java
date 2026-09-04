@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventType;
-import hust.adventure.events.GameEvent;
 import hust.adventure.screens.PlayScreen;
 
 /**
@@ -93,8 +91,7 @@ public abstract class BasePuzzleGame implements PuzzleGame {
             if (mx >= START_BTN_X && mx <= START_BTN_X + START_BTN_W
                     && my >= START_BTN_Y && my <= START_BTN_Y + START_BTN_H) {
                 showIntro = false;
-                EventDispatcher.getInstance()
-                        .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
+                EventDispatcher.getInstance().playSfx(AssetPaths.SFX_UI_CLICK);
                 onIntroDismissed();
                 return true;
             }

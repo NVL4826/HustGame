@@ -7,9 +7,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.GameEvent;
-import hust.adventure.events.EventType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +99,7 @@ public class LevelUpUI {
             if (choiceCallback != null) {
                 choiceCallback.accept(keyPressed - 1);
             }
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_UI_CLICK);
             if (onResume != null) {
                 onResume.run();
             }

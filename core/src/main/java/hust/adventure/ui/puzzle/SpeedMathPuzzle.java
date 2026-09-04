@@ -11,9 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventType;
-import hust.adventure.events.GameEvent;
 import hust.adventure.screens.PlayScreen;
 
 /**
@@ -189,13 +188,11 @@ public class SpeedMathPuzzle extends BasePuzzleGame {
     }
 
     private void playCorrectSound() {
-        EventDispatcher.getInstance()
-                .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_correct.mp3"));
+        EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_CORRECT);
     }
 
     private void playWrongSound() {
-        EventDispatcher.getInstance()
-                .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
+        EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_WRONG);
     }
 
 

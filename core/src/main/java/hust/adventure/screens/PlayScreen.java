@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import hust.adventure.HustGame;
 import hust.adventure.collision.CollisionManager;
 import hust.adventure.core.LootDropService;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.context.LevelManager;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.core.data.EnemyDataLoader;
@@ -350,7 +351,7 @@ public class PlayScreen extends BaseScreen implements EventListener {
                 this.state = PlayMode.RUNNING;
                 EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.INVENTORY_CLOSED, null));
             }
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/ui_click.wav"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_UI_CLICK);
         }
         if (inputReader.isDebugJustPressed()) {
             progressContext.setShowDebug(!progressContext.isShowDebug());

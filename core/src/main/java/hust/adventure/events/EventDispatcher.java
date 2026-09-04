@@ -84,4 +84,15 @@ public class EventDispatcher {
         }
         queueActions.clear();
     }
+
+    /**
+     * Dispatches a sound effect playback event.
+     *
+     * @param sfxPath the asset path of the sound effect to play
+     */
+    public void playSfx(final String sfxPath) {
+        if (sfxPath != null && !sfxPath.trim().isEmpty()) {
+            dispatch(new GameEvent<>(EventType.PLAY_SFX, sfxPath));
+        }
+    }
 }

@@ -33,6 +33,11 @@ public class GameAssetManagerTest {
         assertEquals("map/Library1.jpg", AssetPaths.MAP_LIBRARY_BG);
         assertEquals("map/Boss Room.jpg", AssetPaths.MAP_BOSS_ROOM_BG);
         assertEquals("character/bullet.png", AssetPaths.CHARACTER_BULLET);
+        assertEquals("audio/sfx/ui_click.wav", AssetPaths.SFX_UI_CLICK);
+        assertEquals("audio/sfx/puzzle_boss/answer_correct.mp3", AssetPaths.SFX_ANSWER_CORRECT);
+        assertEquals("audio/sfx/puzzle_boss/answer_wrong.mp3", AssetPaths.SFX_ANSWER_WRONG);
+        assertEquals("audio/sfx/puzzle_boss/puzzle_wrong.mp3", AssetPaths.SFX_PUZZLE_WRONG);
+        assertEquals("audio/sfx/puzzle_boss/card_flip.mp3", AssetPaths.SFX_CARD_FLIP);
     }
 
     @Test

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.context.GameProgressContext;
 import hust.adventure.entities.enemies.Enemy;
 import hust.adventure.screens.LoadingScreen;
@@ -185,7 +186,7 @@ public class BossFightBehavior implements LevelBehavior {
     private void updateCutscene(final PlayScreen context) {
         if (context.getInputReader().isEnterJustPressed()) {
             dialogueIndex++;
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/dialogue_next.mp3"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_DIALOGUE_NEXT);
             if (dialogueIndex >= dialogue.length) {
                 phase = PHASE_QA;
             }
@@ -202,7 +203,7 @@ public class BossFightBehavior implements LevelBehavior {
             if (answerTimer <= 0) {
                 context.getPlayer().takeDamage(TIME_OUT_DAMAGE);
                 shakeTimer = SHAKE_DURATION;
-                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
+                EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_WRONG);
                 nextQuestion();
             } else if (context.getInputReader().isSpaceJustPressed()) {
                 handleAnswerInput(context);
@@ -216,7 +217,7 @@ public class BossFightBehavior implements LevelBehavior {
             final float startX = MathUtils.random(100f, 700f);
             final String text = PAPER_TEXTS[MathUtils.random(PAPER_TEXTS.length - 1)];
             fallingPapers.add(new FallingPaper(new Rectangle(startX, 600f, 80f, 30f), text));
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/paper_spawn.mp3"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_PAPER_SPAWN);
         }
 
         // Check collision with player
@@ -240,11 +241,11 @@ public class BossFightBehavior implements LevelBehavior {
             if (answerRects[i].contains(context.getPlayer().getX(), context.getPlayer().getY())) {
                 if (i == questions.get(currentQuestionIndex).correctIndex) {
                     context.getPlayer().heal(ANSWER_HEAL);
-                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_correct.mp3"));
+                    EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_CORRECT);
                 } else {
                     context.getPlayer().takeDamage(WRONG_ANSWER_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
-                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
+                    EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_WRONG);
                 }
                 nextQuestion();
                 break;
@@ -276,7 +277,7 @@ public class BossFightBehavior implements LevelBehavior {
                 } else {
                     context.getPlayer().takeDamage(FINAL_PHASE_WRONG_DAMAGE);
                     shakeTimer = SHAKE_DURATION;
-                    EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_wrong.mp3"));
+                    EventDispatcher.getInstance().playSfx(AssetPaths.SFX_PUZZLE_WRONG);
                     textField.setText("");
                 }
             }

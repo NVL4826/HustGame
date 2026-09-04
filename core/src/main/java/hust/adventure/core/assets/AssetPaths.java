@@ -16,6 +16,25 @@ public final class AssetPaths {
 
     public static final String MUSIC_WIN_MENU = "audio/music/win_menu.mp3";
 
+    // Sound Effects - UI
+    public static final String SFX_UI_CLICK = "audio/sfx/ui_click.wav";
+
+    // Sound Effects - Weapons
+    public static final String SFX_WEAPON_BUN_DAU = "audio/sfx/player/Player Firing Bun Dau.wav";
+    public static final String SFX_WEAPON_MAGIC_WAND = "audio/sfx/player/Player Firing Magic Wand.mp3";
+    public static final String SFX_WEAPON_GARLIC = "audio/sfx/player/GarlicPulseAura.mp3";
+    public static final String SFX_WEAPON_WHIP = "audio/sfx/player/Player Firing Whip.mp3";
+
+    // Sound Effects - Puzzles & Boss
+    public static final String SFX_ANSWER_CORRECT = "audio/sfx/puzzle_boss/answer_correct.mp3";
+    public static final String SFX_ANSWER_WRONG = "audio/sfx/puzzle_boss/answer_wrong.mp3";
+    public static final String SFX_PUZZLE_WRONG = "audio/sfx/puzzle_boss/puzzle_wrong.mp3";
+    public static final String SFX_PUZZLE_FAILED = "audio/sfx/puzzle_boss/puzzle_failed.mp3";
+    public static final String SFX_PUZZLE_SOLVED = "audio/sfx/puzzle_boss/puzzle_solved.mp3";
+    public static final String SFX_CARD_FLIP = "audio/sfx/puzzle_boss/card_flip.mp3";
+    public static final String SFX_DIALOGUE_NEXT = "audio/sfx/puzzle_boss/dialogue_next.mp3";
+    public static final String SFX_PAPER_SPAWN = "audio/sfx/puzzle_boss/paper_spawn.mp3";
+
     private AssetPaths() {
         // Prevent instantiation of constant utility class
     }

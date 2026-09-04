@@ -154,4 +154,22 @@ public class EventDispatcherTest {
     public void testDispatchNullTypeThrowsException() {
         assertThrows(NullPointerException.class, () -> new GameEvent<>(null, "data"));
     }
+
+    @Test
+    public void testPlaySfxDispatchesCorrectEvent() {
+        EventDispatcher dispatcher = EventDispatcher.getInstance();
+        List<GameEvent<?>> received = new ArrayList<>();
+        dispatcher.addListener(EventType.PLAY_SFX, received::add);
+
+        dispatcher.playSfx("audio/sfx/ui_click.wav");
+
+        assertEquals(1, received.size());
+        assertEquals(EventType.PLAY_SFX, received.get(0).getType());
+        assertEquals("audio/sfx/ui_click.wav", received.get(0).getData());
+
+        // Test null or whitespace ignored safely
+        dispatcher.playSfx(null);
+        dispatcher.playSfx("   ");
+        assertEquals(1, received.size());
+    }
 }

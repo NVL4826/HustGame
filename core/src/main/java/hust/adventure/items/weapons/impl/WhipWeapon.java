@@ -7,9 +7,8 @@ import hust.adventure.entities.base.Direction;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.player.Player;
 import hust.adventure.entities.base.Damageable;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.GameEvent;
-import hust.adventure.events.EventType;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponConfig;
 import hust.adventure.items.weapons.WeaponEffectVisitor;
@@ -35,7 +34,7 @@ public class WhipWeapon extends BaseWeapon {
         final boolean isSecondStrike = (getAmount() > 1 && getShotsRemaining() == 1);
         updateHitArea(isSecondStrike);
         flashTimer = FLASH_DURATION;
-        EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/player/Player Firing Whip.mp3"));
+        EventDispatcher.getInstance().playSfx(AssetPaths.SFX_WEAPON_WHIP);
 
         final Array<MapObject> targets = getOwner().getCollisionManager().getEntitiesInArea(hitArea,
                 CollisionLayer.ENEMY);

@@ -9,9 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventType;
-import hust.adventure.events.GameEvent;
 import hust.adventure.screens.PlayScreen;
 import com.badlogic.gdx.graphics.GL20;
 
@@ -227,8 +226,7 @@ public class SimonPuzzle extends BasePuzzleGame {
                     playerInput[inputIndex] = i;
                     if (playerInput[inputIndex] != sequence[inputIndex]) {
                         // Wrong answer -> dispatch sfx, wait briefly, reset puzzle
-                        EventDispatcher.getInstance().dispatch(
-                                new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_wrong.mp3"));
+                        EventDispatcher.getInstance().playSfx(AssetPaths.SFX_PUZZLE_WRONG);
                         state = SimonState.FAILED_DELAY;
                         stateTimer = 1.5f;
                     } else {
@@ -246,7 +244,7 @@ public class SimonPuzzle extends BasePuzzleGame {
 
     private void playTone(final int buttonIndex) {
         if (buttonIndex >= 0 && buttonIndex < 4) {
-            EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, tones[buttonIndex]));
+            EventDispatcher.getInstance().playSfx(tones[buttonIndex]);
         }
     }
 

@@ -3,6 +3,7 @@ package hust.adventure.items.weapons.impl;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import hust.adventure.collision.CollisionLayer;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.entities.base.MapObject;
 import hust.adventure.entities.player.Player;
 import hust.adventure.items.weapons.BaseWeapon;
@@ -39,7 +40,7 @@ public class MagicWandWeapon extends BaseWeapon {
         final float vy = tmpDirection.y * PROJECTILE_SPEED;
 
         spawnPlayerProjectile(startX, startY, vx, vy, Color.CYAN,
-                "audio/sfx/player/Player Firing Magic Wand.mp3");
+                AssetPaths.SFX_WEAPON_MAGIC_WAND);
     }
 
 }

@@ -287,7 +287,7 @@ public abstract class BaseWeapon extends Item implements Equipable {
                 projectile.setPierce(getPierce());
             }
             if (sfxPath != null && !sfxPath.isEmpty()) {
-                EventDispatcher.getInstance().dispatch(new GameEvent<>(EventType.PLAY_SFX, sfxPath));
+                EventDispatcher.getInstance().playSfx(sfxPath);
             }
             return projectile;
         }

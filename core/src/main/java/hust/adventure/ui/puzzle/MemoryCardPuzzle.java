@@ -9,9 +9,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.events.EventDispatcher;
-import hust.adventure.events.EventType;
-import hust.adventure.events.GameEvent;
 import hust.adventure.screens.PlayScreen;
 
 /**
@@ -125,8 +124,7 @@ public class MemoryCardPuzzle extends BasePuzzleGame {
 
         timeRemaining -= delta;
         if (timeRemaining <= 0f) {
-            EventDispatcher.getInstance()
-                    .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/puzzle_failed.mp3"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_PUZZLE_FAILED);
             reset();
             return;
         }
@@ -190,16 +188,14 @@ public class MemoryCardPuzzle extends BasePuzzleGame {
         if (card1.getPairId() == card2.getPairId()) {
             card1.setMatched(true);
             card2.setMatched(true);
-            EventDispatcher.getInstance()
-                    .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_correct.mp3"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_CORRECT);
             firstSelectedIndex = -1;
             secondSelectedIndex = -1;
             state = MatchState.IDLE;
 
             checkWinCondition();
         } else {
-            EventDispatcher.getInstance()
-                    .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/answer_wrong.mp3"));
+            EventDispatcher.getInstance().playSfx(AssetPaths.SFX_ANSWER_WRONG);
             state = MatchState.MISMATCH_DELAY;
             mismatchTimer = 1.0f;
         }
@@ -219,8 +215,7 @@ public class MemoryCardPuzzle extends BasePuzzleGame {
     }
 
     private void playFlipSound() {
-        EventDispatcher.getInstance()
-                .dispatch(new GameEvent<>(EventType.PLAY_SFX, "audio/sfx/puzzle_boss/card_flip.mp3"));
+        EventDispatcher.getInstance().playSfx(AssetPaths.SFX_CARD_FLIP);
     }
 
 
