@@ -16,6 +16,7 @@ import hust.adventure.ui.components.GearUpgradeAction;
 import hust.adventure.ui.components.HealAction;
 import hust.adventure.ui.components.UpgradeAction;
 import hust.adventure.ui.components.WeaponUpgradeAction;
+import lombok.Builder;
 
 /**
  * Builder class that generates random upgrade choices for a player when leveling up. Evaluates the player's current
@@ -31,6 +32,7 @@ public class LevelUpChoiceBuilder {
     /**
      * Constructs a new LevelUpChoiceBuilder with dependencies.
      */
+    @Builder
     public LevelUpChoiceBuilder(final GearDataLoader gearDataManager, final WeaponDataLoader weaponDataManager,
             final GameProgressContext progressContext,
             final WeaponFactory weaponFactory, final GearFactory gearFactory) {

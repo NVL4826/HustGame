@@ -146,8 +146,13 @@ public class HustGame extends Game implements EventListener {
         enemyDataManager = new EnemyDataLoader("configs/enemies.json");
 
         // Khởi tạo các builder thông qua constructor DI
-        levelUpChoiceBuilder = new LevelUpChoiceBuilder(gearDataManager, weaponDataManager,
-                progressContext, weaponFactory, gearFactory);
+        levelUpChoiceBuilder = LevelUpChoiceBuilder.builder()
+                .gearDataManager(gearDataManager)
+                .weaponDataManager(weaponDataManager)
+                .progressContext(progressContext)
+                .weaponFactory(weaponFactory)
+                .gearFactory(gearFactory)
+                .build();
         debugOptionRegistry = new DebugOptionRegistry(enemyDataManager, itemDataManager, weaponDataManager,
                 gearDataManager, levelDataManager);
 
