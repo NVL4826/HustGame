@@ -19,7 +19,7 @@ import hust.adventure.wave.WaveManager;
  */
 public class Floor1Behavior implements LevelBehavior {
     private static final String COMPLETION_MESSAGE =
-            "Đã vượt qua các Deadline trên giảng đường!\nHãy nhặt Bài Giảng và tiến vào Thư viện.";
+            "Đã vượt qua tất cả các Deadline!\nHãy nhặt Bài Giảng và tiến vào Map 3.";
 
     private WaveManager waveManager;
     private boolean messageTriggered = false;
@@ -93,8 +93,8 @@ public class Floor1Behavior implements LevelBehavior {
     }
 
     String resolveRequiredKeyItemId(final GameProgressContext progress) {
-        if (progress != null && progress.getMapDirector() != null && progress.getMapDirector().getCurrentStage() != null) {
-            final String stageItemId = progress.getMapDirector().getCurrentStage().getRequiredKeyItemId();
+        if (progress != null) {
+            final String stageItemId = progress.getCurrentStageKeyItemId();
             if (stageItemId != null) {
                 return stageItemId;
             }

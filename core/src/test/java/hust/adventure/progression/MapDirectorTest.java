@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,10 +54,29 @@ public class MapDirectorTest {
     @DisplayName("Run starts on Map 1 (Outside) according to ADR-0001")
     void runStartsWithMap1Outside() {
         assertEquals(CampusMap.MAP_1_OUTSIDE, director.getCurrentStage());
+        assertEquals("note", director.getCurrentStageKeyItemId());
         assertEquals(0f, director.getStageElapsedTime(), 0.001f);
         assertFalse(director.canTransition(), "Cannot transition at start of stage");
         assertFalse(director.isPortalActive(), "Portal should be dormant initially");
         assertTrue(director.isAutoAttackAllowed(), "Auto-attack should be enabled outside");
+    }
+
+    @Test
+    @DisplayName("getCurrentStageKeyItemId resolves authoritative key item IDs across all stages")
+    void getCurrentStageKeyItemIdResolvesAcrossStages() {
+        assertEquals("note", director.getCurrentStageKeyItemId());
+
+        completeStage1Outside();
+        assertEquals("lecture_notes", director.getCurrentStageKeyItemId());
+
+        completeStage2Floor1();
+        assertEquals("brain", director.getCurrentStageKeyItemId());
+
+        completeStage3Library();
+        assertEquals("usb", director.getCurrentStageKeyItemId());
+
+        completeStage4Lab();
+        assertNull(director.getCurrentStageKeyItemId(), "Final Map has no required key item");
     }
 
     @Test

@@ -12,6 +12,13 @@ public interface MapDirector {
     CampusMap getCurrentStage();
 
     /**
+     * Gets the required key item identifier for the current active stage.
+     *
+     * @return the key item identifier, or null if no key item is required.
+     */
+    String getCurrentStageKeyItemId();
+
+    /**
      * Gets the elapsed simulation time in seconds within the current stage.
      *
      * @return elapsed time in seconds.

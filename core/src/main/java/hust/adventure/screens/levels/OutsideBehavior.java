@@ -19,7 +19,7 @@ import hust.adventure.wave.WaveManager;
  */
 public class OutsideBehavior implements LevelBehavior {
     private static final String COMPLETION_MESSAGE =
-            "Đã kết thúc tất cả các đợt quái!\nHãy nhặt Giấy Báo Nhập Học và tiến vào Tầng 1.";
+            "Đã vượt qua tất cả các Deadline!\nHãy nhặt Giấy Báo Nhập Học và tiến vào Map 2.";
 
     private WaveManager waveManager;
     private boolean messageTriggered = false;
@@ -73,8 +73,8 @@ public class OutsideBehavior implements LevelBehavior {
     }
 
     String resolveRequiredKeyItemId(final GameProgressContext progress) {
-        if (progress != null && progress.getMapDirector() != null && progress.getMapDirector().getCurrentStage() != null) {
-            final String stageItemId = progress.getMapDirector().getCurrentStage().getRequiredKeyItemId();
+        if (progress != null) {
+            final String stageItemId = progress.getCurrentStageKeyItemId();
             if (stageItemId != null) {
                 return stageItemId;
             }

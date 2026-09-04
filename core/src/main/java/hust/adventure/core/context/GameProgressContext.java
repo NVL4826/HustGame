@@ -155,4 +155,11 @@ public interface GameProgressContext {
      * @param mapDirector the director instance to set.
      */
     void setMapDirector(MapDirector mapDirector);
+
+    /**
+     * Gets the required key item identifier for the active campus stage from the progression director.
+     *
+     * @return the key item identifier, or null if no key item is required or map director is absent.
+     */
+    String getCurrentStageKeyItemId();
 }

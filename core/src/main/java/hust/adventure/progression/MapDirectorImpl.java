@@ -28,6 +28,11 @@ public class MapDirectorImpl implements MapDirector {
     }
 
     @Override
+    public String getCurrentStageKeyItemId() {
+        return currentStage != null ? currentStage.getRequiredKeyItemId() : null;
+    }
+
+    @Override
     public float getStageElapsedTime() {
         return stageElapsedTime;
     }

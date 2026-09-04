@@ -426,6 +426,11 @@ public class ProgressContext implements GameProgressContext, EventListener {
         this.mapDirector = mapDirector;
     }
 
+    @Override
+    public String getCurrentStageKeyItemId() {
+        return mapDirector != null ? mapDirector.getCurrentStageKeyItemId() : null;
+    }
+
     /**
      * Snapshot representing a snapshot of the player's level entry progress.
      */

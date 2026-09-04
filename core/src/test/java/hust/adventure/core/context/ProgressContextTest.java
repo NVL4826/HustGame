@@ -19,6 +19,20 @@ public class ProgressContextTest {
     }
 
     @Test
+    public void testGetCurrentStageKeyItemIdDelegatesToMapDirector() {
+        assertEquals("note", context.getCurrentStageKeyItemId());
+
+        context.getMapDirector().onDeadlinesCleared();
+        context.getMapDirector().onKeyItemCollected("note");
+        context.getMapDirector().advanceToNextMap();
+
+        assertEquals("lecture_notes", context.getCurrentStageKeyItemId());
+
+        context.setMapDirector(null);
+        assertNull(context.getCurrentStageKeyItemId());
+    }
+
+    @Test
     public void testCheckpointInitialization() {
         assertFalse(context.hasCheckpoint());
 

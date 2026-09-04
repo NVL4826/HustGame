@@ -223,13 +223,10 @@ public class LevelNotificationBannerTest {
         assertEquals("lecture_notes", floor1.resolveRequiredKeyItemId(null));
 
         final hust.adventure.core.context.GameProgressContext mockProgress = Mockito.mock(hust.adventure.core.context.GameProgressContext.class);
-        final hust.adventure.progression.MapDirector mockDirector = Mockito.mock(hust.adventure.progression.MapDirector.class);
-        when(mockProgress.getMapDirector()).thenReturn(mockDirector);
-
-        when(mockDirector.getCurrentStage()).thenReturn(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE);
+        when(mockProgress.getCurrentStageKeyItemId()).thenReturn(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId());
         assertEquals(hust.adventure.progression.CampusMap.MAP_1_OUTSIDE.getRequiredKeyItemId(), outside.resolveRequiredKeyItemId(mockProgress));
 
-        when(mockDirector.getCurrentStage()).thenReturn(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1);
+        when(mockProgress.getCurrentStageKeyItemId()).thenReturn(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId());
         assertEquals(hust.adventure.progression.CampusMap.MAP_2_FLOOR_1.getRequiredKeyItemId(), floor1.resolveRequiredKeyItemId(mockProgress));
     }
 }
