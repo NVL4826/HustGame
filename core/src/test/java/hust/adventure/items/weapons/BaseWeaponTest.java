@@ -95,4 +95,18 @@ public class BaseWeaponTest {
         // cooldown: 1.5 - 0.2 = 1.3
         assertEquals(1.3f, weapon.getCooldown(), 0.01f);
     }
+
+    @Test
+    public void testSetLevel() {
+        weapon.setLevel(3);
+        assertEquals(3, weapon.getLevel());
+
+        // Level clamped to maxLevel (5)
+        weapon.setLevel(10);
+        assertEquals(5, weapon.getLevel());
+
+        // Level clamped to min 1
+        weapon.setLevel(-1);
+        assertEquals(1, weapon.getLevel());
+    }
 }

@@ -60,6 +60,11 @@ public class WeaponFactory {
         return provider.create(player, config);
     }
 
+    /**
+     * Retrieves the WeaponDataLoader instance configuring weapons.
+     *
+     * @return the weapon data loader
+     */
     public WeaponDataLoader getDataManager() {
         return weaponDataManager;
     }

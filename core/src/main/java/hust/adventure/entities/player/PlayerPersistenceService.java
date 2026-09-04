@@ -23,10 +23,20 @@ public class PlayerPersistenceService {
         this.weaponFactory = weaponFactory;
     }
 
+    /**
+     * Retrieves the GearFactory used for gear creation and effects.
+     *
+     * @return the gear factory instance
+     */
     public GearFactory getGearFactory() {
         return gearFactory;
     }
 
+    /**
+     * Retrieves the WeaponFactory used for weapon creation.
+     *
+     * @return the weapon factory instance
+     */
     public WeaponFactory getWeaponFactory() {
         return weaponFactory;
     }
@@ -93,10 +103,10 @@ public class PlayerPersistenceService {
                 final int targetLevel = entry.getValue();
                 if (weaponFactory != null) {
                     final BaseWeapon weapon = weaponFactory.createWeapon(weaponId, player);
-                    for (int i = 1; i < targetLevel; i++) {
-                        weapon.upgrade(0f, 0f);
+                    if (weapon != null) {
+                        weapon.setLevel(targetLevel);
+                        weapon.equip(player);
                     }
-                    weapon.equip(player);
                 }
             }
         }

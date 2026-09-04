@@ -168,4 +168,20 @@ public class LevelUpChoiceBuilderTest {
             assertTrue(action.getName().contains("Heal") || action.getName().contains("Tăng sát thương"));
         }
     }
+
+    @Test
+    @DisplayName("Falls back to heal and damage increase when equipment has no available upgrades")
+    public void testGetLevelUpChoicesWithEquipmentFallbacksWhenEverythingIsMaxLevel() {
+        hust.adventure.items.equipment.StudentEquipment mockEquipment = mock(hust.adventure.items.equipment.StudentEquipment.class);
+        when(mockPlayer.getEquipment()).thenReturn(mockEquipment);
+        when(mockEquipment.getAvailableUpgrades(3)).thenReturn(java.util.Collections.emptyList());
+
+        final Array<UpgradeAction> choices = choiceBuilder.getLevelUpChoices(mockPlayer);
+
+        assertNotNull(choices);
+        assertEquals(2, choices.size);
+        for (final UpgradeAction action : choices) {
+            assertTrue(action.getName().contains("Heal") || action.getName().contains("Tăng sát thương"));
+        }
+    }
 }

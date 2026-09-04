@@ -144,14 +144,14 @@ public class PlayerPersistenceServiceTest {
 
         persistenceService.restore(player);
 
-        // Verify bun_dau upgrades: level 3 means 2 upgrades
+        // Verify bun_dau: level 3 set directly
         verify(weaponFactory).createWeapon("bun_dau", player);
-        verify(bundauMock, times(2)).upgrade(0f, 0f);
+        verify(bundauMock).setLevel(3);
         verify(bundauMock).equip(player);
 
-        // Verify magic_wand: level 1 means 0 upgrades
+        // Verify magic_wand: level 1 set directly
         verify(weaponFactory).createWeapon("magic_wand", player);
-        verify(wandMock, never()).upgrade(anyFloat(), anyFloat());
+        verify(wandMock).setLevel(1);
         verify(wandMock).equip(player);
 
         // Verify magnet_gear upgrades: level 4 means 3 upgrades & applyEquipEffects

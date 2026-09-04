@@ -32,8 +32,6 @@ import hust.adventure.items.equipment.StudentEquipment;
 import hust.adventure.items.equipment.DefaultStudentEquipment;
 import hust.adventure.items.weapons.WeaponFactory;
 import hust.adventure.items.gear.GearFactory;
-import hust.adventure.core.data.WeaponDataLoader;
-import hust.adventure.core.data.GearDataLoader;
 
 /**
  * Main player character class.
@@ -96,9 +94,11 @@ public class Player extends Character implements Targetable {
         } else {
             final WeaponFactory wf = persistenceService != null ? persistenceService.getWeaponFactory() : null;
             final GearFactory gf = persistenceService != null ? persistenceService.getGearFactory() : null;
-            final WeaponDataLoader wdl = wf != null ? wf.getDataManager() : null;
-            final GearDataLoader gdl = gf != null ? gf.getDataManager() : null;
-            this.equipment = new DefaultStudentEquipment(this, wf, gf, wdl, gdl);
+            this.equipment = DefaultStudentEquipment.builder()
+                    .owner(this)
+                    .weaponFactory(wf)
+                    .gearFactory(gf)
+                    .build();
         }
         this.weaponManager = new WeaponManager(this, this.equipment);
         this.gearManager = new GearManager(this.equipment);
@@ -173,9 +173,6 @@ public class Player extends Character implements Targetable {
         if (progressContext.getPlayer() != this) {
             progressContext.setPlayer(this);
         }
-
-        final float currentSpeedMult = equipment != null ? equipment.getSpeedMultiplier() : speedMultiplier;
-        setSpeedMultiplier(currentSpeedMult);
 
         super.update(delta);
 
@@ -284,6 +281,11 @@ public class Player extends Character implements Targetable {
         return collisionManager;
     }
 
+    /**
+     * Retrieves the player's consolidated StudentEquipment instance.
+     *
+     * @return the equipment module instance
+     */
     public final StudentEquipment getEquipment() {
         return equipment;
     }
@@ -296,18 +298,38 @@ public class Player extends Character implements Targetable {
         return gearManager;
     }
 
+    /**
+     * Retrieves the effective power multiplier calculated by equipment or base stats.
+     *
+     * @return the current power multiplier
+     */
     public float getPowerMultiplier() {
         return equipment != null ? equipment.getPowerMultiplier() : powerMultiplier;
     }
 
+    /**
+     * Retrieves the effective cooldown multiplier calculated by equipment or base stats.
+     *
+     * @return the current cooldown multiplier
+     */
     public float getCooldownMultiplier() {
         return equipment != null ? equipment.getCooldownMultiplier() : cooldownMultiplier;
     }
 
+    /**
+     * Retrieves the effective area multiplier calculated by equipment or base stats.
+     *
+     * @return the current area multiplier
+     */
     public float getAreaMultiplier() {
         return equipment != null ? equipment.getAreaMultiplier() : areaMultiplier;
     }
 
+    /**
+     * Retrieves the effective magnet radius multiplier calculated by equipment or base stats.
+     *
+     * @return the current magnet multiplier
+     */
     public float getMagnetMultiplier() {
         return equipment != null ? equipment.getMagnetMultiplier() : magnetMultiplier;
     }

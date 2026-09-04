@@ -132,6 +132,37 @@ public abstract class BaseWeapon extends Item implements Equipable {
         }
     }
 
+    /**
+     * Sets the weapon level directly and reconfigures weapon attributes from its level configuration.
+     *
+     * @param targetLevel the target weapon level to set, clamped between 1 and the weapon's maximum level
+     */
+    public void setLevel(final int targetLevel) {
+        final int max = config != null ? config.getMaxLevel() : 5;
+        this.level = Math.max(1, Math.min(max, targetLevel));
+
+        if (config != null && config.getLevels() != null && config.getLevels().size >= this.level) {
+            final WeaponLevelConfig levelCfg = config.getLevels().get(this.level - 1);
+            if (levelCfg != null) {
+                if (levelCfg.getBaseDamage() > 0) {
+                    this.baseDamage = levelCfg.getBaseDamage();
+                }
+                if (levelCfg.getCooldown() > 0) {
+                    this.cooldown = levelCfg.getCooldown();
+                }
+                if (levelCfg.getArea() > 0) {
+                    this.area = levelCfg.getArea();
+                }
+                if (levelCfg.getAmount() > 0) {
+                    this.amount = levelCfg.getAmount();
+                }
+                if (levelCfg.getPierce() > 0) {
+                    this.pierce = levelCfg.getPierce();
+                }
+            }
+        }
+    }
+
     public final int getLevel() {
         return level;
     }

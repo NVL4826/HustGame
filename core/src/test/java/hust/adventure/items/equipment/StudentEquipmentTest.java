@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,7 +170,7 @@ public class StudentEquipmentTest {
 
         equipment.restore(savedWeapons, savedGears);
 
-        verify(bunDau, times(2)).upgrade(0f, 0f);
+        verify(bunDau).setLevel(3);
         assertEquals(1, equipment.getWeapons().size);
         assertEquals(1, equipment.getGears().size);
         assertEquals(2, equipment.getGear("spinach").getLevel());
@@ -180,5 +181,21 @@ public class StudentEquipmentTest {
 
         Map<String, Integer> exportedGears = equipment.getGearLevels();
         assertEquals(2, exportedGears.get("spinach"));
+    }
+
+    @Test
+    @DisplayName("Restore with empty map equips default weapon without mutating caller map")
+    public void testPersistenceRestoreDoesNotMutateInputMap() {
+        Map<String, Integer> emptyWeapons = Collections.emptyMap();
+        Map<String, Integer> emptyGears = Collections.emptyMap();
+
+        BaseWeapon defaultWeapon = mock(BaseWeapon.class);
+        when(defaultWeapon.getId()).thenReturn("bun_dau");
+        when(mockWeaponFactory.createWeapon("bun_dau", mockPlayer)).thenReturn(defaultWeapon);
+
+        assertDoesNotThrow(() -> equipment.restore(emptyWeapons, emptyGears));
+        assertEquals(1, equipment.getWeapons().size);
+        assertEquals(defaultWeapon, equipment.getWeapon("bun_dau"));
+        assertTrue(emptyWeapons.isEmpty());
     }
 }

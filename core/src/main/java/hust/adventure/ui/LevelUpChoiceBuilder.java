@@ -66,6 +66,10 @@ public class LevelUpChoiceBuilder {
                     choices.add(new GearUpgradeAction(opt.id(), opt.name(), opt.description(), opt.isUnlock(), gearFactory));
                 }
             }
+            if (choices.size == 0) {
+                choices.add(new HealAction());
+                choices.add(new DamageIncreaseAction(progressContext));
+            }
             return choices;
         }
         final Array<UpgradeAction> possibleChoices = new Array<>();

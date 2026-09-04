@@ -2,6 +2,7 @@ package hust.adventure.items.equipment;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import hust.adventure.items.gear.GearConfig;
 import hust.adventure.core.data.GearDataLoader;
 import hust.adventure.core.data.WeaponDataLoader;
@@ -10,6 +11,7 @@ import hust.adventure.items.gear.Gear;
 import hust.adventure.items.gear.GearFactory;
 import hust.adventure.items.weapons.BaseWeapon;
 import hust.adventure.items.weapons.WeaponFactory;
+import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +39,16 @@ public class DefaultStudentEquipment implements StudentEquipment {
     private float magnetMultiplier = 1.0f;
     private float speedMultiplier = 1.0f;
 
+    /**
+     * Constructs a new DefaultStudentEquipment instance.
+     *
+     * @param owner            the player owning this equipment
+     * @param weaponFactory    the weapon factory used for weapon instantiation
+     * @param gearFactory      the gear factory used for gear instantiation and effects
+     * @param weaponDataLoader the weapon configuration data loader
+     * @param gearDataLoader   the gear configuration data loader
+     */
+    @Builder
     public DefaultStudentEquipment(final Player owner,
                                   final WeaponFactory weaponFactory,
                                   final GearFactory gearFactory,
@@ -45,8 +57,10 @@ public class DefaultStudentEquipment implements StudentEquipment {
         this.owner = owner;
         this.weaponFactory = weaponFactory;
         this.gearFactory = gearFactory;
-        this.weaponDataLoader = weaponDataLoader;
-        this.gearDataLoader = gearDataLoader;
+        this.weaponDataLoader = (weaponDataLoader != null) ? weaponDataLoader
+                : (weaponFactory != null ? weaponFactory.getDataManager() : null);
+        this.gearDataLoader = (gearDataLoader != null) ? gearDataLoader
+                : (gearFactory != null ? gearFactory.getDataManager() : null);
     }
 
     @Override
@@ -178,12 +192,30 @@ public class DefaultStudentEquipment implements StudentEquipment {
         return speedMultiplier;
     }
 
+    @FunctionalInterface
+    private interface MultiplierApplier {
+        void apply(MultiplierState state, float totalVal);
+    }
+
+    private static class MultiplierState {
+        private float power = 1.0f;
+        private float cooldown = 1.0f;
+        private float area = 1.0f;
+        private float magnet = 1.0f;
+        private float speed = 1.0f;
+    }
+
+    private static final ObjectMap<String, MultiplierApplier> MULTIPLIER_REGISTRY = new ObjectMap<>();
+    static {
+        MULTIPLIER_REGISTRY.put("add_power", (state, val) -> state.power += val);
+        MULTIPLIER_REGISTRY.put("reduce_cooldown", (state, val) -> state.cooldown = Math.max(0.2f, state.cooldown - val));
+        MULTIPLIER_REGISTRY.put("add_area", (state, val) -> state.area += val);
+        MULTIPLIER_REGISTRY.put("add_magnet", (state, val) -> state.magnet += val);
+        MULTIPLIER_REGISTRY.put("add_speed", (state, val) -> state.speed += val);
+    }
+
     private void recalculateMultipliers() {
-        float power = 1.0f;
-        float cooldown = 1.0f;
-        float area = 1.0f;
-        float magnet = 1.0f;
-        float speed = 1.0f;
+        final MultiplierState state = new MultiplierState();
 
         for (int i = 0; i < gears.size; i++) {
             final Gear gear = gears.get(i);
@@ -191,39 +223,29 @@ public class DefaultStudentEquipment implements StudentEquipment {
             if (config != null && config.getOnEquipEffect() != null) {
                 final String effect = config.getOnEquipEffect().toLowerCase();
                 final float totalVal = config.getOnEquipValue() * gear.getLevel();
-                switch (effect) {
-                    case "add_power" -> power += totalVal;
-                    case "reduce_cooldown" -> cooldown = Math.max(0.2f, cooldown - totalVal);
-                    case "add_area" -> area += totalVal;
-                    case "add_magnet" -> magnet += totalVal;
-                    case "add_speed" -> speed += totalVal;
-                    default -> {
-                        // Other effects like increase_max_hp handled directly
-                    }
+                final MultiplierApplier applier = MULTIPLIER_REGISTRY.get(effect);
+                if (applier != null) {
+                    applier.apply(state, totalVal);
                 }
             }
         }
 
-        this.powerMultiplier = power;
-        this.cooldownMultiplier = cooldown;
-        this.areaMultiplier = area;
-        this.magnetMultiplier = magnet;
-        this.speedMultiplier = speed;
+        this.powerMultiplier = state.power;
+        this.cooldownMultiplier = state.cooldown;
+        this.areaMultiplier = state.area;
+        this.magnetMultiplier = state.magnet;
+        this.speedMultiplier = state.speed;
         if (owner != null) {
-            owner.setSpeedMultiplier(speed);
+            owner.setSpeedMultiplier(state.speed);
         }
     }
 
     private void applyImmediateGearEquip(final String gearId, final int levelCount) {
-        if (owner == null || gearDataLoader == null || levelCount <= 0) {
+        if (owner == null || gearFactory == null || levelCount <= 0) {
             return;
         }
-        final GearConfig config = gearDataLoader.getConfig(gearId);
-        if (config != null && config.getOnEquipEffect() != null) {
-            final String effect = config.getOnEquipEffect().toLowerCase();
-            if ("increase_max_hp".equals(effect)) {
-                owner.increaseMaxHp(config.getOnEquipValue() * levelCount);
-            }
+        for (int i = 0; i < levelCount; i++) {
+            gearFactory.applyEquipEffect(gearId, owner);
         }
     }
 
@@ -382,9 +404,6 @@ public class DefaultStudentEquipment implements StudentEquipment {
                     weapons.add(defaultWeapon);
                 }
             }
-            if (savedWeapons != null) {
-                savedWeapons.put("bun_dau", 1);
-            }
         } else {
             for (final Map.Entry<String, Integer> entry : savedWeapons.entrySet()) {
                 final String weaponId = entry.getKey();
@@ -392,9 +411,7 @@ public class DefaultStudentEquipment implements StudentEquipment {
                 if (weaponFactory != null) {
                     final BaseWeapon weapon = weaponFactory.createWeapon(weaponId, owner);
                     if (weapon != null) {
-                        for (int i = 1; i < targetLevel; i++) {
-                            weapon.upgrade(0f, 0f);
-                        }
+                        weapon.setLevel(targetLevel);
                         weapons.add(weapon);
                     }
                 }
