@@ -1,10 +1,6 @@
 package hust.adventure.screens.levels;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import hust.adventure.core.assets.AssetPaths;
 import hust.adventure.core.context.GameProgressContext;
@@ -21,12 +17,12 @@ import hust.adventure.wave.WaveManager;
  * Coordinates lecture hall classroom Deadlines, coffee items, and Lecture Notes gating.
  */
 public class Floor1Behavior implements LevelBehavior {
+    private static final String COMPLETION_MESSAGE =
+            "Đã vượt qua các Deadline trên giảng đường!\nHãy nhặt Bài Giảng và tiến vào Thư viện.";
+
     private WaveManager waveManager;
     private boolean messageTriggered = false;
-    private float messageTimer = 0f;
-    private static final float MESSAGE_DURATION = 4.0f;
-    private Texture textBoxTexture;
-    private final GlyphLayout glyphLayout = new GlyphLayout();
+    private final LevelNotificationBanner banner = new LevelNotificationBanner();
     private boolean notesSpawned = false;
 
     @Override
@@ -58,7 +54,7 @@ public class Floor1Behavior implements LevelBehavior {
         }
 
         if (context.getGame() != null && context.getGame().getAssetManager() != null) {
-            this.textBoxTexture = context.getGame().getAssetManager().getTexture(AssetPaths.UI_TEXT_BOX);
+            this.banner.setTexture(context.getGame().getAssetManager().getTexture(AssetPaths.UI_TEXT_BOX));
         }
     }
 
@@ -68,7 +64,7 @@ public class Floor1Behavior implements LevelBehavior {
             waveManager.update(delta, context.getCamera());
             if (waveManager.isFinished() && !context.getEntityManager().hasActiveEnemies() && !messageTriggered) {
                 messageTriggered = true;
-                messageTimer = MESSAGE_DURATION;
+                banner.show(COMPLETION_MESSAGE);
 
                 final GameProgressContext progress = context.getProgressContext();
                 if (progress != null && progress.getMapDirector() != null) {
@@ -92,53 +88,16 @@ public class Floor1Behavior implements LevelBehavior {
             }
         }
 
-        if (messageTimer > 0) {
-            messageTimer -= delta;
-        }
+        banner.update(delta);
     }
 
     @Override
     public void draw(final PlayScreen context) {
-        if (messageTimer > 0) {
-            final float progress = messageTimer / MESSAGE_DURATION;
-            final float alpha = Math.min(1f, progress * 2f);
+        banner.draw(context);
+    }
 
-            final SpriteBatch batch = context.getBatch();
-            final BitmapFont font = context.getFont();
-
-            batch.begin();
-            final Color batchColor = batch.getColor();
-            final float origBatchR = batchColor.r;
-            final float origBatchG = batchColor.g;
-            final float origBatchB = batchColor.b;
-            final float origBatchA = batchColor.a;
-
-            final Color fontColor = font.getColor();
-            final float origFontR = fontColor.r;
-            final float origFontG = fontColor.g;
-            final float origFontB = fontColor.b;
-            final float origFontA = fontColor.a;
-
-            batch.setColor(1f, 1f, 1f, alpha);
-            font.setColor(0f, 0f, 0f, alpha);
-
-            final String text = "Đã vượt qua các Deadline trên giảng đường!\nHãy nhặt Bài Giảng và tiến vào Thư viện.";
-            glyphLayout.setText(font, text);
-
-            final float boxW = glyphLayout.width + 40f;
-            final float boxH = glyphLayout.height + 30f;
-            final float boxX = 400f - boxW / 2f;
-            final float boxY = 300f - boxH / 2f;
-
-            if (textBoxTexture != null) {
-                batch.draw(textBoxTexture, boxX, boxY, boxW, boxH);
-            }
-            font.draw(batch, text, 400f - glyphLayout.width / 2f, 300f + glyphLayout.height / 2f);
-
-            batch.setColor(origBatchR, origBatchG, origBatchB, origBatchA);
-            font.setColor(origFontR, origFontG, origFontB, origFontA);
-            batch.end();
-        }
+    public LevelNotificationBanner getBanner() {
+        return banner;
     }
 
     @Override
