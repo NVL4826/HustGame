@@ -259,10 +259,10 @@ public class AudioManager implements EventListener, Disposable {
             }
             break;
         case PUZZLE_SOLVED:
-            playSound("audio/sfx/puzzle_boss/puzzle_solved.mp3", false);
+            playSound(AssetPaths.SFX_PUZZLE_SOLVED, false);
             break;
         case PUZZLE_FAILED:
-            playSound("audio/sfx/puzzle_boss/puzzle_failed.mp3", false);
+            playSound(AssetPaths.SFX_PUZZLE_FAILED, false);
             break;
         case ENTITY_DAMAGED:
             if (event.getData() instanceof EntityDamagedEvent) {

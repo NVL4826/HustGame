@@ -34,6 +34,10 @@ public final class AssetPaths {
     public static final String SFX_CARD_FLIP = "audio/sfx/puzzle_boss/card_flip.mp3";
     public static final String SFX_DIALOGUE_NEXT = "audio/sfx/puzzle_boss/dialogue_next.mp3";
     public static final String SFX_PAPER_SPAWN = "audio/sfx/puzzle_boss/paper_spawn.mp3";
+    public static final String SFX_SIMON_TONE_0 = "audio/sfx/puzzle_boss/simon_tone_0.wav";
+    public static final String SFX_SIMON_TONE_1 = "audio/sfx/puzzle_boss/simon_tone_1.wav";
+    public static final String SFX_SIMON_TONE_2 = "audio/sfx/puzzle_boss/simon_tone_2.wav";
+    public static final String SFX_SIMON_TONE_3 = "audio/sfx/puzzle_boss/simon_tone_3.wav";
 
     private AssetPaths() {
         // Prevent instantiation of constant utility class

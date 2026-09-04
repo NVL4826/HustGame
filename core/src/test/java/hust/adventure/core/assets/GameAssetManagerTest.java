@@ -37,7 +37,13 @@ public class GameAssetManagerTest {
         assertEquals("audio/sfx/puzzle_boss/answer_correct.mp3", AssetPaths.SFX_ANSWER_CORRECT);
         assertEquals("audio/sfx/puzzle_boss/answer_wrong.mp3", AssetPaths.SFX_ANSWER_WRONG);
         assertEquals("audio/sfx/puzzle_boss/puzzle_wrong.mp3", AssetPaths.SFX_PUZZLE_WRONG);
+        assertEquals("audio/sfx/puzzle_boss/puzzle_failed.mp3", AssetPaths.SFX_PUZZLE_FAILED);
+        assertEquals("audio/sfx/puzzle_boss/puzzle_solved.mp3", AssetPaths.SFX_PUZZLE_SOLVED);
         assertEquals("audio/sfx/puzzle_boss/card_flip.mp3", AssetPaths.SFX_CARD_FLIP);
+        assertEquals("audio/sfx/puzzle_boss/simon_tone_0.wav", AssetPaths.SFX_SIMON_TONE_0);
+        assertEquals("audio/sfx/puzzle_boss/simon_tone_1.wav", AssetPaths.SFX_SIMON_TONE_1);
+        assertEquals("audio/sfx/puzzle_boss/simon_tone_2.wav", AssetPaths.SFX_SIMON_TONE_2);
+        assertEquals("audio/sfx/puzzle_boss/simon_tone_3.wav", AssetPaths.SFX_SIMON_TONE_3);
     }
 
     @Test

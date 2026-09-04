@@ -43,7 +43,12 @@ public class SimonPuzzle extends BasePuzzleGame {
     private final Rectangle[] buttons = new Rectangle[4];
     private final Color[] baseColors = new Color[4];
     private final Color[] highlightColors = new Color[4];
-    private final String[] tones = new String[4];
+    private final String[] tones = new String[] {
+            AssetPaths.SFX_SIMON_TONE_0,
+            AssetPaths.SFX_SIMON_TONE_1,
+            AssetPaths.SFX_SIMON_TONE_2,
+            AssetPaths.SFX_SIMON_TONE_3
+    };
 
     // Rendering assets & buffers
     private final StringBuilder textBuilder;
@@ -82,12 +87,6 @@ public class SimonPuzzle extends BasePuzzleGame {
         highlightColors[1] = Color.GREEN;
         highlightColors[2] = Color.BLUE;
         highlightColors[3] = Color.YELLOW;
-
-        // Sound Tones
-        tones[0] = "audio/sfx/puzzle_boss/simon_tone_0.wav";
-        tones[1] = "audio/sfx/puzzle_boss/simon_tone_1.wav";
-        tones[2] = "audio/sfx/puzzle_boss/simon_tone_2.wav";
-        tones[3] = "audio/sfx/puzzle_boss/simon_tone_3.wav";
 
         reset();
     }
@@ -371,5 +370,9 @@ public class SimonPuzzle extends BasePuzzleGame {
                 + " vòng để hoàn thành thử thách.\n\n" + "Chú ý: Bấm sai bất kỳ ô nào sẽ phải chơi lại từ đầu!";
 
         drawIntroModal(shapeRenderer, batch, "THỬ THÁCH 1: SIMON GAME", introText);
+    }
+
+    public String[] getTones() {
+        return tones;
     }
 }
